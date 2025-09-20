@@ -1,0 +1,19 @@
+details {
+  ::marker {
+    font-size: .9em;
+    color: var(--stone-7);
+  }
+}
+
+summary {
+  font-size: var(--font-size-medium-sm);
+  font-weight: var(--font-weight-bold);
+
+}
+
+.details-content {
+  ul {
+    padding: 0;
+    margin: 0;
+  }
+}

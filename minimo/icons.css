@@ -1,0 +1,114 @@
+@use 'sass:map';
+
+.icon {
+  display: inline-block;
+  width: 1em;
+  aspect-ratio: 1;
+
+  fill: currentColor;
+  stroke: none;
+
+  /* fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 4px; */
+
+  /* &.icon-bold{
+    stroke-width: 8px;
+  } */
+
+  &.icon-lg {
+    width: 1.2em;
+    height: 1.2em;
+  }
+  &.icon-xl {
+    width: 1.4em;
+    height: 1.4em;
+  }
+  &.icon-xxl {
+    width: 2em;
+    height: 2em;
+  }
+  &.icon-4xl {
+    width: 8em;
+    height: 8em;
+  }
+
+  /* &.fill-icon {
+    fill: currentColor;
+    stroke: none;
+  } */
+
+  /* &.ratio3x4 {
+    height: auto;
+    aspect-ratio: 3 / 4;
+  }
+  &.ratio3x5 {
+    height: auto;
+    aspect-ratio: 3 / 5;
+  } */
+  &.baseline-shift-20 {
+    translate: 0 20%;
+  }
+  &.baseline-shift-30 {
+    translate: 0 30%;
+  }
+  &.baseline-negative-shift-20 {
+    translate: 0 -20%;
+  }
+}
+
+/* .duotone-light, .duotone-medium, .duotone-dark {
+  fill: currentColor;
+  stroke: none;
+}
+.duotone-light {
+  fill-opacity: .2;
+}
+.duotone-medium {
+  fill-opacity: .4;
+}
+.duotone-dark {
+  fill-opacity: .7;
+} */
+
+/* contenitore di icon con aggiunta di barra trasversale
+<span class="icon-stroked-wrapper"><svg...></span> */
+/* .icon-stroked-wrapper {
+  position: relative;
+  top: 2px;
+
+  &::after {
+    position: absolute;
+    top: 45%;
+    left: -6%;
+    width: 110%;
+    height: 3px;
+    content: '';
+    background-color: rgb(var(--ada-danger-rgb) / .7);
+    transform-origin: center;
+    rotate: 30deg;
+    translate: 0 -50%;
+  }
+
+  .icon{
+    position: relative;
+    top: -2px;
+  }
+} */
+
+/*
+a .icon {
+  fill: $link-color;
+
+  &:hover {
+    fill: $link-hover-color;
+  }
+}
+*/
+
+.btn .icon {
+  position: relative;
+  /* top:3px; */
+}

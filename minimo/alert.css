@@ -1,0 +1,77 @@
+/* default altert (danger) */
+
+.alert {
+
+  /*
+    symfony message labels:
+    - success
+    - notice
+    - error
+  */
+
+  /* alert-error / alert-danger (default) */
+  --alert-bg-color: var(--status-danger-color);
+  --alert-fg-color: var(--status-danger-fg-color);
+  --alert-border-color: var(--status-danger-border-color);
+
+  position: relative;
+
+  &.alert-warning, &.alert-notice {
+    --alert-bg-color: var(--status-warning-color);
+    --alert-fg-color: var(--status-warning-fg-color);
+    --alert-border-color: var(--status-warning-border-color);
+  }
+  &.alert-info {
+    --alert-bg-color: var(--status-info-color);
+    --alert-fg-color: var(--status-info-fg-color);
+    --alert-border-color: var(--status-info-border-color);
+  }
+  &.alert-success {
+    --alert-bg-color: var(--status-success-color);
+    --alert-fg-color: var(--status-success-fg-color);
+    --alert-border-color: var(--status-success-border-color);
+  }
+
+  padding: 1rem;
+  margin: 1rem 0;
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+  color: var(--alert-fg-color);
+  background-color: var(--alert-bg-color);
+  border: 1px solid var(--alert-border-color);
+  border-radius: var(--alert-border-radius);
+
+  h2 {
+    margin: 0 0 var(--spacing-xs);
+    font-size: var(--font-size-lg-fluid);
+  }
+  p {
+    margin-block-end: var(--spacing-xs);
+    &:last-child {
+      margin-block-end: 0;
+    }
+  }
+  /* a {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    &, &:visited {
+      color: var(--alert-link-color);
+    }
+
+    @media (--mouse) {
+      &:hover {
+        text-decoration-thickness: 4px;
+        background-color: color-mix(in srgb, var(--body-bg-color) 30%, transparent);
+      }
+    }
+  } */
+
+  .btn-close {
+    position: absolute;
+    top: .4rem;
+    right: .4rem;
+  }
+
+}
+
+

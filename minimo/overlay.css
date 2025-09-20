@@ -1,0 +1,10 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-index-overlay);
+  background-color: color-mix(in srgb, var(--text-color) 20%, transparent);
+}
+.overlay-inverted {
+  background-color: color-mix(in srgb, var(--body-bg) 50%, transparent);
+
+}

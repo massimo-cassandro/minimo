@@ -1,0 +1,130 @@
+:root {
+  color-scheme: light dark;
+
+  --font-family: 'Rubik Variable', sans-serif;
+
+
+  /* --font-weight-light: 300; */
+  --font-weight-regular: 400;
+  --font-weight-semibold: 550;
+  --font-weight-bold: 650;
+  /* --font-weight-extra-bold: 800; */
+
+  --font-size-regular: 1rem;
+  --font-size-regular-fluid: clamp(.85rem, 9vw, 1rem);
+  --font-size-xs: .7rem;
+  --font-size-xs-fluid: clamp(.7rem, 1.5vw, .82rem);
+  --font-size-sm: .8rem; /* 12.8px */
+  /* --font-size-sm-md: .875rem; */ /* 14px */
+  --font-size-sm-fluid: clamp(.85rem, 10vw, .95rem);
+  --font-size-lg-fluid: clamp(1rem, 12vw, 1.3rem);
+  --font-size-lg: 1.3rem;
+
+  --line-height-base: 1.5;
+
+  --form-text-color: var(--cyan-12);
+  --form-bg-color: var(--gray-0);
+  --form-placeholder-color: var(--sand-6);
+
+  --form-btns-border-radius: var(--radius-sm);
+  --form-btns-padding-y: var(--spacing-xxs);
+  --form-btns-padding-x: var(--spacing-xs);
+  --form-btns-font-size: clamp(.85rem, 6vw, 1rem);
+  --form-btns-sm-font-size: clamp(.75rem, 6vw, .9rem);
+  --form-btns-sm-padding-x: .8rem;
+  --form-btns-sm-padding-y: .1rem;
+
+  --btn-primary-bg-color: linear-gradient(45deg, var(--green-9), var(--green-10));
+  --btn-primary-fg-color: var(--gray-0);
+  --btn-primary-border-color: var(--green-10);
+  --btn-primary-hover-bg-color: var(--green-11);
+  --btn-primary-hover-fg-color: var(--btn-primary-fg-color);
+  --btn-primary-hover-border-color: var(--btn-primary-border-color);
+  --btn-primary-active-bg-color: var(--green-12);
+  --btn-primary-active-fg-color: var(--btn-primary-fg-color);
+  --btn-primary-active-border-color: var(--btn-primary-active-bg-color);
+  --btn-primary-focus-outline-color: color-mix(in srgb, var(--btn-primary-border-color) 25%, transparent);
+
+  --btn-secondary-bg-color: var(--stone-4);
+  --btn-secondary-fg-color: var(--stone-9);
+  --btn-secondary-border-color: var(--stone-6);
+  --btn-secondary-hover-bg-color: var(--stone-5);
+  --btn-secondary-hover-fg-color: var(--stone-11);
+  --btn-secondary-hover-border-color: var(--btn-secondary-border-color);
+  --btn-secondary-active-bg-color: var(--stone-11);
+  --btn-secondary-active-fg-color: var(--stone-0);
+  --btn-secondary-active-border-color: var(--btn-secondary-active-bg-color);
+  --btn-secondary-focus-outline-color: color-mix(in srgb, var(--btn-secondary-border-color) 50%, transparent);
+
+  /* --btn-o-primary-bg-color: var(--primary-150);
+  --btn-o-primary-fg-color: var(--primary-10);
+  --btn-o-primary-border-color: var(--btn-bg-color);
+  --btn-o-primary-hover-bg-color: var(--primary-10);
+  --btn-o-primary-hover-fg-color: var(--primary-150);
+  --btn-o-primary-hover-border-color: var(--btn-fg-color);
+  --btn-o-primary-active-bg-color: var(--primary-150);
+  --btn-o-primary-active-fg-color: var(--primary-10);
+  --btn-o-primary-active-border-color: var(--btn-bg-color);
+  --btn-o-primary-focus-outline-color: var(--btn-bg-color); */
+
+
+  --spacing-xxs: .25rem;
+  --spacing-xs: .5rem;
+  --spacing-sm: .75rem;
+  --spacing-base: 1rem;
+  --spacing-md: 1.2rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  --spacing-2xl: 3rem;
+  --spacing-3xl: 4rem;
+
+  /* --size-sm-md: 600px; */
+  /* --size-lg-xl: 1280px; */
+
+  --radius-sm: .25rem;
+  --radius-md: .5rem;
+  --radius-lg: 1rem;
+  --radius-pill: 999rem;
+
+  --text-color: var(--gray-11);
+  --body-bg-color: var(--stone-1);
+
+  --text-muted-color: var(--stone-7);
+  --link-color: var(--lime-10);
+  --link-visited-color: var(--camo-9);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+
+    --text-color: var(--gray-1);
+    --body-bg-color: var(--stone-11);
+
+    --text-muted-color: var(--stone-5);
+    --link-color: var(--lime-3);
+    --link-visited-color: var(--sand-3);
+
+    --btn-primary-bg-color: linear-gradient(45deg, var(--green-9), var(--green-10));
+    --btn-primary-fg-color: var(--gray-0);
+    --btn-primary-border-color: var(--green-10);
+    --btn-primary-hover-bg-color: var(--green-11);
+    --btn-primary-hover-fg-color: var(--btn-primary-fg-color);
+    --btn-primary-hover-border-color: var(--btn-primary-border-color);
+    --btn-primary-active-bg-color: var(--green-12);
+    --btn-primary-active-fg-color: var(--btn-primary-fg-color);
+    --btn-primary-active-border-color: var(--btn-primary-active-bg-color);
+    --btn-primary-focus-outline-color: color-mix(in srgb, var(--btn-primary-border-color) 25%, transparent);
+
+    --btn-secondary-bg-color: var(--stone-4);
+    --btn-secondary-fg-color: var(--stone-9);
+    --btn-secondary-border-color: var(--stone-6);
+    --btn-secondary-hover-bg-color: var(--stone-5);
+    --btn-secondary-hover-fg-color: var(--stone-11);
+    --btn-secondary-hover-border-color: var(--btn-secondary-border-color);
+    --btn-secondary-active-bg-color: var(--stone-11);
+    --btn-secondary-active-fg-color: var(--stone-0);
+    --btn-secondary-active-border-color: var(--btn-secondary-active-bg-color);
+    --btn-secondary-focus-outline-color: color-mix(in srgb, var(--btn-secondary-border-color) 50%, transparent);
+  }
+}

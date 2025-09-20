@@ -1,0 +1,17 @@
+/*
+<div class="form-edit-info" title="Ultima modifica effettuata da Gino Bianchi il xxxx">
+  <span>13 Aug 2025 <small>11:54</small></span>
+  <span>Gino Bianchi</span>
+</div>
+*/
+
+.form-edit-info {
+  display: flex;
+  flex-flow: row wrap;
+  gap: .5rem;
+  /* align-content: flex-start; */ /* multiline container */
+  align-items: center;
+  justify-content: flex-end;
+  font-size: var(--font-size-xs-fluid);
+  color: var(--text-muted-color);
+}

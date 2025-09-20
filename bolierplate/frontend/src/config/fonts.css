@@ -1,0 +1,57 @@
+/*
+  https://fontsource.org/fonts/bangers/install
+  https://fontsource.org/fonts/barlow/install
+  https://fontsource.org/fonts/barlow-semi-condensed/install
+
+*/
+
+/*
+in `custom-properties.css`:
+
+--bangers-font-family: 'Bangers', system-ui;
+--barlow-font-family: 'Barlow', sans-serif;
+--barlow-semi-cond-font-family: 'Barlow Semi Condensed', sans-serif;
+
+*/
+
+@import '@fontsource/bangers/latin-400.css';
+
+@import '@fontsource/barlow/latin-400.css';
+@import '@fontsource/barlow/latin-400-italic.css';
+@import '@fontsource/barlow/latin-600.css';
+@import '@fontsource/barlow/latin-600-italic.css';
+@import '@fontsource/barlow/latin-700.css';
+@import '@fontsource/barlow/latin-700-italic.css';
+
+@import '@fontsource/barlow-semi-condensed/latin-400.css';
+@import '@fontsource/barlow-semi-condensed/latin-400-italic.css';
+@import '@fontsource/barlow-semi-condensed/latin-700.css';
+@import '@fontsource/barlow-semi-condensed/latin-700-italic.css';
+
+
+/*
+
+@use '@fontsource/bangers/scss/mixins' as bangers;
+@use '@fontsource/barlow/scss/mixins' as barlow;
+@use '@fontsource/barlow-semi-condensed/scss/mixins' as barlowSemiCond;
+
+// @import '@fontsource/bangers/latin-400';
+@include bangers.faces(
+  $subsets: latin,
+  $weights: 400,
+  $styles: normal
+);
+
+@include barlow.faces(
+  $subsets: latin,
+  $weights: (400,600,700),
+  $styles: all
+);
+
+@include barlowSemiCond.faces(
+  $subsets: latin,
+  $weights: (400,700),
+  $styles: all
+);
+
+*/

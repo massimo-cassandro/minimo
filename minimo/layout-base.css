@@ -1,0 +1,10 @@
+html, body {
+  height: 100%;
+  padding: 0;
+  margin: 0;
+  font-family: var(--font-family);
+  font-size: var(--font-size-regular-fluid);
+  color: var(--text-color);
+  background-color: var(--body-bg-color);
+  scroll-behavior: smooth;
+}

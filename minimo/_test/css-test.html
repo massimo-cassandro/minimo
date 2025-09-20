@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="it">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>css test</title>
+    <link rel="stylesheet" href="{{ asset('assicorporate.css') }}" type="text/css" media="all" />
+  </head>
+  <body>
+    <div style="margin: 1rem">
+      <h1>CSS test</h1>
+      <h2>Buttons</h2>
+      <div id="btns-test"></div>
+
+      <h2 style="margin-top: 2rem">Alerts</h2>
+      <div id="alerts-test"></div>
+    </div>
+
+    <script src="{{ asset('assicorporate.js') }}"></script>
+
+    <script>
+      let container = document.getElementById('btns-test');
+
+      ['primary', 'secondary', 'success', 'danger', 'info', 'warning'].forEach(b => {
+        container.insertAdjacentHTML('beforeend',
+          `<div style="margin-bottom: 1rem">
+             <button type="button" class="btn btn-${b} me">${b}</button>
+             <button type="button" class="btn btn-outline-${b} me">outline ${b}</button>
+          </div>`
+        );
+      });
+
+      // ******************
+/*
+      container = document.getElementById('alerts-test');
+
+      const trigger_malert = type => mAlert({
+        type  : type,
+        title : type,
+        mes   : 'alert text',
+        // use_warning_icon: true, // solo confirm
+        // ok_btn_text: 'OK',
+        // cancel_btn_text: 'Annulla',
+        // callback: function(esito) {}, // confirm: console.log( esito? 'Confermato' : 'Annullato')
+        timer: null
+        // extra_btn: '<button type="button" data-confirm-result="annulla" class="stop-btn btn btn-confirm">Annulla</button>',
+        // extra_btn_selector: '.stop-btn',
+        // extra_btn_focus: true,
+      });
+
+      ['success', 'error', 'info', 'warning', 'confirm'].forEach(type => {
+        container.insertAdjacentHTML('beforeend',
+          `<div style="margin-bottom: 1rem">
+             <button type="button" class="btn btn-${type} onclick="trigger_malert">${type}</button>
+          </div>`
+        );
+      }); */
+
+    </script>
+
+  </body>
+</html>
