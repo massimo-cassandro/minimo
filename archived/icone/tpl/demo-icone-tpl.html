@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="it">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demo icone</title>
+    <link rel="icon" href="data:;base64,=">
+    <style type="text/css" media="all">
+      :root {
+        --icon-size: 6rem;
+        --icon-color: #4c4c4c;
+      }
+
+      body {
+        font-family: sans-serif;
+        font-size: 14px;
+        color: #333;
+      }
+
+      h1, h2 {
+        margin-left: 1rem;
+      }
+
+      .icon-wrapper {
+        display: flex;
+        flex-wrap: wrap;
+
+      }
+
+      .icona {
+        flex: 0 0 var(--icon-size);
+        max-width: var(--icon-size);
+        margin: 1rem;
+        text-align: center;
+      }
+
+      .icona svg, .line-icon svg {
+        width: var(--icon-size);
+        height: var(--icon-size);
+        margin: 0;
+        background: #ddd;
+        fill: none;
+        stroke: var(--icon-color);
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        stroke-width: 5px;
+      }
+
+      .fill-icon svg, .duotone-light, .duotone-medium, .duotone-dark {
+        fill: var(--icon-color);
+        stroke: none;
+      }
+
+      .duotone-light {
+        fill-opacity: .2;
+      }
+      .duotone-medium {
+        fill-opacity: .4;
+      }
+      .duotone-dark {
+        fill-opacity: .7;
+      }
+
+      .icon-dida {
+        /* overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis; */
+        max-width: 100%;
+      }
+    </style>
+
+  </head>
+  <body>
+    <h1>Demo icone</h1>
+
+    <div class="icon-wrapper"></div>
+
+    <script>
+      var wrapper = document.querySelector('.icon-wrapper');
+
+      icons_list.forEach(function (item) {
+        let div_class = ['icona'];
+
+        if (/-line$/.test(item)) {
+          div_class.push('line-icon');
+
+        } else if (/-fill$/.test(item)) {
+          div_class.push('fill-icon');
+        }
+        wrapper.insertAdjacentHTML('beforeend',
+          `<div class="${div_class.join(' ')}">
+            <svg>
+              <title>${item}</title>
+              <use href="#${item}"></use>
+            </svg>
+            <p class="icon-dida" title="${item}"">
+              ${item.replace(/(_|\-)/g, '$1<wbr>')}
+            </p>
+          </div>`
+        );
+      });
+    </script>
+  </body>
+</html>

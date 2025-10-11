@@ -1,0 +1,355 @@
+/* stylelint-disable selector-class-pattern */
+/* @import '@massimo-cassandro/auto-datatables-bs5/css/index.css'; */
+
+@import '@massimo-cassandro/auto-datatables-bs5/css/crea-datatable.css';
+@import '@massimo-cassandro/auto-datatables-bs5/css/datatable-processing.css';
+@import '@massimo-cassandro/auto-datatables-bs5/css/datatable-controls-bs.css';
+@import '@massimo-cassandro/auto-datatables-bs5/css/datatable-table-bs.css';
+/* @import '@massimo-cassandro/auto-datatables-bs5/css/datatable-sorting.css'; */
+/* @import '@massimo-cassandro/auto-datatables-bs5/css/datatable-pagination-bs.css'; */
+@import '@massimo-cassandro/auto-datatables-bs5/css/datatables-classes.css';
+/* @import '@massimo-cassandro/auto-datatables-bs5/css/datatable-responsive.css'; */
+
+
+/*
+<div class="dt-container m-datatable" data-cdt-options="..." data-cdt_options="..." data-dt-columns="...">
+  <div class="datatable-wrapper no-footer">
+    <div class="dt-controls">
+      <div class="datatable-length">
+        <label>
+          <di class=="dt-control-label">Mostra</di>
+          <div class="dt-control">
+            <select name="cdt-dom-2_length" class="form-control form-control-sm">
+              <option value="...">...</option>
+            </select>
+          </div>
+          <div>record per pagina</div>
+        </label>
+      </div>
+      <div class="datatable-filter"><label>
+          <div class=="dt-control-label">>Filtra risultati:</div>
+          <div class="dt-control">
+            <input type="search" class="form-control form-control-sm" placeholder=""></div>
+        </label></div>
+    </div>
+    <div class="dt-table-wrapper">
+      <table  class="table table-striped table-bordered table-hover dataTable no-footer" >
+        ...
+      </table>
+    </div>
+    <div class="dataTables_processing">...</div>
+
+    <div class="dt-footer">
+      <div class="dataTables_info" role="status" aria-live="polite">Stai visualizzando...</div>
+
+      <div class="dataTables_paginate paging_simple_numbers">
+       ...
+      </div>
+
+    </div>
+
+  </div>
+</div>
+*/
+
+
+
+.m-datatable {
+
+
+  /* --datatable-responsive-border-color: #ccc; */
+  /* --datatable-processing-padding: 0; */
+  /* --datatable-processing-bg: linear-gradient(to right, rgba(#fff, 0) 0%, rgba(#fff, .9) 25%, rgba(#fff, .9) 75%, rgba(#fff, 0) 100%); */
+
+  /* --sorting-cell-base-padding: .5em; */
+
+  /* --datatable-active-sorting-color: currentColor; */
+  /* --datatable-active-sorting-bg: inherit; */
+  /* --datatable-active-sorting-border-bottom: none; */
+
+  /* --sorting-arrow-size: 4px; */
+  /* --datatable-sorting-arrows-color: currentColor; */
+  /* --sorting-cell-arrow-padding: var(--sorting-cell-base-padding) 1.5em var(--sorting-cell-base-padding) var(--sorting-cell-base-padding); */
+  /* --sorting-arrow-bottom: 50%; */
+
+  /* --pagination-padding-x: .5rem; */
+  --pagination-padding-y: .4rem;
+  /* --pagination-font-size: .875rem; */
+
+  --pagination-color: var(--text-color);
+  /* --pagination-bg: #fff; */
+  /* --pagination-border-width: 1px; */
+  --pagination-border-color: var(--stone-5);
+
+  /* --pagination-border-radius: .25rem; */
+  --pagination-hover-color: var(--accent-3-fg);
+  --pagination-hover-bg: var(--accent-3);
+  /* --pagination-hover-border-color: var(--pagination-border-color); */
+  /* --pagination-focus-color: var(--pagination-hover-color); */
+  /* --pagination-focus-bg: var(--pagination-hover-bg); */
+  /* --pagination-focus-box-shadow: 0 0 0 .25rem #06407a40; */
+  --pagination-active-color: var(--secondary-fg);
+  --pagination-active-bg: var(--secondary);
+  /* --pagination-active-border-color: #007e8a; */
+  /* --pagination-disabled-color: #ababab; */
+  /* --pagination-disabled-bg: var(--pagination-hover-bg); */
+  /* --pagination-disabled-border-color: var(--pagination-border-color); */
+
+
+  --sorting-border-size: 6px;
+  --sorting-border-color: var(--secondary);
+
+  position: relative;
+
+  .dt-controls {
+    display: flex;
+    flex-flow: row wrap;
+    gap: 1rem;
+    align-items: center;
+    justify-content: space-between;
+
+    > div {
+      max-width: 100%;
+    }
+  }
+
+  .icon {
+    width: 1.1em;
+  }
+
+
+  @media (--desktop-down) {
+    /* .dt-control-label {} */
+    .dt-controls {
+      flex-direction: column;
+      justify-content: center;
+    }
+  }
+}
+
+@media print {
+  .m-datatable {
+    .dt-controls, .dt-footer {
+      display: none;
+    }
+  }
+}
+
+
+/* https://css-tip.com/overflow-detection/ */
+/* https://csscade.com/can-you-detect-overflow-with-css/ */
+.dt-table-wrapper {
+  max-width: 100%;
+  overflow-x: auto;
+
+  /* animation-timeline: scroll(self);
+  animation: detect-scroll linear;
+  --bg-if-can-scroll: var(--can-scroll) lime;
+  --bg-if-cant-scroll: red;
+  background: var(--bg-if-can-scroll, var(--bg-if-cant-scroll)); */
+
+
+  .table thead th {
+    vertical-align: middle;
+  }
+
+  .sorting_disabled,
+  .sorting_asc_disabled,
+  .sorting_desc_disabled {
+    cursor: default;
+  }
+
+  .sorting {
+    position: relative;
+    cursor: pointer;
+
+
+    @media (--mouse) {
+      &:hover {
+        /* --datatable_active_sorting_color */
+
+        --datatable-active-sorting-bg: color-mix(in srgb, var(--accent-1) 10%, transparent);
+        /* stylelint-disable-next-line declaration-block-no-duplicate-custom-properties */
+        --datatable-active-sorting-bg: light-dark(color-mix(in srgb, var(--accent-1) 10%, transparent), color-mix(in srgb, var(--accent-1) 30%, transparent));
+
+        /* --datatable-active-sorting-border-bottom */
+      }
+    }
+  }
+
+
+  .sorting_asc, .sorting_desc{
+    &::after {
+      position: absolute;
+      right: 0;
+      left: 0;
+      display: block;
+      height: var(--sorting-border-size);
+      content: '';
+      background-color: var(--sorting-border-color);
+
+    }
+    /* border-bottom: var(--sorting-border-size) solid var(--sorting-border-color); */
+  }
+  .sorting_asc{
+    &::after {
+      top: calc(-1 * var(--sorting-border-size) / 2);
+
+    }
+  }
+  .sorting_desc{
+    &::after {
+      bottom: calc(-1 * var(--sorting-border-size) / 2);
+    }
+  }
+}
+
+/*
+@keyframes detect-scroll {
+  from, to {
+    --can-scroll:;
+  }
+} */
+
+
+.dt-footer {
+  display: flex;
+  flex-flow: column wrap;
+  gap: .5rem;
+  align-items: center;
+  justify-content: center;
+  margin-block: 1rem;
+
+  @media (--desktop-up) {
+    flex-direction: row;
+    gap: 2rem;
+    justify-content: space-between;
+  }
+}
+
+.dataTables_info {
+  font-size: var(--font-size-xs);
+  /* color: var(--text-muted-color); */
+}
+
+/*
+<div class="dataTables_paginate paging_simple_numbers">
+  <a class="paginate_button previous disabled" aria-disabled="true" role="link" data-dt-idx="previous" tabindex="-1"></a>
+
+  <span>
+    <a class="paginate_button current" role="link" aria-current="page" data-dt-idx="0" tabindex="0">1</a>
+    <a class="paginate_button " role="link" data-dt-idx="1" tabindex="0">2</a>
+    <span class="ellipsis">…</span>
+    <a class="paginate_button " role="link" data-dt-idx="9" tabindex="0">10</a>
+  </span>
+
+  <a class="paginate_button next" role="link" data-dt-idx="next" tabindex="0"></a>
+</div>
+*/
+
+.dataTables_paginate {
+  display: flex;
+  flex-flow: row nowrap;
+  gap: 0;
+  align-items: center;
+  justify-content: flex-end;
+
+  > span {
+
+    display: flex;
+    flex-flow: row nowrap;
+    gap: 0;
+    align-items: center;
+    justify-content: flex-end;
+  }
+
+  .paginate_button, .ellipsis {
+    display: flex;
+    justify-content: center;
+    padding: var(--pagination-padding-y) var(--pagination-padding-x);
+    font-size: var(--pagination-font-size);
+    font-weight: var(--font-weight-semibold);
+    line-height: 1;
+    color: var(--pagination-color);
+    border: var(--pagination-border-width) var(--pagination-border-color);
+    border-style: solid solid solid none;
+  }
+
+  .ellipsis {
+    justify-content: flex-end;
+  }
+
+  .paginate_button {
+    align-items: center;
+    text-decoration: none;
+    cursor: pointer;
+    background-color: var(--pagination-bg);
+    transition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+
+    &.previous, &.next {
+      display: none;
+    }
+
+    &:first-child {
+      border-style: solid;
+      border-top-left-radius: var(--pagination-border-radius);
+      border-bottom-left-radius: var(--pagination-border-radius);
+    }
+    &:last-child {
+      border-top-right-radius: var(--pagination-border-radius);
+      border-bottom-right-radius: var(--pagination-border-radius);
+    }
+
+    &:hover {
+      z-index: 2;
+      color: var(--pagination-hover-color);
+      text-decoration: none;
+      background-color: var(--pagination-hover-bg);
+      border-color: var(--pagination-hover-border-color);
+    }
+
+    &:focus {
+      z-index: 3;
+      color: var(--pagination-focus-color);
+      background-color: var(--pagination-focus-bg);
+      outline: 0;
+      box-shadow: var(--pagination-focus-box-shadow);
+    }
+
+    &.current {
+      z-index: 3;
+      color: var(--pagination-active-color);
+      background-color: var(--pagination-active-bg);
+      border-color: var(--pagination-active-border-color);
+    }
+
+    &.disabled,
+    .disabled > & {
+      color: var(--pagination-disabled-color);
+      pointer-events: none;
+      background-color: var(--pagination-disabled-bg);
+      border-color: var(--pagination-disabled-border-color);
+    }
+  }
+
+  .page-item {
+    &:not(:first-child) .page-link {
+      margin-left: calc(-1 * var(--pagination-border-width));
+    }
+
+    &:first-child {
+      .page-link {
+        border-radius: var(--pagination-border-radius) 0 0 var(--pagination-border-radius);
+      }
+    }
+
+    &:last-child {
+      .page-link {
+        border-radius: 0 var(--pagination-border-radius) var(--pagination-border-radius) 0;
+      }
+    }
+
+  }
+
+
+}

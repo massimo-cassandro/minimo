@@ -1,0 +1,109 @@
+// da bs
+
+// @use '../scss/cfg/cfg-settings' as settings;
+// @use '../scss/cfg/grid-breakpoints' as breakpoints;
+// @use 'sass:map
+
+@use '../scss/mixins/media-mixins' as mediaMixins;
+@use '../scss/mixins/buttons-mixins' as buttonsMixins;
+// @use '../scss/cfg/status-mixins' as statusMixins;
+// @use '../scss/cfg/text-mixins' as textMixins;
+
+.offcanvas {
+  --offcanvas-padding-x: 1.4rem;
+  --offcanvas-padding-y: 2rem;
+
+  position: fixed;
+  inset: 0;
+  z-index: 1045;
+  display: block;
+  visibility: hidden;
+  background-color: var(--overlay-color);
+  backdrop-filter: blur(1px);
+
+  &.show, &.hiding, &.showing {
+    visibility: visible;
+  }
+
+}
+
+.offcanvasInner {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  width: 18rem;
+  min-width: 280px;
+  max-width: 100dvw;
+  // height: 100%;
+  color: var(--text-color);
+  background-color: var(--body-bg-color);
+  background-clip: padding-box;
+  border-left: var(--text-color);
+  outline: 0;
+  box-shadow: var(--shadow-3);
+  // opacity: 0;
+  // transition: transform, opacity .3s ease-in-out;
+  transition: transform .3s ease-in-out;
+  transform: translateX(100%);
+
+  .show & {
+    box-shadow: -.5rem 0 .5rem var(--text-color);
+    // opacity: 1;
+    transform: none;
+  }
+
+  .fullscreen & {
+    inset: 0;
+    width: auto;
+    border-left: none;
+  }
+  .fullscreen.show & {
+    box-shadow: none;
+  }
+
+  // @include mediaMixins.media-desktop-up() {}
+  @media screen and (min-width: __desktop_breakpoint__) {
+    .fullscreen & {
+      inset: 1.5rem;
+    }
+    .fullscreen.show & {
+      inset: 1.5rem;
+      box-shadow:
+        10px 10px 1rem var(--overlay),
+        -10px 10px 1rem var(--overlay),
+        10px -10px 1rem var(--overlay),
+        -10px -10px 1rem var(--overlay);
+
+    }
+
+  }
+
+}
+
+.offcanvasHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--offcanvas-padding-y) var(--offcanvas-padding-x) calc(var(--offcanvas-padding-y) / 2);
+}
+
+.offcanvasClose {
+  @include buttonsMixins.reset-button();
+  font-size: 2rem;
+  color: var(--bz-primary);
+}
+
+.offcanvasBody {
+  flex-grow: 1;
+  padding: 0 var(--offcanvas-padding-x) var(--offcanvas-padding-y);
+  overflow-y: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .offcanvas {
+    transition: none;
+  }
+}

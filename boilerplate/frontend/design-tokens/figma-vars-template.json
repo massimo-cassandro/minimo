@@ -1,0 +1,110 @@
+{
+  "body-bg-color": {
+    "$type": "color",
+    "$value": "#ffffff"
+  },
+  "text-color": {
+    "$type": "color",
+    "$value": "#000000"
+  },
+  "text-muted-color": {
+    "$type": "color",
+    "$value": "#cccccc"
+  },
+  "link-color": {
+    "$type": "color",
+    "$value": "#003366"
+  },
+  "link-visited-color": {
+    "$type": "color",
+    "$value": "#8800FF"
+  },
+  "link-hover-color": {
+    "$type": "color",
+    "$value": "#3C00FF"
+  },
+  "primary": {
+    "$type": "color",
+    "$value": "#50063a"
+  },
+  "primary-fg": {
+    "$type": "color",
+    "$value": "#ffffff"
+  },
+  "secondary": {
+    "$type": "color",
+    "$value": "#086600"
+  },
+  "secondary-fg": {
+    "$type": "color",
+    "$value": "#ffffff"
+  },
+  "spacing-xxs": {
+    "$type": "dimension",
+    "$value": "4px"
+  },
+  "spacing-xs": {
+    "$type": "dimension",
+    "$value": "8px"
+  },
+  "spacing-sm": {
+    "$type": "dimension",
+    "$value": "12px"
+  },
+  "spacing-base": {
+    "$type": "dimension",
+    "$value": "16px"
+  },
+  "spacing-md": {
+    "$type": "dimension",
+    "$value": "20px"
+  },
+  "spacing-lg": {
+    "$type": "dimension",
+    "$value": "24px"
+  },
+  "spacing-xl": {
+    "$type": "dimension",
+    "$value": "32px"
+  },
+  "spacing-2xl": {
+    "$type": "dimension",
+    "$value": "48px"
+  },
+  "spacing-3xl": {
+    "$type": "dimension",
+    "$value": "64px"
+  },
+  "radius-xxs": {
+    "$type": "dimension",
+    "$value": "{spacing-xxs}"
+  },
+  "radius-xs": {
+    "$type": "dimension",
+    "$value": "{spacing-xs}"
+  },
+  "radius-md": {
+    "$type": "dimension",
+    "$value": "{spacing-md}"
+  },
+  "radius-base": {
+    "$type": "dimension",
+    "$value": "{spacing-base}"
+  },
+  "radius-pill": {
+    "$type": "dimension",
+    "$value": "999px"
+  },
+  "footer-bg": {
+    "$type": "color",
+    "$value": "#dddddd"
+  },
+  "footer-fg": {
+    "$type": "color",
+    "$value": "#000000"
+  },
+  "footer-link": {
+    "$type": "color",
+    "$value": "#003366"
+  }
+}

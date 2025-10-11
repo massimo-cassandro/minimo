@@ -1,8 +1,0 @@
-.inner-nav-main, .inner-nav {
-  margin: .5rem 0;
-  text-align: end;
-
-  @media print {
-    display: none;
-  }
-}
