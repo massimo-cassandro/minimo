@@ -57,7 +57,7 @@ export function img_viewer_dom_builder_array({
   loadingMode = null
 }) {
 
-  if(!viewer_url) {
+  if(!viewer_url || !condition) {
     return null;
   }
 
@@ -66,7 +66,7 @@ export function img_viewer_dom_builder_array({
       id: null,   // id per immagini da db
       src: null,  // percorso dalla root dell'immagine sorgente
       crop: null, // eventuali coordinate per il crop dell'immagine sorgente
-      w: null,    // larghezza e altezza dell'immagine da restiture
+      w: null,    // larghezza e altezza dell'immagine da restituire
       h: null,
       imgWidths: [], // dimensioni dell'immagine
       mq: null    // media query, necessaria solo per gli oggetti prima dell'ultimo
@@ -107,9 +107,10 @@ export function img_viewer_dom_builder_array({
     const isLastSource = sourceIdx === sources.length - 1,
       baseSrc = viewer_url + (item.src? `?src=${encodeURIComponent(item.src)}&` : `/${item.id}?`);
 
-    srcsetsArray = item.imgWidths.map(w =>
-      [`${baseSrc}bb=${w}x`,  `${w}w`]
-    ),
+    srcsetsArray = item.imgWidths.map(w =>{
+      const bbHeight = w / (item.w / item.h);
+      return [`${baseSrc}bb=${w}x${bbHeight}`,  `${w}w`];
+    }),
 
     sizes = item.imgWidths.map((w,idx) => {
 

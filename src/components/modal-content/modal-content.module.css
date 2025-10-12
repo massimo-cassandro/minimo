@@ -1,9 +1,9 @@
 /* TODO custom props nel file generale */
 /* TODO prevedere opzione con bordo del pulsante di chiusura (NB: si disallinea) */
 /* TODO cambiare icona chiusura con svg? */
+/* TODO aggiungere wrapper intorno a dialogInner (a filo con il dialog) per la scroll bar */
 
-
-.modalIframe { /* dialog */
+.dialog { /* dialog */
   --modal-border-radius: var(--radius-md, 1.2rem);
   position: fixed;
   max-width: 80dvw;
@@ -19,8 +19,12 @@
   scale: 0;
 
   /* stylelint-disable selector-class-pattern */
-  /* dimensioni std -> size == 'full' */
   &.size-full {
+    width: 80dvw;
+    height: 90dvh;
+  }
+  /* dimensioni std -> size == 'large' */
+  &.size-large {
     width: 50rem; /* 800px */
     height: auto;
   }
@@ -43,20 +47,15 @@
     background-color: rgb(0 0 0 / .7);
   }
 
-  iframe {
-    width: 100%;
-    height: 100%;
-    padding: 0;
-    margin: 0;
-    overscroll-behavior: contain;
-    border: none;
-  }
 }
 
-.modalIframeInner {
+.dialogInner {
   width: 100%;
   height: 100%;
-  overflow: hidden;
+  padding-inline-end: var(--spacing-md);
+  overflow-x: hidden;
+  overflow-y: auto;
+  /* scrollbar-gutter: stable; */
   border-radius: var(--modal-border-radius);
 
   /* stylelint-disable selector-class-pattern */
@@ -73,11 +72,26 @@
   position: relative;
   padding-block-start: var(--spacing-2xl);
 
-  .modalIframe.on & {
+  .dialog.on & {
     display: none;
   }
 }
 
+.iframeEl, .contentEl {
+  width: 100%;
+  overscroll-behavior: contain;
+}
+
+.iframeEl {
+  height: 100%;
+  padding: 0;
+  margin: 0;
+  border: none;
+}
+
+.contentEl {
+  min-height: 100%;
+}
 
 .closeButton  {
   --btn-color: var(--secondary-fg, #000);
