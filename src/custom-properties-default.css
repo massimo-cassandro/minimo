@@ -8,6 +8,7 @@
 
 
 /* TODO switch to jit */
+/* TODO ricontrollare i colori, se possibile sganciarli da openprops nel defaults */
 /* vedi https://postcss.org/docs/writing-a-postcss-plugin */
 /* https://github.com/GoogleChromeLabs/postcss-jit-props */
 :root {
@@ -99,6 +100,8 @@
   --text-muted-color: var(--stone-7);
   --text-dim-color: var(--gray-8);
   --link-visited-color: var(--camo-9);
+  --link-active-color: var(--sand-3);
+  --link-active-bg-color: var(--sand-3);
 
   --form-group-padding-block: 0 var(--spacing-base);
   --form-text-color: var(--text-color);

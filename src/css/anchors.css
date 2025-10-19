@@ -1,0 +1,40 @@
+/* TODO rivedere e completare */
+
+a:link, .btn-link {
+  /* TODO rivedere, forse più complicato del necessario */
+  &:not(.btn) {
+    font-weight: var(--font-weight-semibold);
+    color: var(--link-color);
+    text-decoration: none;
+  }
+}
+
+
+a:not(.btn), .btn-link {
+  &:focus, &:focus-visible {
+    outline: 1px solid color-mix(in srgb, var(--link-color) 60%, transparent);
+    outline-offset: 2px;
+  }
+  &:hover {
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+  &:active {
+    /* TODO rivedere, sostituire con colori specifici da cuistome props */
+    /* stylelint-disable-next-line declaration-no-important */
+    color: var(--body-bg-color) !important;
+    background-color: var(--link-color);
+    outline: 2px solid var(--link-color);
+    offset: 0;
+  }
+}
+
+a:not(.btn) {
+  text-decoration: none;
+  &:link {
+    color: var(--link-color);
+  }
+  &:visited {
+    color: var(--link-visited-color);
+  }
+}
