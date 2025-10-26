@@ -12,7 +12,9 @@
 
   &.gap-2 {
     gap: calc(var(--flex-grid-gap) * 2);
-
+  }
+  &.column-gap-2 {
+    column-gap: calc(var(--flex-grid-gap) * 2);
   }
 
   &.justify-content-space-between {

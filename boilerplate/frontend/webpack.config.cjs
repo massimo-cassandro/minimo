@@ -1,95 +1,80 @@
 /* eslint-env node */
-
-const { paths } = require('./webpack-src/paths.cjs');
-const { jsConfigAliases } = require('./webpack-src/get-jsconfig-aliases.cjs');
-const { cssPlugins, cssRules } = require('./webpack-src/css-setup.cjs');
-
-const webpack = require('webpack');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
-// const HtmlWebpackInjectPreload = require('@principalstudio/html-webpack-inject-preload');
-const CopyWebpackPlugin = require('copy-webpack-plugin');
-
-const RemoveEmptyScriptsPlugin = require('webpack-remove-empty-scripts');
-const { WebpackManifestPlugin } = require('webpack-manifest-plugin');
-const TerserPlugin = require('terser-webpack-plugin');
-const svgToMiniDataURI = require('mini-svg-data-uri');
-
-const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
-
-const {BannerPlugin} = require('webpack');
-const PACKAGE = require(paths.packageJson);
 const path = require('path');
-const fs = require('fs');
+// const fs = require('fs');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const HtmlWebpackInjectPreload = require('@principalstudio/html-webpack-inject-preload');
+const TerserPlugin = require('terser-webpack-plugin');
+const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
+const Dotenv = require('dotenv-webpack');
+const svgToMiniDataURI = require('mini-svg-data-uri');
+// const RemoveEmptyScriptsPlugin = require('webpack-remove-empty-scripts');
+// const { WebpackManifestPlugin } = require('webpack-manifest-plugin');
 
+const { BannerPlugin } = require('webpack');
+const PACKAGE = require('./package.json');
 
-
-// const Dotenv = require('dotenv-webpack');
 const isDevelopment = process.env.NODE_ENV === 'development'
-  ,output_dir = isDevelopment? '_dev' : 'build'
-  // ,favicons_path = /src\/favicons\/output/
+  ,output_dir = path.resolve(__dirname, './build')
+  ,favicons_path = /src\/favicons\/output/
 
   // https://medium.com/@technoblogueur/webpack-one-manifest-json-from-multiple-configurations-output-fee48578eb92
   // ,manifest_shared_seed = {};
-
-  // =>> CopyWebpackPlugin Obj
-  filesToCopy = [
-    {
-      from: path.resolve(__dirname, './email/logo-assicorporate-email.png'),
-      to: "email/[name].[contenthash][ext]",
-    },
-  ]
 ;
 
 // =>> entries obj
 // lettura dei file in admin
-const entries = {
-  assicorporate: path.resolve(__dirname, './src/index.js'),
-  autoDatatable: path.resolve(__dirname, './src/components/auto-datatable/auto-datatable.js')
-};
-const app_dir = path.resolve(__dirname, './src/pagine');
-fs.readdirSync(app_dir)
-  .forEach(subdir => {
-    const thisDir = path.join(app_dir, subdir);
-    const stats = fs.statSync(thisDir); // stats.isFile() / stats.isDirectory()
-    if(stats.isDirectory()) {
-      fs.readdirSync(thisDir)
-        .filter(f => /\.js$/.test(f))
-        .filter(f => /^[^_]/.test(f)) // ignore files starting with `_`
-        .forEach(file => {
-          entries[subdir + '/' + path.basename(file, '.js')] = path.join(thisDir, file);
-        });
-    }
-  });
+// const entries = {
+//   assicorporate: path.resolve(__dirname, './src/index.js'),
+//   autoDatatable: path.resolve(__dirname, './src/components/auto-datatable/auto-datatable.js')
+// };
+// const app_dir = path.resolve(__dirname, './src/pagine');
+// fs.readdirSync(app_dir)
+//   .forEach(subdir => {
+//     const thisDir = path.join(app_dir, subdir);
+//     const stats = fs.statSync(thisDir); // stats.isFile() / stats.isDirectory()
+//     if(stats.isDirectory()) {
+//       fs.readdirSync(thisDir)
+//         .filter(f => /\.js$/.test(f))
+//         .filter(f => /^[^_]/.test(f)) // ignore files starting with `_`
+//         .forEach(file => {
+//           entries[subdir + '/' + path.basename(file, '.js')] = path.join(thisDir, file);
+//         });
+//     }
+//   });
 
 // dev only entries
 // if(isDevelopment) {
 //   entries['malert'] = path.resolve(__dirname, './src/components/modal-alert/modal-alert.js');
 // }
-
 const config = {
   mode: isDevelopment? 'development' : 'production',
 
-  watch: isDevelopment,
+  // watch: isDevelopment,
+  watchOptions: {
+    ignored: ['build', '**/node_modules', '.git', '_private'],
+  },
 
   // Control how source maps are generated
   // devtool: isDevelopment? 'inline-source-map' : 'source-map', // false, <== false non aggiunge la sourcemap ,
   devtool: isDevelopment? 'inline-source-map' : false,
   // devtool: 'source-map',
-
   // =>> entry
   // https://webpack.js.org/configuration/entry-context/
-  entry: entries,
 
-  // =>> output
-  // https://webpack.js.org/configuration/output/
-  output: {
-    path: path.resolve(__dirname, `../public/${output_dir}` ),
-    // filename: '[name].js',
-    filename: '[name].[contenthash].js',
-    publicPath: `/${output_dir}/`, // usato per i percorsi degli elementi importati nei js
-    clean: !isDevelopment,
+  entry: {
+    'xxx': './src/index.js',
+    // entry: entries,
   },
 
+  output: {
+    path: output_dir,
+    // filename: '[name].js',
+    filename: '[name].[contenthash].js',
+    publicPath: '/', // `/${output_dir}/`,
+    clean: !isDevelopment,
+  },
   // externals: {
   //   jquery: 'jquery',
   // },
@@ -102,13 +87,6 @@ const config = {
       new CssMinimizerPlugin(),
       new TerserPlugin({
         terserOptions: {
-          // https://github.com/terser/terser?tab=readme-ov-file#mangle-options
-          // mangle: {
-          //   reserved: [],
-          //   properties: {
-          //     keep_quoted: 'strict'
-          //   }
-          // },
           output: {
             comments: /^!/,
           },
@@ -116,19 +94,17 @@ const config = {
         extractComments: false,
       }),
     ],
-    runtimeChunk: false, //'single',
+    runtimeChunk: true, //false, //'single',
     // runtimeChunk: { name: entrypoint => `runtime~${entrypoint.name}`,
-    // splitChunks: { chunks: 'all', },
-    // splitChunks: {
-    //   cacheGroups: {
-    //     vendor: {
-    //       test: /[\\/]node_modules[\\/]/,
-    //       name: 'vendors',
-    //       chunks: 'all'
-    //     }
-    //   }
-    // },
-    usedExports: true,
+    splitChunks: {
+      cacheGroups: {
+        vendor: {
+          test: /[\\/]node_modules[\\/]/,
+          name: 'vendors',
+          chunks: 'all'
+        }
+      }
+    },
   }, // end optimization
 
   // =>> performance
@@ -139,35 +115,29 @@ const config = {
     maxAssetSize: 512000,
   }, // end perfomance
 
-
   // =>> devServer
   // https://webpack.js.org/configuration/dev-server/
-  // devServer: {
-  //   historyApiFallback: true,
-  //   static: {
-  //     directory: path.join(__dirname, '/'),
-  //     serveIndex: true,
-  //   },
+  devServer: {
+    historyApiFallback: true,
+    static: {
+      directory: path.join(__dirname, '/'),
+      serveIndex: true,
+    },
+    // open: true,
+    open: {
+      app: {
+        name: 'Google Chrome',
+      },
+    },
+    compress: true,
+    hot: true,
+    // host: '0.0.0.0',
+    port: 5700,
+    // devMiddleware: { writeToDisk: true } // forza la scrittura su disco anche in modalità dev
+  },
 
-  //   open: true, // oppure nel comando cli: --open | --no-open, cambia browser: --open-app-name 'Google Chrome'
-  //   // aletrnative a `open: true`
-  //   // open: ['/my-page', '/another-page'],
-  //   // open: {
-  //   //   app: {
-  //   //     name: 'Google Chrome',
-  //   //   },
-  //   // },
-  //   compress: true,
-  //   hot: true,
-  //   // host: '0.0.0.0',
-  //   port: 5500,
-  //   // devMiddleware: { writeToDisk: true } // forza la scrittura su disco anche in modalità dev
-  // },
-
-  // =>> plugins
+   // =>> plugins
   plugins: [
-
-    ...cssPlugins,
 
     // =>> Dotenv
     // richiede `npm install -D dotenv-webpack`
@@ -188,27 +158,37 @@ const config = {
     //   'APP_VERSION': `'${PACKAGE.version}'`,
     // }),
 
-    // Removes/cleans build folders and unused assets when rebuilding
-    // non necessario con opzione `clean` di output
-    // new CleanWebpackPlugin(),
-
-    // =>> RemoveEmptyScriptsPlugin
-    // https://github.com/webdiscus/webpack-remove-empty-scripts
-    new RemoveEmptyScriptsPlugin({
-      enabled: !isDevelopment,
-      verbose: true
-    }),
-
-
+    // new webpack.ProvidePlugin({
+    //   process: 'process/browser',
+    // }),
 
     // =>> CopyWebpackPlugin
     new CopyWebpackPlugin({
-      patterns: filesToCopy,
-    }), // end CopyWebpackPlugin
+      patterns: [
 
-    // =>> HotModuleReplacementPlugin
-    // Only update what has changed on hot reload
-    // new webpack.HotModuleReplacementPlugin(), (non necessario con devServer.hot === true)
+        // {
+        //   from: 'src/assets/**/_{htaccess,htpasswd}',
+        //   to: ({ context, absoluteFilename }) => {
+        //     return path.join(output_dir,  path.basename(absoluteFilename).replace(/^_/, '.'));
+        //   },
+        //   toType: 'file',
+        // },
+        {
+          from: 'src/favicons/output/icon-*.png',
+          to: "[name][ext]",
+        },
+        {
+          from: 'src/php',
+          to: 'php',
+          globOptions: {
+            dot: true,
+            gitignore: true,
+            ignore: ['**/.DS_Store'],
+          },
+        },
+
+      ],
+    }),
 
     // =>> WebpackManifestPlugin
     new WebpackManifestPlugin({
@@ -229,9 +209,26 @@ const config = {
       sort: isDevelopment? undefined : (a, b) => a.name.localeCompare(b.name)
     }),
 
+
+    // =>> MiniCssExtractPlugin
+    new MiniCssExtractPlugin({
+      // filename: isDevelopment? '[name].css' : '[name].[contenthash].css',
+      // chunkFilename: isDevelopment? '[id].css' : '[id].[contenthash].css'
+      filename: '[name].[contenthash].css',
+      chunkFilename: '[id].[contenthash].css'
+    }),
+
     // =>> HtmlWebpackPlugin
     // https://github.com/jantimon/html-webpack-plugin#readme
+    new HtmlWebpackPlugin({
+      filename: 'index.html',
+      template: path.resolve(__dirname, './src/tpl/index.ejs'),
+      inject: 'body',
+      title: 'Calibre-Reader',
+      minify: !isDevelopment
+    }),
 
+    // ALTERNATIVE
     // new HtmlWebpackPlugin({
     //   filename: 'index.html',
     //   template: path.resolve(__dirname, './src/public/index.ejs'),
@@ -318,28 +315,43 @@ const config = {
 
     // (isDevelopment && new HtmlWebpackPlugin({ ... }))
 
+    new HtmlWebpackInjectPreload({
+      files: [
+        {
+          match: /.*-latin-(?!(ext-)).*\.woff2$/,
+          attributes: {as: 'font', type: 'font/woff2', crossorigin: true },
+        },
+        {
+          match: /.*\.css$/,
+          attributes: {as: 'style' },
+        },
+        {
+          match: /.*\.js$/,
+          attributes: {as: 'script' },
+        },
+      ]
+    }),
+
     // =>> BannerPlugin
     new BannerPlugin({
       banner: () => {
-        const date = new Date().toLocaleString('it-IT', { year: 'numeric', month: 'long' });
+        const year = new Date().toLocaleString('en-UK', { year: 'numeric' });
 
         // version = /(-alpha|-beta|-rc)/.test(PACKAGE.version)? PACKAGE.version :
         //   PACKAGE.version.replace(/(\d+\.\d+)\.\d+/, '$1.x');
 
         return '/*!\n' +
-          ` * Assicorporate v.${PACKAGE.version} - Massimo Cassandro / Gianluca Canale ${date}\n` +
+          ` * ${PACKAGE.name} v.${PACKAGE.version} - Massimo Cassandro 2023-${year}\n` +
           ' */\n';
       },
       raw: true
-    }) // end BannerPlugin
-  ],
+    })
+
+  ], // plugins
 
   module: {
-
     // =>> rules
-    // Determine how modules within the project are treated
     rules: [
-
       // =>> rules: html files
       {
       test: /(\.html?)$/i,
@@ -382,21 +394,22 @@ const config = {
       // }
 
       // =>> rules: favicons
-      // {
-      //   test: /\.(?:ico|png|svg|webmanifest)$/i,
-      //   type: 'javascript/auto',
-      //   include: favicons_path,
-      //   use: [
-      //     {
-      //       loader: 'file-loader',
-      //       options: {
-      //         name: '[name].[ext]?_=[contenthash]',
-      //         outputPath: '',
-      //         esModule: false,
-      //       }
-      //     }
-      //   ]
-      // }, // end favicons
+      {
+        test: /\.(?:ico|png|svg|webmanifest)$/i,
+        type: 'javascript/auto',
+        // type: 'asset/resource',
+        include: favicons_path,
+        use: [
+          {
+            loader: 'file-loader',
+            options: {
+              name: '[name].[ext]?_=[contenthash]',
+              outputPath: '',
+              esModule: false,
+            }
+          }
+        ]
+      },
 
       // =>> JS libraries (not included in scripts) (?as_lib)
       {
@@ -496,9 +509,9 @@ const config = {
         ]
       }, // end fonts
 
-      ...cssRules,
+      ...cssRules()
 
-    ], // end rules
+    ] // end rules
   }, // end module
 
   // =>> resolve
@@ -512,10 +525,119 @@ const config = {
     // alias: {
     //   '@': './',
     // },
-    alias: jsConfigAliases
+    alias: getJsConfigAliases()
   }
 
 };
 
+
+function getJsConfigAliases() {
+  const jsConfig = require('./jsconfig.json');
+  const aliases = {};
+  for(const item in jsConfig.compilerOptions.paths) {
+
+    const key = item.replace(/(\/\*)$/, ''),
+      value = path.resolve(
+        __dirname,
+        path.relative(__dirname, jsConfig.compilerOptions.paths[item][0]
+      )
+        .replace(/(\/\*)$/, ''));
+
+    aliases[key] = value;
+  }
+  console.log(aliases);
+  return aliases;
+}
+
+function cssRules() {
+
+  // =>> css_loaders func
+  const css_loaders = (opts) => {
+
+    opts = {
+      css_modules: false,
+      inline: false,
+      ...opts
+    };
+
+    return [
+      (
+        opts.inline
+          ? {
+            loader: 'style-loader',
+            options: {
+              injectType: 'singletonStyleTag'
+            }
+          }
+          // : isDevelopment ? 'style-loader' : MiniCssExtractPlugin.loader
+          : MiniCssExtractPlugin.loader // per uso con scrittura del css anche in dev (commentando riga precedente)
+      ),
+      {
+        loader: 'css-loader',
+        options: {
+          // esModule: false,
+          modules: opts.css_modules ? {
+            auto: true, // /\.module\.scss$/i.test(filename),
+            localIdentName: isDevelopment? '[local]_[hash:base64:6]' : '[hash:base64]', // '[name]__[local]_[hash:base64:5]'
+            // localIdentName: '[local]_[hash:base64:6]'
+          } : false,
+          sourceMap: isDevelopment,
+          importLoaders: isDevelopment? 1 : 2,
+        }
+      },
+      {
+        loader: 'postcss-loader',
+        options: {
+          postcssOptions: {
+            sourceMap: isDevelopment,
+          },
+        },
+      },
+      // {
+      //   loader: 'sass-loader',
+      //   options: {
+      //     sourceMap: isDevelopment,
+      //     // api: 'legacy',
+      //     sassOptions: {
+      //       quietDeps: true,
+      //       silenceDeprecations: ['legacy-js-api', 'mixed-decls', 'color-functions', 'global-builtin', 'import'],
+      //     }
+      //   }
+      // },
+    ];
+  }; // end css_loaders func
+
+
+  return [
+    // =>> rules: css/scss modules
+    {
+      test: /(\.module\.(sass|scss|css))$/,
+      oneOf: [
+        {
+          resourceQuery: /inline/, // foo.css?inline
+          use: css_loaders({inline: true, css_modules: true}),
+        },
+        {
+          use: css_loaders({css_modules: true}),
+        },
+      ]
+    },
+
+    // =>> rules: css / scss
+    {
+      test: /\.(sass|scss|css)$/,
+      exclude: /(\.module\.(sass|scss|css))$/,
+      oneOf: [
+        {
+          resourceQuery: /inline/, // foo.css?inline
+          use: css_loaders({inline: true}),
+        },
+        {
+          use: css_loaders(),
+        },
+      ]
+    } // end css/scss
+  ];
+}
 
 module.exports = config;
