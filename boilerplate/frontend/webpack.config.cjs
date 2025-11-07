@@ -1,18 +1,19 @@
 /* eslint-env node */
 const path = require('path');
 // const fs = require('fs');
+
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const HtmlWebpackInjectPreload = require('@principalstudio/html-webpack-inject-preload');
 const TerserPlugin = require('terser-webpack-plugin');
 const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
-const Dotenv = require('dotenv-webpack');
 const svgToMiniDataURI = require('mini-svg-data-uri');
 // const RemoveEmptyScriptsPlugin = require('webpack-remove-empty-scripts');
 // const { WebpackManifestPlugin } = require('webpack-manifest-plugin');
 
-const { BannerPlugin } = require('webpack');
+// const Dotenv = require('dotenv-webpack');
+const webpack = require('webpack'); // // const { BannerPlugin, ProvidePlugin } = require('webpack');
 const PACKAGE = require('./package.json');
 
 const isDevelopment = process.env.NODE_ENV === 'development'
@@ -56,7 +57,6 @@ const config = {
     ignored: ['build', '**/node_modules', '.git', '_private'],
   },
 
-  // Control how source maps are generated
   // devtool: isDevelopment? 'inline-source-map' : 'source-map', // false, <== false non aggiunge la sourcemap ,
   devtool: isDevelopment? 'inline-source-map' : false,
   // devtool: 'source-map',
@@ -333,7 +333,7 @@ const config = {
     }),
 
     // =>> BannerPlugin
-    new BannerPlugin({
+    new webpack.BannerPlugin({
       banner: () => {
         const year = new Date().toLocaleString('en-UK', { year: 'numeric' });
 
@@ -518,7 +518,8 @@ const config = {
   resolve: {
     fallback: {
       'fs': false,
-      'util': false
+      'util': false,
+      'process': require.resolve('process'),
     },
     modules: ['./', 'node_modules'],
     extensions: ['.tsx', '.ts', '.js', '.mjs', '.cjs', '.jsx', '.json', '.scss', '.css'],

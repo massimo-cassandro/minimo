@@ -1,11 +1,12 @@
 /**
+ * minimo: img-viewer-dom-builder
  * Produce un array da utilizzare con domBuilder per generare un tag `picture`
  *
  * @returns Array
  */
 
 /*
-img_viewer_dom_builder_array({
+img_viewer_dom_builder({
   viewer_url: 'iviewer',
   sources: [
     {
@@ -25,7 +26,7 @@ img_viewer_dom_builder_array({
   // loadingMode: null | 'lazy' | 'eager'
 })
 */
-export function img_viewer_dom_builder_array({
+export function img_viewer_dom_builder({
   /** url del viewer */
   viewer_url,
 
@@ -41,7 +42,7 @@ export function img_viewer_dom_builder_array({
   /** se false, il markup non viene generato */
   condition = true,
 
-  /** se true, alle dimesnione fornite, viene aggiunta la versione 2x */
+  /** se true, alle dimensioni fornite, viene aggiunta la versione 2x */
   add2XWidths = false,
 
   /** testo alt */
@@ -110,7 +111,7 @@ export function img_viewer_dom_builder_array({
     srcsetsArray = item.imgWidths.map(w =>{
       const bbHeight = w / (item.w / item.h);
       return [`${baseSrc}bb=${w}x${bbHeight}`,  `${w}w`];
-    }),
+    });
 
     sizes = item.imgWidths.map((w,idx) => {
 
