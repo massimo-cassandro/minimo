@@ -5,22 +5,26 @@
  * @returns Array
  */
 
+// TODO implementare getImgInfo (da ada)
+// TODO detect se amabiente local per uso avif
+
 /*
 img_viewer_dom_builder({
   viewer_url: 'iviewer',
   sources: [
     {
       src: 'xxx',
-      crop: null | 'x,y,w,h',
+      crop: null, // 'x,y,w,h',
       w: 100,
       h: 100,
       imgWidths: [100, 200, 300],
-      mq: null | '(max-width: xxx)'
+      mq: null, // '(max-width: xxx)'
     },
     ...
   ],
+  imgClassName: null,
   // condition: true | false,
-  add2XWidths: false | true,
+  add2XWidths: false, // true,
   alt_text: '',
   useAvif: false | true,
   // loadingMode: null | 'lazy' | 'eager'
