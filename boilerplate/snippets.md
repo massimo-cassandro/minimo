@@ -5,13 +5,59 @@
 ### .browserslistrc
 
 ```bash
-echo "# https://github.com/browserslist/browserslist\n# https://browsersl.ist/\n\nlast 2 major versions\nsince 2023\nnot dead\n\nnot op_mini all\nnot op_mob > 0\nnot and_uc > 0\nnot and_qq > 0\nnot baidu > 0\nnot kaios > 0\nnot android > 0\nnot ie > 0\nnot ie_mob > 0\nnot bb > 0\n\nsafari >= 16\nios_saf >= 16\nedge >= 109\nchrome >= 109\nfirefox esr\nopera >= 95\nsamsung >= 20\n\n> 3% in IT\n" > .browserslistrc
+echo "# https://github.com/browserslist/browserslist
+# https://browsersl.ist/
+
+last 2 major versions
+since 2023
+not dead
+
+not op_mini all
+not op_mob > 0
+not and_uc > 0
+not and_qq > 0
+not baidu > 0
+not kaios > 0
+not android > 0
+not ie > 0
+not ie_mob > 0
+not bb > 0
+
+safari >= 16
+ios_saf >= 16
+edge >= 109
+chrome >= 109
+firefox esr
+opera >= 95
+samsung >= 20
+
+> 3% in IT
+" > .browserslistrc
 ```
 
 ### .editorconfig
 
 ```bash
-echo "# https://editorconfig.org\n\n# top-most EditorConfig file\nroot = true\n\n[*]\ncharset = utf-8\nend_of_line = lf\nindent_size = 2\nindent_style = space\ninsert_final_newline = true\ntrim_trailing_whitespace = true\n\n[*.md]\nmax_line_length = off\ntrim_trailing_whitespace = false\n\n[*.{yml,yaml}]\nindent_size = 4\n" > .editorconfig
+echo "# https://editorconfig.org
+
+# top-most EditorConfig file
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+indent_size = 2
+indent_style = space
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+[*.md]
+max_line_length = off
+trim_trailing_whitespace = false
+
+[*.{yml,yaml}]
+indent_size = 4
+" > .editorconfig
 ```
 
 ### .gitignore
@@ -38,13 +84,23 @@ vendor
 # frontend
 node_modules
 _private
-public/_dev" > __gitignore
+public/_dev
+" > .gitignore
 ```
 
 ### .prettierrc
 
 ```bash
-echo "{\n  \"endOfLine\": \"lf\",\n  \"tabWidth\": 2,\n  \"useTabs\": false,\n  \"semi\": true,\n  \"singleQuote\": true,\n  \"trailingComma\": \"es5\",\n  \"bracketSpacing\": true\n}\n" > .prettierrc
+echo "{
+  "endOfLine": "lf",
+  "tabWidth": 2,
+  "useTabs": false,
+  "semi": true,
+  "singleQuote": true,
+  "trailingComma": "es5",
+  "bracketSpacing": true
+}
+" > .prettierrc
 ```
 
 ## css reset
@@ -68,7 +124,6 @@ npm uninstall eslint @eslint/js globals @massimo-cassandro/eslint-config
 ```
 
 
-
 ```bash
 npm i -D eslint@^9 @eslint/js globals && npm i -D @massimo-cassandro/eslint-config@^2
 ```
@@ -77,19 +132,55 @@ npm i -D eslint@^9 @eslint/js globals && npm i -D @massimo-cassandro/eslint-conf
 *eslint.config.mjs*:
 
 ```bash
-echo "import eslint_config from '@massimo-cassandro/eslint-config';\n\nexport default [\n  ...eslint_config,\n  // {\n  //   files: ['src/**/*.js'],\n  //   ignores: [\n  //     'dist/',\n  //     'build/',\n  //     '**/vendor/'\n  //   ],\n  // }\n  // {\n  //   languageOptions: {\n  //     globals: {\n  //       jQuery: 'readonly',\n  //       $: 'readonly',\n  //     },\n  //   },\n  // },\n];\n" > eslint.config.mjs
+echo "import eslint_config from '@massimo-cassandro/eslint-config';
+
+export default [
+  ...eslint_config,
+  // {
+  //   files: ['src/**/*.js'],
+  //   ignores: [
+  //     'dist/',
+  //     'build/',
+  //     '**/vendor/'
+  //   ],
+  // }
+  // {
+  //   languageOptions: {
+  //     globals: {
+  //       jQuery: 'readonly',
+  //       $: 'readonly',
+  //     },
+  //   },
+  // },
+];
+" > eslint.config.mjs
 ```
-
-
 
 
 ## jsconfig.json
 *jsconfig.json*:
 
 ```bash
-echo "{\n  \"__help\": \"https://code.visualstudio.com/docs/languages/jsconfig\",\n  \"compilerOptions\": {\n    \"target\": \"es2023\",\n    \"baseUrl\": \".\",\n    \"module\": \"ES6\",\n    \"allowSyntheticDefaultImports\": false,\n    \"paths\": {\n\n      \"@apps/*\": [\"./apps/*\"],\n      \"@css/*\": [\"./frontend/css/*\"],\n      \"@src/*\": [\"./frontend/src/*\"],\n      \"@minimo/*\": [\"./frontend/minimo/*\"],\n    }\n  },\n  \"exclude\": [\"node_modules\", \"dist\", \"docs\", \"build\"]\n}\n" > jsconfig.json
+echo "{
+  "__help": "https://code.visualstudio.com/docs/languages/jsconfig",
+  "compilerOptions": {
+    "target": "es2023",
+    "baseUrl": ".",
+    "module": "ES6",
+    "allowSyntheticDefaultImports": false,
+    "paths": {
+      "@frontend/*": ["./frontend/*"],
+      "@src/*": ["frontend/src/*"],
+      "@minimo/*": ["./frontend/minimo/*"],
+      "@imgs/*": ["./frontend/imgs/*"],
+      "@icone/*": ["./frontend/icone/*"],
+      "@backoffice/*": ["./frontend/backoffice/*"]
+    }
+  },
+  "exclude": ["node_modules", "dist", "docs", "build", "public"]
+}
+" > jsconfig.json
 ```
-
 
 
 ## Local servers
@@ -105,12 +196,96 @@ npm i -S open-props && npm i -D postcss-jit-props
 ```
 
 
-
-
 *postcss.config.cjs*:
 
 ```bash
-echo "/* eslint-env node */\n\n// const path = require('path');\n\n\nconst isDevelopment = process.env.NODE_ENV === 'development';\n\nconst postcssConfig = {\n  plugins: [\n\n    require('@csstools/postcss-global-data')({\n      files: [\n        './node_modules/open-props/media.min.css',\n        './frontend/css/custom-properties.css',\n      ]\n    }),\n\n    // https://github.com/GoogleChromeLabs/postcss-jit-props\n    // https://github.com/argyleink/open-props\n    // require('postcss-jit-props')(require('open-props')),\n    require('postcss-jit-props')({\n      ...require('open-props'),\n      custom_selector: ':where(html)'\n    }),\n\n    // per IOS < 17 (test)\n    // https://github.com/csstools/postcss-plugins/tree/main/plugins/postcss-nesting\n    // https://github.com/csstools/postcss-plugins/tree/main/plugins/postcss-light-dark-function#readme\n    // require('postcss-nesting')({\n    //  edition: '2021',\n    //  noIsPseudoSelector: true\n    //}),\n    // require('@csstools/postcss-light-dark-function')({preserve: false}), /* NB non funziona benissimo... */\n\n    require('autoprefixer'),\n\n    // https://github.com/csstools/postcss-plugins/tree/main/plugins/postcss-custom-media\n    require('postcss-custom-media')({\n      preserve: isDevelopment\n    }),\n\n    // https://purgecss.com/configuration.html\n    // require('@fullhuman/postcss-purgecss')({\n    //   content: [\n    //     // './node_modules/@massimo-cassandro/**/.js',\n    //     './templates/**/*.html.twig',\n    //     './public/**/*.html',\n    //     './src/**/*.{js,jsx}',\n    //   ],\n    //   // css: ['./src/css/custom-properties-figma.css'],\n    //   // output: ['./AppBundle/Resources/public/css/'],\n    //   // variables: true,\n    //   // fontFace: true,\n    //   // keyframes: true,\n    //   safelist: {\n    //     standard: [/:focus$/],\n    //     // deep: [],\n    //     // greedy: [/yellow$/]\n    //   }\n    // }),\n\n  ]\n};\n\nif (process.env.NODE_ENV === 'production') {\n  postcssConfig.plugins.push(\n\n    // per IOS < 17\n    // require('postcss-nesting')({\n    //  edition: '2021',\n    //  noIsPseudoSelector: true\n    //}),\n    // require('@csstools/postcss-light-dark-function'), /* NB non funziona benissimo... */\n\n    // https://github.com/cssnano/cssnano\n    require('cssnano')({\n      // use the safe preset so that it doesn't\n      // mutate or remove code from our css\n      preset: 'default',\n    })\n  );\n}\n\nmodule.exports = postcssConfig;\n\n" > postcss.config.cjs
+echo "/* eslint-env node */
+
+// const path = require('path');
+
+
+const isDevelopment = process.env.NODE_ENV === 'development';
+
+const postcssConfig = {
+  plugins: [
+
+    // NB: percorsi dalla root
+    require('@csstools/postcss-global-data')({
+      files: [
+        './node_modules/open-props/media.min.css',
+        './frontend/src/config/custom-properties.css',
+      ]
+    }),
+
+    // https://github.com/GoogleChromeLabs/postcss-jit-props
+    // https://github.com/argyleink/open-props
+    // require('postcss-jit-props')(require('open-props')),
+    require('postcss-jit-props')({
+      ...require('open-props'),
+      custom_selector: ':where(html)'
+    }),
+
+    // per IOS < 17 (test)
+    // https://github.com/csstools/postcss-plugins/tree/main/plugins/postcss-nesting
+    // https://github.com/csstools/postcss-plugins/tree/main/plugins/postcss-light-dark-function#readme
+    // require('postcss-nesting')({
+    //  edition: '2021',
+    //  noIsPseudoSelector: true
+    //}),
+    // require('@csstools/postcss-light-dark-function')({preserve: false}), /* NB non funziona benissimo... */
+
+    require('autoprefixer'),
+
+    // https://github.com/csstools/postcss-plugins/tree/main/plugins/postcss-custom-media
+    require('postcss-custom-media')({
+      preserve: isDevelopment
+    }),
+
+    // https://purgecss.com/configuration.html
+    // require('@fullhuman/postcss-purgecss')({
+    //   content: [
+    //     // './node_modules/@massimo-cassandro/**/.js',
+    //     './templates/**/*.html.twig',
+    //     './public/**/*.html',
+    //     './src/**/*.{js,jsx}',
+    //   ],
+    //   // css: ['./src/css/custom-properties-figma.css'],
+    //   // output: ['./AppBundle/Resources/public/css/'],
+    //   // variables: true,
+    //   // fontFace: true,
+    //   // keyframes: true,
+    //   safelist: {
+    //     standard: [/:focus$/],
+    //     // deep: [],
+    //     // greedy: [/yellow$/]
+    //   }
+    // }),
+
+  ]
+};
+
+if (process.env.NODE_ENV === 'production') {
+  postcssConfig.plugins.push(
+
+    // per IOS < 17
+    // require('postcss-nesting')({
+    //  edition: '2021',
+    //  noIsPseudoSelector: true
+    //}),
+    // require('@csstools/postcss-light-dark-function'), /* NB non funziona benissimo... */
+
+    // https://github.com/cssnano/cssnano
+    require('cssnano')({
+      // use the safe preset so that it doesn't
+      // mutate or remove code from our css
+      preset: 'default',
+    })
+  );
+}
+
+module.exports = postcssConfig;
+
+" > postcss.config.cjs
 ```
 
 
@@ -149,6 +324,54 @@ npm i -D @stylistic/stylelint-plugin stylelint-config-css-modules stylelint-conf
 echo "/* eslint-env node */\n\nmodule.exports = {\n  extends: [\n    '@massimo-cassandro/stylelint-config',\n    // 'stylelint-config-css-modules'\n  ],\n  ignoreFiles: [\n    'node_modules/**/*.{css,scss}',\n    'vendor/**/*.{css,scss}',\n    'templates/**/*.{css,scss}',\n    'dist/**/*.css',\n    'build/**/*.css',\n    'public/**/*.css',\n    'test/**/*.css'\n  ],\n\n  // tailwind\n  // 'rules': {\n  //   'value-keyword-case': null,\n  //   '@stylistic/number-no-trailing-zeros': null\n  // }\n};\n" > stylelint.config.cjs
 ```
 
+*stylelint.config.mjs*:
+
+```bash
+echo "export default {
+  // Estende la configurazione base e quella specifica per Tailwind
+  extends: [
+    '@massimo-cassandro/stylelint-config',
+    'stylelint-config-standard', // Consigliato per le regole standard moderne
+    'stylelint-config-tailwindcss' // Configurazione specifica per Tailwind CSS
+  ],
+  
+  // File da ignorare durante l'analisi
+  ignoreFiles: [
+    'node_modules/**/*.{css,scss}',
+    'vendor/**/*.{css,scss}',
+    'templates/**/*.{css,scss}',
+    'dist/**/*.css',
+    'build/**/*.css',
+    'public/**/*.css',
+    'test/**/*.css'
+  ],
+
+  // Override delle regole specifiche
+  rules: {
+    // Disabilita le regole che potrebbero entrare in conflitto con la sintassi di Tailwind
+    // Queste sono spesso coperte da 'stylelint-config-tailwindcss' ma è una buona pratica
+    // mantenerle se si notano falsi positivi.
+    'at-rule-no-unknown': [
+      true, 
+      {
+        // Permette le direttive Tailwind come @apply, @tailwind, ecc.
+        ignoreAtRules: [
+          'tailwind', 
+          'apply', 
+          'variants', 
+          'responsive', 
+          'screen'
+        ]
+      }
+    ],
+
+    // Regole che erano presenti nel tuo config originale (se vuoi riattivarle)
+    // 'value-keyword-case': null,
+    // 'number-no-trailing-zeros': null,
+  }
+};" > stylelint.config.cjs
+```
+
 
 
 ## webhint
@@ -161,7 +384,42 @@ npm i -D hint
 *.hintrc.cjs*:
 
 ```bash
-echo "module.exports = {\n  \"connector\": {\n    \"name\": \"local\",\n    \"options\": {\n      \"pattern\": [\"./build/**/*.html\"] // Analizza i file HTML generati nella directory di build\n    }\n  },\n  \"extends\": [\n    \"development\", // Configurazione base per lo sviluppo\n    \"accessibility\", // Regole per l'accessibilità\n    \"performance\", // Regole per le prestazioni\n    \"security\", // Regole per la sicurezza\n    \"html-checker\" // Controllo della validità HTML\n  ],\n  \"hints\": {\n    \"axe\": \"error\", // Controlla l'accessibilità con axe-core\n    \"content-type\": \"error\", // Verifica i tipi di contenuto corretti\n    \"disown-opener\": \"warning\", // Consiglia di usare `rel=\"noopener\"`\n    \"http-cache\": [\"warning\", { \"maxAge\": 31536000 }], // Suggerisce una cache HTTP ottimale\n    \"image-optimization-cloudinary\": \"off\", // Disattiva l'ottimizzazione delle immagini\n    \"meta-viewport\": \"error\", // Verifica la presenza del meta tag viewport\n    \"no-vulnerable-javascript-libraries\": \"error\", // Controlla librerie JS vulnerabili\n    \"performance-budget\": [\n      \"warning\",\n      {\n        \"resourceTypes\": {\n          \"script\": 250, // Limite di 250 KB per gli script\n          \"image\": 500 // Limite di 500 KB per le immagini\n        }\n      }\n    ],\n    \"strict-transport-security\": \"error\", // Suggerisce l'uso di HSTS\n    \"validate-set-cookie-header\": \"error\" // Controlla l'uso corretto dell'header Set-Cookie\n  }\n};\n" > .hintrc.cjs
+echo "module.exports = {
+  "connector": {
+    "name": "local",
+    "options": {
+      "pattern": ["./build/**/*.html"] // Analizza i file HTML generati nella directory di build
+    }
+  },
+  "extends": [
+    "development", // Configurazione base per lo sviluppo
+    "accessibility", // Regole per l'accessibilità
+    "performance", // Regole per le prestazioni
+    "security", // Regole per la sicurezza
+    "html-checker" // Controllo della validità HTML
+  ],
+  "hints": {
+    "axe": "error", // Controlla l'accessibilità con axe-core
+    "content-type": "error", // Verifica i tipi di contenuto corretti
+    "disown-opener": "warning", // Consiglia di usare `rel="noopener"`
+    "http-cache": ["warning", { "maxAge": 31536000 }], // Suggerisce una cache HTTP ottimale
+    "image-optimization-cloudinary": "off", // Disattiva l'ottimizzazione delle immagini
+    "meta-viewport": "error", // Verifica la presenza del meta tag viewport
+    "no-vulnerable-javascript-libraries": "error", // Controlla librerie JS vulnerabili
+    "performance-budget": [
+      "warning",
+      {
+        "resourceTypes": {
+          "script": 250, // Limite di 250 KB per gli script
+          "image": 500 // Limite di 500 KB per le immagini
+        }
+      }
+    ],
+    "strict-transport-security": "error", // Suggerisce l'uso di HSTS
+    "validate-set-cookie-header": "error" // Controlla l'uso corretto dell'header Set-Cookie
+  }
+};
+" > .hintrc.cjs
 ```
 
 
