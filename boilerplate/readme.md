@@ -11,3 +11,6 @@ in frontend
 * webpack
 * postcss
 * browserlist
+
+
+[Snippets](snippets.md)
