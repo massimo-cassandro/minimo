@@ -443,6 +443,12 @@ npm i -D @babel/core @babel/preset-env babel-loader copy-webpack-plugin css-load
 npm i -D postcss autoprefixer postcss-custom-media @csstools/postcss-global-data postcss-loader 
 ```
 
+### responsive-loader
+
+```bash
+npm i -D responsive-loader 
+```
+
 ### webpack-remove-empty-scripts
 * <https://github.com/webdiscus/webpack-remove-empty-scripts#readme>
 
