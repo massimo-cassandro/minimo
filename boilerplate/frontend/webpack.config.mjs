@@ -1,7 +1,9 @@
 // webpack.config.mjs
 import path from 'path';
-// import fs from 'fs';
 import { fileURLToPath } from 'url';
+import webpack from 'webpack';
+import fs from 'fs';
+import * as process from 'process'; // Rende 'process' disponibile nel contesto ESM
 
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 import HtmlWebpackInjectPreload from '@principalstudio/html-webpack-inject-preload';
@@ -9,114 +11,116 @@ import TerserPlugin from 'terser-webpack-plugin';
 import CssMinimizerPlugin from 'css-minimizer-webpack-plugin';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import CopyWebpackPlugin from 'copy-webpack-plugin';
-import svgToMiniDataURI from 'mini-svg-data-uri';
-// import RemoveEmptyScriptsPlugin from 'webpack-remove-empty-scripts';
-import { WebpackManifestPlugin } from 'webpack-manifest-plugin';
+import Dotenv from 'dotenv-webpack';
 
-// import Dotenv from 'dotenv-webpack';
-import webpack from 'webpack';
-// const { BannerPlugin, ProvidePlugin } = webpack;
-
-// Equivalente a __dirname in CJS
+// --- Variabili Globali ---
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Import del package.json
-import { createRequire } from 'module';
-const require = createRequire(import.meta.url);
-const PACKAGE = require('./package.json');
-const processBrowserPath = require.resolve('process/browser');
+// Import del file package.json (risolto l'errore 'assert')
+const PACKAGE = JSON.parse(
+  fs.readFileSync(path.resolve(__dirname, './package.json'), 'utf-8')
+);
 
-// Variabili di ambiente e percorsi
-const isDevelopment = process.env.NODE_ENV === 'development'
-  , output_dir = path.resolve(__dirname, './build')
-  , favicons_path = /src\/favicons\/output/
-;
+const isDevelopment = process.env.NODE_ENV === 'development';
+const output_dir = path.resolve(__dirname, './build');
+const favicons_path = /src\/favicons\/output/; // Pattern per i favicons
+
+// --- Logica Condizionale SVGO ---
+// SVGO è attivo se è esplicitamente impostato su 'true' O se siamo in produzione.
+const USE_SVGO = true; // process.env.USE_SVGO === 'true' || !isDevelopment;
+
+// Import del config di SVGO (l'oggetto sarà usato solo se USE_SVGO è true)
+let svgoConfig = {};
+try {
+  // Legge il file svgo.config.js come modulo Node/JS standard
+  svgoConfig = (USE_SVGO) ? (await import('./svgo.config.js')).default : {};
+
+} catch {
+  if (USE_SVGO) {
+    // eslint-disable-next-line no-console
+    console.warn('SVGO_CONFIG_WARN: svgo.config.js non trovato o non leggibile. Disabilitare USE_SVGO se non richiesto.');
+  }
+}
 
 /**
- * Funzione per generare le regole per il CSS/SASS
- * @param {boolean} css_modules - Abilita i CSS modules.
- * @param {boolean} inline - Usa style-loader per l'iniezione inline.
- * @returns {Array<object>} Array di oggetti loader.
+ * Funzione per ottenere gli alias da jsconfig.json
+ * @returns {Record<string, string>}
  */
-function css_loaders({ css_modules = false, inline = false } = {}) {
-  return [
-    (
-      inline
+function getJsConfigAliases() {
+  const jsConfig = JSON.parse(
+    fs.readFileSync(path.resolve(__dirname, './jsconfig.json'), 'utf-8')
+  );
+  const aliases = {};
+  for (const item in jsConfig.compilerOptions.paths) {
+    const key = item.replace(/(\/\*)$/, '');
+    const value = path.resolve(
+      __dirname,
+      path.relative(__dirname, jsConfig.compilerOptions.paths[ item ][ 0 ]).replace(/(\/\*)$/, '')
+    );
+    aliases[ key ] = value;
+  }
+  return aliases;
+}
+
+/**
+ * Funzione per definire le regole per CSS/SCSS
+ * @returns {import('webpack').RuleSetRule[]}
+ */
+function cssRules() {
+  const css_loaders = (opts = {}) => {
+    opts = {
+      css_modules: false,
+      inline: false,
+      ...opts
+    };
+    return [
+      opts.inline
         ? {
           loader: 'style-loader',
           options: {
             injectType: 'singletonStyleTag'
           }
         }
-        : isDevelopment ? 'style-loader' : MiniCssExtractPlugin.loader
-    ),
-    {
-      loader: 'css-loader',
-      options: {
-        modules: css_modules ? {
-          auto: true,
-          localIdentName: isDevelopment ? '[local]_[hash:base64:6]' : '[hash:base64]',
-        } : false,
-        sourceMap: isDevelopment,
-        importLoaders: isDevelopment ? 3 : 3, // Incrementato a 3 (postcss, sass)
-      }
-    },
-    {
-      loader: 'postcss-loader',
-      options: {
-        postcssOptions: {
+        : MiniCssExtractPlugin.loader,
+      {
+        loader: 'css-loader',
+        options: {
+          modules: opts.css_modules
+            ? {
+              auto: true,
+              localIdentName: isDevelopment
+                ? '[local]_[hash:base64:6]'
+                : '[hash:base64]'
+            }
+            : false,
           sourceMap: isDevelopment,
-        },
-      },
-    },
-    // => Aggiunta di sass-loader
-    {
-      loader: 'sass-loader',
-      options: {
-        sourceMap: isDevelopment,
-        sassOptions: {
-          quietDeps: true,
-          // Le opzioni legacy sono state rimosse o semplificate per la sintassi moderna
+          importLoaders: isDevelopment ? 1 : 2
         }
-    
-    },
-    },
-  ];
-}
+      },
+      {
+        loader: 'postcss-loader',
+        options: {
+          postcssOptions: {
+            sourceMap: isDevelopment
+          }
+        }
+      },
+      // {
+      //   loader: 'sass-loader',
+      //   options: {
+      //     sourceMap: isDevelopment
+      //   }
+      // }
+    ];
+  };
 
-/**
- * Funzione per ottenere gli alias da jsconfig.json
- * @returns {object} Oggetto alias per Webpack
- */
-function getJsConfigAliases() {
-  const jsConfig = require('./jsconfig.json');
-  const aliases = {};
-  
-  for(const item in jsConfig.compilerOptions.paths) {
-    const key = item.replace(/(\/\*)$/, ''),
-      value = path.resolve(
-        __dirname,
-        path.relative(__dirname, jsConfig.compilerOptions.paths[item][0]
-      )
-        .replace(/(\/\*)$/, ''));
-    aliases[key] = value;
-  }
-  return aliases;
-}
-
-/**
- * Funzione per generare le regole del modulo CSS
- * @returns {Array<object>} Array di regole per `module.rules`
- */
-function cssRules() {
   return [
-    // =>> rules: css/scss modules
     {
       test: /(\.module\.(sass|scss|css))$/,
       oneOf: [
         {
-          resourceQuery: /inline/, 
+          resourceQuery: /inline/,
           use: css_loaders({ inline: true, css_modules: true }),
         },
         {
@@ -124,43 +128,40 @@ function cssRules() {
         },
       ]
     },
-
-    // =>> rules: css / scss normali
     {
       test: /\.(sass|scss|css)$/,
       exclude: /(\.module\.(sass|scss|css))$/,
       oneOf: [
         {
-          resourceQuery: /inline/, 
+          resourceQuery: /inline/,
           use: css_loaders({ inline: true }),
         },
         {
           use: css_loaders(),
-        },
+        }
       ]
     }
   ];
 }
 
-// Oggetto di configurazione principale
 const config = {
   mode: isDevelopment ? 'development' : 'production',
 
   watchOptions: {
-    ignored: ['build', '**/node_modules', '.git', '_private'],
+    ignored: [ 'build', '**/node_modules', '.git', '_private' ]
   },
 
   devtool: isDevelopment ? 'inline-source-map' : false,
 
   entry: {
-    'xxx': './src/index.js',
+    'calibre-reader': './src/index.js'
   },
 
   output: {
     path: output_dir,
     filename: '[name].[contenthash].js',
     publicPath: '/',
-    clean: !isDevelopment,
+    clean: !isDevelopment
   },
 
   // =>> optimization
@@ -171,11 +172,11 @@ const config = {
       new TerserPlugin({
         terserOptions: {
           output: {
-            comments: /^!/,
-          },
+            comments: /^!/
+          }
         },
-        extractComments: false,
-      }),
+        extractComments: false
+      })
     ],
     runtimeChunk: true,
     splitChunks: {
@@ -186,14 +187,14 @@ const config = {
           chunks: 'all'
         }
       }
-    },
+    }
   },
 
   // =>> performance
   performance: {
     hints: false,
     maxEntrypointSize: 512000,
-    maxAssetSize: 512000,
+    maxAssetSize: 512000
   },
 
   // =>> devServer
@@ -201,26 +202,35 @@ const config = {
     historyApiFallback: true,
     static: {
       directory: path.join(__dirname, '/'),
-      serveIndex: true,
+      serveIndex: true
     },
     open: {
       app: {
-        name: 'Google Chrome',
-      },
+        name: 'Google Chrome'
+      }
     },
     compress: true,
     hot: true,
-    port: 5700,
+    port: 5700
   },
 
   // =>> plugins
   plugins: [
-    // CopyWebpackPlugin
+    new Dotenv({
+      path: isDevelopment ? './.env.development' : './.env',
+      expand: true,
+      ignoreStub: true,
+      allowEmptyValues: true
+    }),
+    new webpack.ProvidePlugin({
+      process: 'process/browser.js'
+    }),
+
     new CopyWebpackPlugin({
       patterns: [
         {
           from: 'src/favicons/output/icon-*.png',
-          to: "[name][ext]",
+          to: '[name][ext]'
         },
         {
           from: 'src/php',
@@ -228,28 +238,17 @@ const config = {
           globOptions: {
             dot: true,
             gitignore: true,
-            ignore: ['**/.DS_Store'],
-          },
-        },
-      ],
+            ignore: [ '**/.DS_Store', ...(isDevelopment ? [] : [ '**/init-dev.php' ]) ]
+          }
+        }
+      ]
     }),
 
-    // WebpackManifestPlugin
-    new WebpackManifestPlugin({
-      removeKeyHash: /(\?(as_asset|as_lib))$/,
-      filter: isDevelopment ? undefined : (FileDescriptor) => {
-        return /fonts/.test(FileDescriptor.path) ? false : true;
-      },
-      sort: isDevelopment ? undefined : (a, b) => a.name.localeCompare(b.name)
-    }),
-
-    // MiniCssExtractPlugin
     new MiniCssExtractPlugin({
       filename: '[name].[contenthash].css',
       chunkFilename: '[id].[contenthash].css'
     }),
 
-    // HtmlWebpackPlugin
     new HtmlWebpackPlugin({
       filename: 'index.html',
       template: path.resolve(__dirname, './src/tpl/index.ejs'),
@@ -258,134 +257,163 @@ const config = {
       minify: !isDevelopment
     }),
 
-    // HtmlWebpackInjectPreload
-    new HtmlWebpackInjectPreload({
-      files: [
-        {
-          match: /.*-latin-(?!(ext-)).*\.woff2$/,
-          attributes: { as: 'font', type: 'font/woff2', crossorigin: true },
-        },
-        {
-          match: /.*\.css$/,
-          attributes: { as: 'style' },
-        },
-        {
-          match: /.*\.js$/,
-          attributes: { as: 'script' },
-        },
-      ]
-    }),
+    ...(isDevelopment
+      ? []
+      : [
+        new HtmlWebpackInjectPreload({
+          files: [
+            {
+              match: /.*-latin-(?!(ext-)).*\.woff2$/,
+              attributes: { as: 'font', type: 'font/woff2', crossorigin: true }
+            },
+            {
+              match: /.*\.css$/,
+              attributes: { as: 'style' }
+            },
+            {
+              match: /.*\.js$/,
+              attributes: { as: 'script' }
+            }
+          ]
+        })
+      ]),
 
-    // BannerPlugin
     new webpack.BannerPlugin({
       banner: () => {
         const year = new Date().toLocaleString('en-UK', { year: 'numeric' });
-        return '/*!\n' +
+        return (
+          '/*!\n' +
           ` * ${PACKAGE.name} v.${PACKAGE.version} - Massimo Cassandro 2023-${year}\n` +
-          ' */\n';
+          ' */\n'
+        );
       },
       raw: true
     })
-
   ], // plugins
 
   module: {
     // =>> rules
     rules: [
+      // =>> rules: html files
       {
         test: /(\.html?)$/i,
         oneOf: [
           {
-            resourceQuery: /as_asset/,
             type: 'asset/resource',
+            resourceQuery: /as_asset/,
             generator: {
-              filename: '[name].[contenthash][ext]',
+              filename: '[name].[contenthash].[ext]'
             }
           },
           {
-            type: 'asset/source'
-          },
+            loader: 'html-loader'
+          }
         ]
       },
 
+      // =>> rules: favicons
       {
         test: /\.(?:ico|png|svg|webmanifest)$/i,
-        include: favicons_path,
         type: 'asset/resource',
+        include: favicons_path,
         generator: {
-          filename: ({ filename }) => {
-            const basename = path.basename(filename);
-            return basename.replace(/\.([^.]+)$/, '').replace(/\?.*/, '') + '[ext]';
-          },
+          filename: '[name][ext]?_=[contenthash]'
         }
       },
 
+      // =>> JS libraries
       {
         test: /\.js$/,
-        resourceQuery: /as_lib/,
         type: 'asset/resource',
+        resourceQuery: /as_lib/,
         generator: {
-          filename: 'libs/[name].[contenthash][ext]',
+          filename: 'libs/[name].[contenthash].[ext]'
         }
       },
 
+      // =>> rules: svg (Condizionale SVGO)
       {
         test: /(\.svg)$/i,
         oneOf: [
+          // 1. svg inline dataUri per css (con `?inline-dataURI`)
           {
             resourceQuery: /inline-dataURI/,
-            type: 'asset/inline',
-            generator: {
-              dataUrl: content => svgToMiniDataURI(content.toString()),
-            }
+            type: 'asset/source',
+            use: [
+              // Loader di ottimizzazione SVGO (condizionale)
+              ...(USE_SVGO ? [ {
+                loader: 'svgo-loader',
+                options: svgoConfig,
+              } ] : []),
+
+              // Loader wrapper per Data URI compatto (Mini-SVG-Data-URI-Loader)
+              {
+                loader: path.resolve(__dirname, './loaders/mini-svg-data-uri-loader.cjs'),
+              },
+            ],
           },
+
+          // 2. svg inline (con `?inline`)
           {
             resourceQuery: /inline/,
             type: 'asset/source',
+            // Ottimizzazione SVGO (condizionale)
+            use: USE_SVGO ? [ { loader: 'svgo-loader', options: svgoConfig } ] : [],
           },
+
+          // 3. svg file (copy image files to build folder)
           {
             type: 'asset/resource',
+            exclude: [ /inline-dataURI/, /inline/ ],
             generator: {
-              filename: 'imgs/[name].[contenthash][ext]',
-            }
-          },
+              filename: 'imgs/[name].[contenthash].[ext]'
+            },
+            // Ottimizzazione SVGO (condizionale)
+            use: USE_SVGO ? [
+              {
+                loader: 'svgo-loader',
+                options: svgoConfig,
+              },
+            ] : []
+          }
         ]
-      },
+      }, // end svg
 
+      // =>> rules: Images / pdf
       {
         test: /\.(?:ico|gif|png|jpg|jpeg|webp|avif|pdf)$/i,
         type: 'asset/resource',
         generator: {
-          filename: 'imgs/[name].[contenthash][ext]',
+          filename: 'imgs/[name].[contenthash].[ext]'
         }
       },
 
+      // =>> rules: Fonts
       {
         test: /\.(woff2?|eot|ttf|otf)$/,
         type: 'asset/resource',
         generator: {
-          filename: 'fonts/[name].[contenthash][ext]',
+          filename: 'fonts/[name].[contenthash].[ext]'
         }
       },
 
       ...cssRules()
-    ]
-  },
+    ] // end rules
+  }, // end module
 
   // =>> resolve
   resolve: {
     fallback: {
-      'fs': false,
-      'util': false,
-      // Uso processBrowserPath per risolvere il percorso in un contesto ESM
-      'process': processBrowserPath,
+      fs: false,
+      util: false,
+      process: 'process/browser.js'
     },
-    modules: ['./', 'node_modules'],
-    extensions: ['.tsx', '.ts', '.js', '.mjs', '.cjs', '.jsx', '.json', '.scss', '.css'],
-    alias: getJsConfigAliases()
+    modules: [ './', './node_modules' ],
+    extensions: [ '.tsx', '.ts', '.js', '.mjs', '.cjs', '.jsx', '.json', '.scss', '.css' ],
+    alias: {
+      ...getJsConfigAliases()
+    }
   }
-
 };
 
-// Esporta la configurazione in sintassi ESM
 export default config;
