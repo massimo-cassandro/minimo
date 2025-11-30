@@ -19,4 +19,4 @@ export default {
     // , { name: 'addClassesToSVGElement', params: { className: 'line-icon'  } }
     'removeUselessStrokeAndFill',
   ]
-}
+};
