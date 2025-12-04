@@ -6,11 +6,9 @@
 curl -s https://raw.githubusercontent.com/massimo-cassandro/minimo/refs/heads/main/boilerplate/_browserslistrc > .browserslistrc && \
 curl -s https://raw.githubusercontent.com/massimo-cassandro/minimo/refs/heads/main/boilerplate/_editorconfig > .editorconfig && \
 curl -s https://raw.githubusercontent.com/massimo-cassandro/minimo/refs/heads/main/boilerplate/_prettierrc > .prettierrc && \
-curl -s https://raw.githubusercontent.com/massimo-cassandro/minimo/refs/heads/main/boilerplate/frontend/postcss.config.cjs > postcss.config.cjs && \
 npm i -D @massimo-cassandro/dev-updater && \
 npm i -D eslint@^9 @eslint/js globals && npm i -D @massimo-cassandro/eslint-config@^2 && \
 curl -s https://raw.githubusercontent.com/massimo-cassandro/minimo/refs/heads/main/boilerplate/eslint.config.mjs > eslint.config.mjs && \
-curl -s https://raw.githubusercontent.com/massimo-cassandro/minimo/refs/heads/main/boilerplate/jsconfig.json > jsconfig.json && \
 npm i -D @stylistic/stylelint-plugin stylelint-config-css-modules stylelint-config-twbs-bootstrap stylelint && npm i -D @massimo-cassandro/stylelint-config  && \
 curl -s https://raw.githubusercontent.com/massimo-cassandro/minimo/refs/heads/main/boilerplate/stylelint.config.mjs > stylelint.config.mjs && \
 curl -s https://raw.githubusercontent.com/massimo-cassandro/minimo/refs/heads/main/boilerplate/frontend/webpack.config.mjs > webpack.config.mjs  && \
@@ -176,7 +174,7 @@ npm i -D @babel/core @babel/preset-env babel-loader copy-webpack-plugin css-load
 ### postcss + plugins (webpack)
 
 ```bash
-npm i -D postcss autoprefixer postcss-custom-media @csstools/postcss-global-data postcss-loader 
+npm i -D postcss autoprefixer postcss-custom-media @csstools/postcss-global-data postcss-loader cssnano
 ```
 
 ### responsive-loader
