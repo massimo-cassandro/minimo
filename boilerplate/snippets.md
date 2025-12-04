@@ -6,13 +6,18 @@
 curl -s https://raw.githubusercontent.com/massimo-cassandro/minimo/refs/heads/main/boilerplate/_browserslistrc > .browserslistrc && \
 curl -s https://raw.githubusercontent.com/massimo-cassandro/minimo/refs/heads/main/boilerplate/_editorconfig > .editorconfig && \
 curl -s https://raw.githubusercontent.com/massimo-cassandro/minimo/refs/heads/main/boilerplate/_prettierrc > .prettierrc && \
+
 npm i -D @massimo-cassandro/dev-updater && \
+
 npm i -D eslint@^9 @eslint/js globals && npm i -D @massimo-cassandro/eslint-config@^2 && \
 curl -s https://raw.githubusercontent.com/massimo-cassandro/minimo/refs/heads/main/boilerplate/eslint.config.mjs > eslint.config.mjs && \
+
 npm i -D @stylistic/stylelint-plugin stylelint-config-css-modules stylelint-config-twbs-bootstrap stylelint && npm i -D @massimo-cassandro/stylelint-config  && \
 curl -s https://raw.githubusercontent.com/massimo-cassandro/minimo/refs/heads/main/boilerplate/stylelint.config.mjs > stylelint.config.mjs && \
+
 curl -s https://raw.githubusercontent.com/massimo-cassandro/minimo/refs/heads/main/boilerplate/frontend/webpack.config.mjs > webpack.config.mjs  && \
-npm i -D @babel/core @babel/preset-env babel-loader copy-webpack-plugin css-loader css-minimizer-webpack-plugin dotenv-webpack html-loader html-webpack-plugin mini-css-extract-plugin mini-svg-data-uri postcss-preset-env style-loader terser-webpack-plugin && npm i -D webpack-cli webpack-dev-server webpack-manifest-plugin webpack  && \
+npm i -D @babel/core @babel/preset-env babel-loader copy-webpack-plugin css-loader css-minimizer-webpack-plugin dotenv-webpack html-loader html-webpack-plugin mini-css-extract-plugin mini-svg-data-uri postcss-preset-env style-loader terser-webpack-plugin && \
+npm i -D webpack-cli webpack-dev-server webpack-manifest-plugin webpack  && \
 npm i -D postcss autoprefixer postcss-custom-media @csstools/postcss-global-data postcss-loader  && \
 npm i -D responsive-loader && \
 npm i -D webpack-remove-empty-scripts
