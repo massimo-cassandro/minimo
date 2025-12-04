@@ -17,7 +17,7 @@ import Dotenv from 'dotenv-webpack';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Import del file package.json (risolto l'errore 'assert')
+// Import del file package.json
 const PACKAGE = JSON.parse(
   fs.readFileSync(path.resolve(__dirname, './package.json'), 'utf-8')
 );
@@ -27,13 +27,10 @@ const output_dir = path.resolve(__dirname, './build');
 const favicons_path = /src\/favicons\/output/; // Pattern per i favicons
 
 // --- Logica Condizionale SVGO ---
-// SVGO è attivo se è esplicitamente impostato su 'true' O se siamo in produzione.
 const USE_SVGO = true; // process.env.USE_SVGO === 'true' || !isDevelopment;
 
-// Import del config di SVGO (l'oggetto sarà usato solo se USE_SVGO è true)
 let svgoConfig = {};
 try {
-  // Legge il file svgo.config.js come modulo Node/JS standard
   svgoConfig = (USE_SVGO) ? (await import('./svgo.config.js')).default : {};
 
 } catch {
@@ -417,3 +414,4 @@ const config = {
 };
 
 export default config;
+
