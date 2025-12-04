@@ -151,7 +151,7 @@ const config = {
   devtool: isDevelopment ? 'inline-source-map' : false,
 
   entry: {
-    'calibre-reader': './src/index.js'
+    'xxxxxx': './src/index.js'
   },
 
   output: {
@@ -229,15 +229,15 @@ const config = {
           from: 'src/favicons/output/icon-*.png',
           to: '[name][ext]'
         },
-        {
-          from: 'src/php',
-          to: 'php',
-          globOptions: {
-            dot: true,
-            gitignore: true,
-            ignore: [ '**/.DS_Store', ...(isDevelopment ? [] : [ '**/init-dev.php' ]) ]
-          }
-        }
+        // {
+        //   from: 'src/php',
+        //   to: 'php',
+        //   globOptions: {
+        //     dot: true,
+        //     gitignore: true,
+        //     ignore: [ '**/.DS_Store', ...(isDevelopment ? [] : [ '**/init-dev.php' ]) ]
+        //   }
+        // }
       ]
     }),
 
@@ -250,7 +250,7 @@ const config = {
       filename: 'index.html',
       template: path.resolve(__dirname, './src/tpl/index.ejs'),
       inject: 'body',
-      title: 'Calibre-Reader',
+      title: 'XXXXX',
       minify: !isDevelopment
     }),
 
@@ -332,9 +332,9 @@ const config = {
       {
         test: /(\.svg)$/i,
         oneOf: [
-          // 1. svg inline dataUri per css (con `?inline-dataURI`)
+          // 1. svg inline dataUri per css (con `?cssInline`)
           {
-            resourceQuery: /inline-dataURI/,
+            resourceQuery: /cssInline/, // ex inline-dataURI
             type: 'asset/source',
             use: [
               // Loader di ottimizzazione SVGO (condizionale)
@@ -361,7 +361,7 @@ const config = {
           // 3. svg file (copy image files to build folder)
           {
             type: 'asset/resource',
-            exclude: [ /inline-dataURI/, /inline/ ],
+            exclude: [ /cssInline/, /inline/ ],
             generator: {
               filename: 'imgs/[name].[contenthash].[ext]'
             },
