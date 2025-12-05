@@ -1,7 +1,13 @@
 // svgo.config.js
+import addViewBox from 'svgo-add-viewbox';
+
 export default {
   multipass: true,
   plugins: [
+    {
+      ...addViewBox,
+      params: { overwrite: false }
+    },
     { name: 'cleanupIds', params: { remove: true, minify: true } }
     , 'removeDoctype'
     , 'removeComments'

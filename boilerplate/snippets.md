@@ -22,12 +22,16 @@ npm i -D postcss autoprefixer postcss-custom-media @csstools/postcss-global-data
 npm i -D responsive-loader
 npm i -D webpack-remove-empty-scripts
 curl -s https://raw.githubusercontent.com/massimo-cassandro/minimo/refs/heads/main/boilerplate/frontend/webpack.config.mjs > webpack.config.mjs 
+npm i -S svgo svg-url-loader svgo-loader svgo-add-viewbox
 
 if [ ! -d ./webpack ]; then
   mkdir -p ./webpack
   curl -s https://raw.githubusercontent.com/massimo-cassandro/minimo/refs/heads/main/boilerplate/frontend/webpack/mini-svg-data-uri-loader.cjs > ./webpack/mini-svg-data-uri-loader.cjs
-  curl -s https://raw.githubusercontent.com/massimo-cassandro/minimo/refs/heads/main/boilerplate/frontend/webpack/svgo.config.js > ./webpack/svgo.config.js
 fi
+```
+
+```bash
+curl -s https://raw.githubusercontent.com/massimo-cassandro/minimo/refs/heads/main/boilerplate/frontend/webpack/svgo.config.js > ./webpack/svgo.config.js
 ```
 
 ```bash
@@ -224,7 +228,8 @@ npm i -D @principalstudio/html-webpack-inject-preload
 ### SVGO
 
 ```bash
-npm install svgo svg-url-loader svgo-loader --save-dev
+npm install svgo svg-url-loader svgo-loader svgo-add-viewbox --save-dev
+curl -s https://raw.githubusercontent.com/massimo-cassandro/minimo/refs/heads/main/boilerplate/frontend/webpack/svgo.config.js > ./svgo.config.js
 ```
 
 ### solid-js (webpack)
