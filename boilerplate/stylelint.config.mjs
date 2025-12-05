@@ -1,8 +1,7 @@
 export default {
-  // Estende la configurazione base e quella specifica per Tailwind
   extends: [
+    'stylelint-config-standard',
     '@massimo-cassandro/stylelint-config',
-    'stylelint-config-standard', // Consigliato per le regole standard moderne
   ],
 
   // File da ignorare durante l'analisi
@@ -18,24 +17,22 @@ export default {
 
   // Override delle regole specifiche
   rules: {
-    // Disabilita le regole che potrebbero entrare in conflitto con la sintassi di Tailwind
-    // Queste sono spesso coperte da 'stylelint-config-tailwindcss' ma è una buona pratica
-    // mantenerle se si notano falsi positivi.
-    'at-rule-no-unknown': [
-      true,
-      {
-        // Permette le direttive Tailwind come @apply, @tailwind, ecc.
-        ignoreAtRules: [
-          'tailwind',
-          'apply',
-          'variants',
-          'responsive',
-          'screen'
-        ]
-      }
-    ],
-
-    // 'value-keyword-case': null,
-    // 'number-no-trailing-zeros': null,
+    //********************** tailwind:
+    // 'at-rule-no-unknown': [
+    //   true,
+    //   {
+    //     // Permette le direttive Tailwind come @apply, @tailwind, ecc.
+    //     ignoreAtRules: [
+    //       'tailwind',
+    //       'apply',
+    //       'variants',
+    //       'responsive',
+    //       'screen'
+    //     ]
+    //   },
+    //   'value-keyword-case': null,
+    //   '@stylistic/number-no-trailing-zeros': null
+    // ],
+    //********************** /tailwind
   }
 };

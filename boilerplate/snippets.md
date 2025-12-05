@@ -36,6 +36,14 @@ curl -s https://raw.githubusercontent.com/massimo-cassandro/minimo/refs/heads/ma
 curl -s https://raw.githubusercontent.com/massimo-cassandro/minimo/refs/heads/main/boilerplate/jsconfig.json > jsconfig.json
 ```
 
+## package.json scripts
+* `"launchChrome": "open -n -a 'Google Chrome' --args --profile-directory='Profile 3'",`
+* `"python server": "python3 -m http.server 8000 # --directory __dirname__ # 8000 = default port",`
+* `"php server": "php -S localhost:8000 # -t root_dir/",`
+* `"symfony local server": "symfony serve -d",`
+* `"node server": "node serve # richiede ‘npm i serve’",`
+
+
 ## root / frontend
 
 ### .browserslistrc
@@ -114,15 +122,6 @@ curl -s https://raw.githubusercontent.com/massimo-cassandro/minimo/refs/heads/ma
 curl -s https://raw.githubusercontent.com/massimo-cassandro/minimo/refs/heads/main/boilerplate/jsconfig.json > jsconfig.json
 ```
 
-
-## Local servers
-* `"python server": "python3 -m http.server 8000 # --directory __dirname__ # 8000 = default port",`
-* `"php server": "php -S localhost:8000 # -t root_dir/",`
-* `"symfony local server": "symfony serve -d",`
-* node serve # npm i serve
-
-
-
 ## sass cli
 
 ```bash
@@ -182,7 +181,9 @@ npm i -D @babel/core @babel/preset-env babel-loader copy-webpack-plugin css-load
 **package.json:**
 ```javascript
 {
+"launchChrome"; "open -n -a 'Google Chrome' --args --profile-directory='Profile 3'",
 "webpack DEV": "NODE_ENV=development webpack serve --config ./webpack.config.mjs #--open-app-name 'Google Chrome'",
+"webpack DEV": "npm run 'launchChrome' && NODE_ENV=development webpack serve --config ./webpack.config.mjs #--open-app-name 'Google Chrome'",
 "webpack DEV": "rm -rf ./public/dev && NODE_ENV=development webpack --config ./webpack.config.mjs",
 "webpack PROD": "NODE_ENV=production webpack --config ./webpack.config.mjs"
 }
