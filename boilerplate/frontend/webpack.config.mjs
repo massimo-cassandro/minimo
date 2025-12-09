@@ -46,7 +46,7 @@ try {
  */
 function getJsConfigAliases() {
   const jsConfig = JSON.parse(
-    fs.readFileSync(path.resolve(__dirname, './jsconfig.json'), 'utf-8')
+    fs.readFileSync(path.resolve(__dirname, '../jsconfig.json'), 'utf-8')
   );
   const aliases = {};
   for (const item in jsConfig.compilerOptions.paths) {
