@@ -64,7 +64,7 @@ function getJsConfigAliases() {
  * Funzione per definire le regole per CSS/SCSS
  * @returns {import('webpack').RuleSetRule[]}
  */
-function cssRules() {
+function cssRules(alwaysInline = false) {
   const css_loaders = (opts = {}) => {
     opts = {
       css_modules: false,
@@ -72,7 +72,7 @@ function cssRules() {
       ...opts
     };
     return [
-      opts.inline
+      (opts.inline || alwaysInline)
         ? {
           loader: 'style-loader',
           options: {
