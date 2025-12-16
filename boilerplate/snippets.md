@@ -297,6 +297,13 @@ npm i -S @massimo-cassandro/js-file-uploader
 npm i -S @massimo-cassandro/js-utilities
 ```
 
+## dom-builder
+* <https://github.com/massimo-cassandro/dom-builder>
+
+```bash
+npm i -S @massimo-cassandro/som-builder
+```
+
 
 ## json-table
 * <https://github.com/massimo-cassandro/json-table>
