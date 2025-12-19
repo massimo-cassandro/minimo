@@ -91,29 +91,38 @@ curl -s https://raw.githubusercontent.com/massimo-cassandro/minimo/refs/heads/ma
 * <https://meyerweb.com/eric/tools/css/reset/>
 
 ## dev-updater
-* <https://github.com/massimo-cassandro/dev-updater>
-* `"UPD-version": "npx update-version  # --config=./dev-utilities.config.mjs",`
-* `"upd@m": "npx upd@m",`
+<https://github.com/massimo-cassandro/dev-updater>
 
+*install:*
 ```bash
 npm i -D @massimo-cassandro/dev-updater
 ```
 
-## eslint9 (+ uninstall)
-
-
-```bash
-npm uninstall eslint @eslint/js globals @massimo-cassandro/eslint-config
+*package.json scripts*:
+```json
+"UPD-version": "npx update-version  # --config=./dev-utilities.config.mjs",
+"upd@m": "npx upd@m",
 ```
 
 
+## eslint9 (+ uninstall)
+
+*install*:
 ```bash
 npm i -D eslint@^9 @eslint/js globals && npm i -D @massimo-cassandro/eslint-config@^2
 ```
 
+*@cybozu*:
+```bash
+npm install -D eslint @cybozu/eslint-config
+```
+
+*uninstall*:
+```bash
+npm uninstall eslint @eslint/js globals @massimo-cassandro/eslint-config
+```
 
 *eslint.config.mjs*:
-
 ```bash
 curl -s https://raw.githubusercontent.com/massimo-cassandro/minimo/refs/heads/main/boilerplate/eslint.config.mjs > eslint.config.mjs
 ```
