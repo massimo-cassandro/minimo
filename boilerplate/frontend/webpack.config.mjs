@@ -178,13 +178,49 @@ const config = {
     runtimeChunk: true,
     splitChunks: {
       cacheGroups: {
+
+        icons: {
+          test(module) {
+            return (
+              module.resource &&
+              module.resource.includes(`${path.sep}src${path.sep}icons${path.sep}`) &&
+              !module.resource.includes(`${path.sep}node_modules${path.sep}`)
+            );
+          },
+          name: 'icons',
+          chunks: 'all',
+          priority: 20,
+          enforce: true
+        },
+
         vendor: {
           test: /[\\/]node_modules[\\/]/,
           name: 'vendors',
           chunks: 'all'
-        }
+        },
+
+        // separazione @massimo-cassandro da node_modules:
+        // mc: {
+        //   test: /[\\/]node_modules\/@massimo-cassandro[\\/]/,
+        //   name: 'mc',
+        //   chunks: 'all'
+        // },
+        // vendor: {
+        //   // test: /[\\/]node_modules[\\/]/,
+        //   test(module) {
+        //     // `module.resource` contains the absolute path of the file on disk.
+        //     // Note the usage of `path.sep` instead of / or \, for cross-platform compatibility.
+        //     return (
+        //       module.resource &&
+        //       module.resource.includes(`${path.sep}node_modules${path.sep}`) &&
+        //       !module.resource.includes(`${path.sep}@massimo-cassandro${path.sep}`)
+        //     );
+        //   },
+        //   name: 'vendors',
+        //   chunks: 'all'
+        // },
       }
-    }
+    },
   },
 
   // =>> performance
