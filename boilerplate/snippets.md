@@ -237,7 +237,7 @@ npm i -D @principalstudio/html-webpack-inject-preload
 ### SVGO
 
 ```bash
-npm install svgo svg-url-loader svgo-loader svgo-add-viewbox --save-dev
+npm install -D svgo svg-url-loader svgo-loader svgo-add-viewbox
 curl -s https://raw.githubusercontent.com/massimo-cassandro/minimo/refs/heads/main/boilerplate/frontend/webpack/svgo.config.js > ./svgo.config.js
 ```
 

@@ -364,7 +364,7 @@ const config = {
         }
       },
 
-      // =>> rules: svg (Condizionale SVGO)
+      // =>> rules: svg
       {
         test: /(\.svg)$/i,
         oneOf: [
@@ -386,7 +386,31 @@ const config = {
             ],
           },
 
-          // 2. svg inline (con `?inline`)
+          // as react component -> https://react-svgr.com/docs/webpack/
+          {
+            resourceQuery: /react/,
+            issuer: /\.[jt]sx?$/,
+            use: [
+              ...(USE_SVGO ? [
+                {
+                  loader: 'svgo-loader',
+                  options: svgoConfig,
+                },
+              ] : []),
+              {
+                loader: '@svgr/webpack',
+                options: {
+                  // Disable SVGO inside SVGR if svgo-loader already ran
+                  svgo: !USE_SVGO ? true : false,
+                  ...(USE_SVGO ? {} : { svgoConfig }),
+                }
+              }
+            ],
+          },
+
+
+
+          // svg inline (con `?inline`)
           {
             resourceQuery: /inline/,
             type: 'asset/source',
@@ -394,7 +418,7 @@ const config = {
             use: USE_SVGO ? [ { loader: 'svgo-loader', options: svgoConfig } ] : [],
           },
 
-          // 3. svg file (copy image files to build folder)
+          // svg file (copy image files to build folder)
           {
             type: 'asset/resource',
             exclude: [ /cssInline/, /inline/ ],
