@@ -387,28 +387,26 @@ const config = {
           },
 
           // as react component -> https://react-svgr.com/docs/webpack/
-          {
-            resourceQuery: /react/,
-            issuer: /\.[jt]sx?$/,
-            use: [
-              ...(USE_SVGO ? [
-                {
-                  loader: 'svgo-loader',
-                  options: svgoConfig,
-                },
-              ] : []),
-              {
-                loader: '@svgr/webpack',
-                options: {
-                  // Disable SVGO inside SVGR if svgo-loader already ran
-                  svgo: !USE_SVGO ? true : false,
-                  ...(USE_SVGO ? {} : { svgoConfig }),
-                }
-              }
-            ],
-          },
-
-
+          // {
+          //   resourceQuery: /react/,
+          //   issuer: /\.[jt]sx?$/,
+          //   use: [
+          //     ...(USE_SVGO ? [
+          //       {
+          //         loader: 'svgo-loader',
+          //         options: svgoConfig,
+          //       },
+          //     ] : []),
+          //     {
+          //       loader: '@svgr/webpack',
+          //       options: {
+          //         // Disable SVGO inside SVGR if svgo-loader already ran
+          //         svgo: !USE_SVGO ? true : false,
+          //         ...(USE_SVGO ? {} : { svgoConfig }),
+          //       }
+          //     }
+          //   ],
+          // },
 
           // svg inline (con `?inline`)
           {

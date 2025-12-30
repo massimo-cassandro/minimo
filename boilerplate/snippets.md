@@ -41,12 +41,15 @@ curl -s https://raw.githubusercontent.com/massimo-cassandro/minimo/refs/heads/ma
 ```
 
 ## package.json scripts
-* `"launchChrome": "open -n -a 'Google Chrome' --args --profile-directory='Profile 3'",`
-* `"python server": "python3 -m http.server 8000 # --directory __dirname__ # 8000 = default port",`
-* `"php server": "php -S localhost:8000 # -t root_dir/",`
-* `"symfony local server": "symfony serve -d",`
-* `"node server": "node serve # richiede ‘npm i serve’",`
-
+```javascript
+{
+"launchChrome": "open -n -a 'Google Chrome' --args --profile-directory='Profile 3'",
+"python server": "python3 -m http.server 8000 # --directory __dirname__ # 8000 = default port",
+"php server": "php -S localhost:8000 # -t root_dir/",
+"symfony local server": "symfony serve -d",
+"node server": "node serve # richiede ‘npm i serve’",
+}
+```
 
 ## root / frontend
 
@@ -94,12 +97,14 @@ curl -s https://raw.githubusercontent.com/massimo-cassandro/minimo/refs/heads/ma
 <https://github.com/massimo-cassandro/dev-updater>
 
 *install:*
+
 ```bash
 npm i -D @massimo-cassandro/dev-updater
 ```
 
 *package.json scripts*:
-```json
+
+```javascript
 "UPD-version": "npx update-version  # --config=./dev-utilities.config.mjs",
 "upd@m": "npx upd@m",
 ```
@@ -108,21 +113,25 @@ npm i -D @massimo-cassandro/dev-updater
 ## eslint9 (+ uninstall)
 
 *install*:
+
 ```bash
 npm i -D eslint@^9 @eslint/js globals && npm i -D @massimo-cassandro/eslint-config@^2
 ```
 
-*@cybozu*:
+*@cybozu* (<https://github.com/cybozu/eslint-config>):
+
 ```bash
-npm install -D eslint @cybozu/eslint-config
+npm install -D @cybozu/eslint-config
 ```
 
 *uninstall*:
+
 ```bash
-npm uninstall eslint @eslint/js globals @massimo-cassandro/eslint-config
+npm uninstall eslint @eslint/js globals @massimo-cassandro/eslint-config @cybozu/eslint-config
 ```
 
 *eslint.config.mjs*:
+
 ```bash
 curl -s https://raw.githubusercontent.com/massimo-cassandro/minimo/refs/heads/main/boilerplate/eslint.config.mjs > eslint.config.mjs
 ```
@@ -142,29 +151,30 @@ npm i -D sass
 ```
 
 ## stylelint
-* `## upd config file:`
-* `mv -f .stylelintrc.cjs stylelint.config.cjs`
 
 
-```bash
-npm uninstall @stylistic/stylelint-plugin stylelint-config-css-modules stylelint-config-twbs-bootstrap stylelint @massimo-cassandro/stylelint-config
-```
+**install**
 
 ```bash
 npm i -D @stylistic/stylelint-plugin stylelint-config-css-modules stylelint-config-twbs-bootstrap stylelint && npm i -D @massimo-cassandro/stylelint-config
 ```
 
-
-*stylelint.config.cjs*:
-
-```bash
-curl -s https://raw.githubusercontent.com/massimo-cassandro/minimo/refs/heads/main/boilerplate/stylelint.config.cjs > stylelint.config.cjs
-```
-
-*stylelint.config.mjs*:
+**stylelint.config.mjs**:
 
 ```bash
 curl -s https://raw.githubusercontent.com/massimo-cassandro/minimo/refs/heads/main/boilerplate/stylelint.config.mjs > stylelint.config.mjs
+```
+
+**uninstall**
+
+```bash
+npm uninstall @stylistic/stylelint-plugin stylelint-config-css-modules stylelint-config-twbs-bootstrap stylelint @massimo-cassandro/stylelint-config
+```
+
+**upd config file:**
+
+```bash
+mv -f .stylelintrc.cjs stylelint.config.cjs
 ```
 
 
@@ -191,7 +201,15 @@ curl -s https://raw.githubusercontent.com/massimo-cassandro/minimo/refs/heads/ma
 npm i -D @babel/core @babel/preset-env babel-loader copy-webpack-plugin css-loader css-minimizer-webpack-plugin dotenv-webpack html-loader html-webpack-plugin mini-css-extract-plugin mini-svg-data-uri postcss-preset-env style-loader terser-webpack-plugin && npm i -D webpack-cli webpack-dev-server webpack-manifest-plugin webpack
 ```
 
+**importazione svg come componente react**
+<https://react-svgr.com/docs/webpack/>
+
+```bash
+npm install -D @svgr/webpack
+```
+
 **package.json:**
+
 ```javascript
 {
 "launchChrome"; "open -n -a 'Google Chrome' --args --profile-directory='Profile 3'",
@@ -216,7 +234,7 @@ npm i -D responsive-loader
 ```
 
 ### webpack-remove-empty-scripts
-* <https://github.com/webdiscus/webpack-remove-empty-scripts#readme>
+<https://github.com/webdiscus/webpack-remove-empty-scripts#readme>
 
 ```bash
 npm i -D webpack-remove-empty-scripts
@@ -228,7 +246,7 @@ npm i -D webpack-remove-empty-scripts
 npm i -D sass-loader sass
 ```
 ### html-webpack-inject-preload
-* <https://github.com/principalstudio/html-webpack-inject-preload#readme>
+<https://github.com/principalstudio/html-webpack-inject-preload#readme>
 
 ```bash
 npm i -D @principalstudio/html-webpack-inject-preload
@@ -254,14 +272,14 @@ npm i -D babel-plugin-styled-components styled-components
 ```
 
 ## auto-datatables-bs5
-* <https://github.com/massimo-cassandro/auto-datatables-bs5>
+<https://github.com/massimo-cassandro/auto-datatables-bs5>
 
 ```bash
 npm i -S @massimo-cassandro/auto-datatables-bs5 datatables.net@^1,datatables.net-bs5@^1
 ```
 
 ## autocomplete
-* <https://github.com/massimo-cassandro/autocomplete>
+<https://github.com/massimo-cassandro/autocomplete>
 
 ```bash
 npm i -S @massimo-cassandro/autocomplete
@@ -274,20 +292,31 @@ npm i -S bootstrap
 ```
 
 ## ckeditor-utilities
-* <https://github.com/massimo-cassandro/ckeditor-utilities>
+<https://github.com/massimo-cassandro/ckeditor-utilities>
 
 ```bash
 npm i -S @massimo-cassandro/ckeditor-utilities
 ```
 
 ## create-favicons
-* <https://github.com/massimo-cassandro/create-favicons>
-* `npx create-favicons init`
-* `npx create-favicons --dir=./`
+<https://github.com/massimo-cassandro/create-favicons>
 
 ```bash
 npm i -D @massimo-cassandro/create-favicons
 ```
+
+**init**
+
+```bash
+npx create-favicons init
+```
+
+**run**
+
+```bash
+npx create-favicons --dir=./
+```
+
 
 
 
