@@ -144,6 +144,7 @@ const config = {
     historyApiFallback: true,
     static: {
       directory: path.join(__dirname, '/'),
+      // directory: output_dir, nel caso in cui l'output non sia sulla root
       serveIndex: true
     },
     open: {
