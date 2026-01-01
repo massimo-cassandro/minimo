@@ -4,6 +4,7 @@ import { fileURLToPath } from 'url';
 import webpack from 'webpack';
 import fs from 'fs';
 import * as process from 'process'; // Rende 'process' disponibile nel contesto ESM
+import { styleText } from 'node:util';
 
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 import HtmlWebpackInjectPreload from '@principalstudio/html-webpack-inject-preload';
@@ -12,6 +13,9 @@ import CssMinimizerPlugin from 'css-minimizer-webpack-plugin';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import CopyWebpackPlugin from 'copy-webpack-plugin';
 import Dotenv from 'dotenv-webpack';
+
+import { cssRules } from './webpack/css-rules.mjs';
+import { getJsConfigAliases } from './webpack/get-jsConfig-aliases.mjs';
 
 // --- Variabili Globali ---
 const __filename = fileURLToPath(import.meta.url);
@@ -24,7 +28,7 @@ const PACKAGE = JSON.parse(
 
 const isDevelopment = process.env.NODE_ENV === 'development';
 const output_dir = path.resolve(__dirname, './build');
-const favicons_path = /src\/favicons\/output/; // Pattern per i favicons
+const favicons_path_regexp = /src\/favicons\/output/; // source pattern per le favicons
 
 // --- Logica Condizionale SVGO ---
 const USE_SVGO = true; // process.env.USE_SVGO === 'true' || !isDevelopment;
@@ -35,111 +39,16 @@ try {
 
 } catch {
   if (USE_SVGO) {
+    // https://nodejs.org/api/util.html#utilstyletextformat-text-options
     // eslint-disable-next-line no-console
-    console.warn('SVGO_CONFIG_WARN: svgo.config.js non trovato o non leggibile. Disabilitare USE_SVGO se non richiesto.');
+    console.error( styleText(['red'], 'SVGO_CONFIG_WARN: svgo.config.js non trovato o non leggibile. Disabilitare USE_SVGO se non richiesto.'));
   }
 }
 
-/**
- * Funzione per ottenere gli alias da jsconfig.json
- * @returns {Record<string, string>}
- */
-function getJsConfigAliases() {
-  const jsConfig = JSON.parse(
-    fs.readFileSync(path.resolve(__dirname, '../jsconfig.json'), 'utf-8')
-  );
-  const aliases = {};
-  for (const item in jsConfig.compilerOptions.paths) {
-    const key = item.replace(/(\/\*)$/, '');
-    const value = path.resolve(
-      __dirname,
-      path.relative(__dirname, jsConfig.compilerOptions.paths[ item ][ 0 ]).replace(/(\/\*)$/, '')
-    );
-    aliases[ key ] = value;
-  }
-  return aliases;
-}
+// jsConfig
+const jsConfigAliases = getJsConfigAliases(path.resolve(__dirname, './jsconfig.json'));
 
-/**
- * Funzione per definire le regole per CSS/SCSS
- * @returns {import('webpack').RuleSetRule[]}
- */
-function cssRules(alwaysInline = false) {
-  const css_loaders = (opts = {}) => {
-    opts = {
-      css_modules: false,
-      inline: false,
-      ...opts
-    };
-    return [
-      (opts.inline || alwaysInline)
-        ? {
-          loader: 'style-loader',
-          options: {
-            injectType: 'singletonStyleTag'
-          }
-        }
-        : MiniCssExtractPlugin.loader,
-      {
-        loader: 'css-loader',
-        options: {
-          modules: opts.css_modules
-            ? {
-              auto: true,
-              localIdentName: isDevelopment
-                ? '[local]_[hash:base64:6]'
-                : '[hash:base64]'
-            }
-            : false,
-          sourceMap: isDevelopment,
-          importLoaders: isDevelopment ? 1 : 2
-        }
-      },
-      {
-        loader: 'postcss-loader',
-        options: {
-          postcssOptions: {
-            sourceMap: isDevelopment
-          }
-        }
-      },
-      // {
-      //   loader: 'sass-loader',
-      //   options: {
-      //     sourceMap: isDevelopment
-      //   }
-      // }
-    ];
-  };
 
-  return [
-    {
-      test: /(\.module\.(sass|scss|css))$/,
-      oneOf: [
-        {
-          resourceQuery: /inline/,
-          use: css_loaders({ inline: true, css_modules: true }),
-        },
-        {
-          use: css_loaders({ css_modules: true }),
-        },
-      ]
-    },
-    {
-      test: /\.(sass|scss|css)$/,
-      exclude: /(\.module\.(sass|scss|css))$/,
-      oneOf: [
-        {
-          resourceQuery: /inline/,
-          use: css_loaders({ inline: true }),
-        },
-        {
-          use: css_loaders(),
-        }
-      ]
-    }
-  ];
-}
 
 const config = {
   mode: isDevelopment ? 'development' : 'production',
@@ -335,7 +244,7 @@ const config = {
             type: 'asset/resource',
             resourceQuery: /as_asset/,
             generator: {
-              filename: '[name].[contenthash].[ext]'
+              filename: '[name].[contenthash][ext]'
             }
           },
           {
@@ -348,7 +257,7 @@ const config = {
       {
         test: /\.(?:ico|png|svg|webmanifest)$/i,
         type: 'asset/resource',
-        include: favicons_path,
+        include: favicons_path_regexp,
         generator: {
           filename: '[name][ext]?_=[contenthash]'
         }
@@ -360,13 +269,14 @@ const config = {
         type: 'asset/resource',
         resourceQuery: /as_lib/,
         generator: {
-          filename: 'libs/[name].[contenthash].[ext]'
+          filename: 'libs/[name].[contenthash][ext]'
         }
       },
 
       // =>> rules: svg
       {
         test: /(\.svg)$/i,
+        exclude: favicons_path_regexp,
         oneOf: [
           // 1. svg inline dataUri per css (con `?cssInline`)
           {
@@ -421,7 +331,7 @@ const config = {
             type: 'asset/resource',
             exclude: [ /cssInline/, /inline/ ],
             generator: {
-              filename: 'imgs/[name].[contenthash].[ext]'
+              filename: 'imgs/[name].[contenthash][ext]'
             },
             // Ottimizzazione SVGO (condizionale)
             use: USE_SVGO ? [
@@ -438,8 +348,9 @@ const config = {
       {
         test: /\.(?:ico|gif|png|jpg|jpeg|webp|avif|pdf)$/i,
         type: 'asset/resource',
+        exclude: favicons_path_regexp,
         generator: {
-          filename: 'imgs/[name].[contenthash].[ext]'
+          filename: 'imgs/[name].[contenthash][ext]'
         }
       },
 
@@ -448,11 +359,11 @@ const config = {
         test: /\.(woff2?|eot|ttf|otf)$/,
         type: 'asset/resource',
         generator: {
-          filename: 'fonts/[name].[contenthash].[ext]'
+          filename: 'fonts/[name].[contenthash][ext]'
         }
       },
 
-      ...cssRules()
+      ...cssRules(isDevelopment)
     ] // end rules
   }, // end module
 
@@ -466,7 +377,7 @@ const config = {
     modules: [ './', './node_modules' ],
     extensions: [ '.tsx', '.ts', '.js', '.mjs', '.cjs', '.jsx', '.json', '.scss', '.css' ],
     alias: {
-      ...getJsConfigAliases()
+      ...jsConfigAliases
     }
   }
 };

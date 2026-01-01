@@ -171,12 +171,6 @@ curl -s https://raw.githubusercontent.com/massimo-cassandro/minimo/refs/heads/ma
 npm uninstall @stylistic/stylelint-plugin stylelint-config-css-modules stylelint-config-twbs-bootstrap stylelint @massimo-cassandro/stylelint-config
 ```
 
-**upd config file:**
-
-```bash
-mv -f .stylelintrc.cjs stylelint.config.cjs
-```
-
 
 ## webhint
 
