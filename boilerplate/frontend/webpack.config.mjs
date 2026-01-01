@@ -72,6 +72,12 @@ const config = {
     ignored: [ 'build', '**/node_modules', '.git', '_private' ]
   },
 
+  dotenv: {
+    prefix: 'APP_',
+    dir: '/',
+    template: ['.env', '.env.development'] //, '.env.local', '.env.[mode]', '.env.[mode].local'],
+  },
+
   devtool: isDevelopment ? 'inline-source-map' : false,
 
   entry: {
