@@ -30,7 +30,7 @@ const isDevelopment = process.env.NODE_ENV === 'development';
 const output_dir = path.resolve(__dirname, './build');
 const favicons_path_regexp = /src\/favicons\/output/; // source pattern per le favicons
 
-// --- Logica Condizionale SVGO ---
+// SVGO
 const USE_SVGO = true; // process.env.USE_SVGO === 'true' || !isDevelopment;
 
 let svgoConfig = {};
@@ -48,7 +48,22 @@ try {
 // jsConfig
 const jsConfigAliases = getJsConfigAliases(path.resolve(__dirname, './jsconfig.json'));
 
-
+// CopyWebpackPlugin (null o array vuoto per disattivare)
+const CopyWebpackPluginPatterns = [
+  {
+    from: 'src/favicons/output/icon-*.png',
+    to: '[name][ext]'
+  },
+  // {
+  //   from: 'src/php',
+  //   to: 'php',
+  //   globOptions: {
+  //     dot: true,
+  //     gitignore: true,
+  //     ignore: [ '**/.DS_Store', ...(isDevelopment ? [] : [ '**/init-dev.php' ]) ]
+  //   }
+  // }
+];
 
 const config = {
   mode: isDevelopment ? 'development' : 'production',
@@ -169,23 +184,17 @@ const config = {
       process: 'process/browser.js'
     }),
 
-    new CopyWebpackPlugin({
-      patterns: [
-        {
-          from: 'src/favicons/output/icon-*.png',
-          to: '[name][ext]'
-        },
-        // {
-        //   from: 'src/php',
-        //   to: 'php',
-        //   globOptions: {
-        //     dot: true,
-        //     gitignore: true,
-        //     ignore: [ '**/.DS_Store', ...(isDevelopment ? [] : [ '**/init-dev.php' ]) ]
-        //   }
-        // }
-      ]
-    }),
+    ...(
+      CopyWebpackPlugin &&
+      CopyWebpackPluginPatterns != null &&
+      CopyWebpackPluginPatterns.length > 0
+        ? [
+          new CopyWebpackPlugin({
+            patterns: CopyWebpackPluginPatterns
+          })
+        ]
+        : []
+    ),
 
     new MiniCssExtractPlugin({
       filename: '[name].[contenthash].css',
