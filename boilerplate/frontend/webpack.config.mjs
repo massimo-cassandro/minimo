@@ -13,6 +13,8 @@ import CssMinimizerPlugin from 'css-minimizer-webpack-plugin';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import CopyWebpackPlugin from 'copy-webpack-plugin';
 import Dotenv from 'dotenv-webpack';
+// import { WebpackManifestPlugin } from 'webpack-manifest-plugin';
+
 
 import { cssRules } from './webpack/css-rules.mjs';
 import { getJsConfigAliases } from './webpack/get-jsConfig-aliases.mjs';
@@ -180,6 +182,7 @@ const config = {
 
   // =>> plugins
   plugins: [
+    // =>> plugins: Dotenv
     new Dotenv({
       path: isDevelopment ? './.env.development' : './.env',
       expand: true,
@@ -190,6 +193,7 @@ const config = {
       process: 'process/browser.js'
     }),
 
+    // =>> plugins: CopyWebpackPlugin
     ...(
       CopyWebpackPlugin &&
       CopyWebpackPluginPatterns != null &&
@@ -202,11 +206,23 @@ const config = {
         : []
     ),
 
+    // =>> plugins: WebpackManifestPlugin
+    // new WebpackManifestPlugin({
+    //   fileName: path.join(output_dir, 'manifest.json'),
+    //   // basePath: item.source_dirname
+    //   // removeKeyHash: /(^(_assets\/(?!(fonts\/))))|((\?as_asset)$)/,
+    //   removeKeyHash: true, // /([a-f0-9]{32}\.?)/gi, // /(\?as_asset)$/,
+
+    //   sort: isDevelopment? undefined : (a, b) => a.name.localeCompare(b.name)
+    // }),
+
+    // =>> plugins: MiniCssExtractPlugin
     new MiniCssExtractPlugin({
       filename: '[name].[contenthash].css',
       chunkFilename: '[id].[contenthash].css'
     }),
 
+    // =>> plugins: HtmlWebpackPlugin
     new HtmlWebpackPlugin({
       filename: 'index.html',
       template: path.resolve(__dirname, './src/tpl/index.ejs'),
@@ -215,6 +231,7 @@ const config = {
       minify: !isDevelopment
     }),
 
+    // =>> plugins: HtmlWebpackInjectPreload
     ...(isDevelopment
       ? []
       : [
@@ -236,6 +253,7 @@ const config = {
         })
       ]),
 
+    // =>> plugins: BannerPlugin
     new webpack.BannerPlugin({
       banner: () => {
         const year = new Date().toLocaleString('en-UK', { year: 'numeric' });
@@ -247,11 +265,22 @@ const config = {
       },
       raw: true
     })
-  ], // plugins
+  ], // end plugins
 
   module: {
     // =>> rules
     rules: [
+
+
+      // =>> rules: jsx
+      {
+        test: /\.jsx?$/,
+        exclude: /node_modules/,
+        use: {
+          loader: 'babel-loader',
+        },
+      },
+
       // =>> rules: html files
       {
         test: /(\.html?)$/i,
@@ -279,7 +308,7 @@ const config = {
         }
       },
 
-      // =>> JS libraries
+      // =>> rules: JS libraries
       {
         test: /\.js$/,
         type: 'asset/resource',
@@ -307,7 +336,7 @@ const config = {
 
               // Loader wrapper per Data URI compatto (Mini-SVG-Data-URI-Loader)
               {
-                loader: path.resolve(__dirname, './loaders/mini-svg-data-uri-loader.cjs'),
+                loader: path.resolve(__dirname, './webpack/mini-svg-data-uri-loader.cjs'),
               },
             ],
           },
@@ -362,7 +391,7 @@ const config = {
 
       // =>> rules: Images / pdf
       {
-        test: /\.(?:ico|gif|png|jpg|jpeg|webp|avif|pdf)$/i,
+        test: /\.(?:gif|png|jpg|jpeg|webp|avif|pdf)$/i,
         type: 'asset/resource',
         exclude: favicons_path_regexp,
         generator: {
