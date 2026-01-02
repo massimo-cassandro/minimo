@@ -5,6 +5,7 @@ import webpack from 'webpack';
 import fs from 'fs';
 import * as process from 'process'; // Rende 'process' disponibile nel contesto ESM
 import { styleText } from 'node:util';
+// import { createRequire } from 'node:module';
 
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 import HtmlWebpackInjectPreload from '@principalstudio/html-webpack-inject-preload';
@@ -13,7 +14,9 @@ import CssMinimizerPlugin from 'css-minimizer-webpack-plugin';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import CopyWebpackPlugin from 'copy-webpack-plugin';
 import Dotenv from 'dotenv-webpack';
+import RemoveEmptyScriptsPlugin from 'webpack-remove-empty-scripts';
 // import { WebpackManifestPlugin } from 'webpack-manifest-plugin';
+
 
 
 import { cssRules } from './webpack/css-rules.mjs';
@@ -67,6 +70,14 @@ const CopyWebpackPluginPatterns = [
   //   }
   // }
 ];
+
+// recupero metadata immagini
+// const require = createRequire(import.meta.url);
+// responsive-loader adapter (CJS) — use createRequire
+// const responsiveLoaderSharp = require('responsive-loader/sharp');
+
+/******************************/
+/** CONFIG **/
 
 const config = {
   mode: isDevelopment ? 'development' : 'production',
@@ -194,9 +205,15 @@ const config = {
       process: 'process/browser.js'
     }),
 
+
+    // =>> plugins: RemoveEmptyScriptsPlugin
+    new RemoveEmptyScriptsPlugin({
+      enabled: !isDevelopment,
+      verbose: true
+    }),
+
     // =>> plugins: CopyWebpackPlugin
     ...(
-      CopyWebpackPlugin &&
       CopyWebpackPluginPatterns != null &&
       CopyWebpackPluginPatterns.length > 0
         ? [
@@ -252,7 +269,8 @@ const config = {
             }
           ]
         })
-      ]),
+      ]
+    ),
 
     // =>> plugins: BannerPlugin
     new webpack.BannerPlugin({
@@ -317,17 +335,56 @@ const config = {
         }
       },
 
+      // =>> raw txt / md files
+      {
+        test: /(\.(txt|md))$/i,
+        type: 'asset/source'
+      },
+
       // =>> rules: svg
       ...svgRules({useSvgo: USE_SVGO, svgoConfig: svgoConfig, useSvgr: true }),
 
       // =>> rules: Images / pdf
       {
         test: /\.(?:gif|png|jpg|jpeg|webp|avif|pdf)$/i,
-        type: 'asset/resource',
-        exclude: favicons_path_regexp,
-        generator: {
-          filename: 'imgs/[name].[contenthash][ext]'
-        }
+        oneOf: [
+
+          // './img.jpg?metadata'
+          // {
+          //   resourceQuery: /metadata/,
+          //   // 'javascript/auto' è OBBLIGATORIO qui per impedire a Webpack 5
+          //   // di trattarlo come un asset nativo duplicato
+          //   type: 'javascript/auto',
+          //   use: [
+          //     {
+          //       loader: 'responsive-loader',
+          //       options: {
+          //         // Sharp è necessario per leggere i metadati velocemente
+          //         adapter: responsiveLoaderSharp,
+
+          //         // solo i dati del file originale
+          //         // disable: true,
+          //         sizes: [9999999], // forse responsive-loader a ricalcolare le dimensioni reali
+
+          //         esModule: true,
+
+          //         // Manteniamo i nomi file consistenti
+          //         name: '[name].[contenthash].[ext]',
+          //         outputPath: 'imgs',
+          //         publicPath: path.join((isDevelopment? '/_dev/' : '/build/'), 'imgs')
+          //       },
+          //     },
+          //   ],
+          // },
+
+          {
+            type: 'asset/resource',
+            exclude: favicons_path_regexp,
+            generator: {
+              filename: 'imgs/[name].[contenthash].[ext]',
+            }
+          },
+        ],
       },
 
       // =>> rules: Fonts
