@@ -18,6 +18,7 @@ import Dotenv from 'dotenv-webpack';
 
 import { cssRules } from './webpack/css-rules.mjs';
 import { getJsConfigAliases } from './webpack/get-jsConfig-aliases.mjs';
+import { svgRules } from './webpack/svg-rules.mjs';
 
 // --- Variabili Globali ---
 const __filename = fileURLToPath(import.meta.url);
@@ -29,6 +30,7 @@ const PACKAGE = JSON.parse(
 );
 
 const isDevelopment = process.env.NODE_ENV === 'development';
+const useSass = false;
 const output_dir = path.resolve(__dirname, './build');
 const favicons_path_regexp = /src\/favicons\/output/; // source pattern per le favicons
 
@@ -37,13 +39,12 @@ const USE_SVGO = true; // process.env.USE_SVGO === 'true' || !isDevelopment;
 
 let svgoConfig = {};
 try {
-  svgoConfig = (USE_SVGO) ? (await import('./svgo.config.js')).default : {};
+  svgoConfig = (USE_SVGO) ? (await import('./webpack/svgo.config.js')).default : {};
 
 } catch {
   if (USE_SVGO) {
-    // https://nodejs.org/api/util.html#utilstyletextformat-text-options
     // eslint-disable-next-line no-console
-    console.error( styleText(['red'], 'SVGO_CONFIG_WARN: svgo.config.js non trovato o non leggibile. Disabilitare USE_SVGO se non richiesto.'));
+    console.error( styleText(['red'], 'svgo.config.js non trovato o non leggibile.'));
   }
 }
 
@@ -268,9 +269,7 @@ const config = {
   ], // end plugins
 
   module: {
-    // =>> rules
     rules: [
-
 
       // =>> rules: jsx
       {
@@ -319,75 +318,7 @@ const config = {
       },
 
       // =>> rules: svg
-      {
-        test: /(\.svg)$/i,
-        exclude: favicons_path_regexp,
-        oneOf: [
-          // 1. svg inline dataUri per css (con `?cssInline`)
-          {
-            resourceQuery: /cssInline/, // ex inline-dataURI
-            type: 'asset/source',
-            use: [
-              // Loader di ottimizzazione SVGO (condizionale)
-              ...(USE_SVGO ? [ {
-                loader: 'svgo-loader',
-                options: svgoConfig,
-              } ] : []),
-
-              // Loader wrapper per Data URI compatto (Mini-SVG-Data-URI-Loader)
-              {
-                loader: path.resolve(__dirname, './webpack/mini-svg-data-uri-loader.cjs'),
-              },
-            ],
-          },
-
-          // as react component -> https://react-svgr.com/docs/webpack/
-          // {
-          //   resourceQuery: /react/,
-          //   issuer: /\.[jt]sx?$/,
-          //   use: [
-          //     ...(USE_SVGO ? [
-          //       {
-          //         loader: 'svgo-loader',
-          //         options: svgoConfig,
-          //       },
-          //     ] : []),
-          //     {
-          //       loader: '@svgr/webpack',
-          //       options: {
-          //         // Disable SVGO inside SVGR if svgo-loader already ran
-          //         svgo: !USE_SVGO ? true : false,
-          //         ...(USE_SVGO ? {} : { svgoConfig }),
-          //       }
-          //     }
-          //   ],
-          // },
-
-          // svg inline (con `?inline`)
-          {
-            resourceQuery: /inline/,
-            type: 'asset/source',
-            // Ottimizzazione SVGO (condizionale)
-            use: USE_SVGO ? [ { loader: 'svgo-loader', options: svgoConfig } ] : [],
-          },
-
-          // svg file (copy image files to build folder)
-          {
-            type: 'asset/resource',
-            exclude: [ /cssInline/, /inline/ ],
-            generator: {
-              filename: 'imgs/[name].[contenthash][ext]'
-            },
-            // Ottimizzazione SVGO (condizionale)
-            use: USE_SVGO ? [
-              {
-                loader: 'svgo-loader',
-                options: svgoConfig,
-              },
-            ] : []
-          }
-        ]
-      }, // end svg
+      ...svgRules({useSvgo: USE_SVGO, svgoConfig: svgoConfig, useSvgr: true }),
 
       // =>> rules: Images / pdf
       {
@@ -408,7 +339,7 @@ const config = {
         }
       },
 
-      ...cssRules(isDevelopment)
+      ...cssRules({isDevelopment: isDevelopment, useSass: useSass})
     ] // end rules
   }, // end module
 

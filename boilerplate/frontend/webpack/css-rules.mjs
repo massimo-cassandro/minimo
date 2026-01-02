@@ -6,7 +6,7 @@ import MiniCssExtractPlugin from 'mini-css-extract-plugin';
  */
 
 
-function css_loaders (isDevelopment = false, opts = {}) {
+function css_loaders (isDevelopment = false, useSass = false, opts = {}) {
   opts = {
     css_modules: false,
     inline: false,
@@ -29,7 +29,10 @@ function css_loaders (isDevelopment = false, opts = {}) {
             auto: true,
             localIdentName: isDevelopment
               ? '[local]_[hash:base64:6]'
-              : '[hash:base64]'
+              : '[hash:base64]',
+
+            // namedExport: false, // false: permette l'utilizzo di `import style...` invece di `import * as style...` come nella versione 6
+            exportLocalsConvention: 'as-is', // 'camel-case-only' // 'camel-case-only': forces camelcase style (rewrites classnames)
           }
           : false,
         sourceMap: isDevelopment,
@@ -44,16 +47,30 @@ function css_loaders (isDevelopment = false, opts = {}) {
         }
       }
     },
-    // {
-    //   loader: 'sass-loader',
-    //   options: {
-    //     sourceMap: isDevelopment
-    //   }
-    // }
+    ...(useSass
+      ? [{
+        loader: 'sass-loader',
+        options: {
+          sourceMap: isDevelopment,
+
+          // per bootstrap 5.3
+          // api: 'legacy',
+          sassOptions: {
+            quietDeps: true,
+            silenceDeprecations: ['legacy-js-api', 'mixed-decls', 'color-functions', 'global-builtin', 'import'],
+          }
+
+        }
+      }]
+      : []
+    )
   ];
 }
 
-export function cssRules(isDevelopment = false) {
+export function cssRules({
+  isDevelopment = false,
+  useSass = false
+}) {
 
   return [
     {
@@ -61,10 +78,10 @@ export function cssRules(isDevelopment = false) {
       oneOf: [
         {
           resourceQuery: /inline/,
-          use: css_loaders(isDevelopment, { inline: true, css_modules: true }),
+          use: css_loaders(isDevelopment, useSass, { inline: true, css_modules: true }),
         },
         {
-          use: css_loaders(isDevelopment, { css_modules: true }),
+          use: css_loaders(isDevelopment, useSass, { css_modules: true }),
         },
       ]
     },
@@ -74,10 +91,10 @@ export function cssRules(isDevelopment = false) {
       oneOf: [
         {
           resourceQuery: /inline/,
-          use: css_loaders(isDevelopment, { inline: true }),
+          use: css_loaders(isDevelopment, useSass, { inline: true }),
         },
         {
-          use: css_loaders(isDevelopment),
+          use: css_loaders(isDevelopment, useSass),
         }
       ]
     }
