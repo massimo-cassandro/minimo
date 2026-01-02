@@ -42,7 +42,7 @@ const USE_SVGO = true; // process.env.USE_SVGO === 'true' || !isDevelopment;
 
 let svgoConfig = {};
 try {
-  svgoConfig = (USE_SVGO) ? (await import('./webpack/svgo.config.js')).default : {};
+  svgoConfig = (USE_SVGO) ? (await import('./webpack/svgo.config.mjs')).default : {};
 
 } catch {
   if (USE_SVGO) {
