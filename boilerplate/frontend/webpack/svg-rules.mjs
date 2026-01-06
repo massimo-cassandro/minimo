@@ -6,7 +6,8 @@
 export function svgRules({
   useSvgo = true,
   useSvgr = false,
-  svgoConfig = null
+  svgoConfig = null,
+  favicons_path_regexp = null
 }) {
 
   if(svgoConfig == null) {
@@ -15,7 +16,7 @@ export function svgRules({
 
   return [{
     test: /(\.svg)$/i,
-    // exclude: favicons_path_regexp,
+    exclude: favicons_path_regexp?? undefined,
     oneOf: [
       // 1. svg inline dataUri per css (con `?cssInline`)
       {

@@ -30,7 +30,7 @@ const isDevelopment = process.env.NODE_ENV === 'development'
   ,useSvgr = false // svg per react
   ,svgoConfig = useSvgo? (await import('./webpack/svgo.config.mjs')).default : null
   ,output_dir = path.resolve(__dirname, './build')
-  ,favicons_path_regexp = /src\/favicons\/output/ // source pattern per le favicons
+  ,favicons_path_regexp = /src\/favicons\/output/ // source pattern per le favicons (regexp o null)
   ,jsConfigAliases = getJsConfigAliases(path.resolve(__dirname, './jsconfig.json'))
   ,packageJson = JSON.parse(fs.readFileSync(path.resolve(__dirname, './package.json'), 'utf-8'))
   // ,manifest_shared_seed = {}
@@ -304,7 +304,7 @@ const config = {
       {
         test: /\.(?:ico|png|svg|webmanifest)$/i,
         type: 'asset/resource',
-        include: favicons_path_regexp,
+        include: favicons_path_regexp?? undefined,
         generator: {
           filename: '[name][ext]?_=[contenthash]'
         }
@@ -327,7 +327,7 @@ const config = {
       },
 
       // =>> rules: svg
-      ...svgRules({useSvgo: useSvgo, svgoConfig: svgoConfig, useSvgr: useSvgr }),
+      ...svgRules({useSvgo: useSvgo, svgoConfig: svgoConfig, useSvgr: useSvgr, favicons_path_regexp: favicons_path_regexp?? null }),
 
       // =>> rules: Images / pdf
       {
@@ -337,8 +337,7 @@ const config = {
           // './img.jpg?metadata'
           // {
           //   resourceQuery: /metadata/,
-          //   // 'javascript/auto' è OBBLIGATORIO qui per impedire a Webpack 5
-          //   // di trattarlo come un asset nativo duplicato
+          //   // 'javascript/auto' è OBBLIGATORIO qui per impedire a Webpack 5 di trattarlo come un asset nativo duplicato
           //   type: 'javascript/auto',
           //   use: [
           //     {
@@ -349,7 +348,7 @@ const config = {
 
           //         // solo i dati del file originale
           //         // disable: true,
-          //         sizes: [9999999], // forse responsive-loader a ricalcolare le dimensioni reali
+          //         sizes: [99999999], // forza responsive-loader a ricalcolare le dimensioni reali
 
           //         esModule: true,
 
@@ -364,7 +363,7 @@ const config = {
 
           {
             type: 'asset/resource',
-            exclude: favicons_path_regexp,
+            exclude: favicons_path_regexp?? undefined,
             generator: {
               filename: 'imgs/[name].[contenthash].[ext]',
             }
