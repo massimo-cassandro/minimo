@@ -4,7 +4,7 @@ import { fileURLToPath } from 'url';
 import webpack from 'webpack';
 import fs from 'fs';
 import * as process from 'process'; // Rende 'process' disponibile nel contesto ESM
-import { styleText } from 'node:util';
+// import { styleText } from 'node:util';
 // import { createRequire } from 'node:module';
 
 import HtmlWebpackPlugin from 'html-webpack-plugin';
@@ -17,42 +17,26 @@ import Dotenv from 'dotenv-webpack';
 import RemoveEmptyScriptsPlugin from 'webpack-remove-empty-scripts';
 // import { WebpackManifestPlugin } from 'webpack-manifest-plugin';
 
-
-
 import { cssRules } from './webpack/css-rules.mjs';
 import { getJsConfigAliases } from './webpack/get-jsConfig-aliases.mjs';
 import { svgRules } from './webpack/svg-rules.mjs';
 
-// --- Variabili Globali ---
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+// --- config ---
+const isDevelopment = process.env.NODE_ENV === 'development'
+  ,__filename = fileURLToPath(import.meta.url)
+  ,__dirname = path.dirname(__filename)
+  ,useSass = false
+  ,useSvgo = true
+  ,useSvgr = false // svg per react
+  ,svgoConfig = useSvgo? (await import('./webpack/svgo.config.mjs')).default : null
+  ,output_dir = path.resolve(__dirname, './build')
+  ,favicons_path_regexp = /src\/favicons\/output/ // source pattern per le favicons
+  ,jsConfigAliases = getJsConfigAliases(path.resolve(__dirname, './jsconfig.json'))
+  ,packageJson = JSON.parse(fs.readFileSync(path.resolve(__dirname, './package.json'), 'utf-8'))
+  // ,manifest_shared_seed = {}
+  // ,sf_public_dir_path = path.resolve(__dirname, '../public')
+;
 
-// Import del file package.json
-const PACKAGE = JSON.parse(
-  fs.readFileSync(path.resolve(__dirname, './package.json'), 'utf-8')
-);
-
-const isDevelopment = process.env.NODE_ENV === 'development';
-const useSass = false;
-const output_dir = path.resolve(__dirname, './build');
-const favicons_path_regexp = /src\/favicons\/output/; // source pattern per le favicons
-
-// SVGO
-const USE_SVGO = true; // process.env.USE_SVGO === 'true' || !isDevelopment;
-
-let svgoConfig = {};
-try {
-  svgoConfig = (USE_SVGO) ? (await import('./webpack/svgo.config.mjs')).default : {};
-
-} catch {
-  if (USE_SVGO) {
-    // eslint-disable-next-line no-console
-    console.error( styleText(['red'], 'svgo.config.js non trovato o non leggibile.'));
-  }
-}
-
-// jsConfig
-const jsConfigAliases = getJsConfigAliases(path.resolve(__dirname, './jsconfig.json'));
 
 // CopyWebpackPlugin (null o array vuoto per disattivare)
 const CopyWebpackPluginPatterns = [
@@ -86,6 +70,7 @@ const config = {
     ignored: [ 'build', '**/node_modules', '.git', '_private' ]
   },
 
+  // https://webpack.js.org/configuration/dotenv/
   dotenv: {
     prefix: 'APP_',
     dir: '/',
@@ -278,7 +263,7 @@ const config = {
         const year = new Date().toLocaleString('en-UK', { year: 'numeric' });
         return (
           '/*!\n' +
-          ` * ${PACKAGE.name} v.${PACKAGE.version} - Massimo Cassandro 2023-${year}\n` +
+          ` * ${packageJson.name} v.${packageJson.version} - Massimo Cassandro 2023-${year}\n` +
           ' */\n'
         );
       },
@@ -342,7 +327,7 @@ const config = {
       },
 
       // =>> rules: svg
-      ...svgRules({useSvgo: USE_SVGO, svgoConfig: svgoConfig, useSvgr: true }),
+      ...svgRules({useSvgo: useSvgo, svgoConfig: svgoConfig, useSvgr: useSvgr }),
 
       // =>> rules: Images / pdf
       {
