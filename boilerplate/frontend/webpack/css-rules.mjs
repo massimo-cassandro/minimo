@@ -13,7 +13,7 @@ function css_loaders (isDevelopment = false, useSass = false, opts = {}) {
     ...opts
   };
   return [
-    opts.inline
+    (opts.inline || isDevelopment)
       ? {
         loader: 'style-loader',
         options: {

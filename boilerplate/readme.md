@@ -13,4 +13,4 @@ in frontend
 * browserlist
 
 
-[Snippets](snippets.md)
+[Snippets](../snippets/snippets.md)
