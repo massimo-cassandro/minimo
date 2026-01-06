@@ -3,7 +3,7 @@
 ## webapack full install
 
 ```bash
-curl -s https://raw.githubusercontent.com/massimo-cassandro/minimo/refs/heads/main/snippets/webpack-install.sh | bash
+curl -s https://raw.githubusercontent.com/massimo-cassandro/minimo/refs/heads/main/snippets/webpack-install.sh | zsh
 ```
 
 ## package.json scripts
