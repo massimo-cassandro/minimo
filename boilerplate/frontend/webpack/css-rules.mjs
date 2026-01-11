@@ -6,14 +6,60 @@ import MiniCssExtractPlugin from 'mini-css-extract-plugin';
  */
 
 
-function css_loaders (isDevelopment = false, useSass = false, opts = {}) {
-  opts = {
-    css_modules: false,
-    inline: false,
-    ...opts
+
+export function cssRules({
+  isDevelopment = false,
+  useSass = false,
+  inlineCssInDevMode = true
+}) {
+
+  // opzioni impostate mel config
+  const configOptions = {
+    isDevelopment: isDevelopment,
+    useSass: useSass,
+    inlineCssInDevMode: inlineCssInDevMode
   };
+
   return [
-    (opts.inline || isDevelopment)
+    {
+      test: /(\.module\.(sass|scss|css))$/,
+      oneOf: [
+        {
+          resourceQuery: /inline/,
+          use: css_loaders({...configOptions, inline: true, css_modules: true }),
+        },
+        {
+          use: css_loaders({...configOptions,  css_modules: true }),
+        },
+      ]
+    },
+    {
+      test: /\.(sass|scss|css)$/,
+      exclude: /(\.module\.(sass|scss|css))$/,
+      oneOf: [
+        {
+          resourceQuery: /inline/,
+          use: css_loaders({...configOptions, inline: true }),
+        },
+        {
+          use: css_loaders({...configOptions}),
+        }
+      ]
+    }
+  ];
+}
+
+
+function css_loaders ({
+  isDevelopment = false,
+  useSass = false,
+  inlineCssInDevMode = true,
+  css_modules = false,
+  inline = false
+}) {
+
+  return [
+    (inline || (isDevelopment && inlineCssInDevMode))
       ? {
         loader: 'style-loader',
         options: {
@@ -24,7 +70,7 @@ function css_loaders (isDevelopment = false, useSass = false, opts = {}) {
     {
       loader: 'css-loader',
       options: {
-        modules: opts.css_modules
+        modules: css_modules
           ? {
             auto: true,
             localIdentName: isDevelopment
@@ -64,39 +110,5 @@ function css_loaders (isDevelopment = false, useSass = false, opts = {}) {
       }]
       : []
     )
-  ];
-}
-
-export function cssRules({
-  isDevelopment = false,
-  useSass = false
-}) {
-
-  return [
-    {
-      test: /(\.module\.(sass|scss|css))$/,
-      oneOf: [
-        {
-          resourceQuery: /inline/,
-          use: css_loaders(isDevelopment, useSass, { inline: true, css_modules: true }),
-        },
-        {
-          use: css_loaders(isDevelopment, useSass, { css_modules: true }),
-        },
-      ]
-    },
-    {
-      test: /\.(sass|scss|css)$/,
-      exclude: /(\.module\.(sass|scss|css))$/,
-      oneOf: [
-        {
-          resourceQuery: /inline/,
-          use: css_loaders(isDevelopment, useSass, { inline: true }),
-        },
-        {
-          use: css_loaders(isDevelopment, useSass),
-        }
-      ]
-    }
   ];
 }

@@ -26,6 +26,7 @@ const isDevelopment = process.env.NODE_ENV === 'development'
   ,__filename = fileURLToPath(import.meta.url)
   ,__dirname = path.dirname(__filename)
   ,useSass = false
+  ,inlineCssInDevMode = true
   ,useSvgo = true
   ,useSvgr = false // svg per react
   ,svgoConfig = useSvgo? (await import('./webpack/svgo.config.mjs')).default : null
@@ -380,7 +381,8 @@ const config = {
         }
       },
 
-      ...cssRules({isDevelopment: isDevelopment, useSass: useSass})
+      // =>> rules: css / scss
+      ...cssRules({isDevelopment: isDevelopment, useSass: useSass, inlineCssInDevMode: inlineCssInDevMode})
     ] // end rules
   }, // end module
 
