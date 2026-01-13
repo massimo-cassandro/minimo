@@ -34,7 +34,7 @@ npm i -D webpack-cli webpack-dev-server webpack-manifest-plugin webpack
 npm i -D postcss autoprefixer postcss-custom-media @csstools/postcss-global-data postcss-loader
 npm i -D responsive-loader
 npm i -D webpack-remove-empty-scripts
-npm i -S svgo svg-url-loader svgo-loader svgo-add-viewbox
+npm i -D svgo svg-url-loader svgo-loader svgo-add-viewbox
 
 curl -s "$BASE_URL/boilerplate/frontend/webpack.config.mjs" > webpack.config.mjs
 curl -s "$BASE_URL/boilerplate/frontend/postcss.config.cjs" > postcss.config.cjs
