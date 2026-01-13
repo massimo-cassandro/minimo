@@ -67,6 +67,7 @@ const CopyWebpackPluginPatterns = [
 const config = {
   mode: isDevelopment ? 'development' : 'production',
 
+  // watch: isDevelopment, // necessario se non si usa devServer
   watchOptions: {
     ignored: [ 'build', '**/node_modules', '.git', '_private' ]
   },
