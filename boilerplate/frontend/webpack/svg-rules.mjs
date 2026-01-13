@@ -3,12 +3,20 @@
  * @returns {import('webpack').RuleSetRule[]}
  */
 
+
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+
 export function svgRules({
   useSvgo = true,
   useSvgr = false,
   svgoConfig = null,
-  favicons_path_regexp = null
+  favicons_path_regexp = null,
 }) {
+
+  const this_filename = fileURLToPath(import.meta.url)
+    ,this_dirname = path.dirname(this_filename);
 
   if(svgoConfig == null) {
     useSvgo = false;
@@ -31,7 +39,7 @@ export function svgRules({
 
           // Loader wrapper per Data URI compatto (Mini-SVG-Data-URI-Loader)
           {
-            loader: './mini-svg-data-uri-loader.cjs',
+            loader: path.resolve(this_dirname, './mini-svg-data-uri-loader.cjs'),
           },
         ],
       },
