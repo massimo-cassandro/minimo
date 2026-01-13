@@ -378,6 +378,23 @@ const config = {
         ],
       },
 
+      // =>> Video
+      {
+        test: /\.(?:mp4|webm)$/i,
+        // type: 'asset/resource',
+        type: 'javascript/auto',
+        use: [
+          {
+            loader: 'file-loader',
+            options: {
+              name: '[name].[contenthash].[ext]',
+              outputPath: 'video/',
+              esModule: false,
+            }
+          }
+        ]
+      },
+
       // =>> rules: Fonts
       {
         test: /\.(woff2?|eot|ttf|otf)$/,
