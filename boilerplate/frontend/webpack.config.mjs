@@ -30,7 +30,7 @@ const isDevelopment = process.env.NODE_ENV === 'development'
   ,useSvgo = true
   ,useSvgr = false // svg per react
   ,svgoConfig = useSvgo? (await import('./webpack/svgo.config.mjs')).default : null
-  ,output_dir = path.resolve(__dirname, './build')
+  ,output_dir = path.resolve(__dirname, './build') // sf:  isDevelopment? '_dev' : 'build'
   ,favicons_path_regexp = /src\/favicons\/output/ // source pattern per le favicons (regexp o null)
   ,jsConfigAliases = getJsConfigAliases(path.resolve(__dirname, './jsconfig.json'))
   ,packageJson = JSON.parse(fs.readFileSync(path.resolve(__dirname, './package.json'), 'utf-8'))
@@ -86,9 +86,10 @@ const config = {
   },
 
   output: {
-    path: output_dir,
+    path: output_dir, // sf: path.resolve(__dirname, `./public/${output_dir}` ),
     filename: '[name].[contenthash].js',
     publicPath: '/',
+    // publicPath: `/${output_dir}/`, // sf
     // publicPath: isDevelopment? '/' : './', // per devServer, nel caso in cui l'output di produzione non sia sulla root
     clean: !isDevelopment
   },
@@ -213,11 +214,14 @@ const config = {
 
     // =>> plugins: WebpackManifestPlugin
     // new WebpackManifestPlugin({
-    //   fileName: path.join(output_dir, 'manifest.json'),
+    //   fileName: path.join(output_dir, 'manifest.json'), // sf: fileName: 'manifest.json', // scrive in output.path
     //   // basePath: item.source_dirname
     //   // removeKeyHash: /(^(_assets\/(?!(fonts\/))))|((\?as_asset)$)/,
     //   removeKeyHash: true, // /([a-f0-9]{32}\.?)/gi, // /(\?as_asset)$/,
-
+    //   // rimuove i font dal manifest. Non necessari, rendono il file inutilmente grande
+    //   filter: isDevelopment? undefined : (FileDescriptor) => {
+    //     return /_fonts/.test(FileDescriptor.path)? false : true;
+    //   },
     //   sort: isDevelopment? undefined : (a, b) => a.name.localeCompare(b.name)
     // }),
 
