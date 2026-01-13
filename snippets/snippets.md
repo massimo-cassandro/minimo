@@ -1,6 +1,6 @@
 # Setup snippets
 
-## webapack full install
+## webpack full install
 
 ```bash
 curl -s https://raw.githubusercontent.com/massimo-cassandro/minimo/refs/heads/main/snippets/webpack-install.sh | zsh
