@@ -61,4 +61,4 @@ if [ ! -d "$WEBPACK_LOCAL_DIR" ]; then
 
 fi
 
-echo -e '\n\n${GREEN}*** END ***${NC}'
+echo -e "n\n${GREEN}*** END ***${NC}"
