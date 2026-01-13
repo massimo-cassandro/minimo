@@ -275,13 +275,27 @@ const config = {
   module: {
     rules: [
 
-      // =>> rules: jsx
+      // =>> rules: js / jsx
       {
         test: /\.jsx?$/,
-        exclude: /node_modules/,
-        use: {
-          loader: 'babel-loader',
-        },
+        oneOf: [
+          {
+            resourceQuery: /as_lib/, // utilizzo come libreria
+            type: 'asset/resource',
+            generator: {
+              filename: 'libs/[name].[contenthash][ext]'
+            }
+          },
+          {
+            exclude: /node_modules/,
+            use: {
+              loader: 'babel-loader',
+              options: {
+                presets: [['@babel/preset-env', { targets: 'defaults' }]]
+              }
+            }
+          }
+        ]
       },
 
       // =>> rules: html files
@@ -311,15 +325,7 @@ const config = {
         }
       },
 
-      // =>> rules: JS libraries
-      {
-        test: /\.js$/,
-        type: 'asset/resource',
-        resourceQuery: /as_lib/,
-        generator: {
-          filename: 'libs/[name].[contenthash][ext]'
-        }
-      },
+
 
       // =>> raw txt / md files
       {
