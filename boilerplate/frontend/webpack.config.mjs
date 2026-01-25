@@ -239,6 +239,12 @@ const config = {
       title: 'XXXXX',
       minify: !isDevelopment
     }),
+    new HtmlWebpackPlugin({
+      filename: 'manifest.webmanifest',
+      template: path.resolve(__dirname, './src/favicons/output/manifest.webmanifest.ejs'),
+      inject: false,
+      minify: false //!isDevelopment
+    }),
 
     // =>> plugins: HtmlWebpackInjectPreload
     ...(isDevelopment
@@ -365,7 +371,7 @@ const config = {
           //         esModule: true,
 
           //         // Manteniamo i nomi file consistenti
-          //         name: '[name].[contenthash].[ext]',
+          //         name: '[name].[contenthash][ext]',
           //         outputPath: 'imgs',
           //         publicPath: path.join((isDevelopment? '/_dev/' : '/build/'), 'imgs')
           //       },
@@ -377,7 +383,7 @@ const config = {
             type: 'asset/resource',
             exclude: favicons_path_regexp?? undefined,
             generator: {
-              filename: 'imgs/[name].[contenthash].[ext]',
+              filename: 'imgs/[name].[contenthash][ext]',
             }
           },
         ],
@@ -392,7 +398,7 @@ const config = {
           {
             loader: 'file-loader',
             options: {
-              name: '[name].[contenthash].[ext]',
+              name: '[name].[contenthash][ext]',
               outputPath: 'video/',
               esModule: false,
             }

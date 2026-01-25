@@ -29,14 +29,17 @@ curl -s "$BASE_URL/boilerplate/stylelint.config.mjs" > stylelint.config.mjs
 
 
 echo -e "\n${GREEN}...webpack${NC}"
-npm i -D @babel/core @babel/preset-env babel-loader copy-webpack-plugin css-loader css-minimizer-webpack-plugin dotenv-webpack html-loader html-webpack-plugin mini-css-extract-plugin mini-svg-data-uri postcss-preset-env style-loader terser-webpack-plugin
 npm i -D webpack-cli webpack-dev-server webpack-manifest-plugin webpack
-npm i -D postcss autoprefixer postcss-custom-media @csstools/postcss-global-data postcss-loader
+npm i -D @babel/core @babel/preset-env babel-loader terser-webpack-plugin
+npm i -D webpack-remove-empty-scripts copy-webpack-plugin html-loader html-webpack-plugin
+npm i -D postcss autoprefixer postcss-custom-media @csstools/postcss-global-data postcss-loader postcss-preset-env
+npm i -D cssnano mini-css-extract-plugin style-loader css-loader css-minimizer-webpack-plugin
 npm i -D responsive-loader
-npm i -D webpack-remove-empty-scripts
-npm i -D svgo svg-url-loader svgo-loader svgo-add-viewbox
+npm i -D process dotenv-webpack
+npm i -D svgo svg-url-loader svgo-loader svgo-add-viewbox mini-svg-data-uri
 
 curl -s "$BASE_URL/boilerplate/frontend/webpack.config.mjs" > webpack.config.mjs
+curl -s "$BASE_URL/boilerplate/frontend/webpack-template.ejs" > webpack-template.ejs
 curl -s "$BASE_URL/boilerplate/frontend/postcss.config.cjs" > postcss.config.cjs
 
 
