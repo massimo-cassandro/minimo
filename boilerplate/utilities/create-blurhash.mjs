@@ -35,18 +35,18 @@ async function generateHashes() {
     try {
       if (fs.existsSync(imagePath)) {
         // 1. Estrazione metadati originali (solo una volta per item)
-        const metadata = await sharp(imagePath).metadata();
-        item.originalWidth = metadata.width;
-        item.originalHeight = metadata.height;
+        // const metadata = await sharp(imagePath).metadata();
+        // item.originalWidth = metadata.width;
+        // item.originalHeight = metadata.height;
 
         // 2. Assegnazione dimensioni specifiche per il ritaglio
-        if (variant === 'desktop') {
-          item.desktopWidth = width;
-          item.desktopHeight = height;
-        } else if (variant === 'mobile') {
-          item.mobileWidth = width;
-          item.mobileHeight = height;
-        }
+        // if (variant === 'desktop') {
+        //   item.desktopWidth = width;
+        //   item.desktopHeight = height;
+        // } else if (variant === 'mobile') {
+        //   item.mobileWidth = width;
+        //   item.mobileHeight = height;
+        // }
 
         // 3. Generazione BlurHash
         const { data, info } = await sharp(imagePath)
@@ -67,7 +67,7 @@ async function generateHashes() {
         item[ `blurhash_${variant}` ] = hash;
       }
     } catch (err) {
-      progressBar.log(`\n❌ Errore su ${item.img} (${variant}): ${err.message}\n`);
+      console.log(`\n❌ Errore su ${item.img} (${variant}): ${err.message}\n`);
     }
 
     progressBar.increment({ file: item.img });
