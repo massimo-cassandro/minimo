@@ -309,6 +309,19 @@ const config = {
         ]
       },
 
+      // =>> template ejs
+      {
+        test: /\.ejs$/i,
+        use: [
+          {
+            loader: 'ejs-loader',
+            options: {
+              esModule: false // Necessario per far sì che il require restituisca la stringa correttamente
+            }
+          }
+        ]
+      },
+
       // =>> rules: html files
       {
         test: /(\.html?)$/i,

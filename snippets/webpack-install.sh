@@ -37,6 +37,7 @@ npm i -D cssnano mini-css-extract-plugin style-loader css-loader css-minimizer-w
 npm i -D responsive-loader
 npm i -D process dotenv-webpack
 npm i -D svgo svg-url-loader svgo-loader svgo-add-viewbox mini-svg-data-uri
+npm i -D ejs-loader
 
 curl -s "$BASE_URL/boilerplate/frontend/webpack.config.mjs" > webpack.config.mjs
 curl -s "$BASE_URL/boilerplate/frontend/webpack-template.ejs" > webpack-template.ejs
