@@ -128,9 +128,30 @@ const config = {
 
         vendor: {
           test: /[\\/]node_modules[\\/]/,
+
+          // alternativa: non include nel chunk vendor i path che contengono la stringa `blurhash`
+          // test: /[\\/]node_modules[\\/](?!.*blurhash)/i,
+
+          // alternativa: verifica se l'import ha una query specifica (?exclude-vendor-chunk)
+          // test(module) {
+          //   const resource = module.nameForCondition && module.nameForCondition();
+          //   if (!resource) return false;
+
+          //   // Verifica se è in node_modules
+          //   const isNodeModule = /[\\/]node_modules[\\/]/.test(resource);
+
+          //   // module.resource è il percorso completo + query string
+          //   const hasExcludeQuery = module.resource && module.resource.includes('exclude-vendor-chunk');
+
+          //   // Include nel chunk vendor solo se è un node_module E NON ha la query
+          //   return isNodeModule && !hasExcludeQuery;
+          // },
+
           name: 'vendors',
           chunks: 'all'
         },
+
+
 
         // separazione @massimo-cassandro da node_modules:
         // mc: {
