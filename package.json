@@ -1,0 +1,19 @@
+{
+  "name": "minimo",
+  "version": "0.1.0",
+  "description": "Light css framework",
+  "homepage": "https://github.com/massimo-cassandro/minimo#readme",
+  "bugs": {
+    "url": "https://github.com/massimo-cassandro/minimo/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/massimo-cassandro/minimo.git"
+  },
+  "license": "MIT",
+  "author": "Massimo Cassandro",
+  "type": "module",
+  "devDependencies": {
+    "@massimo-cassandro/dev-updater": "^2.1.0"
+  }
+}

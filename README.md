@@ -1,6 +1,5 @@
 # minimo
 
-Very light size framework
+Very light-size framework
 
-
-[Snippets](boilerplate/snippets.md)
+...and some [snippets](snippets/snippets.md)
