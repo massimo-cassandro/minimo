@@ -69,7 +69,8 @@ const config = {
 
   // watch: isDevelopment, // necessario se non si usa devServer
   watchOptions: {
-    ignored: [ 'build', '**/node_modules', '.git', '_private' ]
+    ignored: [ 'build', '**/node_modules', '.git', '_private' ],
+    // poll: 1000, // se necessario, risolve il problema `Error: EMFILE: too many open files, watch`
   },
 
   // https://webpack.js.org/configuration/dotenv/
