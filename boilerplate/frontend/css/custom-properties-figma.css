@@ -1,0 +1,16 @@
+:root {
+  color-scheme: light dark;
+
+  /* figma */
+  --body-bg-color: var(--stone-0);
+  --text-color: #000;
+  --footer-bg: #282c35;
+  --footer-fg: #fff;
+  --footer-link: var(--yellow-5);
+  --link-color: var(--primary);
+  --primary: #203c6e;
+  --secondary: #a3384e;
+  --secondary-fg: var(--body-bg-color);
+  --radius: 0.38rem;
+  /* end figma */
+}

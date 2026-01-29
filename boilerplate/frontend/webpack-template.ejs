@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="it">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+    <!-- favicons -->
+    <%= require('./favicons/output/favicons.incl.ejs')({}) %>
+    <!-- <%= require('./app/favicons/output/favicons.incl.ejs')({}) %> -->
+    <!-- <%= require('./frontend/favicons/output/favicons.incl.ejs')({}) %> -->
+
+    <title><%= htmlWebpackPlugin.options.title %></title>
+    <%= htmlWebpackPlugin.tags.headTags %> <!-- opzionale, param `inject: false` -->
+  </head>
+  <body>
+    <div id="root" class="wrapper"></div>
+    <%= htmlWebpackPlugin.tags.bodyTags %> <!-- opzionale, param `inject: false` -->
+  </body>
+</html>

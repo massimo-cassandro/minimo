@@ -1,0 +1,230 @@
+/* stylelint-disable function-no-unknown */
+@use 'sass:math';
+@use 'sass:map';
+
+
+$media-breakpoints: (
+  mobile: 400px,
+  desktop: 1000px,
+  // ...other values can go in here
+);
+
+
+@function rnd($number, $places: 2) {
+  $n: 1;
+  @if $places > 0 {
+    @for $i from 1 through $places {
+      $n: $n * 10;
+    }
+  }
+  @return math.div(math.round($number * $n), $n);
+}
+
+@function to-rems($px) {
+  $rems: math.div($px, 16px) * 1rem;
+  @return $rems;
+}
+
+@function clamped($min-px, $max-px, $min-bp: $default-min-bp, $max-bp: $default-max-bp) {
+  $slope: math.div($max-px - $min-px, $max-bp - $min-bp);
+  $slope-vw: rnd($slope * 100, 2);
+  $intercept-rems: rnd(to-rems($min-px - $slope * $min-bp), 2);
+  $min-rems: rnd(to-rems($min-px), 2);
+  $max-rems: rnd(to-rems($max-px), 2);
+  @return clamp(#{$min-rems}, #{$slope-vw}vw + #{$intercept-rems}, #{$max-rems});
+}
+
+
+:root {
+  color-scheme: light dark;
+
+  --container-max-width: 90rem;
+  --font-family: 'Merriweather Sans Variable', sans-serif;
+  --font-family-mono: 'Monaspace Neon Var', 'Monaspace Neon', 'Aptos Mono', 'Roboto Mono', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'Liberation Mono', 'Andale Mono', 'Courier New', monospace;
+  --font-family-redacted: 'Redacted Script', system-ui;
+
+  /* figma */
+  --body-bg-color: var(--stone-2);
+  --text-color: #000;
+  --box-bg-color: var(--stone-0);
+  --box-2-bg-color: var(--sand-1);
+  --box-3-bg-color: var(--sand-2);
+  --box-2-text-color: var(--body-text);
+  --footer-bg-color: #282c35;
+  --footer-fg-color: #fff;
+  --footer-link: var(--yellow-5);
+  --link-color: var(--primary);
+  --primary: #203c6e;
+  --secondary: #a3384e;
+  --secondary-fg: var(--box-bg-color);
+  /* end figma */
+
+  --text-muted-color: var(--stone-7);
+  --link-visited-color: var(--camo-9);
+
+
+  --font-weight-light: 300;
+  --font-weight-regular: 400;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --font-weight-extra-bold: 800;
+
+  --flex-grid-gap: 1.5rem;
+
+  --font-size-base: 1rem;
+  --font-size-base: clamp(.9em, 9vw, 1em);
+  --font-size-xxs: .7em;
+  --font-size-xxs: clamp(.7em, 1.5vw, .8em);
+  --font-size-xs: .8em;
+  --font-size-xs: clamp(.85em, 10vw, .95em);
+  --font-size-sm: .9em;
+  --font-size-md: 1.2rem;
+  /*
+  https://clamp.font-size.app/?config=eyJyb290IjoiMTYiLCJtaW5XaWR0aCI6IjY0cmVtIiwibWF4V2lkdGgiOiI5MHJlbSIsIm1pbkZvbnRTaXplIjoiMS4wNXJlbSIsIm1heEZvbnRTaXplIjoiMS4zcmVtIn0%3D
+  */
+  --font-size-md-lg-fluid: clamp(1.05rem, 0.4346rem + 0.9615vw, 1.3rem);
+
+  /*
+  https://clamp.font-size.app/?config=eyJyb290IjoiMTYiLCJtaW5XaWR0aCI6IjY0cmVtIiwibWF4V2lkdGgiOiI5MHJlbSIsIm1pbkZvbnRTaXplIjoiMS4wMnJlbSIsIm1heEZvbnRTaXplIjoiMS4ycmVtIn0%3D
+  */
+  --font-size-lg: clamp(1.02rem, 0.5769rem + 0.6923vw, 1.2rem);
+  --font-size-lg: 1.8em;
+  --font-size-xl: 2.5em;
+  --font-size-2xl: 3em;
+
+  --line-height-base: 1.5;
+  --headings-text-align: start;
+
+
+  --form-text-color: var(--cyan-12);
+  --form-bg-color: var(--gray-0);
+  --form-input-group-bg-color: var(--gray-1);
+  --form-border-color: var(--gray-6);
+  --form-disabled-bg-color: var(--gray-2);
+  --form-placeholder-color: var(--sand-6);
+  --form-required-flag-color: var(--red-8);
+  --form-required-flag-content: '\002A';
+  --form-fieldset-border-width: 1px;
+  --form-legend-bg-color: var(--stone-3);
+  --form-legend-color: #333; /*  var(--text-color); */
+
+  --form-btns-border-radius: var(--radius-sm);
+  --form-btns-padding-y: var(--spacing-xxs);
+  --form-btns-padding-x: var(--spacing-xs);
+  --form-btns-font-size: clamp(.85rem, 6vw, 1rem);
+  --form-btns-sm-font-size: clamp(.75rem, 6vw, .9rem);
+  --form-btns-sm-padding-x: .8rem;
+  --form-btns-sm-padding-y: .1rem;
+  --form-btns-focus-color: hsl(205 69% 45% / .508);
+  --form-btns-outline-width: 3px;
+
+  --btn-primary-bg-color: linear-gradient(45deg, var(--green-9), var(--green-10));
+  --btn-primary-fg-color: var(--gray-0);
+  --btn-primary-border-color: var(--green-10);
+  --btn-primary-hover-bg-color: var(--green-11);
+  --btn-primary-hover-fg-color: var(--btn-primary-fg-color);
+  --btn-primary-hover-border-color: var(--btn-primary-border-color);
+  --btn-primary-active-bg-color: var(--green-12);
+  --btn-primary-active-fg-color: var(--btn-primary-fg-color);
+  --btn-primary-active-border-color: var(--btn-primary-active-bg-color);
+  --btn-primary-focus-outline-color: color-mix(in srgb, var(--btn-primary-border-color) 25%, transparent);
+
+  --btn-secondary-bg-color: var(--stone-4);
+  --btn-secondary-fg-color: var(--stone-9);
+  --btn-secondary-border-color: var(--stone-6);
+  --btn-secondary-hover-bg-color: var(--stone-5);
+  --btn-secondary-hover-fg-color: var(--stone-11);
+  --btn-secondary-hover-border-color: var(--btn-secondary-border-color);
+  --btn-secondary-active-bg-color: var(--stone-11);
+  --btn-secondary-active-fg-color: var(--stone-0);
+  --btn-secondary-active-border-color: var(--btn-secondary-active-bg-color);
+  --btn-secondary-focus-outline-color: color-mix(in srgb, var(--btn-secondary-border-color) 50%, transparent);
+
+  /* --btn-o-primary-bg-color: var(--primary-150);
+  --btn-o-primary-fg-color: var(--primary-10);
+  --btn-o-primary-border-color: var(--btn-bg-color);
+  --btn-o-primary-hover-bg-color: var(--primary-10);
+  --btn-o-primary-hover-fg-color: var(--primary-150);
+  --btn-o-primary-hover-border-color: var(--btn-fg-color);
+  --btn-o-primary-active-bg-color: var(--primary-150);
+  --btn-o-primary-active-fg-color: var(--primary-10);
+  --btn-o-primary-active-border-color: var(--btn-bg-color);
+  --btn-o-primary-focus-outline-color: var(--btn-bg-color); */
+
+  --btn-o-secondary-bg-color: color-mix(in srgb, var(--secondary) 5%, transparent);
+  --btn-o-secondary-fg-color: var(--secondary);
+  --btn-o-secondary-border-color: var(--secondary);
+  --btn-o-secondary-hover-bg-color: color-mix(in srgb, var(--secondary) 15%, #fff);
+  --btn-o-secondary-hover-fg-color: var(--secondary);
+  --btn-o-secondary-hover-border-color: var(--btn-o-secondary-border-color);
+  --btn-o-secondary-active-bg-color: var(--secondary);
+  --btn-o-secondary-active-fg-color: var(--secondary-fg);
+  --btn-o-secondary-active-border-color: var(--btn-o-secondary-border-color);
+  --btn-o-secondary-focus-outline-color: color-mix(in srgb, var(--secondary) 50%, #fff);
+
+  --spacing-xxs: .25rem;
+  --spacing-xs: .5rem;
+  --spacing-sm: .75rem;
+  --spacing-base: 1rem;
+  --spacing-md: 1.2rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  --spacing-2xl: 3rem;
+  --spacing-3xl: 4rem;
+
+  --radius-xxs: var(--spacing-xxs);
+  --radius-xs: var(--spacing-xs);
+  --radius-base: var(--spacing-base);
+  --radius-md: var(--spacing-md);
+  --radius-pill: 999rem;
+
+  --body-v-padding: var(--spacing-base);
+  --content-box-margin-top: var(--spacing-lg);
+  --box-shadow-base: 0 0 1.2rem #00000040;
+  --box-radius: var(--radius-md);
+  --logo-filter: brightness(0) invert(84%) sepia(4%) saturate(436%) hue-rotate(12deg) brightness(93%) contrast(87%);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+
+    /* figma */
+    --text-color: #fff;
+    --body-bg-color: var(--stone-11);
+    --box-bg-color: var(--stone-9);
+    --box-2-bg-color: var(--stone-10);
+    --box-2-text-color: #fff;
+    --link-color: var(--yellow-5);
+    --primary: #426095;
+    --secondary: var(--yellow-10);
+    --secondary-fg: #fff;
+    /* end figma */
+
+
+    --text-muted-color: var(--stone-5);
+    --link-visited-color: var(--sand-3);
+
+    --btn-primary-bg-color: linear-gradient(45deg, var(--green-9), var(--green-10));
+    --btn-primary-fg-color: var(--gray-0);
+    --btn-primary-border-color: var(--green-10);
+    --btn-primary-hover-bg-color: var(--green-11);
+    --btn-primary-hover-fg-color: var(--btn-primary-fg-color);
+    --btn-primary-hover-border-color: var(--btn-primary-border-color);
+    --btn-primary-active-bg-color: var(--green-12);
+    --btn-primary-active-fg-color: var(--btn-primary-fg-color);
+    --btn-primary-active-border-color: var(--btn-primary-active-bg-color);
+    --btn-primary-focus-outline-color: color-mix(in srgb, var(--btn-primary-border-color) 25%, transparent);
+
+    --btn-secondary-bg-color: var(--stone-4);
+    --btn-secondary-fg-color: var(--stone-9);
+    --btn-secondary-border-color: var(--stone-6);
+    --btn-secondary-hover-bg-color: var(--stone-5);
+    --btn-secondary-hover-fg-color: var(--stone-11);
+    --btn-secondary-hover-border-color: var(--btn-secondary-border-color);
+    --btn-secondary-active-bg-color: var(--stone-11);
+    --btn-secondary-active-fg-color: var(--stone-0);
+    --btn-secondary-active-border-color: var(--btn-secondary-active-bg-color);
+    --btn-secondary-focus-outline-color: color-mix(in srgb, var(--btn-secondary-border-color) 50%, transparent);
+  }
+}

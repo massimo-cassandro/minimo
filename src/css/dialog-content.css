@@ -1,0 +1,72 @@
+.content-dialog {
+  display: none;
+  width: 90dvw;
+  max-width: 900px;
+  height: 90dvh;
+  padding: 1rem;
+  margin: auto;
+  background-color: var(--body-bg);
+  border: none;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-4);
+  transform: translateY(-200vh);
+  animation: dialog-in .3s ease-out;
+
+
+  &[open] {
+    display: block;
+    transform: none;
+  }
+
+  &::backdrop {
+    overscroll-behavior: contain;
+    background-color: color-mix(in srgb, #000 40%, transparent);
+  }
+}
+
+.content-dialog-close {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  align-self: flex-end;
+
+  button {
+    top: -.5rem;
+    right: -.5rem;
+    width: 2rem;
+    aspect-ratio: 1;
+    padding: 4px;
+    background-color: var(--body-bg);
+    border: 1px solid var(--gray-4);
+    border-radius: 50%;
+    box-shadow: var(--shadow-3);
+
+    @media (hover: hover) { /* @media (any-hover: hover) { */
+      &:hover {
+        background-color: color-mix(in srgb, var(--text-color) 10%, transparent);
+      }
+    }
+
+  }
+
+  svg {
+    width: 1.5rem;
+    aspect-ratio: 1;
+  }
+}
+
+.content-dialog-inner {
+  position: relative;
+  z-index: 0;
+  display: flex;
+  flex-flow: column nowrap;
+  gap: .4rem;
+  align-items: stretch;
+  justify-content: flex-start;
+  isolation: isolate;
+}
+.content-dialog-body {
+  position: relative;
+  flex: 1;
+  overflow: auto;
+}

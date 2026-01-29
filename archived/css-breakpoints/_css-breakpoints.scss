@@ -1,0 +1,22 @@
+/* stylelint-disable @stylistic/number-no-trailing-zeros */
+
+// Questo file è stato generato da `build-scss-grid-breakpoint.mjs`,
+// eventuali modifiche apportate manualmente verranno sovrascritte.
+// Se fosse necessario editare i breakpoints,
+// modificare il file `css-breakpoints.mjs`
+// e avviare nuovamente lo script.
+
+$grid-breakpoints: (
+  xs: 0,
+  sm: 576px,
+  md: 768px,
+  lg: 992px,
+  xl: 1200px,
+  xxl: 1400px
+);
+
+$desktop-breakpoint: md;
+$desktop-breakpoint-px: 768px;
+$desktop-breakpoints-px-before: 767px;
+$desktop-breakpoint-rem: 48.0000rem;
+$desktop-breakpoint-before-rem: 47.9375rem;

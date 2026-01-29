@@ -1,0 +1,142 @@
+/* TODO custom props nel file generale */
+/* TODO prevedere opzione con bordo del pulsante di chiusura (NB: si disallinea) */
+/* TODO cambiare icona chiusura con svg? */
+/* TODO aggiungere wrapper intorno a dialogInner (a filo con il dialog) per la scroll bar */
+
+.dialog { /* dialog */
+  --modal-border-radius: var(--radius-md, 1.2rem);
+  position: fixed;
+  max-width: 80dvw;
+  max-height: 90dvh;
+  padding: 0;
+  margin: auto;
+  overflow: visible;
+  background-color: var(--body-bg-color, #fff);
+  border: none;
+  border-radius: var(--modal-border-radius);
+  box-shadow: 0 0 2rem .5rem rgb(0 0 0 / .5);
+  transition: scale .2s ease-out;
+  scale: 0;
+
+  /* stylelint-disable selector-class-pattern */
+  &.size-full {
+    width: 80dvw;
+    height: 90dvh;
+  }
+  /* dimensioni std -> size == 'large' */
+  &.size-large {
+    width: 50rem; /* 800px */
+    height: auto;
+  }
+  &.size-medium {
+    width: 37.5rem; /* 600px */
+    height: 37.5rem;
+  }
+  &.size-small {
+    width: 32rem; /* ~500 x 400 */
+    height: 25rem;
+  }
+  /* stylelint-enable selector-class-pattern */
+
+  &.on {
+    scale: 1;
+  }
+
+  &::backdrop {
+    overscroll-behavior: contain;
+    background-color: rgb(0 0 0 / .7);
+  }
+
+}
+
+.dialogInner {
+  width: 100%;
+  height: 100%;
+  padding-inline-end: var(--spacing-md);
+  overflow-x: hidden;
+  overflow-y: auto;
+  /* scrollbar-gutter: stable; */
+  border-radius: var(--modal-border-radius);
+
+  /* stylelint-disable selector-class-pattern */
+  .padding-std & {
+    padding: var(--spacing-md) 0;
+  }
+  .padding-none & {
+    padding: 0;
+  }
+  /* stylelint-enable selector-class-pattern */
+}
+
+.modalSpinner {
+  position: relative;
+  padding-block-start: var(--spacing-2xl);
+
+  .dialog.on & {
+    display: none;
+  }
+}
+
+.iframeEl, .contentEl {
+  width: 100%;
+  overscroll-behavior: contain;
+}
+
+.iframeEl {
+  height: 100%;
+  padding: 0;
+  margin: 0;
+  border: none;
+}
+
+.contentEl {
+  min-height: 100%;
+}
+
+.closeButton  {
+  --btn-color: var(--secondary-fg, #000);
+  --btn-bg-color: var(--secondary, #fff);
+  --btn-hover-color: var(--secondary, #fff);
+  --btn-hover-bg-color: var(--secondary-fg, #000);
+  --icon-size: 2.5rem;
+  --btn-padding: var(--spacing-xs, .5rem);
+  --icon-bars-thickness: 3px;
+
+  position: absolute;
+  top: calc(-1 * var(--icon-size) / 3);
+  right: calc(-1 * var(--icon-size) / 3);
+  display: block;
+  width: var(--icon-size);
+  height: var(--icon-size);
+  padding: var(--btn-padding);
+  color: var(--btn-color);
+  cursor: pointer;
+  background-color: var(--btn-bg-color);
+  /* border: var(--icon-bars-thickness) solid currentColor; */
+  border: none;
+  border-radius: 50%;
+
+
+  &:hover {
+    --btn-color: var(--btn-hover-color);
+    --btn-bg-color: var(--btn-hover-bg-color);
+  }
+
+  &::before, &::after {
+    position: absolute;
+    top: 50%;
+    left: var(--btn-padding);
+    display: block;
+    width: calc(var(--icon-size) - (var(--btn-padding) * 2));
+    height: var(--icon-bars-thickness);
+    content: '';
+    background: currentColor;
+  }
+  &::before {
+    transform: translateY(-50%) rotate(45deg);
+  }
+  &::after {
+    transform: translateY(-50%) rotate(-45deg);
+  }
+}
+

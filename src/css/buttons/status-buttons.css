@@ -1,0 +1,107 @@
+.btn {
+
+  &.btn-success {
+    --bg: var(--status-success-color);
+    --fg: var(--status-success-fg-color);
+    --btn-bg-color: var(--bg);
+    --btn-fg-color: var(--fg);
+    --btn-border-color: var(--status-success-border-color);
+  }
+  &.btn-info {
+    --bg: var(--status-info-color);
+    --fg: var(--status-info-fg-color);
+    --btn-bg-color: var(--bg);
+    --btn-fg-color: var(--fg);
+    --btn-border-color: var(--status-info-border-color);
+  }
+  &.btn-danger, &.btn-error {
+    --bg: var(--status-danger-color);
+    --fg: var(--status-danger-fg-color);
+    --btn-bg-color: var(--bg);
+    --btn-fg-color: var(--fg);
+    --btn-border-color: var(--status-danger-border-color);
+  }
+
+
+  &.btn-warning {
+    --bg: var(--status-warning-color);
+    --fg: var(--status-warning-fg-color);
+    --btn-bg-color: var(--bg);
+    --btn-fg-color: var(--fg);
+    --btn-border-color: var(--status-warning-border-color);
+
+    @media (--mouse) {
+      &:hover {
+        --btn-bg-color: color-mix(in srgb, var(--bg) 60%, transparent);
+        --btn-fg-color: var(--fg);
+        --btn-border-color: var(--fg);
+      }
+    }
+
+    &:focus, &:active {
+      outline: var(--form-btns-outline-width) solid color-mix(in srgb, var(--bg) 60%, transparent);
+    }
+
+    &:active {
+      --btn-bg-color: color-mix(in srgb, var(--bg) 30%, transparent);
+    }
+  }
+
+
+  &.btn-success, &.btn-info, &.btn-danger  {
+
+    @media (--mouse) {
+      &:hover {
+        --btn-bg-color: color-mix(in srgb, var(--bg) 30%, transparent);
+        --btn-fg-color: var(--bg);
+        --btn-border-color: var(--bg);
+      }
+    }
+
+    &:focus, &:active {
+      outline: var(--form-btns-outline-width) solid color-mix(in srgb, var(--bg) 40%, transparent);
+    }
+
+    &:active {
+      --btn-bg-color: color-mix(in srgb, var(--bg) 10%, transparent);
+    }
+  }
+
+  @media (prefers-color-scheme: dark) {
+
+
+    &.btn-success, &.btn-info, &.btn-danger {
+
+      @media (--mouse) {
+        &:hover {
+          --btn-bg-color: color-mix(in srgb, var(--bg) 60%, #fff);
+          --btn-fg-color: var(--bg);
+          --btn-border-color: color-mix(in srgb, var(--bg) 40%, #fff);
+        }
+      }
+    }
+
+    &.btn-warning {
+
+      @media (--mouse) {
+        &:hover {
+          --btn-bg-color: color-mix(in srgb, var(--bg) 60%, #fff);
+          --btn-fg-color: var(--fg);
+          --btn-border-color: var(--fg);
+        }
+      }
+    }
+
+    &.btn-success, &.btn-info, &.btn-danger, &.btn-warning {
+
+      &:focus, &:active {
+        outline: var(--form-btns-outline-width) solid color-mix(in srgb, var(--bg) 60%, transparent);
+      }
+
+      &:active {
+        --btn-bg-color: color-mix(in srgb, var(--bg) 30%, transparent);
+        --btn-fg-color: var(--text-color);
+      }
+    }
+  }
+}

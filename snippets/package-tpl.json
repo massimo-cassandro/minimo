@@ -1,0 +1,24 @@
+{
+  "name": "xxxxx",
+  "description": "",
+  "version": "0.1.0",
+  "license": "MIT",
+  "author": "Massimo Cassandro",
+  "main": "index.js",
+  "type":"module",
+  "scripts": {
+    "create-favicons INIT": "npx create-favicons init",
+    "webpack DEV": "open -n -a 'Google Chrome' --args --profile-directory='Profile 3' && NODE_ENV=development webpack serve --config ./webpack.config.mjs --progress",
+    "webpack PROD": "NODE_ENV=production webpack --config ./webpack.config.mjs --progress",
+    "create-favicons": "npx create-favicons --dir=./src/favicons",
+    "UPD-version": "npx update-version",
+    "upd@m": "npx upd@m",
+    "launchChrome": "open -n -a 'Google Chrome' --args --profile-directory='Profile 3'",
+    "python server": "python3 -m http.server 8000 # --directory __dirname__ # 8000 = default port",
+    "php server": "php -S localhost:8000 # -t root_dir/",
+    "symfony local server": "symfony serve -d",
+    "node server": "node serve # richiede ‘npm i serve’"
+  },
+  "dependencies": {},
+  "devDependencies": {}
+}

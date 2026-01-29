@@ -1,0 +1,47 @@
+/* NB incluso nel css principale */
+
+@import '@massimo-cassandro/modal-alert';
+
+
+.modal-alert {
+  --malert-success-color: var(--status-success-color);
+  --malert-success-color-fg: var(--status-success-fg-color);
+
+  --malert-info-color: var(--status-info-color);
+  --malert-info-color-fg: var(--status-info-fg-color);
+
+  --malert-warning-color: var(--status-warning-color);
+  --malert-warning-color-fg: var(--status-warning-fg-color);
+
+  --malert-error-color: var(--status-danger-color);
+  --malert-error-color-fg: var(--status-danger-fg-color);
+
+  --malert-confirm-color: var(--status-warning-color);
+  --malert-confirm-color-fg: var(--status-warning-fg-color);
+
+  /* --malert-marks-stroke-width: 6px; */
+  --malert-backdrop: rgb(0 0 0 / .3);
+  --malert-border-radius: var(--radius-md);
+  /* --malert-box-shadow: var(--box-shadow); */
+  --malert-heading-font-family: var(--font-family);
+  /* --malert-heading-line-height: */
+  --malert-heading-font-size: 1.8rem;
+  --malert-heading-font-weigth: var(--font-size-base);
+  --malert-body-font-family: var(--font-family);
+
+  top: 50%;
+  left: 50%;
+  translate: -50% -50%;
+}
+
+
+
+.malert-mark {
+  svg {
+    width: 7rem;
+    max-width: none;
+    height: 7rem;
+    fill: var(--malert-color-fg);
+    stroke: none;
+  }
+}
