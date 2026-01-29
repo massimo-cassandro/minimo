@@ -308,6 +308,7 @@ const config = {
     }),
 
     // =>> plugins: PurgeCSSPlugin (per ultimo)
+    // https://github.com/FullHuman/purgecss/tree/main/packages/purgecss-webpack-plugin
     // https://purgecss.com/configuration.html
     new PurgeCSSPlugin({
       paths: globSync(

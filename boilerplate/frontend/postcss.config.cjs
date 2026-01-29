@@ -40,26 +40,6 @@ const postcssConfig = {
       preserve: isDevelopment
     }),
 
-    // https://purgecss.com/configuration.html
-    // require('@fullhuman/postcss-purgecss')({
-    //   content: [
-    //     // './node_modules/@massimo-cassandro/**/.js',
-    //     './templates/**/*.html.twig',
-    //     './public/**/*.html',
-    //     './src/**/*.{js,jsx}',
-    //   ],
-    //   // css: ['./src/css/custom-properties-figma.css'],
-    //   // output: ['./AppBundle/Resources/public/css/'],
-    //   // variables: true,
-    //   // fontFace: true,
-    //   // keyframes: true,
-    //   safelist: {
-    //     standard: [/:focus$/],
-    //     // deep: [],
-    //     // greedy: [/yellow$/]
-    //   }
-    // }),
-
   ]
 };
 
