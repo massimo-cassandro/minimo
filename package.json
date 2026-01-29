@@ -1,6 +1,6 @@
 {
   "name": "@massimo-cassandro/minimo",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Light css framework",
   "homepage": "https://github.com/massimo-cassandro/minimo#readme",
   "bugs": {
@@ -9,6 +9,11 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/massimo-cassandro/minimo.git"
+  },
+  "scripts": {
+    "UPD-version": "npx update-version  # --config=./dev-utilities.config.mjs",
+    "upd@m": "npx upd@m",
+    "npm-publish": "npm publish"
   },
   "license": "MIT",
   "author": "Massimo Cassandro",
