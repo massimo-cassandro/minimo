@@ -1,0 +1,14 @@
+/* HTML: <div class="loader"></div> */
+/* https://css-loaders.com/dots/  #1 */
+.spinner {
+  width: 80px;
+  aspect-ratio: 6;
+  margin-top: 2rem;
+  clip-path: inset(0 100% 0 0);
+  background: radial-gradient(circle closest-side, var(--text-color) 90%, transparent) 0 / calc(100% / 3) 100% space;
+  animation: l1 1s steps(4) infinite;
+}
+
+@keyframes l1 { to { clip-path: inset(0 -34% 0 0); } }
+
+

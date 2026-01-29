@@ -8,16 +8,17 @@
     "paths": {
       "@frontend/*": ["./frontend/*"],
       "@src/*": ["frontend/src/*"],
-      "@minimo/*": ["./frontend/minimo/*"],
       "@imgs/*": ["./frontend/imgs/*"],
       "@icone/*": ["./frontend/icone/*"],
-      "@backoffice/*": ["./frontend/backoffice/*"]
+      "@backoffice/*": ["./frontend/backoffice/*"],
+      "@minimo/*": ["./node_modules/@massimo-cassandro/minimo/src/css/*"],
+      "@minimoJs/*": ["./node_modules/@massimo-cassandro/minimo/src/js/*"],
+      "@minimoComp/*": ["./node_modules/@massimo-cassandro/minimo/src/components/*"]
     },
 
     "paths---se-si-usa-app": {
       "@app/*": ["./app/*"],
       "@src/*": ["app/src/*"],
-      "@minimo/*": ["./app/minimo/*"],
       "@imgs/*": ["./app/imgs/*"],
       "@icone/*": ["./app/icone/*"]
     }

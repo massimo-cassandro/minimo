@@ -1,0 +1,49 @@
+/*
+  CSS globali
+  i fogli stile delle singole parti sono importate direttamente nel file js relativo
+  o (se non necessario), direttamente nel file js principale
+ */
+
+@import '@src/config/fonts.css';
+/* @import '../node_modules/open-props/open-props.min.css'; */
+/* @import '@src/config/custom-properties-figma.css'; */
+@import '@src/config/custom-media.css';
+@import '@src/config/custom-properties.css';
+
+@import '@minimo/reset.css';
+@import '@minimo/layout-base.css';
+@import '@minimo/container.css';
+
+/* @import '@minimo/forms/forms.css'; */
+/* @import '@minimo/forms/form-edit-info.css'; */
+@import '@minimo/buttons/buttons.css';
+/* @import '@minimo/buttons/status-buttons.css'; */
+/* @import '@minimo/buttons/btn-close.css'; */
+@import '@minimo/text.css';
+@import '@minimo/anchors.css';
+/* @import '@minimo/headings.css'; */
+/* @import '@minimo/alerts.css'; */
+/* @import '@minimo/icons.css'; */
+@import '@minimo/svg.css';
+@import '@minimo/overlay.css';
+/* @import '@minimo/inner-nav.css'; */
+/* @import '@minimo/table.css'; */
+/* @import '@minimo/flex.css'; */
+/* @import '@minimo/grid.css'; */
+/* @import '@minimo/details.css'; */
+
+/* spinner attivarne uno solo + spinner-wrapper */
+@import '@minimo/spinners/spinner-wrapper.css';
+/* @import '@minimo/spinners/spinner-trailing-dots.css'; */
+/* @import '@minimo/spinners/spinner-three-dots.css'; */
+/* @import '@minimo/spinners/spinner-circle.css'; */
+@import '@minimo/spinners/spinner-circle-basic.css';
+
+/* @import '@minimo/utilities.css'; */
+
+
+/* componenti */
+/* @import '@src/components/modal-alert/modal-alert.css'; */
+
+/* file progetto */
+/* @import '@src/layout/layout.css'; */
