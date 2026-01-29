@@ -16,7 +16,6 @@
       // "./node_modules/open-props/buttons.dark.min.css",
       // "./node_modules/open-props/buttons.light.min.css",
       // "./node_modules/open-props/buttons.min.css",
-      "./node_modules/open-props/colors.min.css",
       "./node_modules/open-props/durations.min.css",
       "./node_modules/open-props/easings.min.css",
       // "./node_modules/open-props/fonts.min.css",
@@ -27,7 +26,6 @@
       // "./node_modules/open-props/normalize.dark.min.css",
       // "./node_modules/open-props/normalize.light.min.css",
       // "./node_modules/open-props/normalize.min.css",
-      "./node_modules/open-props/shadows.min.css",
       // "./node_modules/open-props/sizes.min.css",
       "./node_modules/open-props/supports.min.css",
       // "./node_modules/open-props/theme.dark.switch.min.css",
@@ -35,6 +33,7 @@
       "./node_modules/open-props/zindex.min.css",
 
       // colori
+      "./node_modules/open-props/colors.min.css",
       // "./node_modules/open-props/colors-hsl.min.css",
       // "./node_modules/open-props/colors-hsl.shadow.min.css",
       // "./node_modules/open-props/colors-oklch.min.css",
@@ -43,6 +42,7 @@
       // "./node_modules/open-props/oklch-hues.shadow.min.css",
 
       // shadow
+      "./node_modules/open-props/shadows.min.css",
       // "./node_modules/open-props/animations.shadow.min.css",
       // "./node_modules/open-props/aspects.shadow.min.css",
       // "./node_modules/open-props/borders.shadow.min.css",
