@@ -11,9 +11,7 @@
       "@imgs/*": ["./frontend/imgs/*"],
       "@icone/*": ["./frontend/icone/*"],
       "@backoffice/*": ["./frontend/backoffice/*"],
-      "@minimo/*": ["./node_modules/@massimo-cassandro/minimo/src/css/*"],
-      "@minimoJs/*": ["./node_modules/@massimo-cassandro/minimo/src/js/*"],
-      "@minimoComp/*": ["./node_modules/@massimo-cassandro/minimo/src/components/*"]
+      "@minimo/*": ["./node_modules/@massimo-cassandro/minimo/src/*"]
     },
 
     "paths---se-si-usa-app": {

@@ -1,7 +1,7 @@
 /* TODO dividere in più file secondo il tipo di button */
 
 /*
-outline brns: primary/secondary + fondo body bg o trasparente
+outline btns: primary/secondary + fondo body bg o trasparente
 
 */
 
@@ -44,12 +44,13 @@ a.btn {
     pointer-events: none;
     cursor: not-allowed;
     filter: grayscale(60%);
-    opacity: .6;
+    opacity: var(--form-disabled-opacity);
   }
 
-  /* svg {
-    width: 2rem;
-  } */
+  svg {
+    width: 1em;
+    fill: currentColor;
+  }
 
   &.btn-sm {
     --form-btns-padding-x: var(--form-btns-sm-padding-x);
@@ -57,7 +58,7 @@ a.btn {
     font-size: var(--form-btns-sm-font-size);
 
     svg {
-      width: 1.5rem;
+      width: 1.5em;
     }
   }
 
@@ -67,7 +68,7 @@ a.btn {
     font-size: var(--font-size-lg);
 
     svg {
-      width: 1.5rem;
+      width: 1.5em;
     }
   }
 
