@@ -86,6 +86,8 @@
   --font-size-2xl: clamp(2rem, .7692rem + 1.9231vw, 2.5rem);
   --font-size-3xl: clamp(2.2rem, .2308rem + 3.0769vw, 3rem);
 
+  --font-style-base: normal;
+
   /* Rhythm in Web Typography | Better Web Type <https://betterwebtype.com/articles/2018/10/15/rhythm-in-web-typography/> */
   /* The good line-height <https://www.thegoodlineheight.com/> */
   --line-height-base: 1.5;
