@@ -4,6 +4,7 @@ html, body {
   margin: 0;
   font-family: var(--font-family);
   font-size: var(--font-size-base);
+  font-style: normal;
   line-height: var(--line-height-base);
   color: var(--text-color);
   background-color: var(--body-bg-color);

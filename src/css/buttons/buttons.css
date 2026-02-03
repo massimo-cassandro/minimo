@@ -10,7 +10,7 @@ button, [role='button'] {
 }
 
 .btn-reset, .btn-link, .btn-close {
-  &, &.btn { /* nel caso venga anche assegnata la clase `btn`, non necessaria */
+  &, &.btn { /* nel caso venga anche assegnata la classe `btn`, non necessaria */
     padding: 0;
     margin: 0;
     background: transparent;
