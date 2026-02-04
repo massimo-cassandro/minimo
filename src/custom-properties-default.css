@@ -28,11 +28,13 @@
   --font-family: 'Open Sans Variable', sans-serif;
   --font-family-mono: 'Monaspace Neon Var', 'Monaspace Neon', 'Aptos Mono', 'Roboto Mono', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'Liberation Mono', 'Andale Mono', 'Courier New', monospace;
 
+  /* --font-weight-xxlight: 100; */
+  /* --font-weight-xlight: 200; */
   --font-weight-light: 300;
   --font-weight-regular: 400;
   --font-weight-semibold: 550;
   --font-weight-bold: 650;
-  --font-weight-extra-bold: 800;
+  --font-weight-xbold: 800;
 
   --flex-grid-gap: 1.5rem;
 
@@ -168,6 +170,35 @@
   --btn-o-secondary-active-fg-color: var(--secondary-fg);
   --btn-o-secondary-active-border-color: var(--btn-o-secondary-border-color);
   --btn-o-secondary-focus-outline-color: color-mix(in srgb, var(--secondary) 50%, #fff);
+
+  /* btn-close */
+  --btn-close-icon-size: 1.3rem;
+  --btn-close-icon-bar-size: 1.5px;
+  --btn-close-icon-color: var(--text-color);
+
+  /* senza sfondo */
+  /*
+  --btn-close-icon-hover-color: var(--accent);
+  --btn-close-border-radius: 50%;
+  --btn-close-border: none;
+  --btn-close-padding: 0;
+  --btn-close-background: transparent;
+  --btn-close-background-hover: transparent;
+  --btn-close-background-active: transparent;
+  */
+
+  /* con sfondo */
+  --btn-close-border-radius: 50%;
+  --btn-close-border: 1px solid var(--btn-close-icon-color);
+  --btn-close-padding: 3px;
+  --btn-close-background: var(--body-bg-color);
+  --btn-close-hover-background: var(--btn-close-icon-color);
+  --btn-close-icon-hover-color: var(--btn-close-background);
+  --btn-close-active-background: var(--accent);
+  --btn-close-icon-active-color: var(--accent-fg);
+  --btn-close-focus-outline-width: var(--form-btns-outline-width);
+  --btn-close-focus-outline-color: color-mix(in srgb, var(--accent) 50%, transparent);
+  /* end btn-close */
 
   --spacing-xxs: .25rem;
   --spacing-xs: .5rem;

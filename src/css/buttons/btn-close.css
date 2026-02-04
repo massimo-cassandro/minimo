@@ -3,39 +3,63 @@
 */
 
 /* NB richiede buttons.css per il reset */
+
+
 .btn-close  {
 
-  --icon-size: 1.3rem;
-  --icon-bar-size: 1.5px;
-  --icon-color: var(--text-color);
-  --icon-hover-bg: var(--accent-3);
+  --button-size: calc(var(--btn-close-icon-size) + (var(--btn-close-padding) * 2));
+
   position: relative;
 
   display: inline-block;
-  width: var(--icon-size);
-  height: var(--icon-size);
-  color: var(--icon-color);
+  width: var(--button-size);
+  height: var(--button-size);
+  padding: var(--btn-close-padding);
+  color: var(--btn-close-icon-color);
   cursor: pointer;
-  background-color: transparent;
-
-  &:hover {
-    background-color: var(--icon-hover-bg);
-  }
+  background-color: var(--btn-close-background);
+  border: var(--btn-close-border);
+  border-radius: var(--btn-close-border-radius);
 
   &::before, &::after {
     position: absolute;
     top: 50%;
     left: 0;
     display: block;
-    width: var(--icon-size);
-    height: var(--icon-bar-size);
+    width: var(--btn-close-icon-size);
+    height: var(--btn-close-icon-bar-size);
     content: '';
     background: currentColor;
   }
   &::before {
-    transform: translateY(-50%) rotate(45deg);
+    rotate: 45deg;
+    translate: calc(var(--btn-close-padding) / 2) -50%;
   }
   &::after {
-    transform: translateY(-50%) rotate(-45deg);
+    rotate: -45deg;
+    translate: calc(var(--btn-close-padding) / 2) -50%;
+  }
+
+  &:focus {
+    outline: var(--btn-close-outline-width) solid var(--btn-close-focus-outline-color);
+  }
+
+  @media (hover: hover) {
+    &:hover {
+
+      background-color: var(--btn-close-hover-background);
+
+      &::before, &::after {
+        background-color: var(--btn-close-icon-hover-color);
+      }
+    }
+  }
+
+  &:active {
+    background-color: var(--btn-close-active-background);
+    &::before, &::after {
+      background-color: var(--btn-close-icon-active-color);
+    }
+
   }
 }
