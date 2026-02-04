@@ -7,18 +7,18 @@
 
 .btn-close  {
 
-  --button-size: calc(var(--btn-close-icon-size) + (var(--btn-close-padding) * 2));
+  --icon-bar-width: calc(var(--btn-close-size) - (var(--btn-close-padding) * 2) - (var(--btn-close-border-width) * 2));
 
   position: relative;
 
   display: inline-block;
-  width: var(--button-size);
-  height: var(--button-size);
+  width: var(--btn-close-size);
+  height: var(--btn-close-size);
   padding: var(--btn-close-padding);
   color: var(--btn-close-icon-color);
   cursor: pointer;
   background-color: var(--btn-close-background);
-  border: var(--btn-close-border);
+  border: var(--btn-close-border-width) solid var(--btn-close-border-color);
   border-radius: var(--btn-close-border-radius);
 
   &::before, &::after {
@@ -26,22 +26,22 @@
     top: 50%;
     left: 0;
     display: block;
-    width: var(--btn-close-icon-size);
+    width: var(--icon-bar-width);
     height: var(--btn-close-icon-bar-size);
     content: '';
     background: currentColor;
   }
   &::before {
     rotate: 45deg;
-    translate: calc(var(--btn-close-padding) / 2) -50%;
+    translate: var(--btn-close-padding) -50%;
   }
   &::after {
     rotate: -45deg;
-    translate: calc(var(--btn-close-padding) / 2) -50%;
+    translate: var(--btn-close-padding) -50%;
   }
 
   &:focus {
-    outline: var(--btn-close-outline-width) solid var(--btn-close-focus-outline-color);
+    outline: var(--btn-close-focus-outline-width) solid var(--btn-close-focus-outline-color);
   }
 
   @media (hover: hover) {

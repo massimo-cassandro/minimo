@@ -172,8 +172,8 @@
   --btn-o-secondary-focus-outline-color: color-mix(in srgb, var(--secondary) 50%, #fff);
 
   /* btn-close */
-  --btn-close-icon-size: 1.3rem;
-  --btn-close-icon-bar-size: 1.5px;
+  --btn-close-size: 1.5rem;
+  --btn-close-icon-bar-size: 2px;
   --btn-close-icon-color: var(--text-color);
 
   /* senza sfondo */
@@ -188,8 +188,9 @@
   */
 
   /* con sfondo */
+  --btn-close-border-width: 3px;
+  --btn-close-border-color: var(--btn-close-icon-color);
   --btn-close-border-radius: 50%;
-  --btn-close-border: 1px solid var(--btn-close-icon-color);
   --btn-close-padding: 3px;
   --btn-close-background: var(--body-bg-color);
   --btn-close-hover-background: var(--btn-close-icon-color);

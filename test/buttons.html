@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="it">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>buttons test</title>
+
+    <link rel="stylesheet" href="../src/css/reset.css" type="text/css" media="all">
+    <link rel="stylesheet" href="../src/css/layout-base.css" type="text/css" media="all">
+    <link rel="stylesheet" href="../src/css/container.css" type="text/css" media="all">
+
+    <style>
+    body {
+      padding: 2rem;
+    }
+    :root {
+      --body-bg-color: #fff;
+      --text-color: #000;
+      --form-btns-outline-width: 4px;
+      --accent: #c00;
+      --accent-fg: #000;
+
+      /* ----------------- */
+
+      /* btn-close */
+      --btn-close-size: 1.5rem;
+      --btn-close-icon-bar-size: 2px;
+      --btn-close-icon-color: var(--text-color);
+
+      /* senza sfondo */
+      /*
+      --btn-close-icon-hover-color: var(--accent);
+      --btn-close-border-radius: 50%;
+      --btn-close-border: none;
+      --btn-close-padding: 0;
+      --btn-close-background: transparent;
+      --btn-close-background-hover: transparent;
+      --btn-close-background-active: transparent;
+      */
+
+      /* con sfondo */
+      --btn-close-border-width: 3px;
+      --btn-close-border-color: var(--btn-close-icon-color);
+      --btn-close-border-radius: 50%;
+      --btn-close-padding: 3px;
+      --btn-close-background: var(--body-bg-color);
+      --btn-close-hover-background: var(--btn-close-icon-color);
+      --btn-close-icon-hover-color: var(--btn-close-background);
+      --btn-close-active-background: var(--accent);
+      --btn-close-icon-active-color: var(--accent-fg);
+      --btn-close-focus-outline-width: var(--form-btns-outline-width);
+      --btn-close-focus-outline-color: color-mix(in srgb, var(--accent) 50%, transparent);
+      /* end btn-close */
+
+    }
+    </style>
+
+    <link rel="stylesheet" href="../src/css/buttons/buttons.css" type="text/css" media="all">
+    <link rel="stylesheet" href="../src/css/buttons/btn-close.css" type="text/css" media="all">
+
+  </head>
+  <body>
+
+    <div class="container">
+      <p><button type="button" class="btn-close" aria-label="Chiudi"></button> btn-close</p>
+    </div>
+
+  </body>
+</html>
