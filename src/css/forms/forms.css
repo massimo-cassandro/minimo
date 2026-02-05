@@ -178,7 +178,7 @@ select.form-control, .form-select {
 
   padding: var(--form-btns-padding-y) var(--indicator-padding-right) var(--form-btns-padding-y) var(--form-btns-padding-x);
   appearance: none;
-  background-image: url('./select-indicator.svg?cssInline');
+  background-image: var(--form-select-indicator);
   background-repeat: no-repeat;
   background-position: right var(--indicator-padding-right) center;
   background-size: 16px 12px;
