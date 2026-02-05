@@ -115,19 +115,27 @@
   --form-legend-bg-color: var(--stone-3);
   --form-legend-color: #333; /*  var(--text-color); */
 
-  --form-btns-border-radius: var(--radius-sm);
-  --form-btns-padding-y: var(--spacing-xxs);
-  --form-btns-padding-x: var(--spacing-xs);
-  --form-btns-font-size: clamp(.85rem, 6vw, 1rem);
-  --form-btns-sm-font-size: clamp(.75rem, 6vw, .9rem);
-  --form-btns-sm-padding-x: .8rem;
-  --form-btns-sm-padding-y: .1rem;
-  --form-btns-focus-color: hsl(205 69% 45% / .508);
-  --form-btns-outline-width: 3px;
+  --form-btn-border-radius: var(--radius-xxs);
+  --form-btn-padding-y: var(--spacing-xxs);
+  --form-btn-padding-x: var(--spacing-xs);
+  --form-btn-font-size: clamp(.85rem, 6vw, 1rem);
+  --form-btn-sm-font-size: clamp(.75rem, 6vw, .9rem);
+  --form-btn-sm-padding-x: .8rem;
+  --form-btn-sm-padding-y: .1rem;
+  --form-btn-focus-color: hsl(205 69% 45% / .508);
+  --form-btn-outline-width: 4px;
 
   /* TODO importazione automatica SVG (NB problemi con svgo) */
   /* url('./css/forms/select-indicator.svg?cssInline'); */
   --form-select-indicator: url('data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2016%2016%22%3E%3Cpath%20fill%3D%22none%22%20stroke%3D%22rgb(5%2C%2048%2C%2056)%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20stroke-width%3D%222%22%20d%3D%22m2%205%206%206%206-6%22%2F%3E%3C%2Fsvg%3E');
+  --form-font-style: normal;
+  --form-font-weight: var(--font-weight-regular);
+
+  --btn-border-width: 1px;
+  --btn-o-border-width: 2px;
+  --btn-font-style: var(--form-font-style);
+  --btn-font-weight: var(--form-font-weight);
+
 
   --btn-primary-bg-color: linear-gradient(45deg, var(--primary), color-mix(in srgb, var(--primary) 95%, #000));
   --btn-primary-fg-color: var(--primary-fg);
@@ -152,16 +160,16 @@
   --btn-secondary-focus-outline-color: color-mix(in srgb, var(--btn-secondary-border-color) 50%, transparent);
 
 
-  --btn-o-primary-bg-color: var(--primary-150);
-  --btn-o-primary-fg-color: var(--primary-10);
-  --btn-o-primary-border-color: var(--btn-bg-color);
-  --btn-o-primary-hover-bg-color: var(--primary-10);
-  --btn-o-primary-hover-fg-color: var(--primary-150);
-  --btn-o-primary-hover-border-color: var(--btn-fg-color);
-  --btn-o-primary-active-bg-color: var(--primary-150);
-  --btn-o-primary-active-fg-color: var(--primary-10);
-  --btn-o-primary-active-border-color: var(--btn-bg-color);
-  --btn-o-primary-focus-outline-color: var(--btn-bg-color);
+  --btn-o-primary-bg-color: var(--primary-fg);
+  --btn-o-primary-fg-color: var(--primary);
+  --btn-o-primary-border-color: var(--btn-o-primary-fg-color);
+  --btn-o-primary-hover-bg-color: color-mix(in srgb, var(--primary) 10%, transparent);
+  --btn-o-primary-hover-fg-color: var(--btn-o-primary-fg-color);
+  --btn-o-primary-hover-border-color: var(--btn-o-primary-border-color);
+  --btn-o-primary-active-bg-color: var(--btn-o-primary-fg-color);
+  --btn-o-primary-active-fg-color: var(--btn-o-primary-bg-color);
+  --btn-o-primary-active-border-color: var(--btn-o-primary-border-color);
+  --btn-o-primary-focus-outline-color: color-mix(in srgb, var(--primary) 20%, transparent);
 
 
   --btn-o-secondary-bg-color: color-mix(in srgb, var(--secondary) 5%, transparent);
@@ -201,7 +209,7 @@
   --btn-close-icon-hover-color: var(--btn-close-background);
   --btn-close-active-background: var(--accent);
   --btn-close-icon-active-color: var(--accent-fg);
-  --btn-close-focus-outline-width: var(--form-btns-outline-width);
+  --btn-close-focus-outline-width: var(--form-btn-outline-width);
   --btn-close-focus-outline-color: color-mix(in srgb, var(--accent) 50%, transparent);
   /* end btn-close */
 
@@ -218,8 +226,11 @@
 
   --radius-xxs: var(--spacing-xxs);
   --radius-xs: var(--spacing-xs);
+  --radius-sm: var(--spacing-sm);
   --radius-base: var(--spacing-base);
   --radius-md: var(--spacing-md);
+  --radius-lg: var(--spacing-lg);
+  --radius-xl: var(--spacing-xl);
   --radius-pill: 999rem;
 
   --spinner-color: var(--text-color);

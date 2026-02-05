@@ -39,7 +39,7 @@
     }
 
     &:focus, &:active {
-      outline: var(--form-btns-outline-width) solid color-mix(in srgb, var(--bg) 60%, transparent);
+      outline: var(--form-btn-outline-width) solid color-mix(in srgb, var(--bg) 60%, transparent);
     }
 
     &:active {
@@ -59,7 +59,7 @@
     }
 
     &:focus, &:active {
-      outline: var(--form-btns-outline-width) solid color-mix(in srgb, var(--bg) 40%, transparent);
+      outline: var(--form-btn-outline-width) solid color-mix(in srgb, var(--bg) 40%, transparent);
     }
 
     &:active {
@@ -95,7 +95,7 @@
     &.btn-success, &.btn-info, &.btn-danger, &.btn-warning {
 
       &:focus, &:active {
-        outline: var(--form-btns-outline-width) solid color-mix(in srgb, var(--bg) 60%, transparent);
+        outline: var(--form-btn-outline-width) solid color-mix(in srgb, var(--bg) 60%, transparent);
       }
 
       &:active {
