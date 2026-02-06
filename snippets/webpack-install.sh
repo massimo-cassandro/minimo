@@ -24,7 +24,7 @@ fi
 echo -e "\n${GREEN}Dove desideri installare la configurazione frontend?${NC}"
 echo "1) Root directory"
 echo "2) Directory frontend"
-read "?Scegli (1 o 2) [default: 1]: " choice
+read "?Scegli (1 o 2) [default: 1]: " choice < /dev/tty
 choice=${choice:-1}
 
 if [ "$choice" = "2" ]; then
