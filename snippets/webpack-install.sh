@@ -8,7 +8,11 @@ GREEN='\033[0;32m'
 NC='\033[0m' # No Color
 
 echo -e "${GREEN}...package.json${NC}"
-curl -s "$BASE_URL/snippets/package-tpl.json" > package.json
+if [ ! -f package.json ]; then
+  curl -s "$BASE_URL/snippets/package-tpl.json" > package.json
+else
+  echo -e "${GREEN}package.json già presente${NC}"
+fi
 
 
 echo -e "\n${GREEN}...config files & utilities${NC}"
@@ -24,7 +28,7 @@ npm i -D eslint@^9 @eslint/js globals && npm i -D @massimo-cassandro/eslint-conf
 curl -s "$BASE_URL/boilerplate/eslint.config.mjs" > eslint.config.mjs
 
 echo -e "\n${GREEN}...stylelint${NC}"
-npm i -D @stylistic/stylelint-plugin stylelint-config-css-modules stylelint-config-twbs-bootstrap stylelint && npm i -D @massimo-cassandro/stylelint-config
+npm i -D stylelint @stylistic/stylelint-plugin stylelint-config-css-modules stylelint-config-twbs-bootstrap && npm i -D @massimo-cassandro/stylelint-config
 curl -s "$BASE_URL/boilerplate/stylelint.config.mjs" > stylelint.config.mjs
 
 

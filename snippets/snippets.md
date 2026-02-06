@@ -178,7 +178,7 @@ npm i -D purgecss-webpack-plugin glob
 
 ```javascript
 {
-"launchChrome"; "open -n -a 'Google Chrome' --args --profile-directory='Profile 3'",
+"launchChrome": "open -n -a 'Google Chrome' --args --profile-directory='Profile 3'",
 "webpack DEV": "NODE_ENV=development webpack serve --config ./webpack.config.mjs #--open-app-name 'Google Chrome'",
 "webpack DEV": "npm run 'launchChrome' && NODE_ENV=development webpack serve --config ./webpack.config.mjs #--open-app-name 'Google Chrome'",
 "webpack DEV": "rm -rf ./public/dev && NODE_ENV=development webpack --config ./webpack.config.mjs",
