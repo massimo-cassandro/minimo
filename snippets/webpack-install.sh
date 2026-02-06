@@ -24,7 +24,7 @@ fi
 echo -e "\n${GREEN}Dove desideri installare la configurazione frontend?${NC}"
 echo "1) Root directory"
 echo "2) Directory frontend"
-read -p "Scegli (1 o 2) [default: 1]: " choice
+read "?Scegli (1 o 2) [default: 1]: " choice
 choice=${choice:-1}
 
 if [ "$choice" = "2" ]; then
@@ -68,9 +68,9 @@ npm i -D svgo svg-url-loader svgo-loader svgo-add-viewbox mini-svg-data-uri
 npm i -D ejs-loader
 npm i -D purgecss-webpack-plugin glob
 
-curl -s "$BASE_URL/boilerplate/frontend/webpack.config.mjs" > "$FRONTEND_INSTALL_PATH/webpack.config.mjs"$FRONTEND_INSTALL_PATH/
-curl -s "$BASE_URL/boilerplate/frontend/webpack-template.ejs" > "$FRONTEND_INSTALL_PATH/webpack-template.ejs"$FRONTEND_INSTALL_PATH/
-curl -s "$BASE_URL/boilerplate/frontend/postcss.config.cjs" > "$FRONTEND_INSTALL_PATH/postcss.config.cjs"$FRONTEND_INSTALL_PATH/
+curl -s "$BASE_URL/boilerplate/frontend/webpack.config.mjs" > "$FRONTEND_INSTALL_PATH/webpack.config.mjs"
+curl -s "$BASE_URL/boilerplate/frontend/webpack-template.ejs" > "$FRONTEND_INSTALL_PATH/webpack-template.ejs"
+curl -s "$BASE_URL/boilerplate/frontend/postcss.config.cjs" > "$FRONTEND_INSTALL_PATH/postcss.config.cjs"
 
 
 # cartella webpack
