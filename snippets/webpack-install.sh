@@ -14,22 +14,46 @@ else
   echo -e "${GREEN}package.json già presente${NC}"
 fi
 
+echo -e "${GREEN}...gitignore${NC}"
+if [ ! -f .gitignore ]; then
+  curl -s "$BASE_URL/boilerplate/_gitignore" > .gitignore
+else
+  echo -e "${GREEN}.gitignore già presente${NC}"
+fi
+
+echo -e "\n${GREEN}Dove desideri installare la configurazione frontend?${NC}"
+echo "1) Root directory"
+echo "2) Directory frontend"
+read -p "Scegli (1 o 2) [default: 1]: " choice
+choice=${choice:-1}
+
+if [ "$choice" = "2" ]; then
+  FRONTEND_INSTALL_PATH="./frontend"
+  echo -e "${GREEN}I file saranno installati in: ./frontend${NC}"
+else
+  FRONTEND_INSTALL_PATH="."
+  echo -e "${GREEN}I file saranno installati in: root directory${NC}"
+fi
+
+if [ "$FRONTEND_INSTALL_PATH" = "./frontend" ]; then
+  mkdir -p frontend
+fi
 
 echo -e "\n${GREEN}...config files & utilities${NC}"
-curl -s "$BASE_URL/boilerplate/_browserslistrc" > .browserslistrc
-curl -s "$BASE_URL/boilerplate/_editorconfig" > .editorconfig
-curl -s "$BASE_URL/boilerplate/_prettierrc" > .prettierrc
+curl -s "$BASE_URL/boilerplate/_browserslistrc" > "$FRONTEND_INSTALL_PATH/.browserslistrc"
+curl -s "$BASE_URL/boilerplate/_editorconfig" > "$FRONTEND_INSTALL_PATH/.editorconfig"
+curl -s "$BASE_URL/boilerplate/_prettierrc" > "$FRONTEND_INSTALL_PATH/.prettierrc"
 curl -s "$BASE_URL/boilerplate/jsconfig.json" > jsconfig.json
 
 npm i -D @massimo-cassandro/dev-updater
 
 echo -e "\n${GREEN}...eslint${NC}"
 npm i -D eslint@^9 @eslint/js globals && npm i -D @massimo-cassandro/eslint-config@^2
-curl -s "$BASE_URL/boilerplate/eslint.config.mjs" > eslint.config.mjs
+curl -s "$BASE_URL/boilerplate/eslint.config.mjs" > "$FRONTEND_INSTALL_PATH/eslint.config.mjs"
 
 echo -e "\n${GREEN}...stylelint${NC}"
 npm i -D stylelint @stylistic/stylelint-plugin stylelint-config-css-modules stylelint-config-twbs-bootstrap && npm i -D @massimo-cassandro/stylelint-config
-curl -s "$BASE_URL/boilerplate/stylelint.config.mjs" > stylelint.config.mjs
+curl -s "$BASE_URL/boilerplate/stylelint.config.mjs" > "$FRONTEND_INSTALL_PATH/stylelint.config.mjs"
 
 
 echo -e "\n${GREEN}...webpack${NC}"
@@ -44,13 +68,13 @@ npm i -D svgo svg-url-loader svgo-loader svgo-add-viewbox mini-svg-data-uri
 npm i -D ejs-loader
 npm i -D purgecss-webpack-plugin glob
 
-curl -s "$BASE_URL/boilerplate/frontend/webpack.config.mjs" > webpack.config.mjs
-curl -s "$BASE_URL/boilerplate/frontend/webpack-template.ejs" > webpack-template.ejs
-curl -s "$BASE_URL/boilerplate/frontend/postcss.config.cjs" > postcss.config.cjs
+curl -s "$BASE_URL/boilerplate/frontend/webpack.config.mjs" > "$FRONTEND_INSTALL_PATH/webpack.config.mjs"$FRONTEND_INSTALL_PATH/
+curl -s "$BASE_URL/boilerplate/frontend/webpack-template.ejs" > "$FRONTEND_INSTALL_PATH/webpack-template.ejs"$FRONTEND_INSTALL_PATH/
+curl -s "$BASE_URL/boilerplate/frontend/postcss.config.cjs" > "$FRONTEND_INSTALL_PATH/postcss.config.cjs"$FRONTEND_INSTALL_PATH/
 
 
 # cartella webpack
-WEBPACK_LOCAL_DIR="./webpack"
+WEBPACK_LOCAL_DIR="$FRONTEND_INSTALL_PATH/webpack"
 WEBPACK_REMOTE_URL="$BASE_URL/boilerplate/frontend/webpack"
 FILES=(
   'css-rules.mjs'
