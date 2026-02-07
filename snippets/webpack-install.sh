@@ -52,7 +52,7 @@ npm i -D eslint @eslint/js globals && npm i -D @massimo-cassandro/eslint-config
 curl -s "$BASE_URL/boilerplate/eslint.config.mjs" > "$FRONTEND_INSTALL_PATH/eslint.config.mjs"
 
 echo -e "\n${GREEN}...stylelint${NC}"
-npm i -D stylelint @stylistic/stylelint-plugin stylelint-config-css-modules stylelint-config-twbs-bootstrap && npm i -D @massimo-cassandro/stylelint-config
+npm i -D @massimo-cassandro/stylelint-config
 curl -s "$BASE_URL/boilerplate/stylelint.config.mjs" > "$FRONTEND_INSTALL_PATH/stylelint.config.mjs"
 
 

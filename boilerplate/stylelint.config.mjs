@@ -1,6 +1,5 @@
 export default {
   extends: [
-    'stylelint-config-standard',
     '@massimo-cassandro/stylelint-config',
   ],
 

@@ -122,7 +122,7 @@ npm i -D sass
 **install**
 
 ```bash
-npm i -D @stylistic/stylelint-plugin stylelint-config-css-modules stylelint-config-twbs-bootstrap stylelint && npm i -D @massimo-cassandro/stylelint-config
+npm i -D @massimo-cassandro/stylelint-config
 ```
 
 **stylelint.config.mjs**:
