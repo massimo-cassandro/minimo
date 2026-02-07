@@ -81,7 +81,7 @@ npm i -D @massimo-cassandro/dev-updater
 *install*:
 
 ```bash
-npm i -D eslint@^9 @eslint/js globals && npm i -D @massimo-cassandro/eslint-config@^2
+npm i -D eslint @eslint/js globals && npm i -D @massimo-cassandro/eslint-config
 ```
 
 *@cybozu* (<https://github.com/cybozu/eslint-config>):
