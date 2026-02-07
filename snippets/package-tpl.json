@@ -21,10 +21,5 @@
     "node server": "node serve # richiede ‘npm i serve’"
   },
   "dependencies": {},
-  "devDependencies": {},
-  "overrides": {
-    "stylelint-config-twbs-bootstrap": {
-      "stylelint": "latest"
-    }
-  }
+  "devDependencies": {}
 }

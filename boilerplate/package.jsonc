@@ -45,11 +45,6 @@
     "index.js"
   ],
   "dependencies": {},
-  "devDependencies": {},
-  "overrides": {
-    "stylelint-config-twbs-bootstrap": {
-      "stylelint": "latest"
-    }
-  }
+  "devDependencies": {}
 
 }
