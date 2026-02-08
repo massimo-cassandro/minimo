@@ -68,6 +68,11 @@ curl -s https://raw.githubusercontent.com/massimo-cassandro/minimo/refs/heads/ma
 npm i -D @massimo-cassandro/dev-updater
 ```
 
+*aggiorna da versione precedente:*
+```bash
+npm i -D @massimo-cassandro/dev-updater@latest && node ./node_modules/@massimo-cassandro/dev-updater/app/update-version/convert-changelog.mjs [--include-patch]
+```
+
 *package.json scripts*:
 
 ```javascript
