@@ -76,12 +76,18 @@ npm i -D @massimo-cassandro/dev-updater
 ```
 
 
-## eslint9 (+ uninstall)
+## eslint
 
 *install*:
 
 ```bash
-npm i -D eslint @eslint/js globals && npm i -D @massimo-cassandro/eslint-config
+npm i -D @massimo-cassandro/eslint-config
+`
+``
+*eslint.config.mjs*:
+
+```bash
+curl -s https://raw.githubusercontent.com/massimo-cassandro/minimo/refs/heads/main/boilerplate/eslint.config.mjs > eslint.config.mjs
 ```
 
 *@cybozu* (<https://github.com/cybozu/eslint-config>):
@@ -90,34 +96,15 @@ npm i -D eslint @eslint/js globals && npm i -D @massimo-cassandro/eslint-config
 npm install -D @cybozu/eslint-config
 ```
 
-*uninstall*:
+*uninstall (cersione prec.)*:
 
 ```bash
 npm uninstall eslint @eslint/js globals @massimo-cassandro/eslint-config @cybozu/eslint-config
 ```
 
-*eslint.config.mjs*:
 
-```bash
-curl -s https://raw.githubusercontent.com/massimo-cassandro/minimo/refs/heads/main/boilerplate/eslint.config.mjs > eslint.config.mjs
-```
-
-
-## jsconfig.json
-*jsconfig.json*:
-
-```bash
-curl -s https://raw.githubusercontent.com/massimo-cassandro/minimo/refs/heads/main/boilerplate/jsconfig.json > jsconfig.json
-```
-
-## sass cli
-
-```bash
-npm i -D sass
-```
 
 ## stylelint
-
 
 **install**
 
@@ -131,12 +118,18 @@ npm i -D @massimo-cassandro/stylelint-config
 curl -s https://raw.githubusercontent.com/massimo-cassandro/minimo/refs/heads/main/boilerplate/stylelint.config.mjs > stylelint.config.mjs
 ```
 
-**uninstall**
+**uninstall (versione prec.)**
 
 ```bash
 npm uninstall @stylistic/stylelint-plugin stylelint-config-css-modules stylelint-config-twbs-bootstrap stylelint @massimo-cassandro/stylelint-config
 ```
 
+## jsconfig.json
+*jsconfig.json*:
+
+```bash
+curl -s https://raw.githubusercontent.com/massimo-cassandro/minimo/refs/heads/main/boilerplate/jsconfig.json > jsconfig.json
+```
 
 ## webhint
 
@@ -249,6 +242,12 @@ npm i -S @massimo-cassandro/auto-datatables-bs5 datatables.net@^1,datatables.net
 
 ```bash
 npm i -S @massimo-cassandro/autocomplete
+```
+
+## sass cli
+
+```bash
+npm i -D sass
 ```
 
 ## bootstrap
