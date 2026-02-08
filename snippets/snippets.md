@@ -82,8 +82,8 @@ npm i -D @massimo-cassandro/dev-updater
 
 ```bash
 npm i -D @massimo-cassandro/eslint-config
-`
-``
+```
+
 *eslint.config.mjs*:
 
 ```bash
