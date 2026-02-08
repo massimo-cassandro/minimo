@@ -96,10 +96,10 @@ curl -s https://raw.githubusercontent.com/massimo-cassandro/minimo/refs/heads/ma
 npm install -D @cybozu/eslint-config
 ```
 
-*uninstall (cersione prec.)*:
+*uninstall (versione prec.) + install*:
 
 ```bash
-npm uninstall eslint @eslint/js globals @massimo-cassandro/eslint-config @cybozu/eslint-config
+npm uninstall eslint @eslint/js globals @massimo-cassandro/eslint-config @cybozu/eslint-config && npm i -D @massimo-cassandro/eslint-config
 ```
 
 
@@ -118,10 +118,10 @@ npm i -D @massimo-cassandro/stylelint-config
 curl -s https://raw.githubusercontent.com/massimo-cassandro/minimo/refs/heads/main/boilerplate/stylelint.config.mjs > stylelint.config.mjs
 ```
 
-**uninstall (versione prec.)**
+**uninstall (versione prec.) + install**
 
 ```bash
-npm uninstall @stylistic/stylelint-plugin stylelint-config-css-modules stylelint-config-twbs-bootstrap stylelint @massimo-cassandro/stylelint-config
+npm uninstall @stylistic/stylelint-plugin stylelint-config-css-modules stylelint-config-twbs-bootstrap stylelint @massimo-cassandro/stylelint-config && npm i -D @massimo-cassandro/stylelint-config
 ```
 
 ## jsconfig.json
