@@ -27,7 +27,7 @@
       "$description": ""
     },
     "radius-sm": {
-      "$value": "{spacing-radius-sm}",
+      "$value": "{spacing-sm}",
       "$type": "borderRadius",
       "$description": ""
     },

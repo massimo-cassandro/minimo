@@ -1,0 +1,20 @@
+[
+  {
+    "id": "40529444-83b3-80a6-8007-8d093bcf2c4f",
+    "name": "light",
+    "group": "",
+    "description": "",
+    "isSource": false,
+    "selectedTokenSets": {
+      "Global": "enabled"
+    }
+  },
+  {
+    "id": "40529444-83b3-80a6-8007-8d0a6b4e923a",
+    "name": "dark",
+    "group": "",
+    "description": "",
+    "isSource": false,
+    "selectedTokenSets": {}
+  }
+]
