@@ -6,7 +6,9 @@
     "description": "",
     "isSource": false,
     "selectedTokenSets": {
-      "Global": "enabled"
+      "open-props": "enabled",
+      "Global": "enabled",
+      "minimo": "enabled"
     }
   },
   {

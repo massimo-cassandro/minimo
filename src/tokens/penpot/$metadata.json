@@ -1,12 +1,15 @@
 {
   "tokenSetOrder": [
     "Global",
-    "open-props"
+    "open-props",
+    "minimo"
   ],
   "activeThemes": [
     "/light"
   ],
   "activeSets": [
-    "Global"
+    "open-props",
+    "Global",
+    "minimo"
   ]
 }

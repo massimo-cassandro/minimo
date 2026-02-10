@@ -1,137 +1,19 @@
 {
-  "Global": {
-    "body-bg": {
+  "primary": {
+    "$value": "#145591",
+    "$type": "color",
+    "$description": ""
+  },
+  "body": {
+    "bg": {
       "$value": "#ebedef",
       "$type": "color",
       "$description": ""
     },
-    "alert-danger": {
-      "$value": "#c00",
+    "text": {
+      "$value": "{openProps.stone.10}",
       "$type": "color",
       "$description": ""
-    },
-    "primary": {
-      "$value": "#145591",
-      "$type": "color",
-      "$description": ""
-    },
-
-    "radius-xxs": {
-      "$value": "{spacing-xxs}",
-      "$type": "borderRadius",
-      "$description": ""
-    },
-    "radius-xs": {
-      "$value": "{spacing-xs}",
-      "$type": "borderRadius",
-      "$description": ""
-    },
-    "radius-sm": {
-      "$value": "{spacing-sm}",
-      "$type": "borderRadius",
-      "$description": ""
-    },
-    "radius-base": {
-      "$value": "{spacing-base}",
-      "$type": "borderRadius",
-      "$description": ""
-    },
-    "radius-md": {
-      "$value": "{spacing-md}",
-      "$type": "borderRadius",
-      "$description": ""
-    },
-    "radius-lg": {
-      "$value": "{spacing-lg}",
-      "$type": "borderRadius",
-      "$description": ""
-    },
-    "radius-xl": {
-      "$value": "{spacing-xl}",
-      "$type": "borderRadius",
-      "$description": ""
-    },
-    "radius-pill": {
-      "$value": "100000",
-      "$type": "borderRadius",
-      "$description": ""
-    },
-
-    "spacing-base": {
-      "$value": "16",
-      "$type": "spacing",
-      "$description": ""
-    },
-    "spacing-xxs": {
-      "$value": "{spacing-base} * .25",
-      "$type": "spacing",
-      "$description": ""
-    },
-    "spacing-xs": {
-      "$value": "{spacing-base} * .5",
-      "$type": "spacing",
-      "$description": ""
-    },
-    "spacing-sm": {
-      "$value": "{spacing-base} * .55",
-      "$type": "spacing",
-      "$description": ""
-    },
-    "spacing-md": {
-      "$value": "{spacing-base} * 1.2",
-      "$type": "spacing",
-      "$description": ""
-    },
-    "spacing-lg": {
-      "$value": "{spacing-base} * 1.5",
-      "$type": "spacing",
-      "$description": ""
-    },
-    "spacing-xl": {
-      "$value": "{spacing-base} * 2",
-      "$type": "spacing",
-      "$description": ""
-    },
-    "spacing-2xl": {
-      "$value": "{spacing-base} * 3",
-      "$type": "spacing",
-      "$description": ""
-    },
-    "spacing-3xl": {
-      "$value": "{spacing-base} * 4",
-      "$type": "spacing",
-      "$description": ""
     }
-  },
-  "$themes": [
-    {
-      "id": "40529444-83b3-80a6-8007-8d093bcf2c4f",
-      "name": "light",
-      "group": "",
-      "description": "",
-      "isSource": false,
-      "selectedTokenSets": {
-        "Global": "enabled"
-      }
-    },
-    {
-      "id": "40529444-83b3-80a6-8007-8d0a6b4e923a",
-      "name": "dark",
-      "group": "",
-      "description": "",
-      "isSource": false,
-      "selectedTokenSets": {}
-    }
-  ],
-  "$metadata": {
-    "tokenSetOrder": [
-      "Global"
-    ],
-    "activeThemes": [
-      "/light"
-    ],
-    "activeSets": [
-      "Global"
-    ]
   }
 }

@@ -39,11 +39,13 @@ async function convertTokens() {
                                    tokenValue.$type === 'color';
 
           if (isExplicitColor || isColorReference) {
-            const finalKey = `${groupName}-${tokenKey}`;
-            const finalValue = isExplicitColor ? val.hex : val;
 
-            converted[finalKey] = {
-              "$value": finalValue,
+            if(converted[groupName] == null) {
+              converted[groupName] = {};
+            }
+
+            converted[groupName][tokenKey] = {
+              "$value": isExplicitColor ? val.hex : val,
               "$type": "color",
               "$description": tokenValue.$description || ""
             };
