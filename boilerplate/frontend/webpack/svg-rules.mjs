@@ -89,6 +89,7 @@ export function svgRules({
       {
         type: 'asset/resource',
         exclude: [ /cssInline/, /inline/ ],
+        sideEffects: true,
         generator: {
           filename: 'imgs/[name].[contenthash][ext]'
         },

@@ -36,6 +36,7 @@ export function cssRules({
     {
       test: /\.(sass|scss|css)$/,
       exclude: /(\.module\.(sass|scss|css))$/,
+      sideEffects: true,
       oneOf: [
         {
           resourceQuery: /inline/,
