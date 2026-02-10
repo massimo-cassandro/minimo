@@ -44,10 +44,15 @@ async function convertTokens() {
               converted[groupName] = {};
             }
 
-            converted[groupName][tokenKey] = {
+            const description = [
+              tokenValue.$description || null,
+              `[--${groupName}-${tokenKey}]`
+            ].filter(i => i != null).join(' ');
+
+            converted[groupName][tokenKey.padStart(2, '0')] = {
               "$value": isExplicitColor ? val.hex : val,
               "$type": "color",
-              "$description": tokenValue.$description || ""
+              "$description": description
             };
           }
 
@@ -57,7 +62,7 @@ async function convertTokens() {
       }
     }
 
-    await writeFile(outputFile, JSON.stringify(converted, null, 2), 'utf-8');
+    await writeFile(outputFile, JSON.stringify({openProps: converted}, null, 2), 'utf-8');
     console.log(`Successo! Creati ${Object.keys(converted).length} token colore in open-props.json.`);
 
   } catch (error) {

@@ -37,7 +37,7 @@
       "$description": ""
     },
     "pill": {
-      "$value": "100000",
+      "$value": "9999",
       "$type": "borderRadius",
       "$description": ""
     }
