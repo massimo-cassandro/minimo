@@ -178,8 +178,8 @@ npm i -D purgecss-webpack-plugin glob
 {
 "launchChrome": "open -n -a 'Google Chrome' --args --profile-directory='Profile 3'",
 "webpack DEV": "NODE_ENV=development webpack serve --config ./webpack.config.mjs #--open-app-name 'Google Chrome'",
-"webpack DEV": "npm run 'launchChrome' && NODE_ENV=development webpack serve --config ./webpack.config.mjs #--open-app-name 'Google Chrome'",
-"webpack DEV": "rm -rf ./public/dev && NODE_ENV=development webpack --config ./webpack.config.mjs",
+"webpack DEV + chrome": "npm run 'launchChrome' && NODE_ENV=development webpack serve --config ./webpack.config.mjs #--open-app-name 'Google Chrome'",
+"webpack DEV sf": "rm -rf ./public/dev && NODE_ENV=development webpack --config ./webpack.config.mjs",
 "webpack PROD": "NODE_ENV=production webpack --config ./webpack.config.mjs --stats minimal"
 }
 ```

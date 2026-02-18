@@ -158,11 +158,51 @@
       "$description": ""
     }
   },
-  "font-family": {
-    "$value": [
-      "Rubik"
-    ],
-    "$type": "fontFamilies",
-    "$description": ""
+  "font": {
+    "weight": {
+      "xxlight": {
+        "$value": "100",
+        "$type": "fontWeights",
+        "$description": ""
+      },
+      "xlight": {
+        "$value": "200",
+        "$type": "fontWeights",
+        "$description": ""
+      },
+      "light": {
+        "$value": "300",
+        "$type": "fontWeights",
+        "$description": ""
+      },
+      "regular": {
+        "$value": "400",
+        "$type": "fontWeights",
+        "$description": ""
+      },
+      "semibold": {
+        "$value": "550",
+        "$type": "fontWeights",
+        "$description": ""
+      },
+      "bold": {
+        "$value": "700",
+        "$type": "fontWeights",
+        "$description": ""
+      },
+      "xbold": {
+        "$value": "900",
+        "$type": "fontWeights",
+        "$description": ""
+      }
+    },
+    "size": {
+      "base": {
+        "$value": "16",
+        "$type": "fontSizes",
+        "$description": "#css:clamp(.9rem, .6538rem + .3846vw, 1rem)"
+      }
+    }
   }
+
 }
