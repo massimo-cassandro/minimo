@@ -11,7 +11,6 @@ export function getJsConfigAliases(jsconfigAbsPath) {
 
   const baseDir = path.dirname(jsconfigAbsPath);
 
-  // 3. Leggiamo il file in modo sincrono e lo convertiamo in oggetto
   const fileContent = fs.readFileSync(jsconfigAbsPath, 'utf-8');
   const jsconfig = JSON.parse(fileContent);
 
