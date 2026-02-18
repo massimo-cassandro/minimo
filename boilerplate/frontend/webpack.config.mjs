@@ -33,12 +33,14 @@ const isDevelopment = process.env.NODE_ENV === 'development'
   ,useSvgo = true
   ,useSvgr = false // svg per react
   ,svgoConfig = useSvgo? (await import('./webpack/svgo.config.mjs')).default : null
-  ,output_dir = path.resolve(__dirname, './build') // sf:  isDevelopment? '_dev' : 'build'
+  ,output_dir = path.resolve(__dirname, './build')
+
+  // ,output_dir = isDevelopment? '_dev' : 'build' // symfony
+
   ,favicons_path_regexp = /src\/favicons\/output/ // source pattern per le favicons (regexp o null)
   ,jsConfigAliases = getJsConfigAliases(path.resolve(__dirname, './jsconfig.json'))
   ,packageJson = JSON.parse(fs.readFileSync(path.resolve(__dirname, './package.json'), 'utf-8'))
   // ,manifest_shared_seed = {}
-  // ,sf_public_dir_path = path.resolve(__dirname, '../public')
 ;
 
 
@@ -93,10 +95,19 @@ const config = {
     path: output_dir, // sf: path.resolve(__dirname, `./public/${output_dir}` ),
     filename: '[name].[contenthash].js',
     publicPath: '/',
-    // publicPath: `/${output_dir}/`, // sf
     // publicPath: isDevelopment? '/' : './', // per devServer, nel caso in cui l'output di produzione non sia sulla root
     clean: !isDevelopment
   },
+
+  /* SYMFONY:
+  output: {
+    path: path.resolve(__dirname, `../public/${output_dir}` ),
+    // filename: '[name].js',
+    filename: '[name].[contenthash].js',
+    publicPath: `/${output_dir}/`, // sf
+    clean: false //!isDevelopment,
+  },
+  */
 
   // =>> optimization
   optimization: {
