@@ -20,9 +20,9 @@ import RemoveEmptyScriptsPlugin from 'webpack-remove-empty-scripts';
 import { PurgeCSSPlugin } from 'purgecss-webpack-plugin';
 import { globSync } from 'glob';
 
-import { cssRules } from './webpack/css-rules.mjs';
-import { getJsConfigAliases } from './webpack/get-jsConfig-aliases.mjs';
-import { svgRules } from './webpack/svg-rules.mjs';
+import { cssRules } from '../webpack-modules/css-rules.mjs';
+import { getJsConfigAliases } from '../webpack-modules/get-jsConfig-aliases.mjs';
+import { svgRules } from '../webpack-modules/svg-rules.mjs';
 
 // --- config ---
 const isDevelopment = process.env.NODE_ENV === 'development'
@@ -32,7 +32,7 @@ const isDevelopment = process.env.NODE_ENV === 'development'
   ,inlineCssInDevMode = true
   ,useSvgo = true
   ,useSvgr = false // svg per react
-  ,svgoConfig = useSvgo? (await import('./webpack/svgo.config.mjs')).default : null
+  ,svgoConfig = useSvgo? (await import('../webpack-modules/svgo.config.mjs')).default : null
   ,output_dir = path.resolve(__dirname, './build')
   // ,output_dir = isDevelopment? '_dev' : 'build' // symfony
   ,favicons_path_regexp = /src\/favicons\/output/ // source pattern per le favicons (regexp o null)

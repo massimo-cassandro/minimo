@@ -3,20 +3,22 @@
 
 # Configurazione variabili
 BASE_URL="https://raw.githubusercontent.com/massimo-cassandro/minimo/refs/heads/main"
+BOILERPLATE_URL="$BASE_URL/boilerplate"
+WEBPACK_SOURCE_DIR="$BOILERPLATE_URL/webpack-setup"
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 NC='\033[0m' # No Color
 
 echo -e "${GREEN}...package.json${NC}"
 if [ ! -f package.json ]; then
-  curl -s "$BASE_URL/webpack-setup/package-tpl.json" > package.json
+  curl -s "$WEBPACK_SOURCE_DIR/package-tpl.json" > package.json
 else
   echo -e "${GREEN}package.json già presente${NC}"
 fi
 
 echo -e "${GREEN}...gitignore${NC}"
 if [ ! -f .gitignore ]; then
-  curl -s "$BASE_URL/boilerplate/_gitignore" > .gitignore
+  curl -s "$BOILERPLATE_URL/_gitignore" > .gitignore
 else
   echo -e "${GREEN}.gitignore già presente${NC}"
 fi
@@ -40,20 +42,20 @@ if [ "$FRONTEND_INSTALL_PATH" = "./frontend" ]; then
 fi
 
 echo -e "\n${GREEN}...config files & utilities${NC}"
-curl -s "$BASE_URL/boilerplate/_browserslistrc" > "$FRONTEND_INSTALL_PATH/.browserslistrc"
-curl -s "$BASE_URL/boilerplate/_editorconfig" > "$FRONTEND_INSTALL_PATH/.editorconfig"
-curl -s "$BASE_URL/boilerplate/_prettierrc" > "$FRONTEND_INSTALL_PATH/.prettierrc"
-curl -s "$BASE_URL/boilerplate/jsconfig.json" > jsconfig.json
+curl -s "$BOILERPLATE_URL/_browserslistrc" > "$FRONTEND_INSTALL_PATH/.browserslistrc"
+curl -s "$BOILERPLATE_URL/_editorconfig" > "$FRONTEND_INSTALL_PATH/.editorconfig"
+curl -s "$BOILERPLATE_URL/_prettierrc" > "$FRONTEND_INSTALL_PATH/.prettierrc"
+curl -s "$BOILERPLATE_URL/jsconfig.json" > jsconfig.json
 
 npm i -D @massimo-cassandro/dev-updater
 
 echo -e "\n${GREEN}...eslint${NC}"
 npm i -D @massimo-cassandro/eslint-config
-curl -s "$BASE_URL/boilerplate/eslint.config.mjs" > "$FRONTEND_INSTALL_PATH/eslint.config.mjs"
+curl -s "$BOILERPLATE_URL/eslint.config.mjs" > "$FRONTEND_INSTALL_PATH/eslint.config.mjs"
 
 echo -e "\n${GREEN}...stylelint${NC}"
 npm i -D @massimo-cassandro/stylelint-config
-curl -s "$BASE_URL/boilerplate/stylelint.config.mjs" > "$FRONTEND_INSTALL_PATH/stylelint.config.mjs"
+curl -s "$BOILERPLATE_URL/stylelint.config.mjs" > "$FRONTEND_INSTALL_PATH/stylelint.config.mjs"
 
 
 echo -e "\n${GREEN}...webpack${NC}"
@@ -68,14 +70,14 @@ npm i -D svgo svg-url-loader svgo-loader svgo-add-viewbox mini-svg-data-uri
 npm i -D ejs-loader
 npm i -D purgecss-webpack-plugin glob
 
-curl -s "$BASE_URL/webpack-setup/webpack.config.mjs" > "$FRONTEND_INSTALL_PATH/webpack.config.mjs"
-curl -s "$BASE_URL/webpack-setup/webpack-template.ejs" > "$FRONTEND_INSTALL_PATH/webpack-template.ejs"
-curl -s "$BASE_URL/boilerplate/frontend/postcss.config.cjs" > "$FRONTEND_INSTALL_PATH/postcss.config.cjs"
+curl -s "$WEBPACK_SOURCE_DIR/webpack.config.mjs" > "$FRONTEND_INSTALL_PATH/webpack.config.mjs"
+curl -s "$WEBPACK_SOURCE_DIR/webpack-template.ejs" > "$FRONTEND_INSTALL_PATH/webpack-template.ejs"
+curl -s "$BOILERPLATE_URL/postcss.config.cjs" > "$FRONTEND_INSTALL_PATH/postcss.config.cjs"
 
 
 # cartella webpack
-WEBPACK_LOCAL_DIR="$FRONTEND_INSTALL_PATH/webpack"
-WEBPACK_REMOTE_URL="$BASE_URL/webpack-setup/webpack"
+WEBPACK_LOCAL_DIR="$FRONTEND_INSTALL_PATH/webpack-modules"
+WEBPACK_MODULES_REMOTE_URL="$WEBPACK_SOURCE_DIR/webpack-modules"
 FILES=(
   'css-rules.mjs'
   'get-jsConfig-aliases.mjs'
@@ -89,7 +91,7 @@ if [ ! -d "$WEBPACK_LOCAL_DIR" ]; then
 
   for FILE in "${FILES[@]}"; do
     # echo "Scaricamento di $FILE..."
-    curl -s "$WEBPACK_REMOTE_URL/$FILE" > "$WEBPACK_LOCAL_DIR/$FILE"
+    curl -s "$WEBPACK_MODULES_REMOTE_URL/$FILE" > "$WEBPACK_LOCAL_DIR/$FILE"
   done
 
 fi

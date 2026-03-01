@@ -3,7 +3,7 @@
 ## webpack full install
 
 ```bash
-curl -s https://raw.githubusercontent.com/massimo-cassandro/minimo/refs/heads/main/webpack-setup/webpack-install.sh | zsh
+curl -s https://raw.githubusercontent.com/massimo-cassandro/minimo/refs/heads/main/snippets/webpack-install.sh | zsh
 ```
 
 ## package.json scripts
@@ -152,7 +152,7 @@ curl -s https://raw.githubusercontent.com/massimo-cassandro/minimo/refs/heads/ma
 ## webpack
 
 ```bash
-curl -s https://raw.githubusercontent.com/massimo-cassandro/minimo/refs/heads/main/webpack-setup/webpack.config.mjs > webpack.config.mjs
+curl -s https://raw.githubusercontent.com/massimo-cassandro/minimo/refs/heads/main/boliterplate/webpack-setup/webpack.config.mjs > webpack.config.mjs
 ```
 
 ```bash
