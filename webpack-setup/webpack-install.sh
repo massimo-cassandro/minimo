@@ -9,7 +9,7 @@ NC='\033[0m' # No Color
 
 echo -e "${GREEN}...package.json${NC}"
 if [ ! -f package.json ]; then
-  curl -s "$BASE_URL/snippets/package-tpl.json" > package.json
+  curl -s "$BASE_URL/webpack-setup/package-tpl.json" > package.json
 else
   echo -e "${GREEN}package.json già presente${NC}"
 fi
