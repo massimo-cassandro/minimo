@@ -6,6 +6,15 @@
   "author": "Massimo Cassandro",
   "main": "index.js",
   "type":"module",
+  "sideEffects": [
+    "*.css",
+    "*.svg",
+    "*.jpg",
+    "*.jpeg",
+    "*.png",
+    "*.webp",
+    "*.avif"
+  ],
   "scripts": {
     "progetto JS webpack DEV": "npm 'launchChrome' && NODE_ENV=development webpack serve --config ./webpack.config.mjs #--open-app-name 'Google Chrome'",
     "progettop sf webpack DEV": "rm -rf ./public/dev && NODE_ENV=development webpack --config ./webpack.config.mjs",

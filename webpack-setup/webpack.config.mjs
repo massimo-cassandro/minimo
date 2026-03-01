@@ -496,7 +496,17 @@ const config = {
     alias: {
       ...jsConfigAliases
     }
-  }
+  },
+
+  // =>> stats
+  // stats: {
+  //   assets: false,
+  //   modules: false,
+  //   chunks: false,
+  //   errors: true,        // Mostra solo gli errori
+  //   errorDetails: false, // Disabilita i dettagli troppo prolissi
+  //   moduleTrace: false,
+  // },
 };
 
 export default config;

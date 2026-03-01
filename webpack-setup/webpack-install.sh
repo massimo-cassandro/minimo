@@ -68,14 +68,14 @@ npm i -D svgo svg-url-loader svgo-loader svgo-add-viewbox mini-svg-data-uri
 npm i -D ejs-loader
 npm i -D purgecss-webpack-plugin glob
 
-curl -s "$BASE_URL/boilerplate/frontend/webpack.config.mjs" > "$FRONTEND_INSTALL_PATH/webpack.config.mjs"
-curl -s "$BASE_URL/boilerplate/frontend/webpack-template.ejs" > "$FRONTEND_INSTALL_PATH/webpack-template.ejs"
+curl -s "$BASE_URL/webpack-setup/webpack.config.mjs" > "$FRONTEND_INSTALL_PATH/webpack.config.mjs"
+curl -s "$BASE_URL/webpack-setup/webpack-template.ejs" > "$FRONTEND_INSTALL_PATH/webpack-template.ejs"
 curl -s "$BASE_URL/boilerplate/frontend/postcss.config.cjs" > "$FRONTEND_INSTALL_PATH/postcss.config.cjs"
 
 
 # cartella webpack
 WEBPACK_LOCAL_DIR="$FRONTEND_INSTALL_PATH/webpack"
-WEBPACK_REMOTE_URL="$BASE_URL/boilerplate/frontend/webpack"
+WEBPACK_REMOTE_URL="$BASE_URL/webpack-setup/webpack"
 FILES=(
   'css-rules.mjs'
   'get-jsConfig-aliases.mjs'
