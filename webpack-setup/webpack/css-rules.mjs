@@ -5,14 +5,11 @@ import MiniCssExtractPlugin from 'mini-css-extract-plugin';
  * @returns {import('webpack').RuleSetRule[]}
  */
 
-
-
 export function cssRules({
   isDevelopment = false,
   useSass = false,
   inlineCssInDevMode = true
 }) {
-
   // opzioni impostate mel config
   const configOptions = {
     isDevelopment: isDevelopment,
@@ -22,9 +19,10 @@ export function cssRules({
 
   return [
     {
-      test: /(\.module\.(sass|scss|css))$/,
+      test: /\.module\.(sass|scss|css)$/,
       oneOf: [
         {
+          test: /\.inline\.module\.(sass|scss|css)$/,
           resourceQuery: /inline/,
           use: css_loaders({...configOptions, inline: true, css_modules: true }),
         },
@@ -35,10 +33,11 @@ export function cssRules({
     },
     {
       test: /\.(sass|scss|css)$/,
-      exclude: /(\.module\.(sass|scss|css))$/,
+      exclude: /\.module\.(sass|scss|css)$/,
       sideEffects: true,
       oneOf: [
         {
+          test: /\.inline\.(sass|scss|css)$/,
           resourceQuery: /inline/,
           use: css_loaders({...configOptions, inline: true }),
         },
@@ -50,7 +49,6 @@ export function cssRules({
   ];
 }
 
-
 function css_loaders ({
   isDevelopment = false,
   useSass = false,
@@ -58,7 +56,6 @@ function css_loaders ({
   css_modules = false,
   inline = false
 }) {
-
   return [
     (inline || (isDevelopment && inlineCssInDevMode))
       ? {
@@ -77,7 +74,6 @@ function css_loaders ({
             localIdentName: isDevelopment
               ? '[local]_[hash:base64:6]'
               : '[hash:base64]',
-
             // namedExport: false, // false: permette l'utilizzo di `import style...` invece di `import * as style...` come nella versione 6
             exportLocalsConvention: 'as-is', // 'camel-case-only' // 'camel-case-only': forces camelcase style (rewrites classnames)
           }
@@ -99,14 +95,12 @@ function css_loaders ({
         loader: 'sass-loader',
         options: {
           sourceMap: isDevelopment,
-
           // per bootstrap 5.3
           // api: 'legacy',
           sassOptions: {
             quietDeps: true,
             silenceDeprecations: ['legacy-js-api', 'mixed-decls', 'color-functions', 'global-builtin', 'import'],
           }
-
         }
       }]
       : []
