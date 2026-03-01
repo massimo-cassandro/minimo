@@ -96,4 +96,13 @@ if [ ! -d "$WEBPACK_LOCAL_DIR" ]; then
 
 fi
 
+echo -e "\n${GREEN}Creo un template della struttura della cartella frll'applicazione frontend${NC}"
+
+TEMPLATE_DIR_NAME="__frontend_app_dir_template__"
+mkdir -p "$TEMPLATE_DIR_NAME"
+cd "$TEMPLATE_DIR_NAME"
+mkdir -p error_pages imgs src config favicons php
+cd ..
+
+
 echo -e "\n\n${GREEN}*** END ***${NC}"
