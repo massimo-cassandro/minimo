@@ -101,7 +101,7 @@ echo -e "\n${GREEN}Creo un template della struttura della cartella frll'applicaz
 TEMPLATE_DIR_NAME="__frontend_app_dir_template__"
 mkdir -p "$TEMPLATE_DIR_NAME"
 cd "$TEMPLATE_DIR_NAME"
-mkdir -p error_pages imgs src config favicons php
+mkdir -p error-pages imgs src config favicons php design-tokens
 cd ..
 
 

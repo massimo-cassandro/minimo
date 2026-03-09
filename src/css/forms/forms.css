@@ -4,97 +4,7 @@
 /* TODO classe grid specifica per i form ?? (.form-grid?) */
 /* TODO customizable select */
 
-/* TODO da verificare
-fieldset.form-group, fieldset.form-collection-fset {
 
-  &, legend {
-    padding: 0;
-    background: transparent;
-    border: none;
-  }
-
-  legend {
-    position: static;
-    text-transform: none;
-  }
-
-  .form-check {
-    label {
-      font-weight: var(--ada-font-weight-regular);
-    }
-  }
-
-}
-*/
-
-fieldset:not(.fupl-wrapper):not(.form-group):not(.form-collection-fset) {
-  position: relative;
-  padding: 3rem 1rem 1rem;
-  margin: 1rem 0 2rem;
-  background: transparent;
-  border: var(--form-fieldset-border-width) solid var(--form-border-color);
-  border-radius: var(--form-btn-border-radius);
-
-  &, > legend {
-    border: var(--form-fieldset-border-width) solid var(--form-border-color);
-  }
-
-  >legend {
-    position: absolute;
-    top: -.5rem;
-    left: calc(-1 * var(--form-fieldset-border-width));
-    z-index: 1;
-    padding: .4rem .8rem;
-    font-size: .9rem;
-    font-weight: var(--font-weight-semibold);
-    line-height: 1.2;
-    color: var(--form-legend-color);
-    /* text-transform: uppercase; */
-    background-color: var(--form-legend-bg-color);
-    border-radius: var(--form-btn-border-radius) var(--form-btn-border-radius) var(--form-btn-border-radius) 0;
-  }
-
-  fieldset:not(.fupl-wrapper):not(.form-group) {
-    padding-top: 2rem;
-    margin-bottom: .5rem;
-    border: none;
-
-    &:first-of-type {
-      margin-top: 0;
-    }
-
-    >legend {
-      padding-right: 0;
-      padding-left: 0;
-      font-size: .9rem;
-      background: transparent;
-      border-bottom: 1px solid var(--form-border-color);
-    }
-  }
-
-  &[disabled] {
-    font-style: italic;
-    opacity: .6;
-  }
-}
-
-.form-group {
-  display: flex;
-  flex-flow: column nowrap;
-  gap: var(--spacing-xxs);
-  align-content: flex-start; /* multiline container */
-  align-items: flex-start;
-  justify-content: stretch;
-  padding-block: var(--form-group-padding-block);
-
-  &:has(textarea) {
-    height: 100%;
-  }
-
-  .grid & {
-    padding-block-end: 0;
-  }
-}
 
 .form-group:has([required]) .form-label, .required {
   position: relative;
@@ -210,8 +120,8 @@ input[type='checkbox'] {
   margin-block-start: var(--spacing-sm);
 
   .form-check-input {
-    display: inline-block;
     float: left;
+    display: inline-block;
     width: auto;
     margin: 4px 0  0 -1.5em;
   }
@@ -239,77 +149,3 @@ textarea.form-control {
   flex: 1;
 }
 
-/* da bs5 */
-.input-group {
-  position: relative;
-  display: flex;
-  gap: 0;
-  align-items: stretch;
-  justify-content: center;
-  width: 100%;
-
-  > .form-control, > .form-select {
-    z-index: 2;
-    flex: 1;
-    border-inline-end: none;
-    border-top-right-radius: 0;
-    border-bottom-right-radius: 0;
-  }
-
-  > .input-group-text {
-    padding: var(--form-btn-padding-y) var(--form-btn-padding-x);
-    font-size: var(--form-btn-font-size);
-    background-color: var(--form-input-group-bg-color);
-    border: 1px solid var(--form-border-color);
-    border-radius: var(--form-btn-border-radius);
-  }
-
-  > .btn, .input-group-text {
-    z-index: 1;
-    border-top-left-radius: 0;
-    border-bottom-left-radius: 0;
-  }
-
-  > * {
-    &:focus, &:focus-within {
-      z-index: 5;
-    }
-  }
-
-  &:has([disabled]) {
-    > .btn, .input-group-text {
-      font-style: italic;
-      color: var(--text-muted-color);
-      background-color: var(--form-disabled-bg-color);
-      /* opacity: .6; */
-    }
-  }
-
-
-}
-
-.was-validated {
-
-  .form-group:has(:valid), .form-group:has(.is-valid){
-    --status-color: var(--status-success-color);
-  }
-  .form-group:has(:invalid), .form-group:has(.is-invalid){
-    --status-color: var(--status-danger-color);
-  }
-
-  .form-label {
-    color: var(--status-color);
-  }
-  .form-control, .form-select {
-    outline: 2px solid var(--status-color);
-    outline-offset: 2px;
-
-    &:focus {
-      /* background-color: var(--status-bg-color); */
-      outline: var(--form-btn-outline-width) solid var(--status-color);
-      outline-offset: 0;
-
-    }
-  }
-
-}

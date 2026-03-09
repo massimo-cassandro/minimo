@@ -23,7 +23,8 @@
   },
   "main": "./src/index.js",
   "files": [
-    "src/**/*.{js,css,svg}"
+    "src/**/*.{js,css,svg}",
+    "utilities/**/*.{js,css,svg}"
   ],
   "devDependencies": {
     "@massimo-cassandro/dev-updater": "^2.1.0"

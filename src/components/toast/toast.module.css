@@ -1,0 +1,59 @@
+/* purgecss start ignore */
+.toastWrapper {
+  position: fixed;
+  inset-block-end: 0;
+  inset-inline: 0;
+  z-index: 1;
+
+  display: grid;
+  gap: 1vh;
+  justify-content: center;
+  justify-items: stretch;
+  padding-block-end: 5vh;
+
+  /* optimizations */
+  pointer-events: none;
+}
+
+.toast {
+  --_bg-lightness: 90%;
+  --_travel-distance: 0;
+
+  max-inline-size: min(25ch, 90vw);
+  padding-block: .5ch;
+  padding-inline: 1ch;
+
+  /* font-family: system-ui, sans-serif; */
+  font-size: var(--toast-font-size);
+  color: var(--toast-text-color);
+  background: hsl(0 0% var(--_bg-lightness) / 90%);
+  border-radius: var(--toast-border-radius);
+  animation:
+    fade-in .3s ease,
+    slide-in .3s ease,
+    fade-out .3s ease var(--toast-duration);
+
+  will-change: transform;
+
+  @media (--dark) {
+    /* color: white; */
+    --_bg-lightness: 20%;
+  }
+
+  @media (--motionOK) {
+    --_travel-distance: 5vh;
+  }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+}
+
+@keyframes fade-out {
+  to { opacity: 0; }
+}
+
+@keyframes slide-in {
+  from { transform: translateY(var(--_travel-distance, 10px)); }
+}
+/* purgecss end ignore */
