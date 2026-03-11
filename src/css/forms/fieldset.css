@@ -22,7 +22,8 @@ fieldset.form-group, fieldset.form-collection-fset {
 }
 */
 
-fieldset:not(.fupl-wrapper):not(.form-group):not(.form-collection-fset) {
+
+.fieldset { /* :not(.fupl-wrapper):not(.form-group):not(.form-collection-fset) { */
   position: relative;
   padding: 3rem 1rem 1rem;
   margin: 1rem 0 2rem;
@@ -34,7 +35,7 @@ fieldset:not(.fupl-wrapper):not(.form-group):not(.form-collection-fset) {
     border: var(--form-fieldset-border-width) solid var(--form-border-color);
   }
 
-  >legend {
+  > legend {
     position: absolute;
     top: -.5rem;
     left: calc(-1 * var(--form-fieldset-border-width));
@@ -49,7 +50,8 @@ fieldset:not(.fupl-wrapper):not(.form-group):not(.form-collection-fset) {
     border-radius: var(--form-btn-border-radius) var(--form-btn-border-radius) var(--form-btn-border-radius) 0;
   }
 
-  fieldset:not(.fupl-wrapper):not(.form-group) {
+
+  .fieldset { /* :not(.fupl-wrapper):not(.form-group) { */
     padding-top: 2rem;
     margin-bottom: .5rem;
     border: none;
@@ -58,7 +60,7 @@ fieldset:not(.fupl-wrapper):not(.form-group):not(.form-collection-fset) {
       margin-top: 0;
     }
 
-    >legend {
+    > legend {
       padding-right: 0;
       padding-left: 0;
       font-size: .9rem;
