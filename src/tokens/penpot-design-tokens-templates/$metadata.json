@@ -1,13 +1,16 @@
 {
   "tokenSetOrder": [
-    "Global",
-    "open-props"
+    "global",
+    "open-props",
+    "ui-light",
+    "ui-dark"
   ],
   "activeThemes": [
     "/light"
   ],
   "activeSets": [
     "open-props",
-    "Global"
+    "global",
+    "ui-light"
   ]
 }

@@ -7,7 +7,8 @@
     "isSource": false,
     "selectedTokenSets": {
       "open-props": "enabled",
-      "Global": "enabled"
+      "global": "enabled",
+      "ui-light": "enabled"
     }
   },
   {
@@ -16,6 +17,10 @@
     "group": "",
     "description": "",
     "isSource": false,
-    "selectedTokenSets": {}
+    "selectedTokenSets": {
+      "global": "enabled",
+      "open-props": "enabled",
+      "ui-dark": "enabled"
+    }
   }
 ]
