@@ -1,0 +1,69 @@
+{
+
+  "status": {
+    "danger": {
+      "color": {
+        "$value": "#c00",
+        "$type": "color"
+      },
+      "fg": {
+        "$value": "#fff",
+        "$type": "color"
+      },
+      "border": {
+        "color": {
+          "$value": "{status.danger.color}",
+          "$type": "color"
+        }
+      }
+    },
+    "success": {
+      "color": {
+        "$value": "#046d19",
+        "$type": "color"
+      },
+      "fg": {
+        "$value": "#fff",
+        "$type": "color"
+      },
+      "border": {
+        "color": {
+          "$value": "{status.success.color}",
+          "$type": "color"
+        }
+      }
+    },
+    "info": {
+      "color": {
+        "$value": "#0665c5",
+        "$type": "color"
+      },
+      "fg": {
+        "$value": "#fff",
+        "$type": "color"
+      },
+      "border": {
+        "color": {
+          "$value": "{status.info.color}",
+          "$type": "color"
+        }
+      }
+    },
+    "warning": {
+      "color": {
+        "$value": "#fc0",
+        "$type": "color"
+      },
+      "fg": {
+        "$value": "#4f2900",
+        "$type": "color"
+      },
+      "border": {
+        "color": {
+          "$value": "{status.warning.color}",
+          "$type": "color"
+        }
+      }
+    },
+  }
+}

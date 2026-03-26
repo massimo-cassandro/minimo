@@ -15,7 +15,7 @@ fieldset.form-group, fieldset.form-collection-fset {
 
   .form-check {
     label {
-      font-weight: var(--ada-font-weight-regular);
+      font-weight: var(--font-weight-regular);
     }
   }
 
@@ -28,11 +28,11 @@ fieldset.form-group, fieldset.form-collection-fset {
   padding: 3rem 1rem 1rem;
   margin: 1rem 0 2rem;
   background: transparent;
-  border: var(--form-fieldset-border-width) solid var(--form-border-color);
-  border-radius: var(--form-btn-border-radius);
+  border: var(--form-fieldset-border-width) solid var(--form-control-border-color);
+  border-radius: var(--btn-border-radius);
 
   &, > legend {
-    border: var(--form-fieldset-border-width) solid var(--form-border-color);
+    border: var(--form-fieldset-border-width) solid var(--form-control-border-color);
   }
 
   > legend {
@@ -47,7 +47,7 @@ fieldset.form-group, fieldset.form-collection-fset {
     color: var(--form-legend-color);
     /* text-transform: uppercase; */
     background-color: var(--form-legend-bg-color);
-    border-radius: var(--form-btn-border-radius) var(--form-btn-border-radius) var(--form-btn-border-radius) 0;
+    border-radius: var(--btn-border-radius) var(--btn-border-radius) var(--btn-border-radius) 0;
   }
 
 
@@ -65,7 +65,7 @@ fieldset.form-group, fieldset.form-collection-fset {
       padding-left: 0;
       font-size: .9rem;
       background: transparent;
-      border-bottom: 1px solid var(--form-border-color);
+      border-bottom: 1px solid var(--form-control-border-color);
     }
   }
 

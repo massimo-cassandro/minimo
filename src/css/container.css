@@ -1,15 +1,6 @@
-
-
 .container {
-
   width: 100%;
-  max-width: var(--container-max-width);
-  padding-inline-start: var(--spacing-lg);
-  padding-inline-end: var(--spacing-lg);
-  margin-inline-start: auto;
-  margin-inline-end: auto;
-
-  /* @media (--xl-n-above) {} */
+  max-width: var(--layout-container-max-width);
+  padding-inline: var(--size-lg);
+  margin-inline: auto;
 }
-
-

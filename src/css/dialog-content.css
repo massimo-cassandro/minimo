@@ -5,7 +5,7 @@
   height: 90dvh;
   padding: 1rem;
   margin: auto;
-  background-color: var(--body-bg);
+  background-color: var(--body-background-color);
   border: none;
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-4);
@@ -36,7 +36,7 @@
     width: 2rem;
     aspect-ratio: 1;
     padding: 4px;
-    background-color: var(--body-bg);
+    background-color: var(--body-background-color);
     border: 1px solid var(--gray-4);
     border-radius: 50%;
     box-shadow: var(--shadow-3);

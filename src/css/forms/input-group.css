@@ -17,11 +17,11 @@
   }
 
   > .input-group-text {
-    padding: var(--form-btn-padding-y) var(--form-btn-padding-x);
-    font-size: var(--form-btn-font-size);
+    padding: var(--form-control-padding-block) var(--form-control-padding-inline);
+    font-size: var(--btn-font-size);
     background-color: var(--form-input-group-bg-color);
-    border: 1px solid var(--form-border-color);
-    border-radius: var(--form-btn-border-radius);
+    border: 1px solid var(--form-control-border-color);
+    border-radius: var(--btn-border-radius);
   }
 
   > .btn, .input-group-text {
@@ -39,8 +39,8 @@
   &:has([disabled]) {
     > .btn, .input-group-text {
       font-style: italic;
-      color: var(--text-muted-color);
-      background-color: var(--form-disabled-bg-color);
+      color: var(--text-muted);
+      background-color: var(--form-control-status-disabled-background-color);
       /* opacity: .6; */
     }
   }

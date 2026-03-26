@@ -4,28 +4,27 @@
 /* TODO classe grid specifica per i form ?? (.form-grid?) */
 /* TODO customizable select */
 
-
-
 .form-group:has([required]) .form-label, .required {
   position: relative;
-  padding-inline-start: var(--spacing-md);
+  padding-inline-start: var(--size-md);
   &::before {
     position: absolute;
     top: -.2em;
     left: 0;
     display: inline-block;
-    padding-inline-end: var(--spacing-xs);
+    padding-inline-end: var(--size-xs);
     font-size: 2em;
-    color: var(--form-required-flag-color);
-    content: var(--form-required-flag-content);
+    color: var(--form-control-status-required-flag-color);
+    content: var(--form-control-status-required-flag-content);
   }
 
 }
 
 .form-label {
   display: block;
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-semibold);
+  font-size: var(--form-label-font-size);
+  font-weight: var(--form-label-font-weight);
+  color: var(--form-label-color);
 }
 
 /* la classe form-select è mantenuta per compatibilità con bootstrap  */
@@ -33,23 +32,23 @@
   display: block;
   width: 100%;
   font-family: var(--font-family);
-  font-size: var(--form-btn-font-size);
+  font-size: var(--btn-font-size);
   font-weight: var(--font-weight-regular);
-  line-height: var(--line-height-base);
-  color: var(--form-text-color);
-  background-color: var(--form-bg-color);
-  border: 1px solid var(--form-border-color);
-  border-radius: var(--form-btn-border-radius);
+  line-height: var(--font-line-height-base);
+  color: var(--form-control-text-color);
+  background-color: var(--form-control-background-color);
+  border: 1px solid var(--form-control-border-color);
+  border-radius: var(--btn-border-radius);
 
   &:focus {
-    outline: var(--form-btn-outline-width) solid var(--form-btn-focus-color);
+    outline: var(--form-control-status-focus-outline-width) solid var(--form-control-status-focus-color);
   }
 
   &[disabled] {
     /* color: $form-select-disabled-color;
     background-color: $form-select-disabled-bg;
     border-color: $form-select-disabled-border-color; */
-    background-color: var(--form-disabled-bg-color);
+    background-color: var(--form-control-status-disabled-background-color);
     /* opacity: .6; */
     &::placeholder {
       font-style: italic;
@@ -59,17 +58,18 @@
 
 .form-control, .form-control-text {
 
-  padding: var(--form-btn-padding-y) var(--form-btn-padding-x);
+  padding: var(--form-control-padding-block) var(--form-control-padding-inline);
 
   &::placeholder {
-    font-size: var(--form-btn-font-size);
-    color: var(--form-placeholder-color);
-    opacity: 1;
+    font-size: var(--form-control-placeholder-font-size, var(--form-control-font-size));
+    font-style: var(--form-control-placeholder-font-style, italic);
+    color: var(--form-control-placeholder-color);
+    opacity: var(--form-control-placeholder-opacity, .8);
   }
 
   &.form-control-sm {
-    padding: var(--form-btn-sm-padding-y) var(--form-btn-sm-padding-x);
-    font-size: var(--form-btn-sm-font-size);
+    padding: var(--form-control-sm-padding-block) var(--form-control-sm-padding-inline);
+    font-size: var(--btn-sm-font-size);
   }
 }
 .form-control-text {
@@ -77,37 +77,37 @@
   text-overflow: ellipsis;
   white-space: nowrap;
   cursor: not-allowed;
-  background-color: var(--form-disabled-bg-color);
+  background-color: var(--form-control-status-disabled-background-color);
 }
 
 /* da bootstrap */
 select.form-control, .form-select {
 
-  --form-select-indicator-color: var(--form-text-color);
-  --indicator-padding-right: var(--spacing-base);
+  /* --_form-select-trigger-icon-color: var(--form-control-text-color); */
+  --_trigger-icon-padding-right: var(--size-base);
 
-  padding: var(--form-btn-padding-y) var(--indicator-padding-right) var(--form-btn-padding-y) var(--form-btn-padding-x);
+  padding: var(--form-control-padding-block) var(--_trigger-icon-padding-right) var(--form-control-padding-block) var(--form-control-padding-inline);
   appearance: none;
-  background-image: var(--form-select-indicator);
+  background-image: var(--form-control-select-trigger-icon);
   background-repeat: no-repeat;
-  background-position: right var(--indicator-padding-right) center;
+  background-position: right var(--_trigger-icon-padding-right) center;
   background-size: 16px 12px;
 
   &[multiple],
   &[size]:not([size='1']) {
-    padding-right: var(--form-btn-padding-x);
+    padding-right: var(--form-control-padding-inline);
     background-image: none;
   }
 
   &:-moz-focusring {
     color: transparent;
-    text-shadow: 0 0 0 var(--form-text-color);
+    text-shadow: 0 0 0 var(--form-control-text-color);
   }
 }
 
 input[type='checkbox'] {
-  color: var(--secondary-fg);
-  accent-color: var(--secondary);
+  color: var(--form-control-text-color);
+  accent-color: var(--accent-base);
   transform-origin: center;
   scale: 1.3;
 }
@@ -117,7 +117,7 @@ input[type='checkbox'] {
 .form-check {
   display: block;
   padding-left: 1.5em;
-  margin-block-start: var(--spacing-sm);
+  margin-block-start: var(--size-sm);
 
   .form-check-input {
     float: left;
@@ -134,14 +134,14 @@ input::-webkit-datetime-edit {
   margin-block-end: -2px;
   line-height: 1;
 }
-input::-webkit-calendar-picker-indicator { /* solo in chromium, non in safari */
+input::-webkit-calendar-picker-trigger-icon { /* solo in chromium, non in safari */
   margin: 2px 0;
 }
 
 
 .form-help-text {
   font-size: var(--font-size-xs);
-  color: var(--text-muted-color);
+  color: var(--text-muted);
 }
 
 

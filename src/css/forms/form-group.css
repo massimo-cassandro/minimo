@@ -2,7 +2,7 @@
 .form-group {
   display: flex;
   flex-flow: column nowrap;
-  gap: var(--spacing-xxs);
+  gap: var(--size-xxs);
   align-content: flex-start; /* multiline container */
   align-items: flex-start;
   justify-content: stretch;

@@ -1,0 +1,12 @@
+{
+  "secondary": {
+    "base": {
+      "$value": "#650853",
+      "$type": "color"
+    },
+    "on-base": {
+      "$value": "#fff",
+      "$type": "color"
+    }
+  }
+}

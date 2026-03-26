@@ -1,0 +1,66 @@
+{
+  "table": {
+    "thead": {
+      "background": {
+        "color": {
+          "$type": "color",
+          "$value": "#ddd"
+        }
+      },
+      "border": {
+        "width" : {
+          "$type": "dimension",
+          "$value": "3px"
+        }
+      }
+    },
+
+    "body": {
+      "background": {
+        "color": null
+      },
+      "border": {
+        "width" : {
+          "$type": "dimension",
+          "$value": "1px"
+        }
+      },
+      "tr": {
+        "alt-bg-color": {
+          "$type": "color",
+          "$value": "#efefef"
+        },
+        "hover-bg-color": {
+          "$type": "color",
+          "$value": "#cbcbcb"
+        }
+      }
+    },
+
+    "border": {
+      "color" : {
+        "$type": "color",
+        "$value": "#333"
+      }
+    },
+
+    "cell": {
+      "padding" : {
+        "block": {
+          "$type": "dimension",
+          "$value": ".3rem"
+        },
+        "inline": {
+          "$type": "dimension",
+          "$value": ".6rem"
+        }
+      },
+      "line-height": {
+        "$type": "dimension",
+        "$value": "1.3"
+      }
+    }
+
+
+  }
+}

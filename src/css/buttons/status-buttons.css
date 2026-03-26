@@ -30,7 +30,7 @@
     --btn-fg-color: var(--fg);
     --btn-border-color: var(--status-warning-border-color);
 
-    @media (--mouse) {
+    @media (hover: hover) {
       &:hover {
         --btn-bg-color: color-mix(in srgb, var(--bg) 60%, transparent);
         --btn-fg-color: var(--fg);
@@ -39,7 +39,7 @@
     }
 
     &:focus, &:active {
-      outline: var(--form-btn-outline-width) solid color-mix(in srgb, var(--bg) 60%, transparent);
+      outline: var(--btn-focus-outline-width) solid color-mix(in srgb, var(--bg) 60%, transparent);
     }
 
     &:active {
@@ -50,7 +50,7 @@
 
   &.btn-success, &.btn-info, &.btn-danger  {
 
-    @media (--mouse) {
+    @media (hover: hover) {
       &:hover {
         --btn-bg-color: color-mix(in srgb, var(--bg) 30%, transparent);
         --btn-fg-color: var(--bg);
@@ -59,7 +59,7 @@
     }
 
     &:focus, &:active {
-      outline: var(--form-btn-outline-width) solid color-mix(in srgb, var(--bg) 40%, transparent);
+      outline: var(--btn-focus-outline-width) solid color-mix(in srgb, var(--bg) 40%, transparent);
     }
 
     &:active {
@@ -72,7 +72,7 @@
 
     &.btn-success, &.btn-info, &.btn-danger {
 
-      @media (--mouse) {
+      @media (hover: hover) {
         &:hover {
           --btn-bg-color: color-mix(in srgb, var(--bg) 60%, #fff);
           --btn-fg-color: var(--bg);
@@ -83,7 +83,7 @@
 
     &.btn-warning {
 
-      @media (--mouse) {
+      @media (hover: hover) {
         &:hover {
           --btn-bg-color: color-mix(in srgb, var(--bg) 60%, #fff);
           --btn-fg-color: var(--fg);
@@ -95,7 +95,7 @@
     &.btn-success, &.btn-info, &.btn-danger, &.btn-warning {
 
       &:focus, &:active {
-        outline: var(--form-btn-outline-width) solid color-mix(in srgb, var(--bg) 60%, transparent);
+        outline: var(--btn-focus-outline-width) solid color-mix(in srgb, var(--bg) 60%, transparent);
       }
 
       &:active {

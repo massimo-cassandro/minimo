@@ -1,0 +1,12 @@
+{
+  "neutral": {
+    "base": {
+      "$value": "#666",
+      "$type": "color"
+    },
+    "on-base": {
+      "$value": "#fff",
+      "$type": "color"
+    }
+  }
+}

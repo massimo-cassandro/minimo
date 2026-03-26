@@ -7,7 +7,7 @@
   border: var(--spinner-stroke) solid;
   border-color: currentColor currentColor transparent;
   border-radius: 50%;
-  animation: spinner-border .7s linear infinite;
+  /* animation: spinner-border .7s linear infinite; */
 }
 
 @keyframes spinner-border {

@@ -1,6 +1,5 @@
 export default {
   extends: [
-    'stylelint-config-standard',
     '@massimo-cassandro/stylelint-config',
   ],
 
@@ -15,21 +14,14 @@ export default {
     'test/**/*.css'
   ],
 
-  // Override delle regole specifiche
+  // Overrides
   rules: {
-    //********************** tailwind:
+
+    // 'color-function-notation': null,
+
+    //********************** optionally for tailwind:
     // 'at-rule-no-unknown': [
     //   true,
-    //   {
-    //     // Permette le direttive Tailwind come @apply, @tailwind, ecc.
-    //     ignoreAtRules: [
-    //       'tailwind',
-    //       'apply',
-    //       'variants',
-    //       'responsive',
-    //       'screen'
-    //     ]
-    //   },
     //   'value-keyword-case': null,
     //   '@stylistic/number-no-trailing-zeros': null
     // ],

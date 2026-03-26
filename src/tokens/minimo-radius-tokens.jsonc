@@ -1,0 +1,45 @@
+{
+  "radius": {
+
+    "base": {
+      "$value": "{size.base}",
+      "$type": "dimension",
+      "$description": ""
+    },
+    "xxs": {
+      "$value": "{size.xxs}",
+      "$type": "dimension",
+      "$description": ""
+    },
+    "xs": {
+      "$value": "{size.xs}",
+      "$type": "dimension",
+      "$description": ""
+    },
+    "sm": {
+      "$value": "{size.sm}",
+      "$type": "dimension",
+      "$description": ""
+    },
+    "md": {
+      "$value": "{size.md}",
+      "$type": "dimension",
+      "$description": ""
+    },
+    "lg": {
+      "$value": "{size.lg}",
+      "$type": "dimension",
+      "$description": ""
+    },
+    "xl": {
+      "$value": "{size.xl}",
+      "$type": "dimension",
+      "$description": ""
+    },
+    "pill": {
+      "$value": "9999rem",
+      "$type": "dimension",
+      "$description": ""
+    }
+  }
+}

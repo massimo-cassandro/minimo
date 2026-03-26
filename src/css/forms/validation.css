@@ -2,22 +2,22 @@
 .was-validated {
 
   .form-group:has(:valid), .form-group:has(.is-valid){
-    --status-color: var(--status-success-color);
+    --_status-color: var(--status-success-color);
   }
   .form-group:has(:invalid), .form-group:has(.is-invalid){
-    --status-color: var(--status-danger-color);
+    --_status-color: var(--status-danger-color);
   }
 
   .form-label {
-    color: var(--status-color);
+    color: var(--_status-color);
   }
   .form-control, .form-select {
-    outline: 2px solid var(--status-color);
+    outline: 2px solid var(--_status-color);
     outline-offset: 2px;
 
     &:focus {
       /* background-color: var(--status-bg-color); */
-      outline: var(--form-btn-outline-width) solid var(--status-color);
+      outline: var(--btn-focus-outline-width) solid var(--_status-color);
       outline-offset: 0;
 
     }

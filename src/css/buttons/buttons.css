@@ -5,23 +5,25 @@ outline btns: primary/secondary + fondo body bg o trasparente
 
 */
 
-button, [role='button'] {
+button, [role='button'], .btn {
   cursor: pointer;
 }
 
+button svg {
+  pointer-events: none; /* fa sì che le icone non intercettano il click destinata ai pulsanti */
+}
+
 .btn-reset, .btn-link, .btn-close {
-  &, &.btn { /* nel caso venga anche assegnata la classe `btn`, non necessaria */
-    padding: 0;
-    margin: 0;
-    background: transparent;
-    border: none;
-    box-shadow: none;
-  }
+  padding: 0;
+  margin: 0;
+  background: transparent;
+  border: none;
+  box-shadow: none;
 }
 
 a.btn {
   &, &:hover, &:active, &:focus, &:visited {
-    color: var(--button-fg-color);
+    color: var(--_button-fg-color);
     text-decoration: none;
   }
 }
@@ -29,24 +31,24 @@ a.btn {
 .btn {
 
   display: inline-block;
-  padding: var(--form-btn-padding-y) var(--form-btn-padding-x);
-  font-size: var(--form-btn-font-size);
+  padding: var(--btn-padding-block) var(--btn-padding-inline);
+  font-size: var(--btn-font-size);
   font-style: var(--btn-font-style);
   font-weight: var(--btn-font-weight);
-  color: var(--button-fg-color);
+  color: var(--_button-fg-color);
   text-align: center;
   text-decoration: none;
-  background: var(--button-bg-color);
-  border: var(--btn-border-width) solid var(--button-border-color);
-  border-radius: var(--form-btn-border-radius);
+  background: var(--_button-bg-color);
+  border: var(--btn-border-width) solid var(--_button-border-color);
+  border-radius: var(--btn-border-radius);
   box-shadow: none;
 
   &[disabled] {
     font-style: italic;
     pointer-events: none;
     cursor: not-allowed;
+    opacity: var(--btn-disabled-opacity);
     filter: grayscale(60%);
-    opacity: var(--form-disabled-opacity);
   }
 
   svg {
@@ -55,9 +57,8 @@ a.btn {
   }
 
   &.btn-sm {
-    --form-btn-padding-x: var(--form-btn-sm-padding-x);
-    --form-btn-padding-y: var(--form-btn-sm-padding-y);
-    font-size: var(--form-btn-sm-font-size);
+    padding: var(--btn-sm-padding-block) var(--btn-sm-padding-inline);
+    font-size: var(--btn-sm-font-size);
 
     svg {
       width: 1.5em;
@@ -65,9 +66,8 @@ a.btn {
   }
 
   &.btn-lg {
-    --form-btn-padding-x: 1.5rem;
-    --form-btn-padding-y: .6rem;
-    font-size: var(--font-size-lg);
+    padding: var(--btn-lg-padding-block) var(--btn-lg-padding-inline);
+    font-size: var(--btn-lg-font-size);
 
     svg {
       width: 1.5em;
@@ -76,52 +76,52 @@ a.btn {
 
 
   &.btn-primary {
-    --button-bg-color: var(--btn-primary-bg-color);
-    --button-fg-color: var(--btn-primary-fg-color);
-    --button-border-color: var(--btn-primary-border-color);
+    --_button-bg-color: var(--btn-primary-background-color);
+    --_button-fg-color: var(--btn-primary-color);
+    --_button-border-color: var(--btn-primary-border-color);
 
-    @media (--mouse) {
+    @media (hover: hover) {
       &:hover {
-        --button-bg-color: var(--btn-primary-hover-bg-color);
-        --button-fg-color: var(--btn-primary-hover-fg-color);
-        --button-border-color: var(--btn-primary-hover-border-color);
+        --_button-bg-color: var(--btn-primary-hover-background-color);
+        --_button-fg-color: var(--btn-primary-hover-color);
+        --_button-border-color: var(--btn-primary-hover-border-color);
       }
     }
 
     &:focus, &:active {
-      outline: var(--form-btn-outline-width) solid var(--btn-primary-focus-outline-color);
+      outline: var(--btn-focus-outline-width) solid var(--btn-primary-focus-outline-color);
       /* outline-offset: 4px; */
     }
 
     &:active {
-      --button-bg-color: var(--btn-primary-active-bg-color);
-      --button-fg-color: var(--btn-primary-active-fg-color);
-      --button-border-color: var(--btn-primary-active-border-color);
+      --_button-bg-color: var(--btn-primary-active-background-color);
+      --_button-fg-color: var(--btn-primary-active-color);
+      --_button-border-color: var(--btn-primary-active-border-color);
     }
   }
 
   &.btn-secondary {
-    --button-bg-color: var(--btn-secondary-bg-color);
-    --button-fg-color: var(--btn-secondary-fg-color);
-    --button-border-color: var(--btn-secondary-border-color);
+    --_button-bg-color: var(--btn-secondary-background-color));
+    --_button-fg-color: var(--btn-secondary-color);
+    --_button-border-color: var(--btn-secondary-border-color);
 
-    @media (--mouse) {
+    @media (hover: hover) {
       &:hover {
-        --button-bg-color: var(--btn-secondary-hover-bg-color);
-        --button-fg-color: var(--btn-secondary-hover-fg-color);
-        --button-border-color: var(--btn-secondary-hover-border-color);
+        --_button-bg-color: var(--btn-secondary-hover-bg-color);
+        --_button-fg-color: var(--btn-secondary-hover-fg-color);
+        --_button-border-color: var(--btn-secondary-hover-border-color);
       }
     }
 
     &:focus, &:active {
-      outline: var(--form-btn-outline-width) solid var(--btn-secondary-focus-outline-color);
+      outline: var(--btn-focus-outline-width) solid var(--btn-secondary-focus-outline-color);
       /* outline-offset: 4px; */
     }
 
     &:active {
-      --button-bg-color: var(--btn-secondary-active-bg-color);
-      --button-fg-color: var(--btn-secondary-active-fg-color);
-      --button-border-color: var(--btn-secondary-active-border-color);
+      --_button-bg-color: var(--btn-secondary-active-bg-color);
+      --_button-fg-color: var(--btn-secondary-active-fg-color);
+      --_button-border-color: var(--btn-secondary-active-border-color);
     }
 
 
@@ -133,52 +133,52 @@ a.btn {
   }
 
   &.btn-outline-primary {
-    --button-bg-color: var(--btn-o-primary-bg-color);
-    --button-fg-color: var(--btn-o-primary-fg-color);
-    --button-border-color: var(--btn-o-primary-border-color);
+    --_button-bg-color: var(--btn-o-primary-bg-color);
+    --_button-fg-color: var(--btn-o-primary-fg-color);
+    --_button-border-color: var(--btn-o-primary-border-color);
 
 
-    @media (--mouse) {
+    @media (hover: hover) {
       &:hover {
-        --button-bg-color: var(--btn-o-primary-hover-bg-color);
-        --button-fg-color: var(--btn-o-primary-hover-fg-color);
-        --button-border-color: var(--btn-o-primary-hover-border-color);
+        --_button-bg-color: var(--btn-o-primary-hover-bg-color);
+        --_button-fg-color: var(--btn-o-primary-hover-fg-color);
+        --_button-border-color: var(--btn-o-primary-hover-border-color);
       }
     }
 
     &:focus, &:active {
-      outline: var(--form-btn-outline-width) solid var(--btn-o-primary-focus-outline-color);
+      outline: var(--btn-focus-outline-width) solid var(--btn-o-primary-focus-outline-color);
     }
 
     &:active {
-      --button-bg-color: var(--btn-o-primary-active-bg-color);
-      --button-fg-color: var(--btn-o-primary-active-fg-color);
-      --button-border-color: var(--btn-o-primary-active-border-color);
+      --_button-bg-color: var(--btn-o-primary-active-bg-color);
+      --_button-fg-color: var(--btn-o-primary-active-fg-color);
+      --_button-border-color: var(--btn-o-primary-active-border-color);
     }
   }
 
 
   &.btn-outline-secondary {
-    --button-bg-color: var(--btn-o-secondary-bg-color);
-    --button-fg-color: var(--btn-o-secondary-fg-color);
-    --button-border-color: var(--btn-o-secondary-border-color);
+    --_button-bg-color: var(--btn-o-secondary-bg-color);
+    --_button-fg-color: var(--btn-o-secondary-fg-color);
+    --_button-border-color: var(--btn-o-secondary-border-color);
 
-    @media (--mouse) {
+    @media (hover: hover) {
       &:hover {
-        --button-bg-color: var(--btn-o-secondary-hover-bg-color);
-        --button-fg-color: var(--btn-o-secondary-hover-fg-color);
-        --button-border-color: var(--btn-o-secondary-hover-border-color);
+        --_button-bg-color: var(--btn-o-secondary-hover-bg-color);
+        --_button-fg-color: var(--btn-o-secondary-hover-fg-color);
+        --_button-border-color: var(--btn-o-secondary-hover-border-color);
       }
     }
 
     &:focus, &:active {
-      outline: var(--form-btn-outline-width) solid var(--btn-o-secondary-focus-outline-color);
+      outline: var(--btn-focus-outline-width) solid var(--btn-o-secondary-focus-outline-color);
     }
 
     &:active {
-      --button-bg-color: var(--btn-o-secondary-active-bg-color);
-      --button-fg-color: var(--btn-o-secondary-active-fg-color);
-      --button-border-color: var(--btn-o-secondary-active-border-color);
+      --_button-bg-color: var(--btn-o-secondary-active-bg-color);
+      --_button-fg-color: var(--btn-o-secondary-active-fg-color);
+      --_button-border-color: var(--btn-o-secondary-active-border-color);
     }
   }
 
@@ -188,9 +188,7 @@ a.btn {
     gap: 1rem;
     align-items: center;
     justify-content: space-between;
-    padding-inline-start: calc(var(--form-btn-padding-x) * 1.5);
+    padding-inline-start: calc(var(--form-control-padding-inline) * 1.5);
     text-align: start;
   }
 }
-
-

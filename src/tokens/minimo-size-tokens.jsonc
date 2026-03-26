@@ -1,0 +1,101 @@
+{
+
+
+  // in attesa di modifica dello script per il parser automatico delle espressioni
+  // NB: "$type": "string" necessario, dimension converte i valori come se fossero px
+  "size": {
+    "xs": {
+      "$value": ".5rem",
+      "$type": "dimension",
+      "$description": ""
+    },
+    "md": {
+      "$value": "1.2rem",
+      "$type": "dimension",
+      "$description": ""
+    },
+    "3xl": {
+      "$value": "4rem",
+      "$type": "dimension",
+      "$description": ""
+    },
+    "2xl": {
+      "$value": "3rem",
+      "$type": "dimension",
+      "$description": ""
+    },
+    "base": {
+      "$value": "1rem",
+      "$type": "dimension",
+      "$description": ""
+    },
+    "lg": {
+      "$value": "1.5rem",
+      "$type": "dimension",
+      "$description": ""
+    },
+    "xxs": {
+      "$value": ".25rem",
+      "$type": "dimension",
+      "$description": ""
+    },
+    "xl": {
+      "$value": "2rem",
+      "$type": "dimension",
+      "$description": ""
+    },
+    "sm": {
+      "$value": ".75rem",
+      "$type": "dimension",
+      "$description": ""
+    }
+  },
+
+  // "size": {
+  //   "xxs": {
+  //     "$value": "{size.base} * .25",
+  //     "$type": "dimension",
+  //     "$description": ""
+  //   },
+  //   "xs": {
+  //     "$value": "{size.base} * .5",
+  //     "$type": "dimension",
+  //     "$description": ""
+  //   },
+  //   "sm": {
+  //     "$value": "{size.base} * .75",
+  //     "$type": "dimension",
+  //     "$description": ""
+  //   },
+  //   "base": {
+  //     "$value": "1rem",
+  //     "$type": "dimension",
+  //     "$description": ""
+  //   },
+  //   "md": {
+  //     "$value": "{size.base} * 1.2",
+  //     "$type": "dimension",
+  //     "$description": ""
+  //   },
+  //   "lg": {
+  //     "$value": "{size.base} * 1.5",
+  //     "$type": "dimension",
+  //     "$description": ""
+  //   },
+  //   "xl": {
+  //     "$value": "{size.base} * 2",
+  //     "$type": "dimension",
+  //     "$description": ""
+  //   },
+  //   "2xl": {
+  //     "$value": "{size.base} * 3",
+  //     "$type": "dimension",
+  //     "$description": ""
+  //   },
+  //   "3xl": {
+  //     "$value": "{size.base} * 4",
+  //     "$type": "dimension",
+  //     "$description": ""
+  //   }
+  // }
+}

@@ -1,0 +1,40 @@
+{
+  "btn": {
+    "close": {}
+
+  } // end btn
+}
+
+
+
+
+
+// /* btn-close */
+// --btn-close-size: 1.5rem;
+// --btn-close-icon-bar-size: 2px;
+// --btn-close-icon-color: var(--text-color);
+
+// /* senza sfondo */
+// /*
+// --btn-close-icon-hover-color: var(--accent);
+// --btn-close-border-radius: 50%;
+// --btn-close-border: none;
+// --btn-close-padding: 0;
+// --btn-close-background: transparent;
+// --btn-close-background-hover: transparent;
+// --btn-close-background-active: transparent;
+// */
+
+// /* con sfondo */
+// --btn-close-border-width: 3px;
+// --btn-close-border-color: var(--btn-close-icon-color);
+// --btn-close-border-radius: 50%;
+// --btn-close-padding: 3px;
+// --btn-close-background: var(--body-bg-color);
+// --btn-close-hover-background: var(--btn-close-icon-color);
+// --btn-close-icon-hover-color: var(--btn-close-background);
+// --btn-close-active-background: var(--accent);
+// --btn-close-icon-active-color: var(--accent-fg);
+// --btn-close-focus-outline-width: var(--btn-outline-width);
+// --btn-close-focus-outline-color: color-mix(in srgb, var(--accent) 50%, transparent);
+// /* end btn-close */

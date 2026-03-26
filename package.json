@@ -14,7 +14,9 @@
   "scripts": {
     "UPD-version": "npx update-version  # --config=./dev-utilities.config.mjs",
     "upd@m": "npx upd@m",
-    "npm-publish": "npm publish"
+    "npm-publish": "npm publish",
+    "build-tokens": "cd ./test/style-dictionary && node build-tokens.mjs",
+    "check unresolved props": "node ~/Sites/__snippets/utilities/check-unresolved-custom-props.mjs --config ./test/check-unresolved-props/check-props-config.mjs"
   },
   "license": "MIT",
   "author": "Massimo Cassandro",
@@ -27,6 +29,8 @@
     "utilities/**/*.{js,css,svg}"
   ],
   "devDependencies": {
-    "@massimo-cassandro/dev-updater": "^2.1.0"
+    "@massimo-cassandro/dev-updater": "^2.1.0",
+    "@massimo-cassandro/stylelint-config": "^2.3.1",
+    "style-dictionary": "^5.4.0"
   }
 }

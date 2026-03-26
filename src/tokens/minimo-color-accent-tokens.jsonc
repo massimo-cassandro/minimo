@@ -1,0 +1,13 @@
+{
+  "accent": {
+    "base": {
+      "$value": "#567d0d",
+      "$type": "color"
+    },
+    "on-base": {
+      "$value": "#fff",
+      "$type": "color"
+    }
+  }
+
+}

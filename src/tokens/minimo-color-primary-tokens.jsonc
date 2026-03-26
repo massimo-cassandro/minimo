@@ -1,0 +1,12 @@
+{
+  "primary": {
+    "base": {
+      "$value": "#083865",
+      "$type": "color"
+    },
+    "on-base": {
+      "$value": "#fff",
+      "$type": "color"
+    }
+  }
+}
