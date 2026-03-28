@@ -19,7 +19,7 @@
   > .input-group-text {
     padding: var(--form-control-padding-block) var(--form-control-padding-inline);
     font-size: var(--btn-font-size);
-    background-color: var(--form-input-group-bg-color);
+    background-color: var(--form-input-group-background-color);
     border: 1px solid var(--form-control-border-color);
     border-radius: var(--btn-border-radius);
   }

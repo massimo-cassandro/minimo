@@ -7,6 +7,21 @@
   --body-text: var(--text-color);
   --btn-border-radius: var(--form-control-border-radius);
   --btn-border-width: var(--form-control-border-width);
+  --btn-close-active-background-color: var(--link-active-background-color);
+  --btn-close-active-icon-color: var(--link-active-color);
+  --btn-close-background-color: var(--body-background-color);
+  --btn-close-border-color: var(--btn-close-icon-color);
+  --btn-close-border-radius: 3.125rem;
+  --btn-close-border-width: .125rem;
+  --btn-close-focus-outline-color: var(--link-focus-outline-color);
+  --btn-close-focus-outline-offset: .125rem;
+  --btn-close-focus-outline-width: .125rem;
+  --btn-close-hover-background-color: var(--btn-close-icon-color);
+  --btn-close-hover-icon-color: var(--btn-close-background-color);
+  --btn-close-icon-bar-size: .125rem;
+  --btn-close-icon-color: var(--text-color);
+  --btn-close-padding: .1875rem;
+  --btn-close-size: 1.5rem;
   --btn-disabled-opacity: var(--form-control-status-disabled-opacity);
   --btn-focus-outline-width: var(--form-control-status-focus-outline-width);
   --btn-font-size: var(--form-control-font-size);
@@ -106,6 +121,7 @@
   --grid-cols: 3;
   --grid-min-col-width: 6rem;
   --layout-container-max-width: 80rem;
+  --link-active-background-color: transparent;
   --link-active-color: #51054c;
   --link-color: #0d12ae;
   --link-focus-outline-color: var(--link-color);
@@ -123,6 +139,9 @@
   --radius-xl: var(--size-xl);
   --radius-xs: var(--size-xs);
   --radius-xxs: var(--size-xxs);
+  --recaptcha-alert-background-color: #000;
+  --recaptcha-alert-foreground: #fff;
+  --recaptcha-alert-overlay-color: rgb(0 0 0 / .5);
   --secondary-base: #650853;
   --secondary-on-base: #fff;
   --size-2xl: 3rem;
@@ -159,7 +178,7 @@
   --text-dim: var(--text-muted);
   --text-muted: var(--neutral-base);
   --text-negative: #fff;
-  --text-selected-background: #ddd;
+  --text-selected-background-color: #ddd;
   --text-selected-text: var(--body-text);
   --z-index-overlay: 99;
 }

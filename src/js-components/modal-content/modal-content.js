@@ -27,7 +27,7 @@ export function modalContent({
   /** dimensione modal: full, large, medium o small */
   size = 'large',
 
-  /** padding: std (var(--spacing-md) 0) o none */
+  /** padding: std (var(--size-md) 0) o none */
   padding = 'std'
 }) {
 

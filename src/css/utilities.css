@@ -19,8 +19,43 @@
   overflow: hidden;
 }
 
+@media (--media-medium-viewport-down) {
+  .d-md-down-none {
+    display: none;
+  }
+}
+/*
+.d-md-up-block {
+  display: none;
+
+  @media (--media-medium-viewport-up) {
+    display: block;
+  }
+}
+.d-md-up-flex {
+  display: none;
+
+  @media (--media-medium-viewport-up) {
+    display: flex;
+  }
+} */
+
+/*  TODO da rivedere  */
+/* @media (--media-xlarge-viewport-up) {
+  .xlg-visually-hidden {
+    display: block;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    white-space: nowrap !important;
+    border: 0 !important;
+    clip-path: rect(0 0 0 0) !important;
+  }
+}
 @media (--media-large-viewport-up) {
-  .desktop-visually-hidden {
+  .lg-visually-hidden {
     display: block;
     width: 1px !important;
     height: 1px !important;
@@ -34,10 +69,10 @@
 }
 
 @media (--media-large-viewport-down) {
-  .small-screen-hidden {
+  .sm-screen-hidden {
     display: none !important;
   }
-}
+} */
 
 
 @media print {

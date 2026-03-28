@@ -16,10 +16,9 @@
     outline-offset: 2px;
 
     &:focus {
-      /* background-color: var(--status-bg-color); */
+      /* background-color: var(--_status-color); */
       outline: var(--btn-focus-outline-width) solid var(--_status-color);
       outline-offset: 0;
-
     }
   }
 

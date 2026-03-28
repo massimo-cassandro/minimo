@@ -15,8 +15,8 @@
     "UPD-version": "npx update-version  # --config=./dev-utilities.config.mjs",
     "upd@m": "npx upd@m",
     "npm-publish": "npm publish",
-    "build-tokens": "cd ./test/style-dictionary && node build-tokens.mjs",
-    "check unresolved props": "node ~/Sites/__snippets/utilities/check-unresolved-custom-props.mjs --config ./test/check-unresolved-props/check-props-config.mjs"
+    "build-tokens": "node ./utilities/build-tokens.mjs --config ./test/style-dictionary/build-tokens-config.mjs",
+    "check unresolved props": "node ./utilities/check-unresolved-custom-props.mjs --config ./test/check-unresolved-props/check-props-config.mjs"
   },
   "license": "MIT",
   "author": "Massimo Cassandro",

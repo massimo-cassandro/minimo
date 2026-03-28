@@ -7,7 +7,7 @@
 
 .btn-close  {
 
-  --icon-bar-width: calc(var(--btn-close-size) - (var(--btn-close-padding) * 2) - (var(--btn-close-border-width) * 2));
+  --_icon-bar-width: calc(var(--btn-close-size) - (var(--btn-close-padding) * 2) - (var(--btn-close-border-width) * 2));
 
   position: relative;
 
@@ -17,7 +17,7 @@
   padding: var(--btn-close-padding);
   color: var(--btn-close-icon-color);
   cursor: pointer;
-  background-color: var(--btn-close-background);
+  background-color: var(--btn-close-background-color);
   border: var(--btn-close-border-width) solid var(--btn-close-border-color);
   border-radius: var(--btn-close-border-radius);
 
@@ -26,7 +26,7 @@
     top: 50%;
     left: 0;
     display: block;
-    width: var(--icon-bar-width);
+    width: var(--_icon-bar-width);
     height: var(--btn-close-icon-bar-size);
     content: '';
     background: currentColor;
@@ -42,23 +42,24 @@
 
   &:focus {
     outline: var(--btn-close-focus-outline-width) solid var(--btn-close-focus-outline-color);
+    outline-offset: var(--btn-close-focus-outline-offset);
   }
 
   @media (hover: hover) {
     &:hover {
 
-      background-color: var(--btn-close-hover-background);
+      background-color: var(--btn-close-hover-background-color);
 
       &::before, &::after {
-        background-color: var(--btn-close-icon-hover-color);
+        background-color: var(--btn-close-hover-icon-color);
       }
     }
   }
 
   &:active {
-    background-color: var(--btn-close-active-background);
+    background-color: var(--btn-close-active-background-color);
     &::before, &::after {
-      background-color: var(--btn-close-icon-active-color);
+      background-color: var(--btn-close-active-icon-color);
     }
 
   }

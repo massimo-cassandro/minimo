@@ -1,7 +1,7 @@
 details {
   ::marker {
     font-size: .9em;
-    color: var(--stone-7);
+    color: var(--text-color);
   }
 }
 

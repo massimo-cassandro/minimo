@@ -36,7 +36,7 @@
         inset: 0;
         display: block;
         content: '';
-        background-color: var(--recaptcha-alert-overlay, color-mix(in srgb, #000 50%, transparent));
+        background-color: var(--recaptcha-alert-overlay-color, rgb(0 0 0 / .5));
       }
     }
     input, select, textarea {
@@ -49,12 +49,11 @@
       top: 50%;
       left: 50%;
       display: block;
-      padding: var(--spacing-xs);
-      color: var(--recaptcha-alert-fg, #fff);
-      background-color: var(--recaptcha-alert-bg, #000);
+      padding: var(--size-xs);
+      color: var(--recaptcha-alert-foreground, #fff);
+      background-color: var(--recaptcha-alert-background-color, #000);
       border: .5px solid currentColor;
       border-radius: var(--radius-xs);
-      box-shadow: var(--box-shadow-base);
       transform-origin: center;
       translate: -50% -50%;
     }
