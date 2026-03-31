@@ -21,7 +21,7 @@
 
 @media (--media-medium-viewport-down) {
   .d-md-down-none {
-    display: none;
+    display: none !important;
   }
 }
 /*

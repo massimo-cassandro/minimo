@@ -92,12 +92,20 @@
           "$value": "#666",
           "$type": "color"
         },
-        "opacity": null, // default: .8
+        "opacity": {
+          "$value": 0.8,
+          "$type": "number"
+        },
         "font": {
-          "size": null, // default to form-control-font-size
-          "style": null // default italic
+          "size": {
+            "$value": "{form.control.font.size}",
+            "$type": "dimension"
+          },
+          "style": {
+            "$value": "italic",
+            "$type": "string"
+          }
         }
-
       },
 
       "status": {
@@ -243,7 +251,7 @@
         "width": {
           "$value": "1px",
           "$type": "dimension"
-        },
+        }
       },
       "legend": {
         "background": {
@@ -257,26 +265,6 @@
           "$type": "color"
         }
       }
-    },
-
-
+    }
   }
 }
-
-
-// --form-label-font-size: var(--_font-size-sm);
-// --form-label-font-weight: var(--_font-weight-semibold);
-// --form-label-color: var(--_text-color);
-// --form-group-padding-block: 0 var(--_spacing-base);
-// --form-text-color: var(--_text-color);
-// --form-bg-color: var(--_neutral-0);
-// --form-input-group-bg-color: var(--_neutral-1);
-// --form-border-color: var(--_neutral-6);
-// --form-disabled-bg-color: var(--_neutral-3);
-// --form-disabled-opacity: .3;
-// --form-placeholder-color: var(--_stone-8);
-// --form-required-flag-color: var(--_red-8);
-// --form-required-flag-content: '\002A';
-// --form-fieldset-border-width: 1px;
-// --form-legend-bg-color: var(--_stone-3);
-// --form-legend-color: #333; /*  var(--_text-color); */

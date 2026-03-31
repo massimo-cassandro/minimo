@@ -13,43 +13,43 @@
     "size": {
       "base": {
         "$value": "clamp(.9rem, .6538rem + .3846vw, 1rem)",
-        "$type": "expression"
+        "$type": "string"
       },
       "xxs": {
         "$value": "clamp(.6rem, .3538rem + .3846vw, .7rem)",
-        "$type": "expression"
+        "$type": "string"
       },
       "xs": {
         "$value": "clamp(.7rem, .4538rem + .3846vw, .8rem)",
-        "$type": "expression"
+        "$type": "string"
       },
       "sm": {
         "$value": "clamp(.8rem, .5538rem + .3846vw, .9rem)",
-        "$type": "expression"
+        "$type": "string"
       },
-      "lead": {
-        "$value": "clamp(1rem, 0.6923rem + 0.4808vw, 1.125rem)",
-        "$type": "expression"
-      },
+      // "lead": {
+      //   "$value": "clamp(1rem, 0.6923rem + 0.4808vw, 1.125rem)",
+      //   "$type": "string"
+      // },
       "md": {
         "$value": "clamp(1.05rem, .6808rem + .5769vw, 1.2rem)",
-        "$type": "expression"
+        "$type": "string"
       },
       "lg": {
         "$value": "clamp(1.2rem, .7077rem + .7692vw, 1.4rem)",
-        "$type": "expression"
+        "$type": "string"
       },
       "xl": {
         "$value": "clamp(1.6rem, 1.1077rem + .7692vw, 1.8rem)",
-        "$type": "expression"
+        "$type": "string"
       },
       "2xl": {
         "$value": "clamp(2rem, .7692rem + 1.9231vw, 2.5rem)",
-        "$type": "expression"
+        "$type": "string"
       },
       "3xl": {
         "$value": "clamp(2.2rem, .2308rem + 3.0769vw, 3rem)",
-        "$type": "expression"
+        "$type": "string"
       }
 
     },
@@ -77,42 +77,42 @@
     "weight": {
       "xxlight": {
         "$value": "100",
-        "$type": "fontWeight",
+        "$type": "string",
         "$description": ""
       },
       "xlight": {
         "$value": "200",
-        "$type": "fontWeight",
+        "$type": "string",
         "$description": ""
       },
       "light": {
         "$value": "300",
-        "$type": "fontWeight",
+        "$type": "string",
         "$description": ""
       },
       "regular": {
         "$value": "400",
-        "$type": "fontWeight",
+        "$type": "string",
         "$description": ""
       },
       "medium": {
         "$value": "500",
-        "$type": "fontWeight",
+        "$type": "string",
         "$description": ""
       },
       "semibold": {
         "$value": "600",
-        "$type": "fontWeight",
+        "$type": "string",
         "$description": ""
       },
       "bold": {
         "$value": "700",
-        "$type": "fontWeight",
+        "$type": "string",
         "$description": ""
       },
       "xbold": {
         "$value": "900",
-        "$type": "fontWeight",
+        "$type": "string",
         "$description": ""
       }
     }

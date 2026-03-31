@@ -100,7 +100,7 @@ async function run() {
 
     // Output
     fs.writeFileSync(result_file, unresolved_props
-      .map(item => `* [${path.basename(item.file)}:::${item.line}](${item.file}#L${item.line}) -> var(${item.prop})`)
+      .map(item => `* [${path.basename(item.file)} :: ${item.line}](${item.file}#L${item.line}) -> var(${item.prop})`)
       .join('\n'), 'utf-8');
     
     // fs.writeFileSync(path.resolve(configDir, 'full-result.txt'), check.join('\n'), 'utf-8');

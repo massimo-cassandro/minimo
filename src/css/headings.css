@@ -1,34 +1,35 @@
 
 h1, h2, h3, .h3, h4, .h4 {
   line-height: 1.2;
+  color: var(--headings-color);
   text-align: var(--headings-text-align);
 }
 
 h1 {
   margin: 0 0 2rem;
-  font-size: 2.5rem;
-  font-weight: var(--font-weight-bold);
+  font-size: var(--headings-h1-font-size);
+  font-weight: var(--headings-h1-font-weight);
 
   small, .small, .text-sm {
     display: block;
-    font-size: var(--font-size-sm);
+    font-size: .85em;
     color: var(--text-muted);
   }
 }
 
 h2, h3, .h3, h4, .h4 {
-  font-weight: var(--font-weight-semibold);
+  font-weight: var(--headings-font-weight);
 }
 h2 {
   margin: 0 0 2rem;
-  font-size: 2rem;
+  font-size: var(--headings-h2-font-size);
 }
 
 h3, .h3 {
   margin: 0 0 1.5rem;
-  font-size: 1.6rem;
+  font-size: var(--headings-h3-font-size);
 }
 h4, .h4 {
   margin: 0 0 1.5rem;
-  font-size: 1.4rem;
+  font-size: var(--headings-h4-font-size);
 }
