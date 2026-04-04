@@ -94,16 +94,16 @@
   }
 } */
 
-/* .w-100 {
+.w-100 {
   width: 100% !important;
-} */
-/* .w-auto {
+}
+.w-auto {
   width: auto !important;
-} */
+}
 
-/* .mt-xxs {
+.mt-xxs {
   margin-block-start: var(--size-xxs);
-} */
+}
 .mt {
   margin-block-start: var(--size-base);
 }
@@ -153,8 +153,20 @@
   margin-inline-end: var(--size-xs);
 }
 
+.mx {
+  margin-inline: var(--size-base);
+}
+
+.my {
+  margin-block: var(--size-base);
+}
+
 .mx-lg {
   margin-inline: var(--size-lg);
+}
+
+.my-lg {
+  margin-block: var(--size-lg);
 }
 
 .mx-xl {

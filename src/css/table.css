@@ -1,4 +1,7 @@
-/* wrapper per le tabelle per evitare che superino la largheza dello spazio disponibile */
+/* wrapper per le tabelle per evitare che superino la larghezza dello spazio disponibile */
+
+/* purgecss start ignore */
+
 .table-responsive {
   max-width: 100%;
   overflow-x: auto;
@@ -65,4 +68,6 @@
     --_hover-row-bg: color-mix(in srgb, var(--_blue-12) 60%, transparent);
   }
 }
- */
+*/
+
+/* purgecss end ignore */

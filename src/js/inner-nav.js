@@ -1,4 +1,12 @@
 // navigazione scheda / elenco
+/*
+<p class="inner-nav-main">...</p>
+...
+<p class="inner-nav"></p>
+*/
+
+import './inner-nav.css';
+
 let nav_primary = document.querySelector('.inner-nav-main');
 if (nav_primary) {
   // nav_primary.classList.add('text-right', 'd-print-none');

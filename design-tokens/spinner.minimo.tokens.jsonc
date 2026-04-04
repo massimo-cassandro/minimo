@@ -1,0 +1,21 @@
+{
+  "spinner": {
+
+    "size": {
+      "$value": "{size.lg}",
+      "$type": "dimension"
+    },
+
+    "color": {
+      "$value": "{primary.base}",
+      "$type": "color"
+    },
+
+    "stroke": {
+      "width": {
+        "$value": "2px",
+        "$type": "dimension"
+      }
+    }
+  }
+}

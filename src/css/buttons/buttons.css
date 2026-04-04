@@ -74,6 +74,12 @@ a.btn {
     }
   }
 
+  &.btn-xl {
+    padding: var(--btn-xl-padding-block) var(--btn-xl-padding-inline);
+    font-size: var(--btn-xl-font-size);
+    --_focus-ring-size: 6px;
+  }
+
 
   &.btn-primary {
     --_button-bg-color: var(--btn-primary-background-color);

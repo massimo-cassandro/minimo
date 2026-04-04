@@ -1,0 +1,32 @@
+/*
+<div class="form-end">
+
+  <button ...>Registra</button>
+
+  <div class="form-user-info" title="Ultima modifica effettuata da Gino Bianchi il xxxx">
+    [icon]
+    <span>13 Aug 2025 <small>11:54</small></span>
+    <span>Gino Bianchi</span>
+  </div>
+</div>
+*/
+
+.form-end {
+  display: flex;
+  flex-flow: row wrap;
+  gap: var(--size-base);
+  align-content: center;
+  align-items: center;
+  justify-content: space-between;
+  margin-block: var(--form-end-margin-block-start) var(--form-end-margin-block-end);
+}
+
+.form-user-info {
+  display: flex;
+  flex-flow: row wrap;
+  gap: var(--size-xs);
+  align-items: center;
+  justify-content: flex-end;
+  font-size: var(--form-user-info-font-size);
+  color: var(--form-user-info-color);
+}

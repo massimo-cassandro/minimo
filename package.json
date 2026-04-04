@@ -15,8 +15,8 @@
     "UPD-version": "npx update-version  # --config=./dev-utilities.config.mjs",
     "upd@m": "npx upd@m",
     "npm-publish": "npm publish",
-    "build-tokens": "node ./utilities/build-tokens.mjs --config ./test/style-dictionary/build-tokens-config.mjs",
-    "check unresolved props": "node ./utilities/check-unresolved-custom-props.mjs --config ./test/check-unresolved-props/check-props-config.mjs"
+    "build-tokens": "node ./utilities/build-tokens.mjs --config ./test/tokens-test/tokens-config.mjs",
+    "check unresolved props": "node ./utilities/check-unresolved-custom-props.mjs --config ./test/tokens-test/tokens-config.mjs"
   },
   "license": "MIT",
   "author": "Massimo Cassandro",
@@ -25,12 +25,13 @@
   },
   "main": "./src/index.js",
   "files": [
+    "design-tokens/**/*.{json,jsonc,js}",
     "src/**/*.{js,css,svg}",
     "utilities/**/*.{js,css,svg}"
   ],
   "devDependencies": {
     "@massimo-cassandro/dev-updater": "^2.1.0",
-    "@massimo-cassandro/stylelint-config": "^2.3.1",
+    "@massimo-cassandro/stylelint-config": "^2.3.2",
     "style-dictionary": "^5.4.0"
   }
 }

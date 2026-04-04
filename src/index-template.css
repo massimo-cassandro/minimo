@@ -19,7 +19,7 @@
 /* @import '@minimo/css/forms/form-group.css'; */
 /* @import '@minimo/css/forms/input-group.css'; */
 /* @import '@minimo/css/forms/validation.css'; */
-/* @import '@minimo/css/forms/form-edit-info.css'; */
+/* @import '@minimo/css/forms/form-utilities.css'; */
 @import '@minimo/css/buttons/buttons.css';
 /* @import '@minimo/css/buttons/status-buttons.css'; */
 /* @import '@minimo/css/buttons/btn-close.css'; */
@@ -30,12 +30,12 @@
 /* @import '@minimo/css/icons.css'; */
 @import '@minimo/css/svg.css';
 @import '@minimo/css/overlay.css';
-/* @import '@minimo/css/inner-nav.css'; */
 /* @import '@minimo/css/table.css'; */
 /* @import '@minimo/css/flex.css'; */
 /* @import '@minimo/css/grid.css'; */
 /* @import '@minimo/css/details.css'; */
 
+/* TODO cambiare metodo, possibilità di usare più spinner in simultanea */
 /* spinner attivarne uno solo + spinner-wrapper */
 @import '@minimo/css/spinners/spinner-wrapper.css';
 /* @import '@minimo/css/spinners/spinner-trailing-dots.css'; */

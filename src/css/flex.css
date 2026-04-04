@@ -28,3 +28,7 @@
   }
 
 }
+
+.flex-align-self-center {
+  align-self: center;
+}

@@ -1,9 +1,10 @@
 .grid {
-  --cols: 1;
-  --min-col-width: calc((100% - calc(3 * var(--flex-grid-gap))) / var(--grid-cols));
+  --_cols: 1;
+  /* --_min-col-width: calc((100% - calc(var(--_cols) * var(--flex-grid-gap))) / var(--grid-cols)); */
 
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(var(--grid-min-col-width), 1fr));
+  /* grid-template-columns: repeat(var(--_cols), minmax(var(--grid-min-col-width), 1fr)); */
+  grid-template-columns: repeat(var(--_cols), 1fr);
   grid-auto-flow: row;
   gap: var(--flex-grid-gap);
   /* align-items: center; */
@@ -15,7 +16,7 @@
 
 
   @media (--media-medium-viewport-up) {
-    --cols: 2;
+    --_cols: 2;
 
     > .span-2, > .span-3, > .span-4 {
       grid-column-start: span 2;
@@ -23,17 +24,20 @@
   }
 
   @media (--media-large-viewport-up) {
-    --cols: 4;
+    --_cols: 4;
 
-    /* versione a 5, 6, 8 colonne */
+    /* versione a 3, 5, 6, 8 colonne */
+    &.grid-3 {
+      --_cols: 3;
+    }
     &.grid-5 {
-      --cols: 5;
+      --_cols: 5;
     }
     &.grid-6 {
-      --cols: 6;
+      --_cols: 6;
     }
     &.grid-8 {
-      --cols: 8;
+      --_cols: 8;
     }
 
     > .span-2 {

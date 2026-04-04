@@ -63,11 +63,11 @@
 
       "padding": {
         "inline": {
-          "$value": "{size.base}",
+          "$value": "{size.sm}",
           "$type": "dimension"
         },
         "block": {
-          "$value": "{size.sm}",
+          "$value": "{size.xs}",
           "$type": "dimension"
         }
       },
@@ -264,6 +264,33 @@
           "$value": "{text.color}",
           "$type": "color"
         }
+      }
+    },
+
+    "end": {
+      "margin": {
+        "block": {
+          "start": {
+            "$value": "{size.base}",
+            "$type": "dimension"
+          },
+          "end": {
+            "$value": "{size.base}",
+            "$type": "dimension"
+          }
+        }
+      }
+    },
+    "user-info": {
+     "font": {
+        "size": {
+          "$value": "{font.size.xs}",
+          "$type": "dimension"
+        }
+      },
+      "color": {
+        "$value": "{text.muted}",
+        "$type": "color"
       }
     }
   }

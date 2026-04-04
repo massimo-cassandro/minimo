@@ -1,13 +1,14 @@
 .spinner {
-  display: inline-block;
+  display: block;
   width: var(--spinner-size);
   aspect-ratio: 1;
+  margin: .5rem auto;
   color: var(--spinner-color);
   text-indent: -99999em;
-  border: var(--spinner-stroke) solid;
+  border: var(--spinner-stroke-width) solid;
   border-color: currentColor currentColor transparent;
   border-radius: 50%;
-  /* animation: spinner-border .7s linear infinite; */
+  animation: spinner-border .7s linear infinite;
 }
 
 @keyframes spinner-border {

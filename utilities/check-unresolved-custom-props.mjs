@@ -40,8 +40,8 @@ async function run() {
   try {
 
     const { default: config } = await import(pathToFileURL(absoluteConfigPath).href);
-
-    const custom_prop_file_path = path.resolve(configDir, config.custom_prop_file_path);
+console.log(config);
+    const custom_prop_file_path = path.resolve(configDir, path.join(config.buildPath, config.destFile));
     const custom_prop_filename = path.basename(custom_prop_file_path);
     const checkdir = path.resolve(configDir, config.dir_to_check);
     const exclude = config.exclude_pattern;
@@ -61,6 +61,19 @@ async function run() {
     const cssContent = fs.readFileSync(custom_prop_file_path, 'utf-8');
     const regex = /--([a-z0-9-]+)(?=\s*:)/g;
     const propertyNamesList = [...cssContent.matchAll(regex)].map(match => `--${match[1]}`);
+    // extra_custom_props_files 
+
+    (config.extra_custom_props_files??[]).forEach(extraCustomePropsFile => {
+      
+      const extraCustomPropsContent = fs.readFileSync(
+        path.resolve(configDir, extraCustomePropsFile), 
+      'utf-8');
+
+      const extraMatches = [...extraCustomPropsContent.matchAll(regex)].map(match => `--${match[1]}`);
+      propertyNamesList.push(...extraMatches);
+    });
+
+  
 
     // rilevamento custom props nei vari file css
     const regex2 = /var\(\s*(--[a-z0-9-]+)\s*(,.*?)?\)/g;
@@ -109,7 +122,8 @@ async function run() {
     console.log(styleText(['green'], '**** FINE ****'));
 
   } catch (err) {
-    console.error(styleText(['red'], `Errore: ${err.message}`));
+    console.log(styleText(['redBright'], err.stack));
+    // console.error(styleText(['red'], `Errore: ${err.message}`));
     process.exit(1);
   }
 }

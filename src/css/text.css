@@ -29,13 +29,11 @@ a, .btn-link {
   }
   &:active {
     color: var(--body-background-color);
-    background-color: var(--link-color);
     outline: 2px solid var(--link-color);
+    background-color: var(--link-color);
     offset: 0;
   }
 }
-
-
 
 strong, b {
   font-weight: 700;
@@ -81,7 +79,10 @@ em, .italic {
 .text-xs {
   font-size: var(--font-size-xs);
 }
-small, .small, .text-sm {
+small, .small {
+  font-size: .9em;
+}
+.text-sm {
   font-size: var(--font-size-sm);
 }
 .text-md {
