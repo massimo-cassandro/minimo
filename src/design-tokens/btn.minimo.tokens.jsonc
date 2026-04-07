@@ -29,7 +29,7 @@
 
     "disabled": {
       "opacity": {
-        "$value": "{form.control.status.disabled.opacity}",
+        "$value": "{form.control.disabled.opacity}",
         "$type": ""
       }
     },
@@ -37,7 +37,7 @@
     "focus": {
       "outline": {
         "width": {
-          "$value": "{form.control.status.focus.outline.width}",
+          "$value": "{form.control.focus.outline.width}",
           "$type": "dimension"
         }
       }

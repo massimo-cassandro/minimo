@@ -108,39 +108,37 @@
         }
       },
 
-      "status": {
-        "disabled": {
-          "background": {
-            "color": {
-              "$value": "#999",
-              "$type": "color"
-            }
-          },
-          "opacity": {
-            "$value": ".3",
-            "$type": "number"
-          }
-        },
-        "required": {
-          "flag-color": {
-            "$value": "#c00",
-            "$type": "color"
-          },
-          "flag-content": {
-            "$value": "\\002A",
-            "$type": "string"
-          }
-        },
-        "focus": {
+      "disabled": {
+        "background": {
           "color": {
-            "$value": "hsl(205 69% 45% / .508)",
+            "$value": "#999",
             "$type": "color"
-          },
-          "outline": {
-            "width": {
-              "$value": "4px",
-              "$type": "dimension"
-            }
+          }
+        },
+        "opacity": {
+          "$value": ".3",
+          "$type": "number"
+        }
+      },
+      "required": {
+        "flag-color": {
+          "$value": "#c00",
+          "$type": "color"
+        },
+        "flag-content": {
+          "$value": "\\002A",
+          "$type": "string"
+        }
+      },
+      "focus": {
+        "color": {
+          "$value": "hsl(205 69% 45% / .508)",
+          "$type": "color"
+        },
+        "outline": {
+          "width": {
+            "$value": "4px",
+            "$type": "dimension"
           }
         }
       },

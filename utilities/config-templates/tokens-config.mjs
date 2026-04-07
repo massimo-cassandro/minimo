@@ -15,7 +15,7 @@ const config = {
   // tokens files
   source: [
     // '../../node_modules/open-props/open-props.style-dictionary-tokens.json',
-    path.join(minimo_path, '/design-tokens/*.jsonc'),
+    path.join(minimo_path, 'src/design-tokens/*.jsonc'),
     './figma-tokens-OK/*.jsonc',
   ],
 

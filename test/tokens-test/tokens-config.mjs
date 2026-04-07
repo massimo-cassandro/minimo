@@ -5,7 +5,7 @@ const config = {
   buildPath: '../../src',
   destFile: 'custom-properties-default.css',
   source: [
-    '../../design-tokens/*.jsonc',
+    '../../src/design-tokens/*.jsonc',
   ],
 
   custom_prop_file_path: '../../src/custom-properties-default.css', // percorso del file con le proprietà css

@@ -5,6 +5,10 @@
 }
 ```
 
+```bash
+ln -s ~/Sites/minimo/src dest/_minimo-alias
+```
+
 ## TODO
 
 * <https://github.com/georgeadamson/postcss-merge-selectors>

@@ -2,7 +2,7 @@
 import StyleDictionary from 'style-dictionary';
 import path from 'path';
 import { pathToFileURL } from 'url';
-import { styleText } from 'node:util'; 
+import { styleText } from 'node:util';
 
 import { homedir } from 'os';
 
@@ -172,8 +172,73 @@ StyleDictionary.registerTransform({
     if (type === 'radial') return `radial-gradient(circle, ${stopsList})`;
     if (type === 'conic') return `conic-gradient(from ${angle}deg, ${stopsList})`;
 
-    return `linear-gradient(${angle}deg, ${stopsList})`;
+    return `linear-gradient(${angle}${typeof angle === 'number'? 'deg' : ''}, ${stopsList})`;
   }
+});
+
+// ---------------------------------------------------------------------------
+// 5. Composite Transform (border, outline, transition, animation)
+//    Tutti i tipi che hanno un shorthand CSS diretto.
+// ---------------------------------------------------------------------------
+StyleDictionary.registerTransform({
+  name: 'composite/css',
+  type: 'value',
+  transitive: true,
+  filter: (token) => {
+    const type  = token.$type ?? token.type;
+    const value = token.$value ?? token.value;
+    return (
+      typeof value === 'object' &&
+      value !== null &&
+      !Array.isArray(value) &&
+      ['border', 'outline', 'transition', 'animation'].includes(type)
+    );
+  },
+  transform: (token) => {
+    const type = token.$type ?? token.type;
+    const v    = token.$value ?? token.value;
+
+    if (type === 'border' || type === 'outline') {
+      return `${v.width ?? '1px'} ${v.style ?? 'solid'} ${v.color ?? 'transparent'}`;
+    }
+
+    if (type === 'transition') {
+      // Ordine: duration | timing-function | delay | property
+      return [
+        v.duration       ?? '0s',
+        v.timingFunction ?? 'ease',
+        v.delay          ?? '0s',
+        v.property       ?? 'all',
+      ].join(' ');
+    }
+
+    if (type === 'animation') {
+      // Ordine: duration | timing-function | delay | iteration-count |
+      //         direction | fill-mode | play-state | name
+      return [
+        v.duration       ?? '0s',
+        v.timingFunction ?? 'ease',
+        v.delay          ?? '0s',
+        v.iterationCount ?? '1',
+        v.direction      ?? 'normal',
+        v.fillMode       ?? 'none',
+        v.playState      ?? 'running',
+        v.name           ?? 'none',
+      ].join(' ');
+    }
+  }
+});
+
+// ---------------------------------------------------------------------------
+// 6. Typography Transform
+//    Restituisce l'oggetto così com'è: il format lo esploderà in più props.
+// ---------------------------------------------------------------------------
+StyleDictionary.registerTransform({
+  name: 'typography/css',
+  type: 'value',
+  transitive: true,
+  filter: (token) => token.$type === 'typography' || token.type === 'typography',
+  transform: (token) => token.$value ?? token.value,
 });
 
 // ---------------------------------------------------------------------------
@@ -234,34 +299,135 @@ StyleDictionary.registerFormat({
       return `linear-gradient(${angle}deg, ${stopsList})`;
     };
 
+    // border e outline: shorthand con resolveRefs sul colore
+    const buildBorderLike = (original) => {
+      const width = original.width ?? '1px';
+      const style = original.style ?? 'solid';
+      const color = resolveRefs(original.color ?? 'transparent');
+      return `${width} ${style} ${color}`;
+    };
+
+    // transition: resolveRefs su timingFunction se è un riferimento
+    const buildTransition = (original) => [
+      original.duration       ?? '0s',
+      resolveRefs(original.timingFunction ?? 'ease'),
+      original.delay          ?? '0s',
+      original.property       ?? 'all',
+    ].join(' ');
+
+    // animation: resolveRefs su name se è un riferimento a un keyframe token
+    const buildAnimation = (original) => [
+      original.duration       ?? '0s',
+      resolveRefs(original.timingFunction ?? 'ease'),
+      original.delay          ?? '0s',
+      original.iterationCount ?? '1',
+      original.direction      ?? 'normal',
+      original.fillMode       ?? 'none',
+      original.playState      ?? 'running',
+      resolveRefs(original.name ?? 'none'),
+    ].join(' ');
+
+    const buildTypography = (tokenName, original) => {
+      const {
+        fontStyle,
+        fontVariant,
+        fontWeight,
+        fontStretch,
+        fontSize,
+        lineHeight,
+        fontFamily,
+        // queste non entrano nel shorthand font
+        letterSpacing,
+        textTransform,
+        textDecoration,
+      } = original;
+
+      const lines = [];
+
+      // shorthand font se ci sono size e family (requisiti minimi CSS)
+      if (fontSize && fontFamily) {
+        const parts = [];
+        if (fontStyle)   parts.push(resolveRefs(String(fontStyle)));
+        if (fontVariant) parts.push(resolveRefs(String(fontVariant)));
+        if (fontWeight)  parts.push(resolveRefs(String(fontWeight)));
+        if (fontStretch) parts.push(resolveRefs(String(fontStretch)));
+
+        const sizeSlash = lineHeight
+          ? `${resolveRefs(String(fontSize))}/${resolveRefs(String(lineHeight))}`
+          : resolveRefs(String(fontSize));
+
+        parts.push(sizeSlash);
+        parts.push(resolveRefs(String(fontFamily)));
+
+        lines.push(`  --${tokenName}-font: ${parts.join(' ')};`);
+      }
+
+      // proprietà che non entrano nel shorthand font
+      const EXTRA_PROPS = {
+        letterSpacing:  ['letter-spacing',  letterSpacing],
+        textTransform:  ['text-transform',  textTransform],
+        textDecoration: ['text-decoration', textDecoration],
+        // fallback: se mancano size o family, le esponiamo comunque separatamente
+        ...(!fontSize   ? { fontSize:   ['font-size',   original.fontSize]   } : {}),
+        ...(!fontFamily ? { fontFamily: ['font-family', original.fontFamily] } : {}),
+      };
+
+      for (const [, [cssProp, val]] of Object.entries(EXTRA_PROPS)) {
+        if (val !== undefined) {
+          lines.push(`  --${tokenName}-${cssProp}: ${resolveRefs(String(val))};`);
+        }
+      }
+
+      return lines.join('\n');
+    };
+
     const lines = dictionary.allTokens
       .slice()
       .sort((a, b) => a.name.localeCompare(b.name))
-      .map((token) => {
+      .flatMap((token) => {
         const type = token.$type ?? token.type;
         const orig = token.original?.$value ?? token.original?.value;
+
+        // typography: genera più righe, una per proprietà
+        if (type === 'typography') {
+          return [buildTypography(token.name, orig ?? {})];
+        }
 
         let value;
 
         if (type === 'shadow' && options.outputReferences) {
-          if (typeof orig === 'string' && orig.startsWith('{')) {
-            value = resolveRefs(orig);
-          } else {
-            value = buildShadow(orig);
-          }
+          value = (typeof orig === 'string' && orig.startsWith('{'))
+            ? resolveRefs(orig)
+            : buildShadow(orig);
+
         } else if (type === 'gradient' && options.outputReferences) {
-          if (typeof orig === 'string' && orig.startsWith('{')) {
-            value = resolveRefs(orig);
-          } else {
-            value = buildGradient(orig);
-          }
+          value = (typeof orig === 'string' && orig.startsWith('{'))
+            ? resolveRefs(orig)
+            : buildGradient(orig);
+
+        } else if ((type === 'border' || type === 'outline') && options.outputReferences) {
+          value = (typeof orig === 'string' && orig.startsWith('{'))
+            ? resolveRefs(orig)
+            : buildBorderLike(orig);
+
+        } else if (type === 'transition' && options.outputReferences) {
+          value = (typeof orig === 'string' && orig.startsWith('{'))
+            ? resolveRefs(orig)
+            : buildTransition(orig);
+
+        } else if (type === 'animation' && options.outputReferences) {
+          value = (typeof orig === 'string' && orig.startsWith('{'))
+            ? resolveRefs(orig)
+            : buildAnimation(orig);
+
         } else if (options.outputReferences && typeof orig === 'string' && orig.includes('{')) {
           value = resolveRefs(orig);
+
         } else {
           value = String(token.$value ?? token.value);
         }
 
-        return `  --${token.name}: ${value};`;
+        return [`  --${token.name}: ${value};`];
       });
 
     customPropsCount = lines.length;
@@ -290,7 +456,9 @@ const config = {
         'size/pxToRem-smart',
         'color/css-modern',
         'shadow/css',
-        'gradient/css'
+        'gradient/css',
+        'composite/css',   // border, outline, transition, animation
+        'typography/css',  // typography (esploso nel format)
       ],
       files: [
         {
@@ -314,8 +482,6 @@ await stylelint.lint({
   files: [ path.join(buildPath, destFile) ],
   fix: true
 });
-
-
 
 console.log(styleText(['yellow'], `[build-tokens] config file : ${configAbsPath.replace(homedir(), '~')}` ));
 console.log(styleText(['yellow'], `[build-tokens] source      : ${source.map(i => i.replace(homedir(), '~'))}` ));

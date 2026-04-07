@@ -1,49 +1,49 @@
 .btn {
 
   &.btn-success {
-    --bg: var(--status-success-color);
-    --fg: var(--status-success-fg-color);
-    --btn-bg-color: var(--bg);
-    --btn-fg-color: var(--fg);
-    --btn-border-color: var(--status-success-border-color);
+    --_bg: var(--status-success-color);
+    --_fg: var(--status-success-fg-color);
+    --_btn-bg-color: var(--_bg);
+    --_btn-fg-color: var(--_fg);
+    --_btn-border-color: var(--status-success-border-color);
   }
   &.btn-info {
-    --bg: var(--status-info-color);
-    --fg: var(--status-info-fg-color);
-    --btn-bg-color: var(--bg);
-    --btn-fg-color: var(--fg);
-    --btn-border-color: var(--status-info-border-color);
+    --_bg: var(--status-info-color);
+    --_fg: var(--status-info-fg-color);
+    --_btn-bg-color: var(--_bg);
+    --_btn-fg-color: var(--_fg);
+    --_btn-border-color: var(--status-info-border-color);
   }
   &.btn-danger, &.btn-error {
-    --bg: var(--status-danger-color);
-    --fg: var(--status-danger-fg-color);
-    --btn-bg-color: var(--bg);
-    --btn-fg-color: var(--fg);
-    --btn-border-color: var(--status-danger-border-color);
+    --_bg: var(--status-danger-color);
+    --_fg: var(--status-danger-fg-color);
+    --_btn-bg-color: var(--_bg);
+    --_btn-fg-color: var(--_fg);
+    --_btn-border-color: var(--status-danger-border-color);
   }
 
 
   &.btn-warning {
-    --bg: var(--status-warning-color);
-    --fg: var(--status-warning-fg-color);
-    --btn-bg-color: var(--bg);
-    --btn-fg-color: var(--fg);
-    --btn-border-color: var(--status-warning-border-color);
+    --_bg: var(--status-warning-color);
+    --_fg: var(--status-warning-fg-color);
+    --_btn-bg-color: var(--_bg);
+    --_btn-fg-color: var(--_fg);
+    --_btn-border-color: var(--status-warning-border-color);
 
     @media (hover: hover) {
       &:hover {
-        --btn-bg-color: color-mix(in srgb, var(--bg) 60%, transparent);
-        --btn-fg-color: var(--fg);
-        --btn-border-color: var(--fg);
+        --_btn-bg-color: color-mix(in srgb, var(--_bg) 60%, transparent);
+        --_btn-fg-color: var(--_fg);
+        --_btn-border-color: var(--_fg);
       }
     }
 
     &:focus, &:active {
-      outline: var(--btn-focus-outline-width) solid color-mix(in srgb, var(--bg) 60%, transparent);
+      outline: var(--btn-focus-outline-width) solid color-mix(in srgb, var(--_bg) 60%, transparent);
     }
 
     &:active {
-      --btn-bg-color: color-mix(in srgb, var(--bg) 30%, transparent);
+      --_btn-bg-color: color-mix(in srgb, var(--_bg) 30%, transparent);
     }
   }
 
@@ -52,18 +52,18 @@
 
     @media (hover: hover) {
       &:hover {
-        --btn-bg-color: color-mix(in srgb, var(--bg) 30%, transparent);
-        --btn-fg-color: var(--bg);
-        --btn-border-color: var(--bg);
+        --_btn-bg-color: color-mix(in srgb, var(--_bg) 30%, transparent);
+        --_btn-fg-color: var(--_bg);
+        --_btn-border-color: var(--_bg);
       }
     }
 
     &:focus, &:active {
-      outline: var(--btn-focus-outline-width) solid color-mix(in srgb, var(--bg) 40%, transparent);
+      outline: var(--btn-focus-outline-width) solid color-mix(in srgb, var(--_bg) 40%, transparent);
     }
 
     &:active {
-      --btn-bg-color: color-mix(in srgb, var(--bg) 10%, transparent);
+      --_btn-bg-color: color-mix(in srgb, var(--_bg) 10%, transparent);
     }
   }
 
@@ -74,9 +74,9 @@
 
       @media (hover: hover) {
         &:hover {
-          --btn-bg-color: color-mix(in srgb, var(--bg) 60%, #fff);
-          --btn-fg-color: var(--bg);
-          --btn-border-color: color-mix(in srgb, var(--bg) 40%, #fff);
+          --_btn-bg-color: color-mix(in srgb, var(--_bg) 60%, #fff);
+          --_btn-fg-color: var(--_bg);
+          --_btn-border-color: color-mix(in srgb, var(--_bg) 40%, #fff);
         }
       }
     }
@@ -85,9 +85,9 @@
 
       @media (hover: hover) {
         &:hover {
-          --btn-bg-color: color-mix(in srgb, var(--bg) 60%, #fff);
-          --btn-fg-color: var(--fg);
-          --btn-border-color: var(--fg);
+          --_btn-bg-color: color-mix(in srgb, var(--_bg) 60%, #fff);
+          --_btn-fg-color: var(--_fg);
+          --_btn-border-color: var(--_fg);
         }
       }
     }
@@ -95,12 +95,12 @@
     &.btn-success, &.btn-info, &.btn-danger, &.btn-warning {
 
       &:focus, &:active {
-        outline: var(--btn-focus-outline-width) solid color-mix(in srgb, var(--bg) 60%, transparent);
+        outline: var(--btn-focus-outline-width) solid color-mix(in srgb, var(--_bg) 60%, transparent);
       }
 
       &:active {
-        --btn-bg-color: color-mix(in srgb, var(--bg) 30%, transparent);
-        --btn-fg-color: var(--text-color);
+        --_btn-bg-color: color-mix(in srgb, var(--_bg) 30%, transparent);
+        --_btn-fg-color: var(--text-color);
       }
     }
   }
