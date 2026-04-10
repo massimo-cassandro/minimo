@@ -61,7 +61,9 @@
   > .grid-item-last {
     grid-column: -2 / -1;
   }
-
+  > .grid-full-row {
+    grid-column: 1 / -1;
+  }
 
 }
 
