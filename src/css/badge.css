@@ -7,4 +7,10 @@
   color: var(--badge-color);
   background-color: var(--badge-background-color);
   border-radius: var(--radius-pill);
+
+  &.badge-lg {
+    font-size: var(--badge-lg-font-size);
+    font-weight: var(--badge-lg-font-weight);
+
+  }
 }

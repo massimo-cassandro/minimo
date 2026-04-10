@@ -19,6 +19,18 @@
         "$value": "{font.weight.semibold}",
         "$type": "number"
       }
+    },
+    "lg": {
+      "font": {
+        "size": {
+          "$value": "{font.size.base}",
+          "$type": "dimension"
+        },
+        "weight": {
+          "$value": "{badge.font.weight}",
+          "$type": "number"
+        }
+      }
     }
   } // end badge
 }

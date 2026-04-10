@@ -7,6 +7,8 @@
   --badge-color: var(--primary-on-base);
   --badge-font-size: var(--font-size-xs);
   --badge-font-weight: var(--font-weight-semibold);
+  --badge-lg-font-size: var(--font-size-base);
+  --badge-lg-font-weight: var(--badge-font-weight);
   --body-background-color: #fff;
   --body-text: var(--text-color);
   --btn-border-radius: var(--form-control-border-radius);
