@@ -13,3 +13,4 @@
 2026-02-05T14:37:26.705Z |           0.1.11 | 
 2026-02-05T15:54:37.513Z |           0.1.12 | upd
 2026-04-10T08:36:49.307Z |            0.2.0 | added style-dictionary files + directory tree reorganization
+2026-04-10T08:53:26.216Z |            0.2.1 | added design-tokens-utilities

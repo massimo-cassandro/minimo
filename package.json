@@ -1,6 +1,6 @@
 {
   "name": "@massimo-cassandro/minimo",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Light css framework",
   "type": "module",
   "homepage": "https://github.com/massimo-cassandro/minimo#readme",
@@ -25,7 +25,7 @@
   },
   "main": "./src/index.js",
   "files": [
-    "src/**/*.{js,mjs,css,svg,tokens.json,tokens.jsonc}"
+    "src/**/*.{js,mjs,css,svg,tokens.json,tokens.jsonc,md}"
   ],
   "devDependencies": {
     "@massimo-cassandro/dev-updater": "^2.1.0",
