@@ -28,7 +28,7 @@
 }
 
 /* la classe form-select è mantenuta per compatibilità con bootstrap  */
-.form-control, .form-control-text, .form-select {
+.form-control, .form-control-static, .form-select {
   display: block;
   width: 100%;
   font-family: var(--font-family);
@@ -56,7 +56,7 @@
   }
 }
 
-.form-control, .form-control-text {
+.form-control, .form-control-static {
 
   padding: var(--form-control-padding-block) var(--form-control-padding-inline);
 
@@ -72,11 +72,13 @@
     font-size: var(--form-control-sm-font-size);
   }
 }
-.form-control-text {
+.form-control-static {
   overflow: hidden;
   text-overflow: ellipsis;
+  color: var(--form-control-static-color);
   white-space: nowrap;
   cursor: not-allowed;
+  background-color: var(--form-control-static-background-color);
 }
 
 /* da bootstrap */

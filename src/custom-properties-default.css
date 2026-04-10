@@ -121,6 +121,8 @@
   --form-control-sm-font-size: var(--font-size-sm);
   --form-control-sm-padding-block: var(--size-xxs);
   --form-control-sm-padding-inline: var(--size-xs);
+  --form-control-static-background-color: transparent;
+  --form-control-static-color: var(--form-control-text-color);
   --form-control-text-color: var(--text-color);
   --form-control-xl-font-size: var(--font-size-xl);
   --form-control-xl-padding-block: var(--size-md);

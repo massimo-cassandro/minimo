@@ -33,12 +33,26 @@
     },
 
     "control": {
+      "static": {
+        "color": {
+          "$value": "{form.control.text.color}",
+          "$type": "color"
+        },
+        "background": {
+          "color": {
+            "$value": "transparent",
+            "$type": "color"
+          }
+        }
+      },
+
       "text": {
         "color": {
           "$value": "{text.color}",
           "$type": "color"
         }
       },
+
       "font": {
         "style": {
           "$value": "normal",
