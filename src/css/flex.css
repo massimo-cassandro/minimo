@@ -29,6 +29,11 @@
 
 }
 
-.flex-align-self-center {
+/* utilizzata anche da grid */
+
+.align-self-center {
   align-self: center;
+}
+.align-self-end {
+  align-self: end;
 }

@@ -1,6 +1,6 @@
 import './dialog-content.css';
 import x_icon from '@icone/x.svg?inline';
-import { spinner } from './spinner';
+import { spinner } from './spinner/spinner';
 /**
   `indicator_class`: classe da aggiungere al wrapper per indicare in modo univoco il dialog
  */

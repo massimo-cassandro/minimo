@@ -198,7 +198,14 @@ StyleDictionary.registerTransform({
     const type = token.$type ?? token.type;
     const v    = token.$value ?? token.value;
 
-    if (type === 'border' || type === 'outline') {
+    if (type === 'border') {
+      const parts = [v.width ?? '1px'];
+      if (v.style !== undefined && v.style !== null && v.style !== '') parts.push(v.style);
+      parts.push(v.color ?? 'transparent');
+      return parts.join(' ');
+    }
+
+    if (type === 'outline') {
       return `${v.width ?? '1px'} ${v.style ?? 'solid'} ${v.color ?? 'transparent'}`;
     }
 
@@ -299,32 +306,34 @@ StyleDictionary.registerFormat({
       return `linear-gradient(${angle}deg, ${stopsList})`;
     };
 
-    // border e outline: shorthand con resolveRefs sul colore
+    // border e outline: shorthand con resolveRefs su tutti i campi; style è opzionale
     const buildBorderLike = (original) => {
-      const width = original.width ?? '1px';
-      const style = original.style ?? 'solid';
-      const color = resolveRefs(original.color ?? 'transparent');
-      return `${width} ${style} ${color}`;
+      const parts = [resolveRefs(String(original.width ?? '1px'))];
+      if (original.style !== undefined && original.style !== null && original.style !== '') {
+        parts.push(resolveRefs(String(original.style)));
+      }
+      parts.push(resolveRefs(String(original.color ?? 'transparent')));
+      return parts.join(' ');
     };
 
-    // transition: resolveRefs su timingFunction se è un riferimento
+    // transition: resolveRefs su tutti i campi
     const buildTransition = (original) => [
-      original.duration       ?? '0s',
-      resolveRefs(original.timingFunction ?? 'ease'),
-      original.delay          ?? '0s',
-      original.property       ?? 'all',
+      resolveRefs(String(original.duration       ?? '0s')),
+      resolveRefs(String(original.timingFunction ?? 'ease')),
+      resolveRefs(String(original.delay          ?? '0s')),
+      resolveRefs(String(original.property       ?? 'all')),
     ].join(' ');
 
-    // animation: resolveRefs su name se è un riferimento a un keyframe token
+    // animation: resolveRefs su tutti i campi
     const buildAnimation = (original) => [
-      original.duration       ?? '0s',
-      resolveRefs(original.timingFunction ?? 'ease'),
-      original.delay          ?? '0s',
-      original.iterationCount ?? '1',
-      original.direction      ?? 'normal',
-      original.fillMode       ?? 'none',
-      original.playState      ?? 'running',
-      resolveRefs(original.name ?? 'none'),
+      resolveRefs(String(original.duration       ?? '0s')),
+      resolveRefs(String(original.timingFunction ?? 'ease')),
+      resolveRefs(String(original.delay          ?? '0s')),
+      resolveRefs(String(original.iterationCount ?? '1')),
+      resolveRefs(String(original.direction      ?? 'normal')),
+      resolveRefs(String(original.fillMode       ?? 'none')),
+      resolveRefs(String(original.playState      ?? 'running')),
+      resolveRefs(String(original.name           ?? 'none')),
     ].join(' ');
 
     const buildTypography = (tokenName, original) => {

@@ -40,7 +40,7 @@
     > .btn, .input-group-text {
       font-style: italic;
       color: var(--text-muted);
-      background-color: var(--form-control-status-disabled-background-color);
+      background-color: var(--form-control-disabled-background-color);
       /* opacity: .6; */
     }
   }

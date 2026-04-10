@@ -1,0 +1,214 @@
+/* frontend/src/web-components/simple-datatable.module.css */
+
+/* import delle custom properties gestito da jit-props */
+
+
+/* purgecss start ignore */
+
+/* .datatable-wrapper.no-header .datatable-container {
+	border-top: 1px solid #d9d9d9;
+} */
+.datatableWrapper {
+  margin-block: var(--size-md);
+}
+
+.topArea {
+  display: flex;
+  flex-flow: row nowrap;
+  /* gap: 1rem; */
+  align-items: center;
+  justify-content: flex-end;
+  padding-block-end: var(--size-xs);
+}
+
+.searchWrapper {
+  max-width: 50%;
+}
+
+.table {
+  margin-block: 0;
+  border-block: var(--_border); /* definito in minimo table */
+
+  thead {
+    th:has(.sortBtn) {
+      padding-inline-end: 0;
+    }
+  }
+
+}
+
+/* cella unica per indicare l'assenza di record */
+.empty {
+  /* stylelint-disable-next-line declaration-no-important */
+  padding: var(--size-sm) !important;
+  font-style: italic;
+  color: var(--text-muted);
+  /* stylelint-disable-next-line declaration-no-important */
+  text-align: center !important;
+}
+
+.hasIcon {
+  /* stylelint-disable-next-line declaration-no-important */
+  text-align: center !important;
+  svg {
+    display: inline-block;
+    width: 1.05em;
+  }
+}
+
+
+[data-sortable='true'] {
+
+  @media (hover: hover) {
+    &:hover {
+      background-color: var(--sdt-thead-hover-background-color);
+    }
+  }
+
+  .sortBtn {
+    padding: 0 1.5em 0 0;
+    &::after {
+      position: absolute;
+      top: 50%;
+      right: .1em;
+      display: block;
+      width: 1em;
+      height: 1em;
+      translate: 0 -50%;
+    }
+  }
+
+  &:not(.sortAscending):not(.sortDescending){
+    .sortBtn::after {
+      content: url('./icons/arrows-down-up.svg?cssInline');
+      opacity: .4;
+    }
+  }
+}
+.sortAscending {
+  .sortBtn::after {
+    content: url('./icons/arrow-up.svg?cssInline');
+  }
+}
+.sortDescending {
+  .sortBtn::after {
+    content: url('./icons/arrow-down.svg?cssInline');
+  }
+}
+
+.sortBtn {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+
+  padding: var(--table-cell-padding-block) var(--table-cell-padding-inline);
+  line-height: var(--table-cell-line-height);
+
+  text-align: start;
+}
+
+/* stylelint-disable selector-class-pattern */
+:global(.text-start), :global(.text-left) {
+  .sortBtn {
+    text-align: start;
+  }
+}
+:global(.text-end), :global(.text-right) {
+  .sortBtn {
+    text-align: end;
+  }
+}
+:global(.text-center) {
+  .sortBtn {
+    text-align: center;
+  }
+}
+/* stylelint-enable selector-class-pattern */
+
+.bottomArea {
+  display: flex;
+  flex-flow: row wrap;
+  gap: var(--size-md);
+  align-content: center;
+  align-items: center;
+  justify-content: space-between;
+  margin-block-start: var(--size-xs);
+}
+.info {
+  font-size: var(--font-size-sm);
+  font-style: italic;
+  color: var(--text-muted);
+}
+
+/* pagination */
+/* .paginationNav {} */
+.paginationList, .paginationListItem, .paginationListItemBtn {
+  padding: 0;
+  margin: 0;
+}
+
+.paginationList {
+  display: flex;
+  flex-flow: row wrap;
+  gap: 0;
+  align-items: stretch;
+  justify-content: flex-start;
+  list-style: none;
+}
+.paginationListItem {
+  border: var(--sdt-pagination-border);
+  border-style: solid solid solid none;
+
+  &:first-child {
+    border-inline-start-style: solid;
+    border-radius: var(--radius-xxs) 0 0 var(--radius-xxs);
+  }
+  &:last-child {
+    border-radius: 0 var(--radius-xxs) var(--radius-xxs) 0;
+  }
+
+  @media (hover: hover) {
+    &:hover {
+      color: var(--sdt-hover-color);
+      background-color: var(--sdt-hover-background-color);
+    }
+  }
+
+}
+
+.paginationDisabled {
+  pointer-events: none;
+
+  .paginationListItemBtn {
+    opacity: .7;
+  }
+}
+
+.paginationActive {
+  color: var(--sdt-hover-color);
+  background-color: var(--sdt-hover-background-color);
+}
+
+.paginationListItemBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: var(--sdt-pagination-padding-block) var(--sdt-pagination-padding-inline);
+  color: inherit;
+  background-color: transparent;
+  border: none;
+
+  &.hasSvg {
+    padding-inline: calc(var(--sdt-pagination-padding-inline) / 2);
+  }
+
+  svg {
+    width: 1em;
+    aspect-ratio: 1;
+    fill: currentColor;
+  }
+}
+
+/* purgecss end ignore */

@@ -126,7 +126,7 @@
           "$type": "color"
         },
         "flag-content": {
-          "$value": "\\002A",
+          "$value": "'\\002A'",
           "$type": "string"
         }
       },

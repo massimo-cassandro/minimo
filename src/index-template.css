@@ -34,15 +34,6 @@
 /* @import '@minimo/css/flex.css'; */
 /* @import '@minimo/css/grid.css'; */
 /* @import '@minimo/css/details.css'; */
-
-/* TODO cambiare metodo, possibilità di usare più spinner in simultanea */
-/* spinner attivarne uno solo + spinner-wrapper */
-@import '@minimo/css/spinners/spinner-wrapper.css';
-/* @import '@minimo/css/spinners/spinner-trailing-dots.css'; */
-/* @import '@minimo/css/spinners/spinner-three-dots.css'; */
-/* @import '@minimo/css/spinners/spinner-circle.css'; */
-@import '@minimo/css/spinners/spinner-circle-basic.css';
-
 /* @import '@minimo/css/utilities.css'; */
 
 

@@ -1,8 +1,8 @@
-{}
-
-
-// --spinner-color: var(--text-color);
-// --spinner-size: 3rem;
-// --spinner-stroke: .4rem; /* dove utilizzato */
-// --spinner-overlay-color: color-mix(in srgb, var(--text-color) 20%, transparent);
-
+{
+  "overlay": {
+    "color": {
+      "$value": "rgb(0 0 0 / .6)",
+      "$type": "color"
+    }
+  }
+}

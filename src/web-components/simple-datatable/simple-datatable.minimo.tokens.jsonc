@@ -1,0 +1,50 @@
+{
+  "sdt": {
+
+    "thead": {
+      "hover": {
+        "background": {
+          "color": {
+            "$value": "color-mix(in srgb, {table.thead.background.color} 90%, {accent.base})",
+            "$type": "color"
+          }
+        }
+      }
+    },
+
+    "pagination": {
+      "border": {
+        "$type": "border",
+        "$value": {
+          "color": "{neutral.base}",
+          "width": "{btn.border.width}",
+          // "style": "solid"
+        }
+      },
+      "padding": {
+        "block": {
+          "$value": "{size.xxs}",
+          "$type": "dimension"
+        },
+        "inline": {
+          "$value": "{size.xs}",
+          "$type": "dimension"
+        },
+      }
+    },
+    "hover": {
+      "background": {
+        "color": {
+          "$value": "{btn.primary.background.color}",
+          "$type": "color"
+        }
+      },
+      "color": {
+        "$value": "{btn.primary.color}",
+        "$type": "color"
+      }
+
+    }
+  }
+
+}

@@ -3,7 +3,7 @@ import { homedir } from 'os';
 import path from 'path';
 
 // TODO spostare percorsi minimo su node modules
-const minimo_path = path.resolve(homedir(), 'Sites/minimo');
+const minimo_path = path.resolve(homedir(), 'Sites/minimo/src');
 
 // path relativi a questo file
 
@@ -15,7 +15,9 @@ const config = {
   // tokens files
   source: [
     // '../../node_modules/open-props/open-props.style-dictionary-tokens.json',
-    path.join(minimo_path, 'src/design-tokens/*.jsonc'),
+    path.join(minimo_path, 'design-tokens/*.jsonc'),
+    path.join(minimo_path, 'components/**/*.tokens.jsonc'),
+    path.join(minimo_path, 'web-components/**/*.tokens.jsonc'),
     './figma-tokens-OK/*.jsonc',
   ],
 

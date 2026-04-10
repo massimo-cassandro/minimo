@@ -5,7 +5,7 @@
   display: grid;
   place-content: center;
   pointer-events: none;
-  background-color: var(--spinner-overlay-color);
+  background-color: var(--overlay-color);
 }
 
 .spinner-wrapper {

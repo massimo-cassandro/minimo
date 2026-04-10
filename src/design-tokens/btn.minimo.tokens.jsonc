@@ -26,6 +26,15 @@
       }
     },
 
+    "hollow": {
+      "border": {
+        "width": {
+          "$value": "{btn.border.width}",
+          "$type": "dimension"
+        }
+      }
+    },
+
 
     "disabled": {
       "opacity": {
