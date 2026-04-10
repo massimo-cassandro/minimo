@@ -1,11 +1,15 @@
 {
   "name": "@massimo-cassandro/minimo",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Light css framework",
   "type": "module",
   "homepage": "https://github.com/massimo-cassandro/minimo#readme",
   "bugs": {
     "url": "https://github.com/massimo-cassandro/minimo/issues"
+  },
+  "bin": {
+    "buildTokens": "./src/design-tokens-utilities/build-tokens.mjs",
+    "checkUnresolvedProps": "./src/design-tokens-utilities/check-unresolved-custom-props.mjs"
   },
   "repository": {
     "type": "git",

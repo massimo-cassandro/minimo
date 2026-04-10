@@ -1,12 +1,8 @@
 ```json
 {
-  "build tokens": "node ~/Sites/minimo/utilities/build-tokens.mjs --config ./path/to/tokens-config.mjs",
-  "check unresolved props": "node ~/Sites/minimo/utilities/check-unresolved-custom-props.mjs --config ./path/to/tokens-config.mjs"
+  "build tokens": "npx buildTokens --config ./path/to/tokens-config.mjs",
+  "check unresolved props": "npx checkUnresolvedProps --config ./path/to/tokens-config.mjs"
 }
-```
-
-```bash
-ln -s ~/Sites/minimo/src dest/_minimo-alias
 ```
 
 ## TODO
