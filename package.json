@@ -32,8 +32,8 @@
     "src/**/*.{js,mjs,css,svg,tokens.json,tokens.jsonc,md}"
   ],
   "devDependencies": {
-    "@massimo-cassandro/dev-updater": "^2.1.0",
-    "@massimo-cassandro/stylelint-config": "^2.3.2",
+    "@massimo-cassandro/dev-updater": "^3.0.2",
+    "@massimo-cassandro/stylelint-config": "^2.3.4",
     "style-dictionary": "^5.4.0"
   }
 }
