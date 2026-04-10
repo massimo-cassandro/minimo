@@ -106,6 +106,7 @@
   --form-control-lg-font-size: var(--font-size-lg);
   --form-control-lg-padding-block: var(--size-base);
   --form-control-lg-padding-inline: var(--size-md);
+  --form-control-line-height: 1.2;
   --form-control-md-font-size: var(--font-size-md);
   --form-control-md-padding-block: var(--size-xs);
   --form-control-md-padding-inline: var(--size-sm);

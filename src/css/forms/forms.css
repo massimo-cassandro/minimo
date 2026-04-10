@@ -34,7 +34,7 @@
   font-family: var(--font-family);
   font-size: var(--form-control-font-size);
   font-weight: var(--font-weight-regular);
-  line-height: var(--font-line-height-base);
+  line-height: var(--form-control-line-height);
   color: var(--form-control-text-color);
   background-color: var(--form-control-background-color);
   border: 1px solid var(--form-control-border-color);

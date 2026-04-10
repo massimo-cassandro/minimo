@@ -74,6 +74,10 @@
           "$type": "color"
         }
       },
+      "line-height": {
+        "$value": "1.2",
+        "$type": "number"
+      },
 
       "padding": {
         "inline": {
