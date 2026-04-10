@@ -6,7 +6,13 @@
         "$value": "#c00",
         "$type": "color"
       },
-      "fg": {
+      "background": {
+        "color": {
+          "$value": "{status.danger.color}",
+          "$type": "color"
+        }
+      },
+      "foreground": {
         "$value": "#fff",
         "$type": "color"
       },
@@ -22,7 +28,13 @@
         "$value": "#046d19",
         "$type": "color"
       },
-      "fg": {
+      "background": {
+        "color": {
+          "$value": "{status.success.color}",
+          "$type": "color"
+        }
+      },
+      "foreground": {
         "$value": "#fff",
         "$type": "color"
       },
@@ -38,7 +50,13 @@
         "$value": "#0665c5",
         "$type": "color"
       },
-      "fg": {
+      "background": {
+        "color": {
+          "$value": "{status.info.color}",
+          "$type": "color"
+        }
+      },
+      "foreground": {
         "$value": "#fff",
         "$type": "color"
       },
@@ -54,7 +72,13 @@
         "$value": "#fc0",
         "$type": "color"
       },
-      "fg": {
+      "background": {
+        "color": {
+          "$value": "{status.warning.color}",
+          "$type": "color"
+        }
+      },
+      "foreground": {
         "$value": "#4f2900",
         "$type": "color"
       },

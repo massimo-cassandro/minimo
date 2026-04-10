@@ -1,6 +1,6 @@
 {
   "name": "@massimo-cassandro/minimo",
-  "version": "0.3.4",
+  "version": "0.3.5",
   "description": "Light css framework",
   "type": "module",
   "homepage": "https://github.com/massimo-cassandro/minimo#readme",
@@ -32,7 +32,7 @@
     "src/**/*.{js,mjs,css,svg,tokens.json,tokens.jsonc,md}"
   ],
   "devDependencies": {
-    "@massimo-cassandro/dev-updater": "^3.0.2",
+    "@massimo-cassandro/dev-updater": "^3.0.3",
     "@massimo-cassandro/stylelint-config": "^2.3.4",
     "style-dictionary": "^5.4.0"
   }

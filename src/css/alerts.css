@@ -25,8 +25,8 @@
   */
 
   /* alert-error / alert-danger (default) */
-  --_alert-bg-color: var(--status-danger-color);
-  --_alert-fg-color: var(--status-danger-fg);
+  --_alert-bg-color: var(--status-danger-background-color);
+  --_alert-fg-color: var(--status-danger-foreground);
   --_alert-border-color: var(--status-danger-border-color);
 
   position: relative;
@@ -49,14 +49,18 @@
 
   padding: var(--size-base) var(--size-xl) var(--size-base) var(--size-base);
   margin: var(--size-base) 0;
-  font-size: var(--font-size-md);
-  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-base);
+  /* font-weight: var(--font-weight-semibold); */
   color: var(--_alert-fg-color);
-  background-color: color-mix(in srgb, var(--_alert-bg-color) 60%, transparent);
+  background-color: var(--_alert-bg-color);
   border: 1px solid var(--_alert-border-color);
   border-radius: var(--alert-border-radius);
-  box-shadow: var(--alert-drop-shadow);
+  box-shadow: var(--alert-box-shadow);
 
+  *:not(.btn-close) {
+    /* stylelint-disable-next-line declaration-no-important */
+    color: var(--_alert-fg-color) !important;
+  }
   h2 {
     margin: 0 0 var(--size-xs);
     font-size: var(--font-size-lg);
@@ -67,6 +71,8 @@
       margin-block-end: 0;
     }
   }
+
+  /* TODO alerts links */
   /* a {
     text-decoration: underline;
     text-underline-offset: 3px;
@@ -82,12 +88,10 @@
     }
   } */
 
-  /* TODO sistemare meglio */
   .btn-close {
     position: absolute;
-    top: 1rem;
-    right: 1rem;
-    color: currentColor;
+    top: -.3rem;
+    right: -.3rem;
   }
 
 }
