@@ -1,0 +1,24 @@
+{
+  "badge": {
+    "background": {
+      "color": {
+        "$value": "{primary.base}",
+        "$type": "color"
+      }
+    },
+    "color": {
+      "$value": "{primary.on-base}",
+      "$type": "color"
+    },
+    "font": {
+      "size": {
+        "$value": "{font.size.xs}",
+        "$type": "dimension"
+      },
+      "weight": {
+        "$value": "{font.weight.semibold}",
+        "$type": "number"
+      }
+    }
+  } // end badge
+}

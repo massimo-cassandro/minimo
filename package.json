@@ -1,6 +1,6 @@
 {
   "name": "@massimo-cassandro/minimo",
-  "version": "0.2.4",
+  "version": "0.3.0",
   "description": "Light css framework",
   "type": "module",
   "homepage": "https://github.com/massimo-cassandro/minimo#readme",
@@ -19,8 +19,8 @@
     "UPD-version": "npx update-version  # --config=./dev-utilities.config.mjs",
     "upd@m": "npx upd@m",
     "npm-publish": "npm publish",
-    "build-tokens": "node ./utilities/build-tokens.mjs --config ./test/tokens-test/tokens-config.mjs",
-    "check unresolved props": "node ./utilities/check-unresolved-custom-props.mjs --config ./test/tokens-test/tokens-config.mjs"
+    "build-tokens": "node ./src/design-tokens-utilities/build-tokens.mjs --config ./test/tokens-test/tokens-config.mjs",
+    "check unresolved props": "node ./src/design-tokens-utilities/check-unresolved-custom-props.mjs --config ./test/tokens-test/tokens-config.mjs"
   },
   "license": "MIT",
   "author": "Massimo Cassandro",

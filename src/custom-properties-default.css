@@ -3,6 +3,10 @@
   --accent-on-base: #fff;
   --alert-border-radius: var(--radius-md);
   --alert-drop-shadow: 0 0 .5rem 0 oklch(0% 0 0 / .5);
+  --badge-background-color: var(--primary-base);
+  --badge-color: var(--primary-on-base);
+  --badge-font-size: var(--font-size-xs);
+  --badge-font-weight: var(--font-weight-semibold);
   --body-background-color: #fff;
   --body-text: var(--text-color);
   --btn-border-radius: var(--form-control-border-radius);
@@ -153,6 +157,7 @@
   --link-visited-color: #ae0da3;
   --neutral-base: #666;
   --neutral-on-base: #fff;
+  --overlay-color: rgb(0 0 0 / .6);
   --primary-base: #083865;
   --primary-on-base: #fff;
   --radius-base: var(--size-base);
@@ -184,7 +189,6 @@
   --size-xs: .5rem;
   --size-xxs: .25rem;
   --spinner-color: var(--primary-base);
-  --spinner-overlay-color: rgb(0 0 0 / .6);
   --spinner-size: var(--size-lg);
   --spinner-stroke-width: .125rem;
   --status-danger-border-color: var(--status-danger-color);
