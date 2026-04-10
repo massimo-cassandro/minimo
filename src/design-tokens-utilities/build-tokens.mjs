@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 // StyleDictionary v.5
 import StyleDictionary from 'style-dictionary';
 import path from 'path';
