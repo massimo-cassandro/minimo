@@ -38,7 +38,8 @@
 
 
 /* componenti */
-/* @import '@src/components/modal-alert/modal-alert.css'; */
+/* @import '@minimo/components/spinner/spinner-circle-basic.css'; */
+/* @import '@minimo/components/modal-alert/modal-alert.css'; */
 
 /* file progetto */
-/* @import '@src/layout/layout.css'; */
+/* @import '@src/path_to/layout.css'; */
