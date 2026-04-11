@@ -1,16 +1,9 @@
 
 .sf-macro-wrapper {
-  --sf-macro-rows-padding: .5rem;
-  --sf-macro-rows-margin-bottom: 1rem;
-  --sf-macro-rows-border-radius: .4rem;
-  --sf-macro-rows-hover-bg-color: color-mix(in srgb, var(--body-bg-color) 95%, #000);
-  --sf-macro-even-rows-bg-color: var(--body-bg-color); /* rgb(0 0 0 / .05); */
-  --sf-macro-rows-border: 1px solid var(--stone-5);
-  --sf-macro-close-btn-size: 2rem;
 
 
   /* etichette campi righe successive alla prima */
-  @media (--desktop-up) {
+  @media (--media-large-viewport-up) {
     &:not(.always-show-labels) {
       .sf-macro-riga {
         &:not(:first-child) {
@@ -41,17 +34,17 @@
 .sf-macro-riga {
   position: relative;
   padding: var(--sf-macro-rows-padding);
-  margin-bottom: var(--sf-macro-rows-margin-bottom);
+  margin-bottom: var(--sf-macro-rows-margin-block-end);
   border: var(--sf-macro-rows-border);
   border-radius: var(--sf-macro-rows-border-radius);
 
   &:nth-child(even) {
-    background-color: var(--sf-macro-even-rows-bg-color);
+    background-color: var(--sf-macro-rows-even-background-color);
   }
 
 
   &:hover {
-    background-color: var(--sf-macro-rows-hover-bg-color);
+    background-color: var(--sf-macro-rows-hover-background-color);
   }
 
   .form-group {
@@ -75,11 +68,11 @@
   right: -.5rem;
   z-index: 1;
   display: block;
-  width: var(--sf-macro-close-btn-size);
-  height: var(--sf-macro-close-btn-size);
+  width: var(--sf-macro-btn-close-size);
+  height: var(--sf-macro-btn-close-size);
   padding: 1px;
   color: currentColor;
-  background-color: var(--body-content-bg);
+  background-color: var(--sf-macro-btn-close-background-color);
   border-radius: 50%;
 
 

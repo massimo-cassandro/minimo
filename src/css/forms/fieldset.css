@@ -44,8 +44,8 @@ fieldset.form-group, fieldset.form-collection-fset {
     font-size: .9rem;
     font-weight: var(--font-weight-semibold);
     line-height: 1.2;
-    color: var(--form-fieldset-legend-color);
-    background-color: var(--form-fieldset-legend-background-color);
+    color: var(--form-legend-color);
+    background-color: var(--form-legend-background-color);
     border-radius: var(--btn-border-radius) var(--btn-border-radius) var(--btn-border-radius) 0;
   }
 

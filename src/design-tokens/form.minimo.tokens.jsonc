@@ -269,20 +269,21 @@
           "$type": "dimension"
         }
       },
-      "legend": {
-        "background": {
-          "color": {
-            "$value": "transparent",
-            "$type": "color"
-          }
-        },
+    },
+    "legend": {
+      "background": {
         "color": {
-          "$value": "{text.color}",
+          "$value": "transparent",
           "$type": "color"
         }
+      },
+      "color": {
+        "$value": "{text.color}",
+        "$type": "color"
       }
     },
 
+    // blocco info finali form
     "end": {
       "margin": {
         "block": {

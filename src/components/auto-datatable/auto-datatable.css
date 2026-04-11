@@ -144,9 +144,9 @@
 
   /* animation-timeline: scroll(self);
   animation: detect-scroll linear;
-  --bg-if-can-scroll: var(--can-scroll) lime;
-  --bg-if-cant-scroll: red;
-  background: var(--bg-if-can-scroll, var(--bg-if-cant-scroll)); */
+  --_bg-if-can-scroll: var(--_can-scroll) lime;
+  --_bg-if-cant-scroll: red;
+  background: var(--_bg-if-can-scroll, var(--_bg-if-cant-scroll)); */
 
 
   .table thead th {
@@ -207,7 +207,7 @@
 /*
 @keyframes detect-scroll {
   from, to {
-    --can-scroll:;
+    --_can-scroll:;
   }
 } */
 
