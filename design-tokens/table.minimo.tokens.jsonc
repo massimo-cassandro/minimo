@@ -1,0 +1,64 @@
+// -----------------------------------------------------------------------
+// Generated file — do not edit manually.
+// This file is produced by the design-token build pipeline.
+// Source of truth: the token files in the project source directory.
+// Re-generate with: node build-tokens.mjs --config <path/to/config>
+// -----------------------------------------------------------------------
+{
+  "table": {
+    "thead": {
+      "background": {
+        "color": {
+          "$type": "color",
+          "$value": "#ddd"
+        }
+      },
+      "border": {
+        "width": {
+          "$type": "dimension",
+          "$value": "3px"
+        }
+      }
+    },
+    "body": {
+      "border": {
+        "width": {
+          "$type": "dimension",
+          "$value": "1px"
+        }
+      },
+      "tr": {
+        "alt-bg-color": {
+          "$type": "color",
+          "$value": "#efefef"
+        },
+        "hover-bg-color": {
+          "$type": "color",
+          "$value": "#cbcbcb"
+        }
+      }
+    },
+    "border": {
+      "color": {
+        "$type": "color",
+        "$value": "#333"
+      }
+    },
+    "cell": {
+      "padding": {
+        "block": {
+          "$type": "dimension",
+          "$value": ".3rem"
+        },
+        "inline": {
+          "$type": "dimension",
+          "$value": ".6rem"
+        }
+      },
+      "line-height": {
+        "$type": "number",
+        "$value": "1.3"
+      }
+    }
+  }
+}

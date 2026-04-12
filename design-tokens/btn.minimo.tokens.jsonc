@@ -1,0 +1,196 @@
+// -----------------------------------------------------------------------
+// Generated file — do not edit manually.
+// This file is produced by the design-token build pipeline.
+// Source of truth: the token files in the project source directory.
+// Re-generate with: node build-tokens.mjs --config <path/to/config>
+// -----------------------------------------------------------------------
+{
+  "btn": {
+    "font": {
+      "style": {
+        "$type": "string",
+        "$value": "{form.control.font.style}"
+      },
+      "weight": {
+        "$type": "fontWeight",
+        "$value": "{form.control.font.weight}"
+      },
+      "size": {
+        "$type": "dimension",
+        "$value": "{form.control.font.size}"
+      }
+    },
+    "border": {
+      "radius": {
+        "$type": "dimension",
+        "$value": "{form.control.border.radius}"
+      },
+      "width": {
+        "$type": "dimension",
+        "$value": "{form.control.border.width}"
+      }
+    },
+    "hollow": {
+      "border": {
+        "width": {
+          "$type": "dimension",
+          "$value": "{btn.border.width}"
+        }
+      }
+    },
+    "disabled": {
+      "opacity": {
+        "$type": "",
+        "$value": "{form.control.disabled.opacity}"
+      }
+    },
+    "focus": {
+      "outline": {
+        "width": {
+          "$type": "dimension",
+          "$value": "{form.control.focus.outline.width}"
+        }
+      }
+    },
+    "padding": {
+      "inline": {
+        "$type": "dimension",
+        "$value": "{size.base}"
+      },
+      "block": {
+        "$type": "dimension",
+        "$value": "{size.xs}"
+      }
+    },
+    "xs": {
+      "font": {
+        "size": {
+          "$type": "dimension",
+          "$value": "{font.size.xs}"
+        }
+      },
+      "padding": {
+        "inline": {
+          "$type": "dimension",
+          "$value": "{size.xxs}"
+        },
+        "block": {
+          "$type": "dimension",
+          "$value": "{size.xxs}"
+        }
+      },
+      "focus": {
+        "outline": {
+          "width": {
+            "$type": "dimension",
+            "$value": "1px"
+          }
+        }
+      }
+    },
+    "sm": {
+      "font": {
+        "size": {
+          "$type": "dimension",
+          "$value": "{font.size.sm}"
+        }
+      },
+      "padding": {
+        "inline": {
+          "$type": "dimension",
+          "$value": "{size.xs}"
+        },
+        "block": {
+          "$type": "dimension",
+          "$value": "{size.xxs}"
+        }
+      },
+      "focus": {
+        "outline": {
+          "width": {
+            "$type": "dimension",
+            "$value": "2px"
+          }
+        }
+      }
+    },
+    "md": {
+      "font": {
+        "size": {
+          "$type": "dimension",
+          "$value": "{font.size.md}"
+        }
+      },
+      "padding": {
+        "inline": {
+          "$type": "dimension",
+          "$value": "{size.sm}"
+        },
+        "block": {
+          "$type": "dimension",
+          "$value": "{size.xs}"
+        }
+      },
+      "focus": {
+        "outline": {
+          "width": {
+            "$type": "dimension",
+            "$value": "3px"
+          }
+        }
+      }
+    },
+    "lg": {
+      "font": {
+        "size": {
+          "$type": "dimension",
+          "$value": "{font.size.lg}"
+        }
+      },
+      "padding": {
+        "inline": {
+          "$type": "dimension",
+          "$value": "{size.md}"
+        },
+        "block": {
+          "$type": "dimension",
+          "$value": "{size.base}"
+        }
+      },
+      "focus": {
+        "outline": {
+          "width": {
+            "$type": "dimension",
+            "$value": "4px"
+          }
+        }
+      }
+    },
+    "xl": {
+      "font": {
+        "size": {
+          "$type": "dimension",
+          "$value": "{font.size.xl}"
+        }
+      },
+      "padding": {
+        "inline": {
+          "$type": "dimension",
+          "$value": "{size.xl}"
+        },
+        "block": {
+          "$type": "dimension",
+          "$value": "{size.md}"
+        }
+      },
+      "focus": {
+        "outline": {
+          "width": {
+            "$type": "dimension",
+            "$value": "6px"
+          }
+        }
+      }
+    }
+  }
+}

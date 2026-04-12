@@ -6,8 +6,8 @@ import { parseCols } from './src/parse-cols.js';
 
 import * as styles from './simple-datatable.module.css';
 
-import caretLeftIcon from './icons/caret-left.svg?inline';
-import caretRightIcon from './icons/caret-right.svg?inline';
+import caretLeftIcon from '../../icons/caret-left.svg?inline';
+import caretRightIcon from '../../icons/caret-right.svg?inline';
 
 // TODO possibilità di definizione cols anche da js. In questo caso, in presenza ANCHE dell'attributo, deve prevalere quest'ultimo
 

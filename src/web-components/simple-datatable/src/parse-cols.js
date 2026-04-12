@@ -6,8 +6,8 @@ import { classnames } from '@massimo-cassandro/js-utilities/index.js';
 
 import * as styles from '../simple-datatable.module.css';
 
-import checkIcon from '../icons/check-bold.svg?inline';
-import xIcon from '../icons/x-bold.svg?inline';
+import checkIcon from '../../../icons/check-bold.svg?inline';
+import xIcon from '../../../icons/x-bold.svg?inline';
 
 // col_obj è l'oggetto che descrive una singola colonna del datatable
 // vine utilizzato per produrre l'oggetto columns di simple-datatable

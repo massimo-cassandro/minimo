@@ -1,0 +1,98 @@
+// -----------------------------------------------------------------------
+// Generated file — do not edit manually.
+// This file is produced by the design-token build pipeline.
+// Source of truth: the token files in the project source directory.
+// Re-generate with: node build-tokens.mjs --config <path/to/config>
+// -----------------------------------------------------------------------
+{
+  "status": {
+    "danger": {
+      "color": {
+        "$type": "color",
+        "$value": "#c00"
+      },
+      "background": {
+        "color": {
+          "$type": "color",
+          "$value": "{status.danger.color}"
+        }
+      },
+      "foreground": {
+        "$type": "color",
+        "$value": "#fff"
+      },
+      "border": {
+        "color": {
+          "$type": "color",
+          "$value": "{status.danger.color}"
+        }
+      }
+    },
+    "success": {
+      "color": {
+        "$type": "color",
+        "$value": "#046d19"
+      },
+      "background": {
+        "color": {
+          "$type": "color",
+          "$value": "{status.success.color}"
+        }
+      },
+      "foreground": {
+        "$type": "color",
+        "$value": "#fff"
+      },
+      "border": {
+        "color": {
+          "$type": "color",
+          "$value": "{status.success.color}"
+        }
+      }
+    },
+    "info": {
+      "color": {
+        "$type": "color",
+        "$value": "#0665c5"
+      },
+      "background": {
+        "color": {
+          "$type": "color",
+          "$value": "{status.info.color}"
+        }
+      },
+      "foreground": {
+        "$type": "color",
+        "$value": "#fff"
+      },
+      "border": {
+        "color": {
+          "$type": "color",
+          "$value": "{status.info.color}"
+        }
+      }
+    },
+    "warning": {
+      "color": {
+        "$type": "color",
+        "$value": "#fc0"
+      },
+      "background": {
+        "color": {
+          "$type": "color",
+          "$value": "{status.warning.color}"
+        }
+      },
+      "foreground": {
+        "$type": "color",
+        "$value": "#4f2900"
+      },
+      "border": {
+        "color": {
+          "$type": "color",
+          "$value": "{status.warning.color}"
+        }
+      }
+    }
+  }
+}

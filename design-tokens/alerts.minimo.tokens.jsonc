@@ -1,0 +1,28 @@
+// -----------------------------------------------------------------------
+// Generated file — do not edit manually.
+// This file is produced by the design-token build pipeline.
+// Source of truth: the token files in the project source directory.
+// Re-generate with: node build-tokens.mjs --config <path/to/config>
+// -----------------------------------------------------------------------
+{
+  "alert": {
+    "border": {
+      "radius": {
+        "$type": "dimension",
+        "$value": "{radius.sm}"
+      }
+    },
+    "box-shadow": {
+      "$type": "shadow",
+      "$value": [
+        {
+          "offsetX": 0,
+          "offsetY": 0,
+          "blur": "8px",
+          "spread": 0,
+          "color": "oklch(0 0 0 / 0.5)"
+        }
+      ]
+    }
+  }
+}

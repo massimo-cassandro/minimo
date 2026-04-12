@@ -1,0 +1,96 @@
+// -----------------------------------------------------------------------
+// Generated file — do not edit manually.
+// This file is produced by the design-token build pipeline.
+// Source of truth: the token files in the project source directory.
+// Re-generate with: node build-tokens.mjs --config <path/to/config>
+// -----------------------------------------------------------------------
+{
+  "btn": {
+    "close": {
+      "size": {
+        "$type": "dimension",
+        "$value": "1.5rem"
+      },
+      "padding": {
+        "$type": "dimension",
+        "$value": "3px"
+      },
+      "border": {
+        "width": {
+          "$type": "dimension",
+          "$value": "2px"
+        },
+        "color": {
+          "$type": "color",
+          "$value": "{btn.close.icon.color}"
+        },
+        "radius": {
+          "$type": "dimension",
+          "$value": "50%"
+        }
+      },
+      "background": {
+        "color": {
+          "$type": "color",
+          "$value": "{body.background.color}"
+        }
+      },
+      "icon": {
+        "color": {
+          "$type": "color",
+          "$value": "{text.color}"
+        },
+        "bar": {
+          "size": {
+            "$type": "dimension",
+            "$value": "2px"
+          }
+        }
+      },
+      "hover": {
+        "background": {
+          "color": {
+            "$type": "color",
+            "$value": "{btn.close.icon.color}"
+          }
+        },
+        "icon": {
+          "color": {
+            "$type": "color",
+            "$value": "{btn.close.background.color}"
+          }
+        }
+      },
+      "focus": {
+        "outline": {
+          "width": {
+            "$type": "dimension",
+            "$value": "2px"
+          },
+          "offset": {
+            "$type": "dimension",
+            "$value": "2px"
+          },
+          "color": {
+            "$type": "color",
+            "$value": "{link.focus.outline.color}"
+          }
+        }
+      },
+      "active": {
+        "background": {
+          "color": {
+            "$type": "color",
+            "$value": "{link.active.background.color}"
+          }
+        },
+        "icon": {
+          "color": {
+            "$type": "color",
+            "$value": "{link.active.color}"
+          }
+        }
+      }
+    }
+  }
+}

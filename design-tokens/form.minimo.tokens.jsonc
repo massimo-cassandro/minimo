@@ -1,0 +1,304 @@
+// -----------------------------------------------------------------------
+// Generated file — do not edit manually.
+// This file is produced by the design-token build pipeline.
+// Source of truth: the token files in the project source directory.
+// Re-generate with: node build-tokens.mjs --config <path/to/config>
+// -----------------------------------------------------------------------
+{
+  "form": {
+    "label": {
+      "font": {
+        "size": {
+          "$type": "dimension",
+          "$value": "{font.size.sm}"
+        },
+        "weight": {
+          "$type": "fontWeight",
+          "$value": "{font.weight.semibold}"
+        }
+      },
+      "color": {
+        "$type": "color",
+        "$value": "{text.color}"
+      }
+    },
+    "group": {
+      "padding-block": {
+        "$type": "dimension",
+        "$value": "0 1rem"
+      }
+    },
+    "input-group": {
+      "background": {
+        "color": {
+          "$type": "color",
+          "$value": "transparent"
+        }
+      }
+    },
+    "control": {
+      "static": {
+        "color": {
+          "$type": "color",
+          "$value": "{form.control.text.color}"
+        },
+        "background": {
+          "color": {
+            "$type": "color",
+            "$value": "transparent"
+          }
+        }
+      },
+      "text": {
+        "color": {
+          "$type": "color",
+          "$value": "{text.color}"
+        }
+      },
+      "font": {
+        "style": {
+          "$type": "string",
+          "$value": "normal"
+        },
+        "weight": {
+          "$type": "fontWeight",
+          "$value": "{font.weight.regular}"
+        },
+        "size": {
+          "$type": "dimension",
+          "$value": "{font.size.base}"
+        }
+      },
+      "background": {
+        "color": {
+          "$type": "color",
+          "$value": "{body.background.color}"
+        }
+      },
+      "line-height": {
+        "$type": "number",
+        "$value": "1.2"
+      },
+      "padding": {
+        "inline": {
+          "$type": "dimension",
+          "$value": "{size.sm}"
+        },
+        "block": {
+          "$type": "dimension",
+          "$value": "{size.xs}"
+        }
+      },
+      "border": {
+        "color": {
+          "$type": "color",
+          "$value": "#666"
+        },
+        "width": {
+          "$type": "dimension",
+          "$value": "1px"
+        },
+        "radius": {
+          "$type": "dimension",
+          "$value": "{radius.xxs}"
+        }
+      },
+      "placeholder": {
+        "color": {
+          "$type": "color",
+          "$value": "#666"
+        },
+        "opacity": {
+          "$type": "number",
+          "$value": 0.8
+        },
+        "font": {
+          "size": {
+            "$type": "dimension",
+            "$value": "{form.control.font.size}"
+          },
+          "style": {
+            "$type": "string",
+            "$value": "italic"
+          }
+        }
+      },
+      "disabled": {
+        "background": {
+          "color": {
+            "$type": "color",
+            "$value": "#999"
+          }
+        },
+        "opacity": {
+          "$type": "number",
+          "$value": ".3"
+        }
+      },
+      "required": {
+        "flag-color": {
+          "$type": "color",
+          "$value": "#c00"
+        },
+        "flag-content": {
+          "$type": "string",
+          "$value": "'\\002A'"
+        }
+      },
+      "focus": {
+        "color": {
+          "$type": "color",
+          "$value": "hsl(205 69% 45% / .508)"
+        },
+        "outline": {
+          "width": {
+            "$type": "dimension",
+            "$value": "4px"
+          }
+        }
+      },
+      "xs": {
+        "font": {
+          "size": {
+            "$type": "dimension",
+            "$value": "{font.size.xs}"
+          }
+        },
+        "padding": {
+          "inline": {
+            "$type": "dimension",
+            "$value": "{size.xxs}"
+          },
+          "block": {
+            "$type": "dimension",
+            "$value": "{size.xxs}"
+          }
+        }
+      },
+      "sm": {
+        "font": {
+          "size": {
+            "$type": "dimension",
+            "$value": "{font.size.sm}"
+          }
+        },
+        "padding": {
+          "inline": {
+            "$type": "dimension",
+            "$value": "{size.xs}"
+          },
+          "block": {
+            "$type": "dimension",
+            "$value": "{size.xxs}"
+          }
+        }
+      },
+      "md": {
+        "font": {
+          "size": {
+            "$type": "dimension",
+            "$value": "{font.size.md}"
+          }
+        },
+        "padding": {
+          "inline": {
+            "$type": "dimension",
+            "$value": "{size.sm}"
+          },
+          "block": {
+            "$type": "dimension",
+            "$value": "{size.xs}"
+          }
+        }
+      },
+      "lg": {
+        "font": {
+          "size": {
+            "$type": "dimension",
+            "$value": "{font.size.lg}"
+          }
+        },
+        "padding": {
+          "inline": {
+            "$type": "dimension",
+            "$value": "{size.md}"
+          },
+          "block": {
+            "$type": "dimension",
+            "$value": "{size.base}"
+          }
+        }
+      },
+      "xl": {
+        "font": {
+          "size": {
+            "$type": "dimension",
+            "$value": "{font.size.xl}"
+          }
+        },
+        "padding": {
+          "inline": {
+            "$type": "dimension",
+            "$value": "{size.xl}"
+          },
+          "block": {
+            "$type": "dimension",
+            "$value": "{size.md}"
+          }
+        }
+      },
+      "select": {
+        "trigger-icon": {
+          "$type": "string",
+          "$value": "url('data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2016%2016%22%3E%3Cpath%20fill%3D%22none%22%20stroke%3D%22rgb(5%2C%2048%2C%2056)%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20stroke-width%3D%222%22%20d%3D%22m2%205%206%206%206-6%22%2F%3E%3C%2Fsvg%3E')"
+        }
+      }
+    },
+    "fieldset": {
+      "border": {
+        "width": {
+          "$type": "dimension",
+          "$value": "1px"
+        }
+      }
+    },
+    "legend": {
+      "background": {
+        "color": {
+          "$type": "color",
+          "$value": "transparent"
+        }
+      },
+      "color": {
+        "$type": "color",
+        "$value": "{text.color}"
+      }
+    },
+    "end": {
+      "margin": {
+        "block": {
+          "start": {
+            "$type": "dimension",
+            "$value": "{size.base}"
+          },
+          "end": {
+            "$type": "dimension",
+            "$value": "{size.base}"
+          }
+        }
+      }
+    },
+    "user-info": {
+      "font": {
+        "size": {
+          "$type": "dimension",
+          "$value": "{font.size.xs}"
+        }
+      },
+      "color": {
+        "$type": "color",
+        "$value": "{text.muted}"
+      }
+    }
+  }
+}

@@ -1,0 +1,102 @@
+// -----------------------------------------------------------------------
+// Generated file — do not edit manually.
+// This file is produced by the design-token build pipeline.
+// Source of truth: the token files in the project source directory.
+// Re-generate with: node build-tokens.mjs --config <path/to/config>
+// -----------------------------------------------------------------------
+{
+  "font": {
+    "family": {
+      "$type": "fontFamily",
+      "$value": "sans-serif"
+    },
+    "family-mono": {
+      "$type": "fontFamily",
+      "$value": "'Monaspace Neon Var', 'Monaspace Neon', 'Aptos Mono', 'Roboto Mono', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'Liberation Mono', 'Andale Mono', 'Courier New', monospace"
+    },
+    "size": {
+      "base": {
+        "$type": "string",
+        "$value": "clamp(.9rem, .6538rem + .3846vw, 1rem)"
+      },
+      "xxs": {
+        "$type": "string",
+        "$value": "clamp(.6rem, .3538rem + .3846vw, .7rem)"
+      },
+      "xs": {
+        "$type": "string",
+        "$value": "clamp(.7rem, .4538rem + .3846vw, .8rem)"
+      },
+      "sm": {
+        "$type": "string",
+        "$value": "clamp(.8rem, .5538rem + .3846vw, .9rem)"
+      },
+      "md": {
+        "$type": "string",
+        "$value": "clamp(1.05rem, .6808rem + .5769vw, 1.2rem)"
+      },
+      "lg": {
+        "$type": "string",
+        "$value": "clamp(1.2rem, .7077rem + .7692vw, 1.4rem)"
+      },
+      "xl": {
+        "$type": "string",
+        "$value": "clamp(1.6rem, 1.1077rem + .7692vw, 1.8rem)"
+      },
+      "2xl": {
+        "$type": "string",
+        "$value": "clamp(2rem, .7692rem + 1.9231vw, 2.5rem)"
+      },
+      "3xl": {
+        "$type": "string",
+        "$value": "clamp(2.2rem, .2308rem + 3.0769vw, 3rem)"
+      }
+    },
+    "line-height": {
+      "base": {
+        "$type": "number",
+        "$value": "1.5"
+      }
+    },
+    "style": {
+      "base": {
+        "$type": "string",
+        "$value": "normal"
+      }
+    },
+    "weight": {
+      "xxlight": {
+        "$type": "string",
+        "$value": "100"
+      },
+      "xlight": {
+        "$type": "string",
+        "$value": "200"
+      },
+      "light": {
+        "$type": "string",
+        "$value": "300"
+      },
+      "regular": {
+        "$type": "string",
+        "$value": "400"
+      },
+      "medium": {
+        "$type": "string",
+        "$value": "500"
+      },
+      "semibold": {
+        "$type": "string",
+        "$value": "600"
+      },
+      "bold": {
+        "$type": "string",
+        "$value": "700"
+      },
+      "xbold": {
+        "$type": "string",
+        "$value": "900"
+      }
+    }
+  }
+}

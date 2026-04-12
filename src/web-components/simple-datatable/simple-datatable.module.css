@@ -80,19 +80,19 @@
 
   &:not(.sortAscending):not(.sortDescending){
     .sortBtn::after {
-      content: url('./icons/arrows-down-up.svg?cssInline');
+      content: url('../../icons/arrows-down-up.svg?cssInline');
       opacity: .4;
     }
   }
 }
 .sortAscending {
   .sortBtn::after {
-    content: url('./icons/arrow-up.svg?cssInline');
+    content: url('../../icons/arrow-up.svg?cssInline');
   }
 }
 .sortDescending {
   .sortBtn::after {
-    content: url('./icons/arrow-down.svg?cssInline');
+    content: url('../../icons/arrow-down.svg?cssInline');
   }
 }
 

@@ -1,0 +1,58 @@
+// -----------------------------------------------------------------------
+// Generated file — do not edit manually.
+// This file is produced by the design-token build pipeline.
+// Source of truth: the token files in the project source directory.
+// Re-generate with: node build-tokens.mjs --config <path/to/config>
+// -----------------------------------------------------------------------
+{
+  "layout": {
+    "container": {
+      "max-width": {
+        "$type": "dimension",
+        "$value": "80rem"
+      }
+    }
+  },
+  "body": {
+    "background": {
+      "color": {
+        "$type": "color",
+        "$value": "#fff"
+      }
+    },
+    "text": {
+      "$type": "color",
+      "$value": "{text.color}"
+    }
+  },
+  "text": {
+    "muted": {
+      "$type": "color",
+      "$value": "{neutral.base}"
+    },
+    "dim": {
+      "$type": "color",
+      "$value": "{text.muted}"
+    },
+    "negative": {
+      "$type": "color",
+      "$value": "#ffffff"
+    },
+    "color": {
+      "$type": "color",
+      "$value": "#000"
+    },
+    "selected": {
+      "background": {
+        "color": {
+          "$type": "color",
+          "$value": "#ddd"
+        }
+      },
+      "text": {
+        "$type": "color",
+        "$value": "{body.text}"
+      }
+    }
+  }
+}

@@ -1,0 +1,42 @@
+// -----------------------------------------------------------------------
+// Generated file — do not edit manually.
+// This file is produced by the design-token build pipeline.
+// Source of truth: the token files in the project source directory.
+// Re-generate with: node build-tokens.mjs --config <path/to/config>
+// -----------------------------------------------------------------------
+{
+  "badge": {
+    "background": {
+      "color": {
+        "$type": "color",
+        "$value": "{primary.base}"
+      }
+    },
+    "color": {
+      "$type": "color",
+      "$value": "{primary.on-base}"
+    },
+    "font": {
+      "size": {
+        "$type": "dimension",
+        "$value": "{font.size.xs}"
+      },
+      "weight": {
+        "$type": "number",
+        "$value": "{font.weight.semibold}"
+      }
+    },
+    "lg": {
+      "font": {
+        "size": {
+          "$type": "dimension",
+          "$value": "{font.size.base}"
+        },
+        "weight": {
+          "$type": "number",
+          "$value": "{badge.font.weight}"
+        }
+      }
+    }
+  }
+}

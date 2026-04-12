@@ -1,6 +1,6 @@
 {
   "name": "@massimo-cassandro/minimo",
-  "version": "0.3.6",
+  "version": "0.4.0",
   "description": "Light css framework",
   "type": "module",
   "homepage": "https://github.com/massimo-cassandro/minimo#readme",
@@ -8,8 +8,8 @@
     "url": "https://github.com/massimo-cassandro/minimo/issues"
   },
   "bin": {
-    "buildTokens": "./src/design-tokens-utilities/build-tokens.mjs",
-    "checkUnresolvedProps": "./src/design-tokens-utilities/check-unresolved-custom-props.mjs"
+    "buildTokens": "./design-tokens-utilities/build-tokens.mjs",
+    "checkUnresolvedProps": "./design-tokens-utilities/check-unresolved-custom-props.mjs"
   },
   "repository": {
     "type": "git",
@@ -19,8 +19,8 @@
     "UPD-version": "npx update-version  # --config=./dev-utilities.config.mjs",
     "upd@m": "npx upd@m",
     "npm-publish": "npm publish",
-    "build-tokens": "node ./src/design-tokens-utilities/build-tokens.mjs --config ./test/tokens-test/tokens-config.mjs",
-    "check unresolved props": "node ./src/design-tokens-utilities/check-unresolved-custom-props.mjs --config ./test/tokens-test/tokens-config.mjs"
+    "build-tokens": "node ./design-tokens-utilities/build-tokens.mjs --config ./tokens-config.mjs",
+    "check unresolved props": "node ./design-tokens-utilities/check-unresolved-custom-props.mjs --config ./tokens-config.mjs"
   },
   "license": "MIT",
   "author": "Massimo Cassandro",
@@ -29,10 +29,14 @@
   },
   "main": "./src/index.js",
   "files": [
-    "src/**/*.{js,mjs,css,svg,tokens.json,tokens.jsonc,md}"
+    "src/**/*.{js,mjs,css,svg,md}",
+    "design-tokens/**/*.{tokens.json,tokens.jsonc}",
+    "design-tokens-src/**/*.{tokens.json,tokens.jsonc,mjs,js,md}",
+    "design-tokens-utilities/**/*.{mjs,md}"
   ],
   "devDependencies": {
     "@massimo-cassandro/dev-updater": "^3.0.3",
+    "@massimo-cassandro/eslint-config": "^3.0.6",
     "@massimo-cassandro/stylelint-config": "^2.3.4",
     "style-dictionary": "^5.4.0"
   }

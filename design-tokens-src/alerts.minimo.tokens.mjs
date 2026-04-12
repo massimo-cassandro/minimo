@@ -1,0 +1,25 @@
+export default {
+  alert: {
+    border: {
+      radius: {
+        $value: '{radius.sm}',
+        $type: 'dimension'
+      },
+    },
+
+    'box-shadow': {
+      // $type: "string",
+      // $value: "none"
+      $type: 'shadow',
+      $value: [
+        {
+          offsetX: 0,
+          offsetY: 0,
+          blur: '8px',
+          spread: 0,
+          color: 'oklch(0 0 0 / 0.5)'
+        }
+      ]
+    }
+  }
+};
