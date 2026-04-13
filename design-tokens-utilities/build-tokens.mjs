@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+/* eslint-disable no-console */
 
 // build-tokens.mjs
 // Entry point: imports modules, runs the build, lints the CSS output, prints the log.
@@ -106,7 +107,7 @@ if (penpotBuildPath) {
   }
 } else {
   console.log(styleText(['yellow'],
-    `[build-tokens] penpot json : (disabled — penpotBuildPath not set)`
+    '[build-tokens] penpot json : (disabled — penpotBuildPath not set)'
   ));
 }
 

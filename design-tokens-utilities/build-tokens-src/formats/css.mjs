@@ -149,7 +149,7 @@ StyleDictionary.registerFormat({
 
     const lines = dictionary.allTokens
       .slice()
-      .sort((a, b) => a.name.localeCompare(b.name))
+      .sort((a, b) => a.name.localeCompare(b.name, 'en', {numeric: true, sensitivity: 'base'}))
       .flatMap((token) => {
         const type = token.$type ?? token.type;
         const orig = token.original?.$value ?? token.original?.value;
