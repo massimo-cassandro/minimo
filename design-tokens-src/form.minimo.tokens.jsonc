@@ -129,13 +129,23 @@
       "disabled": {
         "background": {
           "color": {
-            "$value": "#999",
+            "$value": "#ddd",
             "$type": "color"
           }
+        },
+        "color": {
+          "$value": "#999",
+          "$type": "color"
         },
         "opacity": {
           "$value": ".3",
           "$type": "number"
+        },
+        "font": {
+          "style": {
+            "$value": "italic",
+            "$type": "string"
+          }
         }
       },
       "required": {

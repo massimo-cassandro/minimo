@@ -11,7 +11,7 @@
   &:has(textarea) {
     height: 100%;
   }
-
+  
   .grid & {
     padding-block-end: 0;
   }

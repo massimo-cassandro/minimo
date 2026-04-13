@@ -127,12 +127,22 @@
         "background": {
           "color": {
             "$type": "color",
-            "$value": "#999"
+            "$value": "#ddd"
           }
+        },
+        "color": {
+          "$type": "color",
+          "$value": "#999"
         },
         "opacity": {
           "$type": "number",
           "$value": ".3"
+        },
+        "font": {
+          "style": {
+            "$type": "string",
+            "$value": "italic"
+          }
         }
       },
       "required": {

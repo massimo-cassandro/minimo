@@ -96,7 +96,9 @@
   --form-control-border-color: #666;
   --form-control-border-radius: var(--radius-xxs);
   --form-control-border-width: .0625rem;
-  --form-control-disabled-background-color: #999;
+  --form-control-disabled-background-color: #ddd;
+  --form-control-disabled-color: #999;
+  --form-control-disabled-font-style: italic;
   --form-control-disabled-opacity: .3;
   --form-control-focus-color: hsl(205 69% 45% / .508);
   --form-control-focus-outline-width: .25rem;
