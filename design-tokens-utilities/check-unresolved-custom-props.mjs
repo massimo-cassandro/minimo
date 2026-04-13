@@ -8,6 +8,8 @@
 //
 // Usage: node check-unresolved-custom-props.mjs --config ./path/to/config.mjs
 
+// TODO rimuovere/non generare file result se vuoto
+
 import path from 'path';
 import fs from 'node:fs';
 import { fileURLToPath, pathToFileURL } from 'url';
