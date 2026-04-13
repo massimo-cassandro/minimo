@@ -33,7 +33,6 @@
 
 import StyleDictionary from 'style-dictionary';
 import path from 'path';
-import { padTokenPath } from '../lib/color-scale.mjs';
 
 // Disclaimer prepended to every generated file when penpotFormat is 'jsonc'
 const DISCLAIMER = [
@@ -127,28 +126,20 @@ StyleDictionary.registerFormat({
   name: 'json/penpot',
   format: ({ dictionary, options }) => {
     const root = {};
-    const expressionMode      = options.penpotExpressions  ?? 'keep';
-    const colorScalePrefixes  = options.colorScalePrefixes ?? [];
+    const expressionMode = options.penpotExpressions ?? 'keep'; // 'keep' | 'calc' | 'resolve'
     const tokenMap = (expressionMode === 'resolve') ? makeTokenMap(dictionary) : null;
 
     for (const token of dictionary.allTokens) {
-      const type = token.$type ?? token.type;
-
-      // Apply zero-padding to color scale path segments
-      // e.g. ['neutral', '80'] -> ['neutral', '080']
-      const tokenPath = (type === 'color')
-        ? padTokenPath(token.path, colorScalePrefixes)
-        : token.path;
-
-      // Rebuild the nested tree from the (possibly padded) token path
+      // Rebuild the nested tree from the token path
       let node = root;
-      for (let i = 0; i < tokenPath.length - 1; i++) {
-        const segment = tokenPath[i];
+      for (let i = 0; i < token.path.length - 1; i++) {
+        const segment = token.path[i];
         node[segment] = node[segment] ?? {};
         node = node[segment];
       }
 
-      const leafKey = tokenPath[tokenPath.length - 1];
+      const leafKey = token.path[token.path.length - 1];
+      const type    = token.$type ?? token.type;
       const orig    = token.original?.$value ?? token.original?.value;
 
       // ── Value resolution ────────────────────────────────────────────────────
@@ -232,15 +223,13 @@ export const collectConcreteFilePaths = async (sd) => {
 // @param {string|null}                    penpotDestFile     Aggregated file base name, or null
 // @param {'json'|'jsonc'}                 penpotFormat       Output format
 // @param {'keep'|'calc'|'resolve'}        penpotExpressions  Expression handling mode
-// @param {string[]}                       colorScalePrefixes Color token prefixes for numeric scale zero-padding
 // @returns {object[]}  File descriptors for the Style Dictionary platform
 
 export const buildPenpotFiles = (
   concreteFilePaths,
   penpotDestFile,
   penpotFormat = 'json',
-  penpotExpressions = 'keep',
-  colorScalePrefixes = []
+  penpotExpressions = 'keep'
 ) => {
   const ext  = penpotFormat === 'jsonc' ? '.jsonc' : '.json';
   const jsonc = penpotFormat === 'jsonc';
@@ -249,7 +238,7 @@ export const buildPenpotFiles = (
     return [{
       destination: penpotDestFile + ext,
       format: 'json/penpot',
-      options: { jsonc, penpotExpressions, colorScalePrefixes },
+      options: { jsonc, penpotExpressions },
     }];
   }
 
@@ -263,7 +252,7 @@ export const buildPenpotFiles = (
     return {
       destination: destName,
       format: 'json/penpot',
-      options: { jsonc, penpotExpressions, colorScalePrefixes },
+      options: { jsonc, penpotExpressions },
       filter: (token) => {
         const fp = token.filePath ? path.resolve(token.filePath) : '';
         return fp === absPath;

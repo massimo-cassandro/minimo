@@ -9,8 +9,6 @@ const config = {
     '!./design-tokens-src/_cfg/**',
   ],
 
-  colorScalePrefixes: ['primary', 'secondary', 'neutral'],
-
   penpotExpressions: 'resolve', // or 'calc' or 'keep'
   penpotFormat: 'jsonc',
   penpotBuildPath: './design-tokens',

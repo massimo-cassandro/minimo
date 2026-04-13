@@ -75,11 +75,7 @@ const config = {
   //               e.g. {size.base} = 16px, "{size.base} * .25" -> "4px"
   penpotExpressions: 'resolve',
 
-  // Color token prefixes for which the numeric scale segment is zero-padded
-  // to 3 digits in both CSS output and Penpot token files.
-  // e.g. --neutral-80 -> --neutral-080, --primary-5 -> --primary-005
-  // Set to an empty array or omit to disable.
-  colorScalePrefixes: ['primary', 'secondary', 'neutral'],
+
 
   // ---------------------------------------------------------------------------
   // check-unresolved-custom-props.mjs settings

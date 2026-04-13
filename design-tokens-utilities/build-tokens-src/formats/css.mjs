@@ -6,7 +6,6 @@
 //   - individual properties for letterSpacing, textTransform, textDecoration
 
 import StyleDictionary from 'style-dictionary';
-import { padColorName } from '../lib/color-scale.mjs';
 
 const BASE_FONT_SIZE = 16;
 
@@ -148,8 +147,6 @@ StyleDictionary.registerFormat({
 
     const resolveRefs = makeResolveRefs(tokenByPath);
 
-    const colorScalePrefixes = options.colorScalePrefixes ?? [];
-
     const lines = dictionary.allTokens
       .slice()
       .sort((a, b) => a.name.localeCompare(b.name))
@@ -157,13 +154,8 @@ StyleDictionary.registerFormat({
         const type = token.$type ?? token.type;
         const orig = token.original?.$value ?? token.original?.value;
 
-        // Apply zero-padding to color scale names (e.g. --neutral-80 -> --neutral-080)
-        const tokenName = (type === 'color')
-          ? padColorName(token.name, colorScalePrefixes)
-          : token.name;
-
         if (type === 'typography') {
-          return [buildTypography(tokenName, orig ?? {}, resolveRefs)];
+          return [buildTypography(token.name, orig ?? {}, resolveRefs)];
         }
 
         let value;
@@ -200,7 +192,7 @@ StyleDictionary.registerFormat({
           value = String(token.$value ?? token.value);
         }
 
-        return [`  --${tokenName}: ${value};`];
+        return [`  --${token.name}: ${value};`];
       });
 
     customPropsCount = lines.length;

@@ -10,10 +10,6 @@
       "$type": "color",
       "$value": "#083865"
     },
-    "080": {
-      "$type": "color",
-      "$value": "#0957A0"
-    },
     "100-fg": {
       "$type": "color",
       "$value": "#fff"
