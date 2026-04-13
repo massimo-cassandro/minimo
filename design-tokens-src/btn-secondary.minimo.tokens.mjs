@@ -1,13 +1,14 @@
-{
-  "btn": {
-    "secondary": {
+export default {
+  btn: {
 
-      "hollow": {
+    secondary: {
+      
+      hollow: {
 
-      } // end hollow
+      } 
     } // end secondary
   } // end btn
-}
+};
 // --btn-secondary-bg-color: var(--_secondary);
 // --btn-secondary-fg-color: var(--_secondary-fg);
 // --btn-secondary-border-color: var(--_secondary);

@@ -15,7 +15,7 @@
           "$value": "#000"
         }
       },
-      "foreground": {
+      "fg": {
         "$type": "color",
         "$value": "#fff"
       },

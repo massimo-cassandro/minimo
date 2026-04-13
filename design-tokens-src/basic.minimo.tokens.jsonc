@@ -22,7 +22,7 @@
   "text": {
     "muted": {
       "$type": "color",
-      "$value": "{neutral.base}"
+      "$value": "{neutral.100}"
     },
     "dim": {
       "$type": "color",

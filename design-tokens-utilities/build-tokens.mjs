@@ -28,6 +28,7 @@ import {
   penpotDestFile,
   penpotFormat,
   penpotExpressions,
+  colorScalePrefixes,
   source,
 } from './build-tokens-src/config.mjs';
 
@@ -71,6 +72,7 @@ const sd = new StyleDictionary({
     penpotDestFile,
     penpotFormat,
     penpotExpressions,
+    colorScalePrefixes,
     concreteFilePaths,
   }),
 });
@@ -94,7 +96,7 @@ console.log(styleText(['yellow'], `[build-tokens] source      : ${source.map(sho
 console.log(styleText(['yellow'], `[build-tokens] dest file   : ${short(path.join(buildPath, destFile))}`));
 
 if (penpotBuildPath) {
-  const penpotFiles = buildPenpotFiles(concreteFilePaths, penpotDestFile, penpotFormat, penpotExpressions);
+  const penpotFiles = buildPenpotFiles(concreteFilePaths, penpotDestFile, penpotFormat, penpotExpressions, colorScalePrefixes);
   if (penpotFiles.length === 1) {
     console.log(styleText(['yellow'],
       `[build-tokens] penpot json : ${short(path.join(penpotBuildPath, penpotFiles[0].destination))}`

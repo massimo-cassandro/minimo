@@ -8,17 +8,18 @@
 //
 // Usage: node check-unresolved-custom-props.mjs --config ./path/to/config.mjs
 
-// TODO rimuovere/non generare file result se vuoto
+
+/* globals process */
 
 import path from 'path';
 import fs from 'node:fs';
-import { fileURLToPath, pathToFileURL } from 'url';
-import { dirname } from 'path';
+import { /* fileURLToPath,  */pathToFileURL } from 'url';
+// import { dirname } from 'path';
 import { glob } from 'node:fs/promises';
 import { styleText, parseArgs } from 'node:util';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname  = dirname(__filename);
+// const __filename = fileURLToPath(import.meta.url);
+// const __dirname  = dirname(__filename);
 
 // ---------------------------------------------------------------------------
 // 1. Parse flags
@@ -118,15 +119,21 @@ async function run() {
       `${unresolved_props.length} unresolved custom properties found -> ${path.relative(process.cwd(), result_file)}`
     ));
 
-    fs.writeFileSync(
-      result_file,
-      unresolved_props
-        .map(item =>
-          `* [${path.basename(item.file)} :: ${item.line}](${item.file}#L${item.line}) -> var(${item.prop})`
-        )
-        .join('\n'),
-      'utf-8'
-    );
+    if(unresolved_props.length) {
+      fs.writeFileSync(
+        result_file,
+        unresolved_props
+          .map(item =>
+            `* [${path.basename(item.file, '.css')}](${item.file}#L${item.line}) -> \`${item.prop}\``
+          )
+          .join('\n'),
+        'utf-8'
+      );
+    } else {
+      if (fs.existsSync(result_file)) {
+        fs.unlinkSync(result_file);
+      }
+    }
 
     console.log(styleText(['green'], '**** DONE ****'));
 

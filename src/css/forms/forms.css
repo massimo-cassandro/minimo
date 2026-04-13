@@ -99,7 +99,7 @@ select.form-control, .form-select {
 
 input[type='checkbox'] {
   color: var(--form-control-text-color);
-  accent-color: var(--accent-base);
+  accent-color: var(--accent-100);
   transform-origin: center;
   scale: 1.3;
 }

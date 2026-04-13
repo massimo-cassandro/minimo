@@ -2,21 +2,21 @@
 
   &.btn-success {
     --_bg: var(--status-success-color);
-    --_fg: var(--status-success-foreground);
+    --_fg: var(--status-success-fg);
     --_btn-bg-color: var(--_bg);
     --_btn-fg-color: var(--_fg);
     --_btn-border-color: var(--status-success-border-color);
   }
   &.btn-info {
     --_bg: var(--status-info-color);
-    --_fg: var(--status-info-foreground);
+    --_fg: var(--status-info-fg);
     --_btn-bg-color: var(--_bg);
     --_btn-fg-color: var(--_fg);
     --_btn-border-color: var(--status-info-border-color);
   }
   &.btn-danger, &.btn-error {
     --_bg: var(--status-danger-color);
-    --_fg: var(--status-danger-foreground);
+    --_fg: var(--status-danger-fg);
     --_btn-bg-color: var(--_bg);
     --_btn-fg-color: var(--_fg);
     --_btn-border-color: var(--status-danger-border-color);
@@ -25,7 +25,7 @@
 
   &.btn-warning {
     --_bg: var(--status-warning-color);
-    --_fg: var(--status-warning-foreground);
+    --_fg: var(--status-warning-fg);
     --_btn-bg-color: var(--_bg);
     --_btn-fg-color: var(--_fg);
     --_btn-border-color: var(--status-warning-border-color);

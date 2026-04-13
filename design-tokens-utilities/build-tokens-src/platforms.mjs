@@ -40,6 +40,7 @@ const PENPOT_TRANSFORMS = [
  *                                                   Collected from sd.allTokens after SD initialisation.
  *                                                   Ignored when penpotDestFile is set.
  * @param {'keep'|'calc'|'resolve'} opts.penpotExpressions  How to handle math expressions in dimension tokens.
+ * @param {string[]}        opts.colorScalePrefixes  Color token prefixes for numeric scale zero-padding.
  * @returns {object} platforms object ready for Style Dictionary config
  */
 export const buildPlatforms = ({
@@ -49,6 +50,7 @@ export const buildPlatforms = ({
   penpotDestFile,
   penpotFormat,
   penpotExpressions = 'keep',
+  colorScalePrefixes = [],
   concreteFilePaths = [],
 }) => {
   const platforms = {
@@ -62,6 +64,7 @@ export const buildPlatforms = ({
           options: {
             outputReferences: true,
             showFileHeader: true,
+            colorScalePrefixes,
           },
         },
       ],
@@ -72,7 +75,7 @@ export const buildPlatforms = ({
     platforms.penpot = {
       buildPath: penpotBuildPath + '/',
       transforms: PENPOT_TRANSFORMS,
-      files: buildPenpotFiles(concreteFilePaths, penpotDestFile, penpotFormat, penpotExpressions),
+      files: buildPenpotFiles(concreteFilePaths, penpotDestFile, penpotFormat, penpotExpressions, colorScalePrefixes),
     };
   }
 

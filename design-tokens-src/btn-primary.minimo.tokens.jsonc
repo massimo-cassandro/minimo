@@ -3,12 +3,12 @@
     "primary": {
       "background": {
         "color": {
-          "$value": "{primary.base}",
+          "$value": "{primary.100}",
           "$type": "color"
         }
       },
       "color": {
-        "$value": "{primary.on-base}",
+        "$value": "{primary.100-fg}",
         "$type": "color"
       },
 

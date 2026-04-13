@@ -9,12 +9,12 @@
     "background": {
       "color": {
         "$type": "color",
-        "$value": "{primary.base}"
+        "$value": "{primary.100}"
       }
     },
     "color": {
       "$type": "color",
-      "$value": "{primary.on-base}"
+      "$value": "{primary.100-fg}"
     },
     "font": {
       "size": {

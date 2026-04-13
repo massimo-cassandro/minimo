@@ -68,6 +68,14 @@ export const penpotFormat = buildConfig.penpotFormat === 'jsonc' ? 'jsonc' : 'js
 //   'keep'    (default) — write the expression as-is
 //   'calc'    — wrap in CSS calc()
 //   'resolve' — evaluate numerically; unit inherited from the first referenced token
+// colorScalePrefixes: list of color token prefixes for which the numeric scale
+// segment is zero-padded to 3 digits (e.g. --neutral-80 -> --neutral-080).
+// Applied to both CSS custom property names and Penpot DTCG token keys.
+// Set to an empty array or omit to disable.
+export const colorScalePrefixes = Array.isArray(buildConfig.colorScalePrefixes)
+  ? buildConfig.colorScalePrefixes
+  : [];
+
 const VALID_EXPR_MODES = ['keep', 'calc', 'resolve'];
 export const penpotExpressions = VALID_EXPR_MODES.includes(buildConfig.penpotExpressions)
   ? buildConfig.penpotExpressions

@@ -5,19 +5,19 @@
 
 .modal-alert {
   --malert-success-color: var(--status-success-color);
-  --malert-success-color-fg: var(--status-success-foreground);
+  --malert-success-color-fg: var(--status-success-fg);
 
   --malert-info-color: var(--status-info-color);
-  --malert-info-color-fg: var(--status-info-foreground);
+  --malert-info-color-fg: var(--status-info-fg);
 
   --malert-warning-color: var(--status-warning-color);
-  --malert-warning-color-fg: var(--status-warning-foreground);
+  --malert-warning-color-fg: var(--status-warning-fg);
 
   --malert-error-color: var(--status-danger-color);
-  --malert-error-color-fg: var(--status-danger-foreground);
+  --malert-error-color-fg: var(--status-danger-fg);
 
   --malert-confirm-color: var(--status-warning-color);
-  --malert-confirm-color-fg: var(--status-warning-foreground);
+  --malert-confirm-color-fg: var(--status-warning-fg);
 
   /* --malert-marks-stroke-width: 6px; */
   --malert-backdrop: rgb(0 0 0 / .3);

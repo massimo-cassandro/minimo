@@ -50,7 +50,7 @@
       left: 50%;
       display: block;
       padding: var(--size-xs);
-      color: var(--recaptcha-alert-foreground, #fff);
+      color: var(--recaptcha-alert-fg, #fff);
       background-color: var(--recaptcha-alert-background-color, #000);
       border: .5px solid currentColor;
       border-radius: var(--radius-xs);

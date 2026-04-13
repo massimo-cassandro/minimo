@@ -7,7 +7,7 @@
     },
 
     "color": {
-      "$value": "{primary.base}",
+      "$value": "{primary.100}",
       "$type": "color"
     },
 

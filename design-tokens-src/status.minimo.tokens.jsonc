@@ -12,7 +12,7 @@
           "$type": "color"
         }
       },
-      "foreground": {
+      "fg": {
         "$value": "#fff",
         "$type": "color"
       },
@@ -34,7 +34,7 @@
           "$type": "color"
         }
       },
-      "foreground": {
+      "fg": {
         "$value": "#fff",
         "$type": "color"
       },
@@ -56,7 +56,7 @@
           "$type": "color"
         }
       },
-      "foreground": {
+      "fg": {
         "$value": "#fff",
         "$type": "color"
       },
@@ -78,7 +78,7 @@
           "$type": "color"
         }
       },
-      "foreground": {
+      "fg": {
         "$value": "#4f2900",
         "$type": "color"
       },
