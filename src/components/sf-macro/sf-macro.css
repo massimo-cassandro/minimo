@@ -38,6 +38,19 @@
   border: var(--sf-macro-rows-border);
   border-radius: var(--sf-macro-rows-border-radius);
 
+  &::before {
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+    text-indent: -999em;
+    /* TODO content nelle custom properties */
+    content: url(../../icons/x-bold.svg?cssInline);
+    translate: -50% -50%;
+  }
+
   &:nth-child(even) {
     background-color: var(--sf-macro-rows-even-background-color);
   }

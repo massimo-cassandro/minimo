@@ -18,8 +18,10 @@
 /* @import '@minimo/css/forms/fieldset.css'; */
 /* @import '@minimo/css/forms/form-group.css'; */
 /* @import '@minimo/css/forms/input-group.css'; */
+/* @import '@minimo/css/forms/form-disabled-readonly.css'; */
 /* @import '@minimo/css/forms/validation.css'; */
 /* @import '@minimo/css/forms/form-utilities.css'; */
+
 @import '@minimo/css/buttons/buttons.css';
 /* @import '@minimo/css/buttons/status-buttons.css'; */
 /* @import '@minimo/css/buttons/btn-close.css'; */
@@ -30,7 +32,6 @@
 /* @import '@minimo/css/alerts.css'; */
 /* @import '@minimo/css/icons.css'; */
 @import '@minimo/css/svg.css';
-@import '@minimo/css/overlay.css';
 /* @import '@minimo/css/table.css'; */
 /* @import '@minimo/css/flex.css'; */
 /* @import '@minimo/css/grid.css'; */
@@ -38,9 +39,6 @@
 /* @import '@minimo/css/utilities.css'; */
 
 
-/* componenti */
-/* @import '@minimo/components/spinner/spinner-circle-basic.css'; */
-/* @import '@minimo/components/modal-alert/modal-alert.css'; */
 
 /* file progetto */
 /* @import '@src/path_to/layout.css'; */

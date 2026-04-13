@@ -99,7 +99,7 @@
   --form-control-disabled-background-color: #ddd;
   --form-control-disabled-color: #999;
   --form-control-disabled-font-style: italic;
-  --form-control-disabled-opacity: .3;
+  --form-control-disabled-opacity: .7;
   --form-control-focus-color: hsl(205 69% 45% / .508);
   --form-control-focus-outline-width: .25rem;
   --form-control-font-size: var(--font-size-base);
@@ -118,6 +118,10 @@
   --form-control-placeholder-font-size: var(--form-control-font-size);
   --form-control-placeholder-font-style: italic;
   --form-control-placeholder-opacity: .8;
+  --form-control-readonly-background-color: var(--form-control-background-color);
+  --form-control-readonly-color: #666;
+  --form-control-readonly-font-style: italic;
+  --form-control-readonly-opacity: 1;
   --form-control-required-flag-color: #c00;
   --form-control-required-flag-content: '\002A';
   --form-control-select-trigger-icon: url('data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2016%2016%22%3E%3Cpath%20fill%3D%22none%22%20stroke%3D%22rgb(5%2C%2048%2C%2056)%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20stroke-width%3D%222%22%20d%3D%22m2%205%206%206%206-6%22%2F%3E%3C%2Fsvg%3E');

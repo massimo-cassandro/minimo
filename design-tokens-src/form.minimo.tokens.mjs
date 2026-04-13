@@ -148,6 +148,28 @@ export default {
           }
         }
       },
+      readonly: {
+        background: {
+          color: {
+            $value: '{form.control.background.color}',
+            $type: 'color'
+          }
+        },
+        color: {
+          $value: '#666',
+          $type: 'color'
+        },
+        opacity: {
+          $value: 1,
+          $type: 'number'
+        },
+        font: {
+          style: {
+            $value: 'italic',
+            $type: 'string'
+          }
+        }
+      },
       required: {
         'flag-color': {
           $value: '#c00',

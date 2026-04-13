@@ -43,26 +43,9 @@
   &:focus {
     outline: var(--form-control-focus-outline-width) solid var(--form-control-focus-color);
   }
-
-  &[disabled] {
-    color: var(--form-control-disabled-color);
-    /* border-color: $form-select-disabled-border-color; */
-    cursor: not-allowed;
-    background-color: var(--form-control-disabled-background-color);
-    
-    &, &::placeholder {
-      font-style: var(--form-control-disabled-font-style);
-    }
-  }
 }
 
-.form-group:has([disabled]) {
-  opacity: var(--form-control-disabled-opacity);
-  .form-label {
-    font-style: var(--form-control-disabled-font-style);
-    color: var(--form-control-disabled-color);
-  }
-}
+
 
 .form-control, .form-control-static {
 
@@ -157,4 +140,5 @@ input::-webkit-calendar-picker-trigger-icon { /* solo in chromium, non in safari
 textarea.form-control {
   flex: 1;
 }
+
 

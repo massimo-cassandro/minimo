@@ -136,7 +136,29 @@
         },
         "opacity": {
           "$type": "number",
-          "$value": ".3"
+          "$value": 0.7
+        },
+        "font": {
+          "style": {
+            "$type": "string",
+            "$value": "italic"
+          }
+        }
+      },
+      "readonly": {
+        "background": {
+          "color": {
+            "$type": "color",
+            "$value": "{form.control.background.color}"
+          }
+        },
+        "color": {
+          "$type": "color",
+          "$value": "#666"
+        },
+        "opacity": {
+          "$type": "number",
+          "$value": 1
         },
         "font": {
           "style": {
