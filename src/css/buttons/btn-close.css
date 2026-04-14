@@ -16,6 +16,7 @@
   height: var(--btn-close-size);
   padding: var(--btn-close-padding);
   color: var(--btn-close-icon-color);
+  text-indent: -999em;
   cursor: pointer;
   background-color: var(--btn-close-background-color);
   border: var(--btn-close-border-width) solid var(--btn-close-border-color);

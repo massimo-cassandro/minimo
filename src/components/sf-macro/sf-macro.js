@@ -1,4 +1,4 @@
-import './sf-macro.css';
+// import './sf-macro.css'; // da importare nel progetto
 
 export function sf_macro({
   wrapper_selector = '.sf-macro-wrapper',

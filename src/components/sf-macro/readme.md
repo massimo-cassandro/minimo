@@ -33,9 +33,7 @@ sf_macro({
 
       </div> {# end .grid #}
 
-      <button type="button" class="btn-reset sf-macro-close-btn" aria-label="Elimina riga">
-        Elimina riga
-      </button>
+      <button type="button" class="btn-close sf-macro-close-btn">Elimina riga</button>
     </div> {# end .sf-macro-riga #}
   {%- endmacro -%}
   {% import _self as m %}
