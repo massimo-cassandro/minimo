@@ -23,7 +23,7 @@ fieldset.form-group, fieldset.form-collection-fset {
 */
 
 
-.fieldset { /* :not(.fupl-wrapper):not(.form-group):not(.form-collection-fset) { */
+.fset { /* :not(.fupl-wrapper):not(.form-group):not(.form-collection-fset) { */
   position: relative;
   padding: 3rem 1rem 1rem;
   margin: 1rem 0 2rem;
@@ -50,7 +50,7 @@ fieldset.form-group, fieldset.form-collection-fset {
   }
 
 
-  .fieldset { /* :not(.fupl-wrapper):not(.form-group) { */
+  .fset { /* :not(.fupl-wrapper):not(.form-group) { */
     padding-top: 2rem;
     margin-bottom: .5rem;
     border: none;

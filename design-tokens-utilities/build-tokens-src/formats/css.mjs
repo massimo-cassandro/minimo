@@ -147,9 +147,32 @@ StyleDictionary.registerFormat({
 
     const resolveRefs = makeResolveRefs(tokenByPath);
 
+    const sequenceList = [
+      'xxs', 'xs', 'sm', 'base', 'md', 'lg', 'xl', 'xxl', 'xxxl', '2xl', '3xl',
+      'xlight', 'light', 'regular', 'medium', 'semibold', 'bold', 'xbold'
+    ]
+
+    const sortFunction = (a, b) => {
+      const idxA = sequenceList.indexOf(a.name);
+      const idxB = sequenceList.indexOf(b.name);
+
+      // Entrambi nella lista → ordine arbitrario
+      if (idxA !== -1 && idxB !== -1) return idxA - idxB;
+
+      // Solo A nella lista → A viene prima
+      if (idxA !== -1) return -1;
+
+      // Solo B nella lista → B viene prima
+      if (idxB !== -1) return 1;
+
+      // Nessuno nella lista → ordine alfabetico
+      return a.name.localeCompare(b.name, 'en', { numeric: true, sensitivity: 'base' });
+    };
+
     const lines = dictionary.allTokens
       .slice()
-      .sort((a, b) => a.name.localeCompare(b.name, 'en', {numeric: true, sensitivity: 'base'}))
+      // .sort((a, b) => a.name.localeCompare(b.name, 'en', {numeric: true, sensitivity: 'base'}))
+      .sort((a, b) => sortFunction(a,b))
       .flatMap((token) => {
         const type = token.$type ?? token.type;
         const orig = token.original?.$value ?? token.original?.value;
