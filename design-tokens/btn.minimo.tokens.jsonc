@@ -34,7 +34,7 @@
       "border": {
         "width": {
           "$type": "dimension",
-          "$value": "{btn.border.width}"
+          "$value": "2px"
         }
       }
     },

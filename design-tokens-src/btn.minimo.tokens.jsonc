@@ -29,7 +29,7 @@
     "hollow": {
       "border": {
         "width": {
-          "$value": "{btn.border.width}",
+          "$value": "{btn.border.width} * 2",
           "$type": "dimension"
         }
       }
