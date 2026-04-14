@@ -189,6 +189,10 @@ export default {
           width: {
             $value: '4px',
             $type: 'dimension'
+          },
+          offset: {
+            $value: '-2px',
+            $type: 'dimension'
           }
         }
       },

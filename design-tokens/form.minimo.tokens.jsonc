@@ -186,6 +186,10 @@
           "width": {
             "$type": "dimension",
             "$value": "4px"
+          },
+          "offset": {
+            "$type": "dimension",
+            "$value": "-2px"
           }
         }
       },

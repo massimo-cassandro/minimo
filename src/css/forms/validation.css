@@ -11,14 +11,16 @@
   .form-label {
     color: var(--_status-color);
   }
+
+  /* TODO .form-select è necessario? */
   .form-control, .form-select {
-    outline: 2px solid var(--_status-color);
-    outline-offset: 2px;
+    outline: var(--form-validation-outline-width) solid var(--_status-color);
+    outline-offset: var(--form-validation-outline-offset);
 
     &:focus {
       /* background-color: var(--_status-color); */
-      outline: var(--btn-focus-outline-width) solid var(--_status-color);
-      outline-offset: 0;
+      outline: var(--form-control-focus-outline-width) solid var(--_status-color);
+      outline-offset: var(--form-control-focus-outline-offset);
     }
   }
 

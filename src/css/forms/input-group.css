@@ -21,7 +21,7 @@
     font-size: var(--btn-font-size);
     background-color: var(--form-input-group-background-color);
     border: 1px solid var(--form-control-border-color);
-    border-radius: var(--btn-border-radius);
+    border-radius: var(--form-control-border-radius);
   }
 
   > .btn, .input-group-text {

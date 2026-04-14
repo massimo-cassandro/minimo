@@ -101,6 +101,7 @@
   --form-control-disabled-font-style: italic;
   --form-control-disabled-opacity: .7;
   --form-control-focus-color: hsl(205 69% 45% / .508);
+  --form-control-focus-outline-offset: -.125rem;
   --form-control-focus-outline-width: .25rem;
   --form-control-font-size: var(--font-size-base);
   --form-control-font-style: normal;
@@ -149,6 +150,8 @@
   --form-legend-color: var(--text-color);
   --form-user-info-color: var(--text-muted);
   --form-user-info-font-size: var(--font-size-xs);
+  --form-validation-outline-offset: -.1875rem;
+  --form-validation-outline-width: .1875rem;
   --grid-cols: 3;
   --grid-min-col-width: 6rem;
   --headings-color: var(--text-color);
