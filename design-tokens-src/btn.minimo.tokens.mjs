@@ -1,0 +1,200 @@
+export default {
+  btn: {
+
+    font: {
+      style: {
+        $value: '{form.control.font.style}',
+        $type: 'string'
+      },
+      weight: {
+        $value: '{font.weight.semibold}',
+        $type: 'fontWeight'
+      },
+      size: {
+        $value: '{form.control.font.size}',
+        $type: 'dimension'
+      }
+    },
+    border: {
+      radius: {
+        $value: '{form.control.border.radius}',
+        $type: 'dimension'
+      },
+      width: {
+        $value: '{form.control.border.width}',
+        $type: 'dimension'
+      }
+    },
+
+    hollow: {
+      border: {
+        width: {
+          $value: '{btn.border.width} * 2',
+          $type: 'dimension'
+        }
+      }
+    },
+
+
+    disabled: {
+      opacity: {
+        $value: '{form.control.disabled.opacity}',
+        $type: ''
+      }
+    },
+
+    focus: {
+      outline: {
+        width: {
+          $value: '{form.control.focus.outline.width}',
+          $type: 'dimension'
+        }
+      }
+    },
+
+    padding: {
+      inline: {
+        $value: '{size.base}',
+        $type: 'dimension'
+      },
+      block: {
+        $value: '{size.xs}',
+        $type: 'dimension'
+      }
+    },
+
+    xs: {
+      font: {
+        size: {
+          $value: '{font.size.xs}',
+          $type: 'dimension'
+        }
+      },
+      padding: {
+        inline: {
+          $value: '{size.xxs}',
+          $type: 'dimension'
+        },
+        block: {
+          $value: '{size.xxs}',
+          $type: 'dimension'
+        }
+      },
+      focus: {
+        outline: {
+          width: {
+            $value: '1px',
+            $type: 'dimension'
+          }
+        }
+      }
+    },
+    sm: {
+      font: {
+        size: {
+          $value: '{font.size.sm}',
+          $type: 'dimension'
+        }
+      },
+      padding: {
+        inline: {
+          $value: '{size.xs}',
+          $type: 'dimension'
+        },
+        block: {
+          $value: '{size.xxs}',
+          $type: 'dimension'
+        }
+      },
+      focus: {
+        outline: {
+          width: {
+            $value: '2px',
+            $type: 'dimension'
+          }
+        }
+      }
+    },
+    md: {
+      font: {
+        size: {
+          $value: '{font.size.md}',
+          $type: 'dimension'
+        }
+      },
+      padding: {
+        inline: {
+          $value: '{size.sm}',
+          $type: 'dimension'
+        },
+        block: {
+          $value: '{size.xs}',
+          $type: 'dimension'
+        }
+      },
+      focus: {
+        outline: {
+          width: {
+            $value: '3px',
+            $type: 'dimension'
+          }
+        }
+      }
+    },
+    lg: {
+      font: {
+        size: {
+          $value: '{font.size.lg}',
+          $type: 'dimension'
+        }
+      },
+      padding: {
+        inline: {
+          $value: '{size.md}',
+          $type: 'dimension'
+        },
+        block: {
+          $value: '{size.base}',
+          $type: 'dimension'
+        }
+      },
+      focus: {
+        outline: {
+          width: {
+            $value: '4px',
+            $type: 'dimension'
+          }
+        }
+      }
+    },
+    xl: {
+      font: {
+        size: {
+          $value: '{font.size.xl}',
+          $type: 'dimension'
+        }
+      },
+      padding: {
+        inline: {
+          $value: '{size.xl}',
+          $type: 'dimension'
+        },
+        block: {
+          $value: '{size.md}',
+          $type: 'dimension'
+        }
+      },
+      focus: {
+        outline: {
+          width: {
+            $value: '6px',
+            $type: 'dimension'
+          }
+        }
+      }
+    }
+
+  } // end btn
+};
+
+

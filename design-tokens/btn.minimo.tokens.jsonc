@@ -13,7 +13,7 @@
       },
       "weight": {
         "$type": "fontWeight",
-        "$value": "{form.control.font.weight}"
+        "$value": "{font.weight.semibold}"
       },
       "size": {
         "$type": "dimension",

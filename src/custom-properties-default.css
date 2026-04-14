@@ -32,7 +32,7 @@
   --btn-focus-outline-width: var(--form-control-focus-outline-width);
   --btn-font-size: var(--form-control-font-size);
   --btn-font-style: var(--form-control-font-style);
-  --btn-font-weight: var(--form-control-font-weight);
+  --btn-font-weight: var(--font-weight-semibold);
   --btn-hollow-border-width: calc(var(--btn-border-width) * 2);
   --btn-lg-focus-outline-width: .25rem;
   --btn-lg-font-size: var(--font-size-lg);
