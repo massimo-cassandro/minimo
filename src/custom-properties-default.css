@@ -182,9 +182,6 @@
   --radius-xl: var(--size-xl);
   --radius-xs: var(--size-xs);
   --radius-xxs: var(--size-xxs);
-  --recaptcha-alert-background-color: #000;
-  --recaptcha-alert-fg: #fff;
-  --recaptcha-alert-overlay-color: rgb(0 0 0 / .5);
   --sdt-hover-background-color: var(--btn-primary-background-color);
   --sdt-hover-color: var(--btn-primary-color);
   --sdt-pagination-border: var(--btn-border-width) var(--neutral-100);
@@ -248,9 +245,5 @@
   --text-negative: #fff;
   --text-selected-background-color: #ddd;
   --text-selected-text: var(--body-text);
-  --toast-border-radius: var(--radius-sm);
-  --toast-duration: 5s;
-  --toast-font-size: var(--font-size-sm);
-  --toast-text-color: var(--text-color);
   --z-index-overlay: 99;
 }

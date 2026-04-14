@@ -4,7 +4,8 @@ export function sf_macro({
   wrapper_selector = '.sf-macro-wrapper',
   row_selector = '.sf-macro-riga',
   add_callback = null,
-  del_callback = null
+  del_callback = null,
+  insertAtTop = false
 }={}) {
 
   document.querySelectorAll(wrapper_selector).forEach(fset => {
@@ -19,7 +20,7 @@ export function sf_macro({
 
         const righe_macro = macro_container.querySelectorAll(row_selector).length;
 
-        macro_container.insertAdjacentHTML('beforeend',
+        macro_container.insertAdjacentHTML(insertAtTop? 'afterbegin' : 'beforeend',
           macro_template.replace(/__indice\d?__/g, righe_macro + 1)
         );
 

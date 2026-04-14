@@ -1,4 +1,4 @@
-import { mAlert } from './modal-alert.js';
+import { mAlert } from '../src/components/modal-alert/modal-alert.js';
 
 
 /*
