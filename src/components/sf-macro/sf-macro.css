@@ -1,6 +1,9 @@
 
 .sf-macro-wrapper {
 
+  --btn-close-background-color: var(--sf-macro-btn-close-background-color);
+  --btn-close-size: var(--sf-macro-btn-close-size);
+
 
   /* etichette campi righe successive alla prima */
   @media (--media-large-viewport-up) {
@@ -63,12 +66,15 @@
 
 
 .sf-macro-close-btn { /* button */
+
   position: absolute;
-  top: -.5rem;
-  right: -.5rem;
+  top: var(--sf-macro-btn-close-position-top);
+  right: var(--sf-macro-btn-close-position-right);
+  bottom: var(--sf-macro-btn-close-position-bottom);
+  left: var(--sf-macro-btn-close-position-left);
+
   z-index: 1;
   display: block;
-
 
   &[disabled], [disabled] & {
     cursor: not-allowed;

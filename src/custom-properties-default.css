@@ -193,8 +193,12 @@
   --sdt-thead-hover-background-color: calc(color-mix(in srgb, var(--table-thead-background-color) 90%, var(--accent-100)));
   --secondary-100: #650853;
   --secondary-100-fg: #fff;
-  --sf-macro-btn-close-background-color: var(--body-background-color);
-  --sf-macro-btn-close-size: 2rem;
+  --sf-macro-btn-close-background-color: var(--btn-close-background-color);
+  --sf-macro-btn-close-position-bottom: auto;
+  --sf-macro-btn-close-position-left: auto;
+  --sf-macro-btn-close-position-right: -.5rem;
+  --sf-macro-btn-close-position-top: -.5rem;
+  --sf-macro-btn-close-size: var(--btn-close-size);
   --sf-macro-rows-border: 1px solid var(--neutral-100);
   --sf-macro-rows-border-radius: var(--radius-xs);
   --sf-macro-rows-even-background-color: var(--body-background-color);

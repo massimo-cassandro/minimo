@@ -52,12 +52,30 @@
       "close": {
         "size": {
           "$type": "dimension",
-          "$value": "2rem"
+          "$value": "{btn.close.size}"
         },
         "background": {
           "color": {
             "$type": "color",
-            "$value": "{body.background.color}"
+            "$value": "{btn.close.background.color}"
+          }
+        },
+        "position": {
+          "top": {
+            "$type": "dimension",
+            "$value": "-.5rem"
+          },
+          "right": {
+            "$type": "dimension",
+            "$value": "-.5rem"
+          },
+          "bottom": {
+            "$type": "dimension",
+            "$value": "auto"
+          },
+          "left": {
+            "$type": "dimension",
+            "$value": "auto"
           }
         }
       }

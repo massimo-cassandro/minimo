@@ -47,20 +47,38 @@ export default {
       }
     }, // end rows
 
-    // btn: {
-    //   close: {
-    //     size: {
-    //       $value: '2rem',
-    //       $type: 'dimension'
-    //     },
-    //     background: {
-    //       color: {
-    //         $value: '{body.background.color}',
-    //         $type: 'color'
-    //       }
-    //     }
-    //   }
-    // }, // end btn
+    btn: {
+      close: {
+        size: {
+          $value: '{btn.close.size}',
+          $type: 'dimension'
+        },
+        background: {
+          color: {
+            $value: '{btn.close.background.color}',
+            $type: 'color'
+          }
+        },
+        position: {
+          top: {
+            $type: 'dimension',
+            $value: '-.5rem'
+          },
+          right: {
+            $type: 'dimension',
+            $value: '-.5rem'
+          },
+          bottom:{
+            $type: 'dimension',
+            $value: 'auto'
+          },
+          left: {
+            $type: 'dimension',
+            $value: 'auto'
+          },
+        }
+      }
+    }, // end btn
 
   } // end sf-macro
 };
