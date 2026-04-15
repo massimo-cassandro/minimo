@@ -54,6 +54,12 @@
             "$value": "{btn.close.icon.color}"
           }
         },
+        "border": {
+          "color": {
+            "$type": "color",
+            "$value": "{btn.close.icon.color}"
+          }
+        },
         "icon": {
           "color": {
             "$type": "color",

@@ -22,14 +22,14 @@
           "$value": "50%",
           "$type": "dimension"
         }
-        
+
       },
       "background": {
         "color": {
           "$value": "{body.background.color}",
           "$type": "color"
         },
-        
+
       },
       "icon": {
         "color": {
@@ -47,6 +47,12 @@
 
       "hover": {
         "background": {
+          "color": {
+            "$value": "{btn.close.icon.color}",
+            "$type": "color"
+          }
+        },
+        "border": {
           "color": {
             "$value": "{btn.close.icon.color}",
             "$type": "color"

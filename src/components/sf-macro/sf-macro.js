@@ -26,7 +26,9 @@ export function sf_macro({
 
         if(add_callback && typeof add_callback === 'function') {
           add_callback(
-            macro_container.querySelector('.sf-macro-riga:last-child'),
+            insertAtTop
+              ? macro_container.querySelector('.sf-macro-riga:first-child')
+              : macro_container.querySelector('.sf-macro-riga:last-child'),
             e.target.closest('.sf-macro-riga-add')
           );
         }

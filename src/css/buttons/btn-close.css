@@ -50,6 +50,7 @@
     &:hover {
 
       background-color: var(--btn-close-hover-background-color);
+      border-color: var(--btn-close-hover-border-color);
 
       &::before, &::after {
         background-color: var(--btn-close-hover-icon-color);

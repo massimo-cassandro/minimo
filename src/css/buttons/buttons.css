@@ -53,6 +53,7 @@ a.btn {
 
   svg {
     width: 1em;
+    pointer-events: none;
     fill: currentColor;
   }
 

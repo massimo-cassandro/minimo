@@ -23,6 +23,7 @@
   --btn-close-focus-outline-offset: .125rem;
   --btn-close-focus-outline-width: .125rem;
   --btn-close-hover-background-color: var(--btn-close-icon-color);
+  --btn-close-hover-border-color: var(--btn-close-icon-color);
   --btn-close-hover-icon-color: var(--btn-close-background-color);
   --btn-close-icon-bar-size: .125rem;
   --btn-close-icon-color: var(--text-color);

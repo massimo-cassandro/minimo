@@ -113,3 +113,8 @@ li {
 .text-success {
   color: var(--status-success-color);
 }
+
+.text-numeric {
+  font-feature-settings: 'lnum', 'tnum';
+  font-variant-numeric: lining-nums tabular-nums;
+}
