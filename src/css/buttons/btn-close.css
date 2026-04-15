@@ -1,9 +1,9 @@
 /*
-<button type="button" class="btn-close" aria-label="Chiudi"></button>
+<button type="button" class="btn-close" aria-label="Chiudi">Chiudi</button>
+<button type="button" class="btn-close">Chiudi</button>
 */
 
-/* NB richiede buttons.css per il reset */
-
+/* TODO controllare allineamento x interna - prob. valutare meglio l'ingombro dello spessore */
 
 .btn-close  {
 

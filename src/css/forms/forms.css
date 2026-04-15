@@ -77,14 +77,15 @@
 select.form-control, .form-select {
 
   /* --_form-select-trigger-icon-color: var(--form-control-text-color); */
-  --_trigger-icon-padding-right: var(--size-base);
+  --_trigger-icon-padding-right: calc(var(--form-control-padding-inline) * 2);
+  --_bg-img-inline-size: 16px;
 
   padding: var(--form-control-padding-block) var(--_trigger-icon-padding-right) var(--form-control-padding-block) var(--form-control-padding-inline);
   appearance: none;
   background-image: var(--form-control-select-trigger-icon);
   background-repeat: no-repeat;
-  background-position: right var(--_trigger-icon-padding-right) center;
-  background-size: 16px 12px;
+  background-position: right calc(var(--_trigger-icon-padding-right) - var(--_bg-img-inline-size) - 2px) center;
+  background-size: var(--_bg-img-inline-size) 12px;
 
   &[multiple],
   &[size]:not([size='1']) {

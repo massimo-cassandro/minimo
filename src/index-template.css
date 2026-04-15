@@ -23,6 +23,8 @@
 /* @import '@minimo/css/forms/form-utilities.css'; */
 
 @import '@minimo/css/buttons/buttons.css';
+@import '@minimo/css/buttons/buttons-primary.css';
+@import '@minimo/css/buttons/buttons-secondary.css';
 /* @import '@minimo/css/buttons/status-buttons.css'; */
 /* @import '@minimo/css/buttons/btn-close.css'; */
 /* @import '@minimo/css/badge.css'; */
