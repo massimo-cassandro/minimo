@@ -84,7 +84,15 @@ StyleDictionary.registerTransform({
   type: 'value',
   transitive: true,
   filter: (token) => token.$type === 'color' || token.type === 'color',
-  transform: (token) => token.$value ?? token.value,
+  transform: (token) => {
+    const original = token.original?.$value ?? token.original?.value;
+    // If the original value is a CSS function containing {references},
+    // return it untouched so the css format can resolve refs to var(--...)
+    if (typeof original === 'string' && original.includes('{') && !original.startsWith('{')) {
+      return original;
+    }
+    return token.$value ?? token.value;
+  },
 });
 
 // ---------------------------------------------------------------------------
@@ -100,6 +108,12 @@ StyleDictionary.registerTransform({
   filter: (token) => token.$type === 'gradient' || token.type === 'gradient',
   transform: (token) => {
     const original = token.original?.$value ?? token.original?.value;
+
+    // If the original is a CSS function containing {references}, return it
+    // untouched so the css format can resolve refs to var(--...).
+    if (typeof original === 'string' && original.includes('{') && !original.startsWith('{')) {
+      return original;
+    }
 
     const value = (typeof original === 'string' && original.startsWith('{'))
       ? (token.$value ?? token.value)

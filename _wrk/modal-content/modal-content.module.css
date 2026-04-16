@@ -15,8 +15,8 @@
   border: none;
   border-radius: var(--modal-border-radius);
   box-shadow: 0 0 2rem .5rem rgb(0 0 0 / .5);
-  transition: scale .2s ease-out;
   scale: 0;
+  transition: scale .2s ease-out;
 
   /* stylelint-disable selector-class-pattern */
   &.size-full {

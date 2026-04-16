@@ -168,9 +168,12 @@ StyleDictionary.registerFormat({
           value = orig;
         }
       } else {
-        // Non-expression value: preserve aliases for Penpot token links
-        const isAlias = typeof orig === 'string' && orig.startsWith('{') && !orig.includes(' ');
-        value = isAlias ? orig : (token.$value ?? token.value);
+        // Non-expression value: preserve {references} wherever they appear.
+        //   - Pure alias:   "{some.token}"           → kept as-is for Penpot token links
+        //   - CSS function: "color-mix(in srgb, {some.token} 60%, #000)" → kept as-is
+        //   - Plain value:  "#ff0000", "16px", …     → use the resolved $value
+        const containsRef = typeof orig === 'string' && orig.includes('{');
+        value = containsRef ? orig : (token.$value ?? token.value);
       }
 
       const entry = { $type: type, $value: value };

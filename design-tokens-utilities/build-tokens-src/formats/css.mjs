@@ -204,11 +204,17 @@ StyleDictionary.registerFormat({
             ? resolveRefs(orig) : buildAnimation(orig, resolveRefs);
 
         } else if (options.outputReferences && typeof orig === 'string' && orig.includes('{')) {
-          // Resolve {references} to var(--name). If arithmetic operators remain
-          // after substitution the value is a math expression and must be wrapped
-          // in calc() to produce valid CSS.
+          // Covers both plain aliases and CSS functions containing {references}
+          // e.g. color-mix(in srgb, {btn.secondary.background.color} 60%, #000)
+          // {references} are replaced with var(--name); arithmetic gets calc().
           const resolved = resolveRefs(orig);
-          const isCalcNeeded = /[+\-*/]/.test(resolved.replace(/var\([^)]+\)/g, '0'));
+          // Strip var(...) and CSS function calls (word chars + hyphens followed by '(')
+          // before checking for arithmetic operators, so that hyphens in names like
+          // "color-mix" or "linear-gradient" don't trigger a spurious calc() wrap.
+          const stripped = resolved
+            .replace(/var\([^)]+\)/g, '0')
+            .replace(/[\w-]+\(/g, '(');
+          const isCalcNeeded = /[+\-*/]/.test(stripped);
           value = isCalcNeeded ? `calc(${resolved})` : resolved;
 
         } else {

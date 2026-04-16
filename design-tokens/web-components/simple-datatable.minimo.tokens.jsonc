@@ -11,7 +11,7 @@
         "background": {
           "color": {
             "$type": "color",
-            "$value": "color-mix(in srgb, #ddd 90%, #567d0d)"
+            "$value": "color-mix(in srgb, {table.thead.background.color} 90%, {accent.100})"
           }
         }
       }

@@ -27,7 +27,7 @@
         "outline": {
           "color": {
             "$type": "color",
-            "$value": "color-mix(in srgb, #083865 60%, transparent);"
+            "$value": "color-mix(in srgb, {btn.primary.background.color} 60%, transparent)"
           }
         }
       },
@@ -53,7 +53,7 @@
         "background": {
           "color": {
             "$type": "color",
-            "$value": "color-mix(in srgb, #083865 60%, #000);"
+            "$value": "color-mix(in srgb, {btn.primary.background.color} 60%, #000)"
           }
         },
         "color": {
@@ -82,12 +82,12 @@
           "background": {
             "color": {
               "$type": "color",
-              "$value": "color-mix(in srgb, #083865 20%, transparent);"
+              "$value": "{btn.primary.background.color}"
             }
           },
           "color": {
             "$type": "color",
-            "$value": "{btn.primary.hollow.color}"
+            "$value": "{btn.primary.color}"
           }
         }
       }
@@ -113,7 +113,7 @@
         "outline": {
           "color": {
             "$type": "color",
-            "$value": "color-mix(in srgb, #650853 60%, transparent);"
+            "$value": "color-mix(in srgb, {btn.secondary.background.color} 60%, transparent)"
           }
         }
       },
@@ -139,7 +139,7 @@
         "background": {
           "color": {
             "$type": "color",
-            "$value": "color-mix(in srgb, #650853 60%, #000);"
+            "$value": "color-mix(in srgb, {btn.secondary.background.color} 60%, #000)"
           }
         },
         "color": {
@@ -168,12 +168,12 @@
           "background": {
             "color": {
               "$type": "color",
-              "$value": "color-mix(in srgb, #650853 20%, transparent);"
+              "$value": "{btn.secondary.background.color}"
             }
           },
           "color": {
             "$type": "color",
-            "$value": "{btn.secondary.hollow.color}"
+            "$value": "{btn.secondary.color}"
           }
         }
       }

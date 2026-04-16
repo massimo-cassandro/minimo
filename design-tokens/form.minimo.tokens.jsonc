@@ -25,7 +25,7 @@
     "group": {
       "padding-block": {
         "$type": "dimension",
-        "$value": "0 1rem"
+        "$value": "0 {size.base}"
       }
     },
     "input-group": {

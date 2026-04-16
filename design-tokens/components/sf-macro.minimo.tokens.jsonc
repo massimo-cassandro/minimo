@@ -23,7 +23,7 @@
         "background": {
           "color": {
             "$type": "color",
-            "$value": "color-mix(in srgb, #fff 95%, #000)"
+            "$value": "color-mix(in srgb, {body.background.color} 95%, #000)"
           }
         }
       },

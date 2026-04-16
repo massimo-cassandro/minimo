@@ -61,7 +61,16 @@ if (penpotBuildPath && !penpotDestFile) {
   concreteFilePaths = await collectConcreteFilePaths(sdInit);
 }
 
-// ── 7. Build ──────────────────────────────────────────────────────────────────
+// ── 7. Clean penpot output directory ─────────────────────────────────────────
+// Wipe the destination folder before writing new files so that tokens removed
+// from the source are not left behind as stale artefacts.
+if (penpotBuildPath) {
+  const { rm, mkdir } = await import('fs/promises');
+  await rm(penpotBuildPath, { recursive: true, force: true });
+  await mkdir(penpotBuildPath, { recursive: true });
+}
+
+// ── 8. Build ──────────────────────────────────────────────────────────────────
 const sd = new StyleDictionary({
   source,
   log: { verbosity: 'verbose' },
@@ -78,7 +87,7 @@ const sd = new StyleDictionary({
 
 await sd.buildAllPlatforms();
 
-// ── 8. CSS lint ───────────────────────────────────────────────────────────────
+// ── 9. CSS lint ───────────────────────────────────────────────────────────────
 const stylelintConfig = await import(pathToFileURL(stylelintConfigPath)).then(m => m.default);
 
 await stylelint.lint({
@@ -87,7 +96,7 @@ await stylelint.lint({
   fix: true,
 });
 
-// ── 9. Log ────────────────────────────────────────────────────────────────────
+// ── 10. Log ────────────────────────────────────────────────────────────────────
 const short = (p) => p.replace(homedir(), '~');
 
 console.log(styleText(['yellow'], `[build-tokens] config file : ${short(configAbsPath)}`));

@@ -1,3 +1,5 @@
+// TODO aggiungere neutral e accent
+
 const makeBtnObj = theme => {
 
   return {
@@ -22,7 +24,7 @@ const makeBtnObj = theme => {
     focus: {
       outline: {
         color: {
-          $value: `color-mix(in srgb, {btn.${theme}.background.color} 60%, transparent);`,
+          $value: `color-mix(in srgb, {btn.${theme}.background.color} 60%, transparent)`,
           $type: 'color'
         }
       }
@@ -51,7 +53,7 @@ const makeBtnObj = theme => {
     active: {
       background: {
         color: {
-          $value: `color-mix(in srgb, {btn.${theme}.background.color} 60%, #000);`,
+          $value: `color-mix(in srgb, {btn.${theme}.background.color} 60%, #000)`,
           $type: 'color'
         }
       },
@@ -83,12 +85,12 @@ const makeBtnObj = theme => {
       hover: {
         background: {
           color: {
-            $value: `color-mix(in srgb, {btn.${theme}.hollow.color} 20%, transparent);`,
+            $value: `{btn.${theme}.background.color}`,
             $type: 'color'
           }
         },
         color: {
-          $value: `{btn.${theme}.hollow.color}`,
+          $value: `{btn.${theme}.color}`,
           $type: 'color'
         }
 
