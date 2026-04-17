@@ -1,7 +1,7 @@
 // forked from https://github.com/argyleink/gui-challenges/tree/main/toast
 // https://web.dev/articles/building/a-toast-component?hl=en
 
-// TODO rivedere
+// TODO rivedere, usare popover
 
 import * as styles from './toast.module.css';
 

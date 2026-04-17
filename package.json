@@ -1,6 +1,6 @@
 {
   "name": "@massimo-cassandro/minimo",
-  "version": "0.8.5",
+  "version": "0.8.8",
   "description": "Light css framework",
   "type": "module",
   "homepage": "https://github.com/massimo-cassandro/minimo#readme",
@@ -27,8 +27,9 @@
   "publishConfig": {
     "access": "public"
   },
-  "main": "./src/index.js",
+  "main": "./index.js",
   "files": [
+    "./index.js",
     "src/**/*.{js,mjs,css,svg,md}",
     "design-tokens/**/*.{tokens.json,tokens.jsonc}",
     "design-tokens-src/**/*.{tokens.json,tokens.jsonc,mjs,js,md}",

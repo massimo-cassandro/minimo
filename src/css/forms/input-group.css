@@ -16,6 +16,7 @@
     border-bottom-right-radius: 0;
   }
 
+
   > .input-group-text {
     padding: var(--form-control-padding-block) var(--form-control-padding-inline);
     font-size: var(--btn-font-size);
@@ -24,8 +25,9 @@
     border-radius: var(--form-control-border-radius);
   }
 
-  > .btn, .input-group-text {
+  > .btn, > .input-group-text {
     z-index: 1;
+    line-height: 1;
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
   }

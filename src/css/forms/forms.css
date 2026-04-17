@@ -133,10 +133,6 @@ input::-webkit-calendar-picker-trigger-icon { /* solo in chromium, non in safari
 }
 
 
-.form-help-text {
-  font-size: var(--font-size-xs);
-  color: var(--text-muted);
-}
 
 
 textarea.form-control {

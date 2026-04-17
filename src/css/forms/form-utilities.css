@@ -1,3 +1,6 @@
+
+/* blocco finale con le info sull'utente che h salvato il form */
+
 /*
 <div class="form-end">
 
@@ -29,4 +32,13 @@
   justify-content: flex-end;
   font-size: var(--form-user-info-font-size);
   color: var(--form-user-info-color);
+}
+
+
+/* ---------------------------------------------------------------- */
+/* testo di aiuto sotto il controllo */
+
+.form-help-text {
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
 }

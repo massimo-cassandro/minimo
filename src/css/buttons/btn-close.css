@@ -6,7 +6,6 @@
 /* TODO controllare allineamento x interna - prob. valutare meglio l'ingombro dello spessore */
 
 .btn-close  {
-
   --_icon-bar-width: calc(var(--btn-close-size) - (var(--btn-close-padding) * 2) - (var(--btn-close-border-width) * 2));
 
   position: relative;
@@ -25,20 +24,20 @@
   &::before, &::after {
     position: absolute;
     top: 50%;
-    left: 0;
+    left: 0; /* calc(var(--btn-close-icon-bar-size) / 2); */
     display: block;
     width: var(--_icon-bar-width);
     height: var(--btn-close-icon-bar-size);
     content: '';
     background: currentColor;
+    transform-origin: center;
+    translate: var(--btn-close-padding) -50%;
   }
   &::before {
     rotate: 45deg;
-    translate: var(--btn-close-padding) -50%;
   }
   &::after {
     rotate: -45deg;
-    translate: var(--btn-close-padding) -50%;
   }
 
   &:focus {
