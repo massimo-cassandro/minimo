@@ -56,7 +56,7 @@ cat "$TEMPLATES_DIR/_browserslistrc" > .browserslistrc
 cat "$TEMPLATES_DIR/_editorconfig" > .editorconfig
 cat "$TEMPLATES_DIR/_prettierrc" > .prettierrc
 cat "$TEMPLATES_DIR/jsconfig.json" > jsconfig.json
-cat "$TEMPLATES_DIR/vscode-workspace-settings.jsonc" > vscode-workspace-settings.jsonc
+cat "$TEMPLATES_DIR/__project__.code-workspace" > __project__.code-workspace
 
 npm i -D @massimo-cassandro/dev-updater
 

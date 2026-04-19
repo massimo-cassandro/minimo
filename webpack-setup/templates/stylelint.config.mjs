@@ -11,7 +11,9 @@ export default {
     'dist/**/*.css',
     'build/**/*.css',
     'public/**/*.css',
-    'test/**/*.css'
+    'test/**/*.css',
+    'docs/**/*.css',
+    'demo/**/*.css',
   ],
 
   // Overrides

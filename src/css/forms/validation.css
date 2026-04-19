@@ -18,6 +18,10 @@
     outline-offset: var(--form-validation-outline-offset);
 
     &:focus {
+      outline: none;
+    }
+
+    &:focus-visible {
       /* background-color: var(--_status-color); */
       outline: var(--form-control-focus-outline-width) solid var(--_status-color);
       outline-offset: var(--form-control-focus-outline-offset);

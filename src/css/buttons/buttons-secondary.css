@@ -12,7 +12,11 @@
     }
   }
 
-  &:focus, &:active {
+  &:focus {
+    outline: none;
+  }
+
+  &:focus-visible, &:active {
     outline: var(--btn-focus-outline-width) solid var(--btn-secondary-focus-outline-color);
     /* outline-offset: 4px; */
   }

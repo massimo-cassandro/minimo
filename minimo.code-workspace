@@ -15,5 +15,8 @@
     "cssvar.extensions": [
       "css", "postcss", "jsx", "tsx", "scss"
     ],
+    "bootstrapIntelliSense": {
+      "enable": false
+    },
   }
 }

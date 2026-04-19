@@ -18,13 +18,13 @@
     --_status-fg-color: var(--status-info-fg);
     --_status-border-color: var(--status-info-border-color);
   }
-  &.btn-danger, &.btn-error {
+  &.btn-danger {
     --_status-bg-color: var(--status-danger-color);
     --_status-fg-color: var(--status-danger-fg);
     --_status-border-color: var(--status-danger-border-color);
   }
 
-  &.btn-success, &.btn-info, &.btn-danger, &.btn-error  {
+  &.btn-success, &.btn-info, &.btn-danger  {
     --_status-hover-bg-color: color-mix(in srgb, var(--_status-bg-color) 30%, transparent);
     --_status-hover-fg-color: var(--_status-bg-color);
     --_status-hover-border-color: var(--_status-bg-color);
@@ -51,7 +51,7 @@
 
   }
 
-  &.btn-success, &.btn-info, &.btn-danger, &.btn-error, &.btn-warning  {
+  &.btn-success, &.btn-info, &.btn-danger, &.btn-warning  {
 
     --_button-bg-color: var(--_status-bg-color);
     --_button-fg-color: var(--_status-fg-color);
@@ -74,7 +74,11 @@
       }
     }
 
-    &:focus, &:active {
+    &:focus {
+      outline: none;
+    }
+
+    &:focus-visible, &:active {
       outline: var(--_status-focus-outline);
     }
 

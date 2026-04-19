@@ -1,0 +1,41 @@
+
+/* @import '@src/css/fonts.css'; */
+@import '@src/custom-properties-default.css';
+/* @import '@src/css/custom-media.css'; */
+@import '@src/css/custom-properties.css';
+
+@import '@src/css/reset.css';
+@import '@src/css/layout-base.css';
+@import '@src/css/container.css';
+
+@import '@src/css/forms/forms.css';
+@import '@src/css/forms/fieldset.css';
+@import '@src/css/forms/form-group.css';
+@import '@src/css/forms/input-group.css';
+@import '@src/css/forms/form-disabled-readonly.css';
+@import '@src/css/forms/validation.css';
+@import '@src/css/forms/form-utilities.css';
+
+@import '@src/css/buttons/buttons.css';
+@import '@src/css/buttons/buttons-primary.css';
+@import '@src/css/buttons/buttons-secondary.css';
+@import '@src/css/buttons/status-buttons.css';
+@import '@src/css/buttons/btn-close.css';
+@import '@src/css/badge.css';
+@import '@src/css/text.css';
+@import '@src/css/anchors.css';
+@import '@src/css/headings.css';
+@import '@src/css/alerts.css';
+@import '@src/css/icons.css';
+@import '@src/css/svg.css';
+@import '@src/css/table.css';
+@import '@src/css/flex.css';
+@import '@src/css/grid.css';
+@import '@src/css/details.css';
+@import '@src/css/utilities.css';
+
+
+body {padding: 2rem}
+p {
+  margin: .5rem 0;
+}

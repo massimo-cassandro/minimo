@@ -8,6 +8,7 @@
   "type":"module",
   "sideEffects": [
     "*.css",
+    "*.js",
     "*.svg",
     "*.jpg",
     "*.jpeg",

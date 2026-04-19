@@ -1,7 +1,7 @@
 {
   "name": "@massimo-cassandro/minimo",
-  "version": "0.8.8",
-  "description": "Light css framework",
+  "version": "0.9.0",
+  "description": "Light css framework & utilities",
   "type": "module",
   "homepage": "https://github.com/massimo-cassandro/minimo#readme",
   "bugs": {
@@ -19,6 +19,7 @@
     "UPD-version": "npx update-version  # --config=./dev-utilities.config.mjs",
     "upd@m": "npx upd@m",
     "npm-publish": "npm publish",
+    "webpack": "NODE_ENV=development webpack serve --config ./demo/demo-src/webpack.config.mjs",
     "build-tokens": "node ./design-tokens-utilities/build-tokens.mjs --config ./tokens-config.mjs",
     "check unresolved props": "node ./design-tokens-utilities/check-unresolved-custom-props.mjs --config ./tokens-config.mjs"
   },
@@ -28,6 +29,16 @@
     "access": "public"
   },
   "main": "./index.js",
+  "sideEffects": [
+    "*.css",
+    "*.js",
+    "*.svg",
+    "*.jpg",
+    "*.jpeg",
+    "*.png",
+    "*.webp",
+    "*.avif"
+  ],
   "files": [
     "./index.js",
     "src/**/*.{js,mjs,css,svg,md}",
@@ -36,9 +47,36 @@
     "design-tokens-utilities/**/*.{mjs,md}"
   ],
   "devDependencies": {
+    "@babel/core": "^7.29.0",
+    "@babel/preset-env": "^7.29.2",
+    "@csstools/postcss-global-data": "^4.0.0",
     "@massimo-cassandro/dev-updater": "^3.0.3",
     "@massimo-cassandro/eslint-config": "^3.0.6",
     "@massimo-cassandro/stylelint-config": "^2.3.4",
-    "style-dictionary": "^5.4.0"
+    "autoprefixer": "^10.5.0",
+    "babel-loader": "^10.1.1",
+    "css-loader": "^7.1.4",
+    "css-minimizer-webpack-plugin": "^8.0.0",
+    "cssnano": "^7.1.5",
+    "ejs-loader": "^0.5.0",
+    "html-loader": "^5.1.0",
+    "html-webpack-plugin": "^5.6.7",
+    "mini-css-extract-plugin": "^2.10.2",
+    "mini-svg-data-uri": "^1.4.4",
+    "postcss": "^8.5.10",
+    "postcss-custom-media": "^12.0.1",
+    "postcss-loader": "^8.2.1",
+    "postcss-preset-env": "^11.2.1",
+    "process": "^0.11.10",
+    "style-dictionary": "^5.4.0",
+    "style-loader": "^4.0.0",
+    "svg-url-loader": "^8.0.0",
+    "svgo": "^4.0.1",
+    "svgo-add-viewbox": "^3.1.0",
+    "svgo-loader": "^5.0.0",
+    "terser-webpack-plugin": "^5.4.0",
+    "webpack": "^5.106.2",
+    "webpack-cli": "^7.0.2",
+    "webpack-dev-server": "^5.2.3"
   }
 }

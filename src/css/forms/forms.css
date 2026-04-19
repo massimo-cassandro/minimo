@@ -41,6 +41,10 @@
   border-radius: var(--form-control-border-radius);
 
   &:focus {
+    outline: none;
+  }
+
+  &:focus-visible {
     outline: var(--form-control-focus-outline-width) solid var(--form-control-focus-color);
     outline-offset: var(--form-control-focus-outline-offset);
   }

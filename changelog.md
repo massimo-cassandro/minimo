@@ -8,3 +8,4 @@
 * 0.6.0 (14 apr 2026) - Status btns
 * 0.7.0 (14 apr 2026) - file reorganization
 * 0.8.0 (15 apr 2026) - btn themes
+* 0.9.0 (19 apr 2026) - add demo

@@ -11,8 +11,11 @@
       --_button-border-color: var(--btn-primary-hover-border-color);
     }
   }
+  &:focus {
+    outline: none;
+  }
 
-  &:focus, &:active {
+  &:focus-visible, &:active {
     outline: var(--btn-focus-outline-width) solid var(--btn-primary-focus-outline-color);
     /* outline-offset: 4px; */
   }

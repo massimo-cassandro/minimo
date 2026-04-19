@@ -19,7 +19,11 @@ a {
 }
 
 a, .btn-link {
-  &:focus, &:focus-visible {
+  &:focus {
+    outline: none;
+  }
+
+  &:focus-visible {
     outline: 1px solid color-mix(in srgb, var(--link-color) 60%, transparent);
     outline-offset: 2px;
   }

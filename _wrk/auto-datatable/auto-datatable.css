@@ -309,6 +309,10 @@
     }
 
     &:focus {
+      outline: none;
+    }
+
+    &:focus-visible {
       z-index: 3;
       color: var(--pagination-focus-color);
       background-color: var(--pagination-focus-bg);

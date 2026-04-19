@@ -2,16 +2,13 @@
   "__help": "https://code.visualstudio.com/docs/languages/jsconfig",
   "compilerOptions": {
     "target": "es2023",
+    "ignoreDeprecations": "6.0",
     "baseUrl": ".",
     "allowSyntheticDefaultImports": false,
     "module": "ES6",
     "paths": {
-      "@frontend/*": ["./frontend/*"],
-      "@src/*": ["frontend/src/*"],
-      "@imgs/*": ["./frontend/imgs/*"],
-      "@icone/*": ["./frontend/icone/*"],
-      "@backoffice/*": ["./frontend/backoffice/*"],
-      "@minimo/*": ["./node_modules/@massimo-cassandro/minimo/src/*"]
+      "@demo/*": ["./demo/*"],
+      "@src/*": ["./src/*"]
     }
 
 

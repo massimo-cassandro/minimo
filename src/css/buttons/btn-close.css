@@ -41,6 +41,10 @@
   }
 
   &:focus {
+    outline: none;
+  }
+
+  &:focus-visible {
     outline: var(--btn-close-focus-outline-width) solid var(--btn-close-focus-outline-color);
     outline-offset: var(--btn-close-focus-outline-offset);
   }

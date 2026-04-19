@@ -24,7 +24,7 @@
     --------------------------
   */
 
-  /* alert-error / alert-danger (default) */
+  /* alert-danger (default) */
   --_alert-bg-color: var(--status-danger-background-color);
   --_alert-fg-color: var(--status-danger-fg);
   --_alert-border-color: var(--status-danger-border-color);

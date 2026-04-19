@@ -33,7 +33,11 @@
   }
 
   > * {
-    &:focus, &:focus-within {
+    &:focus {
+      outline: none;
+    }
+
+    &:focus-visible, &:focus-within {
       z-index: 5;
     }
   }

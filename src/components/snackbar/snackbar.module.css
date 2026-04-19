@@ -1,4 +1,18 @@
 /* purgecss start ignore */
+
+.snackbar {
+
+}
+
+/* purgecss end ignore */
+
+
+/*
+
+
+
+
+
 .toastWrapper {
   position: fixed;
   inset-block-end: 0;
@@ -11,7 +25,6 @@
   justify-items: stretch;
   padding-block-end: 5vh;
 
-  /* optimizations */
   pointer-events: none;
 }
 
@@ -23,7 +36,6 @@
   padding-block: .5ch;
   padding-inline: 1ch;
 
-  /* font-family: system-ui, sans-serif; */
   font-size: var(--toast-font-size);
   color: var(--toast-text-color);
   background: hsl(0 0% var(--_bg-lightness) / 90%);
@@ -36,7 +48,6 @@
   will-change: transform;
 
   @media (--dark) {
-    /* color: white; */
     --_bg-lightness: 20%;
   }
 
@@ -56,4 +67,4 @@
 @keyframes slide-in {
   from { transform: translateY(var(--_travel-distance, 10px)); }
 }
-/* purgecss end ignore */
+ */

@@ -1,5 +1,11 @@
+// tokens utitilizzati sia da snackaber che da toast
 export default{
-  toast: {
+  snackbar: {
+
+
+
+
+
 
     font: {
       size: {

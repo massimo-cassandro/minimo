@@ -22,7 +22,11 @@ button svg {
 }
 
 a.btn {
-  &, &:hover, &:active, &:focus, &:visited {
+  &:focus {
+    outline: none;
+  }
+
+  &, &:hover, &:active, &:focus-visible, &:visited {
     color: var(--_button-fg-color);
     text-decoration: none;
   }
