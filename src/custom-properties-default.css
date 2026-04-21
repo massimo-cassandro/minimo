@@ -107,6 +107,7 @@
   --font-weight-xbold: 900;
   --font-weight-xlight: 200;
   --font-weight-xxlight: 100;
+  --form-control-accent-color: var(--accent-100);
   --form-control-background-color: var(--body-background-color);
   --form-control-border-color: #666;
   --form-control-border-radius: var(--radius-xxs);

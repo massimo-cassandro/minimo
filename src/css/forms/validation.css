@@ -13,8 +13,7 @@
     color: var(--_status-color);
   }
 
-  /* TODO .form-select è necessario? */
-  .form-control, .form-select, .form-control-static {
+  .form-control, .form-control-static {
     outline: var(--form-validation-outline-width) solid var(--_status-color);
     outline-offset: var(--form-validation-outline-offset);
 

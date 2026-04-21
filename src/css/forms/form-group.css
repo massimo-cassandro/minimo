@@ -8,10 +8,10 @@
   justify-content: stretch;
   padding-block: var(--form-group-padding-block);
 
-  &:has(textarea) {
+  /* &:has(textarea) {
     height: 100%;
-  }
-  
+  } */
+
   .grid & {
     padding-block-end: 0;
   }

@@ -37,6 +37,12 @@
       }
     },
     "control": {
+      "accent": {
+        "color": {
+          "$type": "color",
+          "$value": "{accent.100}"
+        }
+      },
       "static": {
         "color": {
           "$type": "color",

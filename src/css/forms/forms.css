@@ -38,8 +38,8 @@
   color: var(--form-label-color);
 }
 
-/* la classe form-select è mantenuta per compatibilità con bootstrap  */
-.form-control, .form-control-static, .form-select {
+
+.form-control, .form-control-static {
   display: block;
   width: 100%;
   font-family: var(--font-family);
@@ -47,6 +47,7 @@
   font-weight: var(--font-weight-regular);
   line-height: var(--form-control-line-height);
   color: var(--form-control-text-color);
+  accent-color: var(--form-control-accent-color);
   background-color: var(--form-control-background-color);
   border: 1px solid var(--form-control-border-color);
   border-radius: var(--form-control-border-radius);
@@ -87,9 +88,8 @@
 }
 
 /* da bootstrap */
-select.form-control, .form-select {
+select.form-control {
 
-  /* --_form-select-trigger-icon-color: var(--form-control-text-color); */
   --_trigger-icon-padding-right: calc(var(--form-control-padding-inline) * 2);
   --_bg-img-inline-size: 16px;
 
@@ -146,10 +146,9 @@ input::-webkit-calendar-picker-trigger-icon { /* solo in chromium, non in safari
 }
 
 
-
-
 textarea.form-control {
   flex: 1;
+  min-height: calc(3.5lh + var(--form-control-padding-block) * 2);
 }
 
 

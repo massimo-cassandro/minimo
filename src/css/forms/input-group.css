@@ -8,7 +8,7 @@
   justify-content: center;
   width: 100%;
 
-  > .form-control, > .form-select {
+  > .form-control {
     z-index: 2;
     flex: 1;
     border-inline-end: none;
