@@ -1,19 +1,19 @@
-import path from 'path';
-import { fileURLToPath } from 'url';
+// import path from 'path';
+// import { fileURLToPath } from 'url';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+// const __filename = fileURLToPath(import.meta.url);
+// const __dirname = path.dirname(__filename);
 
 
 
-const postcssLoader = (isDevelopment) => ({
+const postcssLoader = (isDevelopment, postcssConfig_path) => ({
   loader: 'postcss-loader',
   options: {
     sourceMap: isDevelopment,
     postcssOptions: {
       // 'config' accetta un percorso assoluto (stringa) o un booleano
-      config: path.resolve(__dirname, './postcss.config.mjs'),
+      config: postcssConfig_path,
     },
   }
 });
@@ -21,9 +21,10 @@ const postcssLoader = (isDevelopment) => ({
 export function cssRules({
   isDevelopment = false,
   useSass = false,
-  inlineCssInDevMode = true
+  inlineCssInDevMode = true,
+  postcssConfig_path
 }) {
-  const configOptions = { isDevelopment, useSass, inlineCssInDevMode };
+  const configOptions = { isDevelopment, useSass, inlineCssInDevMode, postcssConfig_path };
 
 
   return [
@@ -70,7 +71,7 @@ export function cssRules({
               }
             },
 
-            postcssLoader(isDevelopment),
+            postcssLoader(isDevelopment, postcssConfig_path),
 
             ...(useSass ? [{
               loader: 'sass-loader',
@@ -100,6 +101,7 @@ function css_loaders({
   isDevelopment = false,
   useSass = false,
   inlineCssInDevMode = true,
+  postcssConfig_path = postcssConfig_path,
   css_modules = false,
   critical = false,     // Iniezione statica nell'HTML
   inline = false        // Iniezione dinamica via JS
@@ -156,7 +158,7 @@ function css_loaders({
       }
     },
 
-    postcssLoader(isDevelopment),
+    postcssLoader(isDevelopment, postcssConfig_path),
 
     ...(useSass
       ? [ {

@@ -1,6 +1,6 @@
 // import './form.css'; //incorporato nel css principale
 
-import { enableSubmitBtns } from '@massimo-cassandro/js-utilities';
+import { enableSubmitBtns } from '../../index.js';
 
 document.querySelectorAll('form').forEach( form => {
 

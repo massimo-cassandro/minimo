@@ -1,0 +1,32 @@
+// -----------------------------------------------------------------------
+// Generated file — do not edit manually.
+// This file is produced by the design-token build pipeline.
+// Source of truth: the token files in the project source directory.
+// Re-generate with: node build-tokens.mjs --config <path/to/config>
+// -----------------------------------------------------------------------
+{
+  "snackbar": {
+    "font": {
+      "size": {
+        "$type": "dimension",
+        "$value": "{font.size.sm}"
+      }
+    },
+    "border": {
+      "radius": {
+        "$type": "color",
+        "$value": "{radius.sm}"
+      }
+    },
+    "text": {
+      "color": {
+        "$type": "color",
+        "$value": "{text.color}"
+      }
+    },
+    "duration": {
+      "$type": "duration",
+      "$value": "5s"
+    }
+  }
+}

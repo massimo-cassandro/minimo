@@ -2,7 +2,6 @@
 /* @import '@src/css/fonts.css'; */
 @import '@src/custom-properties-default.css';
 /* @import '@src/css/custom-media.css'; */
-@import '@src/css/custom-properties.css';
 
 @import '@src/css/reset.css';
 @import '@src/css/layout-base.css';
@@ -35,7 +34,6 @@
 @import '@src/css/utilities.css';
 
 
-body {padding: 2rem}
-p {
-  margin: .5rem 0;
+body {
+  padding: 2rem;
 }

@@ -31,8 +31,8 @@
   align-self: flex-end;
 
   button {
-    top: -.5rem;
-    right: -.5rem;
+    top: -0.5rem;
+    right: -0.5rem;
     width: 2rem;
     aspect-ratio: 1;
     padding: 4px;

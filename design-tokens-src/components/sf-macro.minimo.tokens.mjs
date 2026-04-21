@@ -62,11 +62,11 @@ export default {
         position: {
           top: {
             $type: 'dimension',
-            $value: '-.5rem'
+            $value: '-0.5rem'
           },
           right: {
             $type: 'dimension',
-            $value: '-.5rem'
+            $value: '-0.5rem'
           },
           bottom:{
             $type: 'dimension',

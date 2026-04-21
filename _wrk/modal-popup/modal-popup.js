@@ -1,4 +1,4 @@
-import { domBuilder, classnames } from '@node_modules/@massimo-cassandro/js-utilities/index.js';
+import { domBuilder, classnames } from '../index.js';
 import { spinner } from '@minimo/spinner.js';
 import * as styles from './modal-content.module.css?inline';
 

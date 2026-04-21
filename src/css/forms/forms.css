@@ -4,20 +4,31 @@
 /* TODO classe grid specifica per i form ?? (.form-grid?) */
 /* TODO customizable select */
 
-.form-group:has([required]):not(:has([disabled])) .form-label {
-  position: relative;
-  padding-inline-start: var(--size-base);
-  &::before {
-    position: absolute;
-    top: -.15em;
-    left: 0;
-    display: inline-block;
-    padding-inline-end: var(--size-xxs);
-    font-size: 2em;
-    color: var(--form-control-required-flag-color);
-    content: var(--form-control-required-flag-content);
-  }
+.form-group:has([required]):not(:has([disabled])) {
 
+  /* `>` excludes labels within form-collections  */
+  > .form-label {
+    position: relative;
+    padding-inline-start: var(--size-base);
+    &::before {
+      position: absolute;
+      top: -.15em;
+      left: 0;
+      display: inline-block;
+      padding-inline-end: var(--size-xxs);
+      font-size: 2em;
+      color: var(--form-control-required-flag-color);
+      content: var(--form-control-required-flag-content);
+    }
+  }
+}
+
+/* single checkbozes and radios are centered */
+.form-group:not(.form-collection-fset):has(.form-check:not(.form-check-top-label)) {
+  align-self: center;
+  .form-check {
+    margin-block-start: 0;
+  }
 }
 
 .form-label {
@@ -49,8 +60,6 @@
     outline-offset: var(--form-control-focus-outline-offset);
   }
 }
-
-
 
 .form-control, .form-control-static {
 

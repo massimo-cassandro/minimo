@@ -1,0 +1,16 @@
+{
+  "__help": "https://code.visualstudio.com/docs/languages/jsconfig",
+  "compilerOptions": {
+    "target": "es2023",
+    "baseUrl": ".",
+    "allowSyntheticDefaultImports": false,
+    "module": "ES6",
+    "paths": {
+      "@src/*": ["../../src/*"]
+    }
+
+
+
+  },
+  "exclude": ["node_modules", "dist", "docs", "build", "public"]
+}

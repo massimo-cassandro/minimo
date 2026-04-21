@@ -34,12 +34,13 @@ const isDevelopment = process.env.NODE_ENV === 'development'
   ,useSvgo = true
   ,useSvgr = false // svg per react
   ,svgoConfig = useSvgo? (await import('../../webpack-setup/webpack-modules/svgo.config.mjs')).default : null
-  ,output_dir = path.resolve(__dirname, '../build')
+  ,postcssConfig_path = path.resolve(__dirname, './postcss.config.mjs')
+  ,output_dir = path.resolve(__dirname, '../../demo-build')
   // ,output_dir = isDevelopment? '_dev' : 'build' // symfony
-  ,favicons_path = null //'frontend/favicons/output'
+  // ,favicons_path = null //'frontend/favicons/output'
   ,favicons_path_regexp = null //new RegExp(favicons_path) // source pattern per le favicons (regexp o null)
-  ,jsConfigAliases = getJsConfigAliases(path.resolve(__dirname, '../../jsconfig.json'))
-  ,packageJson = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../../package.json'), 'utf-8'))
+  ,jsConfigAliases = getJsConfigAliases(path.resolve(__dirname, './jsconfig.json'))
+  // ,packageJson = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../../package.json'), 'utf-8'))
   // ,manifest_shared_seed = {}
 ;
 
@@ -90,13 +91,13 @@ const config = {
     publicPath: '/',
     // publicPath: isDevelopment? '/' : './', // per devServer, nel caso in cui l'output di produzione non sia sulla root
     clean: !isDevelopment,
-    // module: true, 
+    // module: true,
     // chunkFormat: 'module',
   },
 
-  experiments: {
-    outputModule: true,
-  },
+  // experiments: {
+  //   outputModule: true,
+  // },
 
   // =>> optimization
   optimization: {
@@ -192,10 +193,10 @@ const config = {
     // =>> plugins: HtmlWebpackPlugin
     new HtmlWebpackPlugin({
       filename: 'index.html',
-      template: path.resolve(__dirname, '../index.ejs'),
+      template: path.resolve(__dirname, './index.ejs'),
       inject: 'body',
       // title: 'Buttons Demo',
-      minify: !isDevelopment
+      minify: false //!isDevelopment
     }),
 
     // =>> plugins: HtmlWebpackInjectAttributesPlugin
@@ -211,7 +212,7 @@ const config = {
     //   }
     // }),
 
- 
+
 
     // =>> plugins: PurgeCSSPlugin (per ultimo)
     // https://github.com/FullHuman/purgecss/tree/main/packages/purgecss-webpack-plugin
@@ -221,13 +222,13 @@ const config = {
 
     //   // css da pulire
     //   paths: globSync(
-       
+
     //     // path.resolve(__dirname, '@minimo/**/!(*.module).css'),
     //     path.resolve(__dirname, '@src/**/*.{css,js,ejs}'),
     //     //   path.resolve(__dirname, '@src/**/*.js'),
     //     //   path.resolve(__dirname, '@app/**/*.ejs'),
     //     //   path.join(__dirname, './templates/**/*.twig')
-    
+
     //     { nodir: true }
     //   ), // .filter(filePath => !filePath.endsWith('.module.css'));
 
@@ -235,15 +236,15 @@ const config = {
 
     //   variables: false, // Analizza le variabili custom
     //   safelist: {
-    //     standard: ['body', 'html', 'button', 'a'], 
+    //     standard: ['body', 'html', 'button', 'a'],
     //     deep: [/^btn/],
     //     greedy: []
 
     //   },
 
-      // verbose: true,
-      // rejected: true,
-      // stdout: true
+    //   verbose: true,
+    //   rejected: true,
+    //   stdout: true
     // })
 
   ], // end plugins
@@ -392,7 +393,7 @@ const config = {
       },
 
       // =>> rules: css / scss
-      ...cssRules({isDevelopment: isDevelopment, useSass: useSass, inlineCssInDevMode: inlineCssInDevMode})
+      ...cssRules({isDevelopment: isDevelopment, useSass: useSass, inlineCssInDevMode: inlineCssInDevMode, postcssConfig_path: postcssConfig_path})
     ] // end rules
   }, // end module
 

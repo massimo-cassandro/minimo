@@ -34,6 +34,7 @@ const isDevelopment = process.env.NODE_ENV === 'development'
   ,useSvgo = true
   ,useSvgr = false // svg per react
   ,svgoConfig = useSvgo? (await import('./webpack-modules/svgo.config.mjs')).default : null
+  ,postcssConfig_path = path.resolve(__dirname, './webpack-modules/postcss.config.mjs')
   ,output_dir = path.resolve(__dirname, '../build')
   // ,output_dir = isDevelopment? '_dev' : 'build' // symfony
   ,favicons_path = 'frontend/favicons/output'
@@ -348,7 +349,7 @@ const config = {
             start_year,
             ...(current_year > start_year? [current_year] : [])
           ].join('-'),
-          
+
           vers = packageJson.version.split('.').slice(0,-1).join('.');
 
         return (
@@ -369,13 +370,13 @@ const config = {
 
       // css da pulire
       paths: globSync(
-       
+
         // path.resolve(__dirname, '@minimo/**/!(*.module).css'),
         path.resolve(__dirname, '@src/**/*.{css,js,ejs}'),
         //   path.resolve(__dirname, '@src/**/*.js'),
         //   path.resolve(__dirname, '@app/**/*.ejs'),
         //   path.join(__dirname, './templates/**/*.twig')
-    
+
         { nodir: true }
       ), // .filter(filePath => !filePath.endsWith('.module.css'));
 
@@ -383,7 +384,7 @@ const config = {
 
       variables: false, // Analizza le variabili custom
       safelist: {
-        standard: ['body', 'html', 'button', 'a'], 
+        standard: ['body', 'html', 'button', 'a'],
         deep: [/^btn/],
         greedy: []
 
@@ -542,7 +543,7 @@ const config = {
       },
 
       // =>> rules: css / scss
-      ...cssRules({isDevelopment: isDevelopment, useSass: useSass, inlineCssInDevMode: inlineCssInDevMode})
+      ...cssRules({isDevelopment: isDevelopment, useSass: useSass, inlineCssInDevMode: inlineCssInDevMode, postcssConfig_path: postcssConfig_path})
     ] // end rules
   }, // end module
 

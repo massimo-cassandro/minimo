@@ -2,7 +2,7 @@
 // pre-elaborazione tipi dati predefiniti
 // le chiavi che cominciano con '_' sono di questa applicazione, le altre sono di simple-datatable
 
-import { classnames } from '@massimo-cassandro/js-utilities/index.js';
+import { classnames } from '../../../../index.js';
 
 import * as styles from '../simple-datatable.module.css';
 

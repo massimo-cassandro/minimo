@@ -87,7 +87,7 @@
         "background": {
           "color": {
             "$type": "color",
-            "$value": "{link.active.background.color}"
+            "$value": "{btn.close.background.color}"
           }
         },
         "icon": {

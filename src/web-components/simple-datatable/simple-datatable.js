@@ -1,6 +1,5 @@
 
 import { DataTable } from 'simple-datatables';
-// import { classnames } from '@massimo-cassandro/js-utilities/index.js';
 
 import { parseCols } from './src/parse-cols.js';
 

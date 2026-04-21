@@ -1,2 +1,2 @@
 da rivedere
-spostare custome props nel dictionary
+spostare custom props nel dictionary

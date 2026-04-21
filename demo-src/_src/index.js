@@ -19,7 +19,7 @@ const routes = [
     key: 'home',
     title: 'Minimo Demo',
     callback: () => {
-      const routeList = routes.filter(r => r.key !== 'home')
+      const routeList = routes.filter(r => r.key !== 'home');
       routeList.sort((a,b) => {
         return (a.title?? a.key).toLowerCase().localeCompare((b.title?? b.key).toLowerCase());
       });
@@ -40,7 +40,7 @@ if(!routeObj) {
 
 
 h1.innerHTML =  routeObj.title?? titleCase(route);
-document.title = h1.innerText + ' | Minimo Demo';
+document.title = h1.innerText + (route !== 'home'? ' | Minimo Demo' : '');
 
 if(routeObj.incl) {
   root.innerHTML = buttons;
@@ -51,10 +51,10 @@ if(routeObj.callback) {
 }
 
 document.body.addEventListener('click', e => {
-  if(e.target.closest('a') && 
-    e.target.hasAttribute('href') && 
+  if(e.target.closest('a') &&
+    e.target.hasAttribute('href') &&
     e.target.getAttribute('href').includes('/#/')
   ) {
-    window.location(e.target.getAttribute('href'));
+    window.location.assign(e.target.getAttribute('href'));
   }
 });

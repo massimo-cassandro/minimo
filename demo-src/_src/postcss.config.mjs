@@ -5,8 +5,7 @@ import globalData from '@csstools/postcss-global-data';
 import customMedia from 'postcss-custom-media';
 import autoprefixer from 'autoprefixer';
 import cssnano from 'cssnano';
-import jitProps from 'postcss-jit-props';
-// import openProps from './modulo_cjs.cjs';
+
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -18,25 +17,11 @@ export default (loaderContext) => {
     globalData({
       files: [
         // openProps.
-        path.resolve(__dirname, '../src/css/custom-properties.css'),
-        path.resolve(__dirname, '../src/css/custom-media.css'),
+        path.resolve(__dirname, '../../src/custom-properties-default.css'),
+        path.resolve(__dirname, '../../src/custom-media-default.css'),
       ]
     }),
 
-    // https://github.com/GoogleChromeLabs/postcss-jit-props
-    // https://github.com/argyleink/open-props
-    // require('postcss-jit-props')(require('open-props')),
-    // require('postcss-jit-props')({
-    //   ...require('open-props'),
-    //   custom_selector: ':where(html)'
-    // }),
-    jitProps({
-      files: [
-        // ...openProps,
-        path.resolve(__dirname, '../src/css/custom-properties.css')
-      ],
-      custom_selector: ':where(html)'
-    }),
 
     // per IOS < 17 (test)
     // https://github.com/csstools/postcss-plugins/tree/main/plugins/postcss-nesting

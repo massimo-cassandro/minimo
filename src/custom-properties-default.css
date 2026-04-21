@@ -13,7 +13,7 @@
   --body-text: var(--text-color);
   --btn-border-radius: var(--form-control-border-radius);
   --btn-border-width: var(--form-control-border-width);
-  --btn-close-active-background-color: var(--link-active-background-color);
+  --btn-close-active-background-color: var(--btn-close-background-color);
   --btn-close-active-icon-color: var(--link-active-color);
   --btn-close-background-color: var(--body-background-color);
   --btn-close-border-color: var(--btn-close-icon-color);
@@ -226,6 +226,10 @@
   --size-xl: 2rem;
   --size-xs: .5rem;
   --size-xxs: .25rem;
+  --snackbar-border-radius: var(--radius-sm);
+  --snackbar-duration: 5s;
+  --snackbar-font-size: var(--font-size-sm);
+  --snackbar-text-color: var(--text-color);
   --spinner-color: var(--primary-100);
   --spinner-size: var(--size-lg);
   --spinner-stroke-width: .125rem;

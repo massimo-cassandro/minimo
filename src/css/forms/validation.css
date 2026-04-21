@@ -1,10 +1,11 @@
 /* da BS5 */
 .was-validated {
 
-  .form-group:has(:valid), .form-group:has(.is-valid){
+  /* includes static field which container has is-valid / is-invalid class */
+  .form-group:has(:valid), .form-group:has(.is-valid), .form-group.is-valid .form-control-static{
     --_status-color: var(--status-success-color);
   }
-  .form-group:has(:invalid), .form-group:has(.is-invalid){
+  .form-group:has(:invalid), .form-group:has(.is-invalid), .form-group.is-invalid .form-control-static{
     --_status-color: var(--status-danger-color);
   }
 
@@ -13,7 +14,7 @@
   }
 
   /* TODO .form-select è necessario? */
-  .form-control, .form-select {
+  .form-control, .form-select, .form-control-static {
     outline: var(--form-validation-outline-width) solid var(--_status-color);
     outline-offset: var(--form-validation-outline-offset);
 

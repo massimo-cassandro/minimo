@@ -1,7 +1,7 @@
 .spinner {
   display: block;
   width: var(--spinner-size);
-  aspect-ratio: 1;
+  height: var(--spinner-size);
   margin: .5rem auto;
   color: var(--spinner-color);
   text-indent: -99999em;

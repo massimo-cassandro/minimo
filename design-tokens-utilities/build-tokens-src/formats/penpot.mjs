@@ -49,11 +49,15 @@ const DISCLAIMER = [
 
 // Returns true if the string contains a math expression — i.e. it has at least
 // one operator (+, -, *, /) outside of a token reference ({...}).
+// Negative values like "-0.5rem" or "-8px" are NOT expressions.
 const isExpression = (str) => {
   if (typeof str !== 'string') return false;
   // Strip token references, then check for operators
   const stripped = str.replace(/\{[^}]+\}/g, '0');
-  return /[+\-*/]/.test(stripped);
+  // Remove leading minus (negative number) before testing for operators.
+  // An operator is only meaningful when it appears between two operands,
+  // i.e. it is preceded by a digit, closing paren, or word character.
+  return /[\d)]\s*[+\-*/]/.test(stripped) || /[+*/]/.test(stripped.replace(/^-/, ''));
 };
 
 // Builds a token lookup map (dot-path -> token) from the dictionary.
