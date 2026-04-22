@@ -21,9 +21,9 @@ import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 // import { PurgeCSSPlugin } from 'purgecss-webpack-plugin';
 // import { globSync } from 'glob';
 
-import { cssRules } from '../../webpack-setup/webpack-modules/css-rules.mjs';
-import { getJsConfigAliases } from '../../webpack-setup/webpack-modules/get-jsConfig-aliases.mjs';
-import { svgRules } from '../../webpack-setup/webpack-modules/svg-rules.mjs';
+import { cssRules } from '../webpack-setup/webpack-modules/css-rules.mjs';
+import { getJsConfigAliases } from '../webpack-setup/webpack-modules/get-jsConfig-aliases.mjs';
+import { svgRules } from '../webpack-setup/webpack-modules/svg-rules.mjs';
 
 // --- config ---
 const isDevelopment = process.env.NODE_ENV === 'development'
@@ -33,7 +33,7 @@ const isDevelopment = process.env.NODE_ENV === 'development'
   ,inlineCssInDevMode = true
   ,useSvgo = true
   ,useSvgr = false // svg per react
-  ,svgoConfig = useSvgo? (await import('../../webpack-setup/webpack-modules/svgo.config.mjs')).default : null
+  ,svgoConfig = useSvgo? (await import('../webpack-setup/webpack-modules/svgo.config.mjs')).default : null
   ,postcssConfig_path = path.resolve(__dirname, './postcss.config.mjs')
   ,output_dir = path.resolve(__dirname, '../../demo-build')
   // ,output_dir = isDevelopment? '_dev' : 'build' // symfony

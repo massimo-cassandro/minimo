@@ -1,6 +1,7 @@
 import './index.css';
 
-import buttons from '../buttons.html';
+import buttons from './pages/buttons.html';
+import { snackbarsDemo } from './pages/snackbars/snackbars-demo.js';
 
 const root = document.getElementById('root')
   ,h1 = document.getElementById('title')
@@ -12,9 +13,13 @@ const root = document.getElementById('root')
 const routes = [
   {
     key: 'buttons',
-    incl: buttons,
-    callback: null
+    incl: buttons
   },
+  {
+    key: 'snackbars',
+    callback: snackbarsDemo
+  },
+
   {
     key: 'home',
     title: 'Minimo Demo',
@@ -25,8 +30,8 @@ const routes = [
       });
 
       root.innerHTML = '<ul>' +
-        routeList.map(r => `<li><a href="/#/${r.key}">${r.title?? titleCase(r.key)}</a></li>`) +
-        '</ul>';
+        routeList.map(r => `<li><a href="/#/${r.key}">${r.title?? titleCase(r.key)}</a></li>`).join('') +
+        '</ul>'
     }
   }
 ];
@@ -50,11 +55,18 @@ if(routeObj.callback) {
   routeObj.callback();
 }
 
+if( route !== 'home') {
+  root.insertAdjacentHTML('afterend', '<p class="mt-lg"><a href="/">Home</a></p>');
+}
+
 document.body.addEventListener('click', e => {
   if(e.target.closest('a') &&
     e.target.hasAttribute('href') &&
     e.target.getAttribute('href').includes('/#/')
   ) {
-    window.location.assign(e.target.getAttribute('href'));
+
+    console.log(e.target.getAttribute('href'));
+    window.location.href = e.target.getAttribute('href');
+    window.location.reload();
   }
 });

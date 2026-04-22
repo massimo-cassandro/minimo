@@ -17,8 +17,8 @@ export default (loaderContext) => {
     globalData({
       files: [
         // openProps.
-        path.resolve(__dirname, '../../src/custom-properties-default.css'),
-        path.resolve(__dirname, '../../src/custom-media-default.css'),
+        path.resolve(__dirname, '../src/custom-properties.css'),
+        path.resolve(__dirname, '../src/custom-media.css'),
       ]
     }),
 

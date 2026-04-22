@@ -1,5 +1,5 @@
 import { domBuilder, classnames } from '../../../index.js';
-import * as styles from './core.module.css';
+import * as styles from './snackbar.module.css';
 
 /*
 References
@@ -45,9 +45,9 @@ export function snackbar(message, options = {}){
             type: 'button',
           },
           className: classnames('btn-reset', styles.action),
-          content: options.action_text?? '_actions_',
+          content: options.action_text?? '_action-text_',
           condition: options.action && (typeof options.action === 'function'),
-          callback: el => {}
+          // callback: el => {}
         },
         {
           tag: 'button',
