@@ -1,16 +1,12 @@
-/* TODO dividere in più file secondo il tipo di button */
+/* TODO dividere in più file secondo la variante? */
 
-/*
-outline btns: primary/secondary + fondo body bg o trasparente
-
-*/
-
-button, [role='button'], .btn {
-  cursor: pointer;
-}
-
-button svg {
-  pointer-events: none; /* fa sì che le icone non intercettano il click destinata ai pulsanti */
+button, [role='button'], .btn, .btn-reset {
+  &:not([disabled]) {
+    cursor: pointer;
+  }
+  & svg, &[disabled] {
+    pointer-events: none;
+  }
 }
 
 .btn-reset, .btn-link, .btn-close {
@@ -33,7 +29,6 @@ a.btn {
 }
 
 .btn {
-
   display: inline-block;
   padding: var(--btn-padding-block) var(--btn-padding-inline);
   font-size: var(--btn-font-size);
@@ -49,7 +44,6 @@ a.btn {
 
   &[disabled] {
     font-style: italic;
-    pointer-events: none;
     cursor: not-allowed;
     opacity: var(--btn-disabled-opacity);
     filter: grayscale(60%);
@@ -57,7 +51,6 @@ a.btn {
 
   svg {
     width: 1em;
-    pointer-events: none;
     fill: currentColor;
   }
 
@@ -90,6 +83,7 @@ a.btn {
   }
 
 
+  /* TODO button con solo icona o cosa? controllare: completare o eliminare */
   &.btn-icon {
     display: inline-flex;
     flex-flow: row nowrap;

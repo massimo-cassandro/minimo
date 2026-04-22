@@ -8,7 +8,8 @@
     "module": "ES6",
     "paths": {
       "@demo/*": ["./demo/*"],
-      "@src/*": ["./src/*"]
+      "@src/*": ["./src/*"],
+      "@minimo/*": ["./src/*"]
     }
 
 

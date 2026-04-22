@@ -1,0 +1,37 @@
+
+/* @import '@app/fonts.css'; */
+/* @import '@app/css/custom-media.css'; */ /* managed by postcss */
+@import '@app/css/custom-properties.css';
+
+@import '@minimo/css/reset.css';
+@import '@minimo/css/layout-base.css';
+@import '@minimo/css/container.css';
+
+@import '@minimo/css/forms/forms.css';
+@import '@minimo/css/forms/fieldset.css';
+@import '@minimo/css/forms/form-collections.css';
+@import '@minimo/css/forms/form-group.css';
+@import '@minimo/css/forms/input-group.css';
+@import '@minimo/css/forms/form-disabled-readonly.css';
+@import '@minimo/css/forms/validation.css';
+@import '@minimo/css/forms/form-utilities.css';
+
+@import '@minimo/css/buttons/buttons.css';
+@import '@minimo/css/buttons/buttons-primary.css';
+@import '@minimo/css/buttons/buttons-secondary.css';
+@import '@minimo/css/buttons/status-buttons.css';
+@import '@minimo/css/buttons/btn-close.css';
+
+@import '@minimo/css/badge.css';
+@import '@minimo/css/text.css';
+@import '@minimo/css/anchors.css';
+@import '@minimo/css/headings.css';
+@import '@minimo/css/alerts.css';
+@import '@minimo/css/icons.css';
+@import '@minimo/css/svg.css';
+@import '@minimo/css/table.css';
+@import '@minimo/css/flex.css';
+@import '@minimo/css/grid.css';
+@import '@minimo/css/details.css';
+@import '@minimo/css/utilities.css';
+

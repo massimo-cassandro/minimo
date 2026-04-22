@@ -407,9 +407,7 @@
       bs_custom_control: true
     }|merge(params|default({}))
   %}
-  {% set attr = attr|merge({class: (attr.class|default('') ~
-    ' ' ~ (params.bs_custom_control? 'form-select' : 'form-control')
-  )|trim}) %}
+  {% set attr = attr|merge({class: (attr.class|default('') ~ ' form-control')|trim}) %}
   {{- parent() -}}
 {%- endblock choice_widget_collapsed %}
 

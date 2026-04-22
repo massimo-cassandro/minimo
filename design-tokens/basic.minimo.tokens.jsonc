@@ -25,6 +25,12 @@
       "$value": "{text.color}"
     }
   },
+  "accent": {
+    "color": {
+      "$type": "color",
+      "$value": "{accent.100}"
+    }
+  },
   "text": {
     "muted": {
       "$type": "color",
@@ -49,7 +55,7 @@
           "$value": "#ddd"
         }
       },
-      "text": {
+      "color": {
         "$type": "color",
         "$value": "{body.text}"
       }

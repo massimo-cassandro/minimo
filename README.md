@@ -1,8 +1,6 @@
 # minimo
 
-Very light-size framework
-
-...and some install [snippets](snippets/snippets.md)
+My light framework + utilities
 
 ## Install
 

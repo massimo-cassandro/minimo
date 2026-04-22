@@ -1,6 +1,7 @@
 :root {
   --accent-100: #567d0d;
   --accent-100-fg: #fff;
+  --accent-color: var(--accent-100);
   --alert-border-radius: var(--radius-sm);
   --alert-box-shadow: 0 0 .5rem 0 oklch(0% 0 0 / .5);
   --badge-background-color: var(--primary-100);
@@ -107,7 +108,6 @@
   --font-weight-xbold: 900;
   --font-weight-xlight: 200;
   --font-weight-xxlight: 100;
-  --form-control-accent-color: var(--accent-100);
   --form-control-background-color: var(--body-background-color);
   --form-control-border-color: #666;
   --form-control-border-radius: var(--radius-xxs);
@@ -264,6 +264,6 @@
   --text-muted: var(--neutral-100);
   --text-negative: #fff;
   --text-selected-background-color: #ddd;
-  --text-selected-text: var(--body-text);
+  --text-selected-color: var(--body-text);
   --z-index-overlay: 99;
 }

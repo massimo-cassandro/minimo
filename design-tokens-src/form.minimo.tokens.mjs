@@ -34,13 +34,6 @@ export default {
 
     control: {
 
-      accent: {
-        color: {
-          $value: '{accent.100}',
-          $type: 'color'
-        }
-      },
-
       static: {
         color: {
           $value: '{form.control.text.color}',

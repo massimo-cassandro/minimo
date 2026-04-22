@@ -42,12 +42,12 @@
 .form-control, .form-control-static {
   display: block;
   width: 100%;
+  padding: var(--form-control-padding-block) var(--form-control-padding-inline);
   font-family: var(--font-family);
   font-size: var(--form-control-font-size);
   font-weight: var(--font-weight-regular);
   line-height: var(--form-control-line-height);
   color: var(--form-control-text-color);
-  accent-color: var(--form-control-accent-color);
   background-color: var(--form-control-background-color);
   border: 1px solid var(--form-control-border-color);
   border-radius: var(--form-control-border-radius);
@@ -60,11 +60,7 @@
     outline: var(--form-control-focus-outline-width) solid var(--form-control-focus-color);
     outline-offset: var(--form-control-focus-outline-offset);
   }
-}
 
-.form-control, .form-control-static {
-
-  padding: var(--form-control-padding-block) var(--form-control-padding-inline);
 
   &::placeholder {
     font-size: var(--form-control-placeholder-font-size, var(--form-control-font-size));
@@ -78,6 +74,7 @@
     font-size: var(--form-control-sm-font-size);
   }
 }
+
 .form-control-static {
   overflow: hidden;
   text-overflow: ellipsis;

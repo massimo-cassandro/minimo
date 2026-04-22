@@ -8,5 +8,7 @@ html, body {
   font-style: var(--font-style-base);
   line-height: var(--font-line-height-base);
   color: var(--text-color);
+  accent-color: var(--accent-color);
   background-color: var(--body-background-color);
+
 }

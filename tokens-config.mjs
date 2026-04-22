@@ -3,7 +3,7 @@
 const config = {
   stylelintConfigPath: './stylelint.config.mjs',
   buildPath: './src',
-  destFile: 'custom-properties-default.css',
+  destFile: 'custom-properties.css',
   source: [
     './design-tokens-src/**/*.tokens.{mjs,jsonc}',
     '!./design-tokens-src/_cfg/**',
@@ -14,9 +14,8 @@ const config = {
   penpotBuildPath: './design-tokens',
   penpotDestFile: null,
 
-  custom_prop_file_path: './src/custom-properties-default.css',
-  dir_to_check: './src', 
-  exclude_pattern: [ 
+  dir_to_check: './src',
+  exclude_pattern: [
     /^--_/,
   ]
 };
