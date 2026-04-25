@@ -4,7 +4,7 @@
 
 import { classnames } from '../../../../index.js';
 
-import * as styles from '../simple-datatable.module.css';
+import * as styles from '../s-datatable-component.module.css';
 
 import checkIcon from '../../../icons/check-bold.svg?inline';
 import xIcon from '../../../icons/x-bold.svg?inline';

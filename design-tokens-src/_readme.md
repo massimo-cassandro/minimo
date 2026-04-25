@@ -15,7 +15,7 @@
   * Name of the font family or list (array).  ("Inter", ["Helvetica", "Arial"] )
 * **Font Weight** (`fontWeight`)
   * Font weight (number or text alias).  (700, "bold", "light" )
-* **Edge** (`border`)
+* **border** (`border`)
   * Compound: requires color, width, style.  ({"color": "#000", "width": "1px", "style": "solid"} )
 * **Shadow** (`shadow`)
   * Compound: color, offsetX, offsetY, blur, spread, inset.  ({"color": "#0003", "offsetX": "0px", "offsetY": "4px", "blur": "10px"} )

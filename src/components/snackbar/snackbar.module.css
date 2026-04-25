@@ -1,75 +1,105 @@
 /* purgecss start ignore */
 
-.snackbar {
-
-}
-
-.text {}
-.action {}
-.closeBtn {}
-
-
-/* purgecss end ignore */
-
-
-/*
-
-
-
-
-
-.toastWrapper {
+.snackbarOuter {
   position: fixed;
-  inset-block-end: 0;
-  inset-inline: 0;
-  z-index: 1;
+  inset-block: auto var(--size-md);
+  /* inset-inline: 0 auto; */
+  z-index: var(--z-index-snackbar);
+  inline-size: 20dvw;
+  min-inline-size: min(100%, 37ch);
+  padding: var(--snackbar-outer-padding-block) var(--snackbar-outer-padding-inline);
+  margin-inline: auto;
+  background-color: var(--snackbar-outer-background-color);
+  border: var(--snackbar-outer-border);
+  border-radius: var(--snackbar-outer-border-radius);
+  box-shadow: var(--snackbar-outer-drop-shadow);
+  animation: slide-in .3s cubic-bezier(.34, 1.56, .64, 1) forwards;
 
-  display: grid;
-  gap: 1vh;
-  justify-content: center;
-  justify-items: stretch;
-  padding-block-end: 5vh;
-
-  pointer-events: none;
-}
-
-.toast {
-  --_bg-lightness: 90%;
-  --_travel-distance: 0;
-
-  max-inline-size: min(25ch, 90vw);
-  padding-block: .5ch;
-  padding-inline: 1ch;
-
-  font-size: var(--toast-font-size);
-  color: var(--toast-text-color);
-  background: hsl(0 0% var(--_bg-lightness) / 90%);
-  border-radius: var(--toast-border-radius);
-  animation:
-    fade-in .3s ease,
-    slide-in .3s ease,
-    fade-out .3s ease var(--toast-duration);
-
-  will-change: transform;
-
-  @media (--dark) {
-    --_bg-lightness: 20%;
+  &.isHiding {
+    animation: slide-out .25s ease-in forwards;
   }
 
-  @media (--motionOK) {
-    --_travel-distance: 5vh;
+}
+
+.snackbar {
+  display: flex;
+  gap: var(--size-xs);
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--size-xs) var(--size-sm);
+  font-size: var(--snackbar-font-size);
+  color: var(--snackbar-text-color);
+  background-color: var(--snackbar-background-color);
+  border-radius: var(--snackbar-border-radius);
+
+  &::backdrop {
+    display: none;
+  }
+
+  * {
+    overflow-wrap: break-word;
   }
 }
 
-@keyframes fade-in {
-  from { opacity: 0; }
-}
+/* .text {} */
 
-@keyframes fade-out {
-  to { opacity: 0; }
+.action {
+  margin-inline-start: auto;
+}
+.closeBtn {
+  --_icon-bar-width: var(--snackbar-btn-close-size); /* --_icon-bar-width is defined in buttons/btn-close.css */
+
+  --btn-close-background-color: var(--snackbar-btn-close-background-color);
+  --btn-close-icon-color: var(--snackbar-btn-close-icon-color);
+  --btn-close-icon-bar-size: 2px;
+
+
+  --btn-close-hover-background-color: var(--snackbar-btn-close-hover-background-color);
+  --btn-close-hover-border-color: var(--snackbar-btn-close-hover-border-color);
+  --btn-close-hover-icon-color: var(--snackbar-btn-close-hover-icon-color);
+
+  --btn-close-focus-outline-color: var(--snackbar-btn-close-focus-outline-color);
+  --btn-close-focus-outline-offset: var(--snackbar-btn-close-focus-outline-offset);
+  --btn-close-focus-outline-width: var(--snackbar-btn-close-focus-outline-width);
+
+  --btn-close-active-background-color: var(--snackbar-btn-close-active-background-color);
+  --btn-close-active-icon-color: var(--snackbar-btn-close-active-icon-color);
+
+
+  border: none;
+
+  &:active {
+    scale: .6;
+  }
 }
 
 @keyframes slide-in {
-  from { transform: translateY(var(--_travel-distance, 10px)); }
+  from {
+    opacity: 0;
+    translate: 0 calc(100% + var(--size-md));
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
 }
- */
+
+@keyframes slide-out {
+  from {
+    opacity: 1;
+    translate: 0 0;
+  }
+  to {
+    opacity: 0;
+    translate: 0 calc(100% + var(--size-md));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .snackbarOuter,
+  .snackbarOuter.isHiding {
+    animation: none;
+  }
+}
+
+/* purgecss end ignore */

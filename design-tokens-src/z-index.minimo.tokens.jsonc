@@ -1,8 +1,0 @@
-{
-  "z-index": {
-    "overlay": {
-      "$value": 99,
-      "$type": "number"
-    }
-  }
-}

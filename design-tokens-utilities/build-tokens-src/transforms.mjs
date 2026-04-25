@@ -64,7 +64,8 @@ StyleDictionary.registerTransform({
     const value = token.$value || token.value;
     return (token.$type === 'dimension' || token.type === 'dimension')
       && typeof value === 'string'
-      && !value.endsWith('rem');
+      && !value.endsWith('rem')
+      && !value.endsWith('%');
   },
   transform: (token) => {
     const value      = token.$value || token.value;

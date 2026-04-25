@@ -130,11 +130,7 @@ const config = {
       directory: path.join(__dirname, '/'),
       serveIndex: true
     },
-    open: {
-      app: {
-        name: 'Google Chrome'
-      }
-    },
+    // open: { app: { name: 'Google Chrome' } },
     compress: true,
     hot: true,
     port: 5700

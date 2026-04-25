@@ -6,27 +6,121 @@
 // -----------------------------------------------------------------------
 {
   "snackbar": {
+    "outer": {
+      "drop-shadow": {
+        "$type": "shadow",
+        "$value": "{box-shadow.base}"
+      },
+      "background": {
+        "color": {
+          "$type": "color",
+          "$value": "{secondary.100}"
+        }
+      },
+      "border": {
+        "$type": "string",
+        "$value": "none"
+      },
+      "border-radius": {
+        "$type": "color",
+        "$value": "{radius.xs}"
+      },
+      "padding": {
+        "block": {
+          "$type": "dimension",
+          "$value": 0
+        },
+        "inline": {
+          "$type": "dimension",
+          "$value": 0
+        }
+      }
+    },
+    "text": {
+      "color": {
+        "$type": "color",
+        "$value": "{secondary.100-fg}"
+      }
+    },
+    "background": {
+      "color": {
+        "$type": "color",
+        "$value": "{secondary.100}"
+      }
+    },
+    "border": {
+      "radius": {
+        "$type": "color",
+        "$value": "{radius.xs}"
+      }
+    },
     "font": {
       "size": {
         "$type": "dimension",
         "$value": "{font.size.sm}"
       }
     },
-    "border": {
-      "radius": {
-        "$type": "color",
-        "$value": "{radius.sm}"
+    "btn-close": {
+      "size": {
+        "$type": "dimension",
+        "$value": "1rem"
+      },
+      "icon": {
+        "color": {
+          "$type": "color",
+          "$value": "{snackbar.text.color}"
+        }
+      },
+      "hover": {
+        "background": {
+          "color": {
+            "$type": "color",
+            "$value": "color-mix(in srgb, {snackbar.text.color} 40%, transparent)"
+          }
+        },
+        "border": {
+          "color": {
+            "$type": "color",
+            "$value": "transparent"
+          }
+        },
+        "icon": {
+          "color": {
+            "$type": "color",
+            "$value": "{snackbar.background.color}"
+          }
+        }
+      },
+      "focus": {
+        "outline": {
+          "width": {
+            "$type": "dimension",
+            "$value": "2px"
+          },
+          "offset": {
+            "$type": "dimension",
+            "$value": "2px"
+          },
+          "color": {
+            "$type": "color",
+            "$value": "color-mix(in srgb, {snackbar.text.color} 50%, transparent)"
+          }
+        }
+      },
+      "active": {
+        "background": {
+          "color": {
+            "$type": "color",
+            "$value": "transparent"
+          }
+        },
+        "icon": {
+          "color": {
+            "$type": "color",
+            "$value": "{snackbar.text.color}"
+          }
+        }
       }
-    },
-    "text": {
-      "color": {
-        "$type": "color",
-        "$value": "{text.color}"
-      }
-    },
-    "duration": {
-      "$type": "duration",
-      "$value": "5s"
     }
   }
 }

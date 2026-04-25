@@ -3,6 +3,7 @@
 /* TODO multiselect */
 /* TODO classe grid specifica per i form ?? (.form-grid?) */
 /* TODO customizable select */
+/* TODO form-check: rifare come flex, separare? */
 
 .form-group:has([required]):not(:has([disabled])) {
 
