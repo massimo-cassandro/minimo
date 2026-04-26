@@ -7,13 +7,16 @@
 
 import './inner-nav.css';
 
-let nav_primary = document.querySelector('.inner-nav-main');
-if (nav_primary) {
-  // nav_primary.classList.add('text-right', 'd-print-none');
-  let nav = nav_primary.innerHTML;
+export function innerNav(){
 
-  document.querySelectorAll('.inner-nav').forEach(item => {
-    item.innerHTML = nav;
-    // item.classList.add('text-right', 'd-print-none');
-  });
+  const nav_primary = document.querySelector('.inner-nav-main');
+  if (nav_primary) {
+    // nav_primary.classList.add('text-right', 'd-print-none');
+    let nav = nav_primary.innerHTML;
+
+    document.querySelectorAll('.inner-nav').forEach(item => {
+      item.innerHTML = nav;
+      // item.classList.add('text-right', 'd-print-none');
+    });
+  }
 }

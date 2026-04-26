@@ -1,6 +1,6 @@
 {
   "name": "@massimo-cassandro/minimo",
-  "version": "0.11.0",
+  "version": "0.11.1",
   "description": "Light css framework & utilities",
   "type": "module",
   "homepage": "https://github.com/massimo-cassandro/minimo#readme",
@@ -30,16 +30,7 @@
     "access": "public"
   },
   "main": "./index.js",
-  "sideEffects": [
-    "*.css",
-    "*.js",
-    "*.svg",
-    "*.jpg",
-    "*.jpeg",
-    "*.png",
-    "*.webp",
-    "*.avif"
-  ],
+  "sideEffects": false,
   "files": [
     "./index.js",
     "src/**/*.{js,mjs,css,svg,md}",
