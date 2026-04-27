@@ -3,6 +3,8 @@
 export { classnames } from './src/utilities/classnames.js';
 export { domBuilder } from './src/utilities/dom-builder/dom-builder.js';
 export { enableSubmitBtns } from './src/utilities/enable-submit-btns.js';
+export { titleCase } from './src/utilities/title-case.js';
+export { sentenceCase } from './src/utilities/sentence-case.js';
 
 // components
 export { default as modalAlert } from './src/components/modal-alert/modal-alert.js';

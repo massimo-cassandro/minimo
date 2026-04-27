@@ -21,16 +21,48 @@ import caretRightIcon from '../../icons/caret-right.svg?inline';
  * @typedef  {object} ColDefinition
  * @property {string}  _heading              Intestazione della colonna (obbligatorio).
  * @property {string}  _field                Chiave del campo nell'oggetto dato (obbligatorio).
- * @property {string}  [_title]              Testo del tooltip sull'intestazione.
- * @property {string}  [_renderTpl]          Template HTML per il contenuto della cella.
- *                                           I segnaposto `[[key]]` vengono sostituiti con i
- *                                           valori corrispondenti dell'oggetto riga.
- * @property {'id'|'email'|'boolean'|'sf_datetime'} [_renderMode]
+ * @property {string|Function}  [_headingTitle]       Testo del tooltip sull'intestazione (`<abbr title="…">`).
+ *                                           Accetta:
+ *                                           - stringa semplice (tooltip statico)
+ *                                           - stringa mustache-like con segnaposto `[[key]]`
+ *                                             (interpolati sui dati della prima riga disponibile;
+ *                                              utile solo se il titolo varia per colonna, non per riga)
+ *                                           - funzione `(row) => string` (row è null per le intestazioni)
+ * @property {string|Function}  [_cellTitle]          Testo del tooltip delle celle (attributo `title`).
+ *                                           Accetta:
+ *                                           - stringa semplice (tooltip statico uguale per tutte le righe)
+ *                                           - stringa mustache-like con segnaposto `[[key]]`
+ *                                             (i segnaposto vengono sostituiti con i valori della riga corrente)
+ *                                           - funzione `(row) => string` (riceve l'oggetto riga corrente)
+ * @property {string|Function} [_cellRender]     stringa o funzione per renderizzare il contenuto della cella.
+ *                                           Accetta:
+ *                                           - stringa mustache-like con segnaposto `[[key]]`
+ *                                             (sostituiti con i valori dell'oggetto riga;
+ *                                              i segnaposto non trovati usano `_renderNullAs`)
+ *                                           - funzione `(row) => string`
+ * @property {string|Function} [_sortValue]   Percorso del campo da usare per l'ORDINAMENTO al posto
+ *                                           del contenuto visualizzato, oppure una funzione
+ *                                           `(row) => string|number` per casi complessi
+ *                                           (es. booleani, valori calcolati).
+ *                                           Stringa: percorso con notazione punto (es. 'owner.cognome').
+ *                                           Funzione: riceve l'oggetto riga originale.
+ * @property {string|Function} [_searchValue] Percorso/i del campo da usare per la RICERCA al posto
+ *                                           del contenuto visualizzato, oppure una funzione
+ *                                           `(row) => string` per casi complessi (es. booleani).
+ *                                           Stringa: uno o più percorsi separati da spazio.
+ *                                           Funzione: riceve l'oggetto riga originale.
+ * @property {string}  [_renderNullAs]       Stringa da mostrare al posto di valori null/undefined.
+ *                                           Default: `'&mdash;'` (trattino em).
+ *                                           Applicato al valore della cella e ai segnaposto
+ *                                           di `_cellRender` che si risolvono a null.
+ * @property {'id'|'email'|'sf_datetime'} [_renderMode]
  *                                           Modalità di visualizzazione predefinita:
  *                                           - `id`          – colonna numerica, non ricercabile, allineata a destra
  *                                           - `email`       – inserisce andate a capo prima e dopo la `@`
- *                                           - `boolean`     – icona segno di spunta / croce con colore semantico
  *                                           - `sf_datetime` – data e ora da oggetto Symfony (con pre-elaborazione in `_load`)
+ *                                           Per i booleani usare `type: 'boolean'` (proprietà nativa
+ *                                           simple-datatables): parseCols aggiunge automaticamente
+ *                                           l'icona spunta/croce con colore semantico.
  *
  * @param {string}        json      URL da cui recuperare i dati (struttura attesa: `{ data: [...] }`).
  *                                  Ignorato se `data` è presente.
@@ -47,8 +79,13 @@ import caretRightIcon from '../../icons/caret-right.svg?inline';
  *                                  direttamente a simple-datatables (es. `sortable`, `searchable`).
  *                                  Default: `[]`
  *
- * @param {number}        perPage   Numero di righe per pagina.
- *                                  Default: `25`
+ * @param {number}        perPage          Numero di righe per pagina.
+ *                                           Default: `25`
+ *
+ * @param {string}        renderNullAs     Stringa globale da mostrare al posto di valori null/undefined
+ *                                           in tutte le colonne. Può essere sovrascritto per singola
+ *                                           colonna con `_renderNullAs`.
+ *                                           Default: `\u2014` (em dash)
  */
 
 
@@ -66,10 +103,64 @@ import caretRightIcon from '../../icons/caret-right.svg?inline';
  *   getNestedValue(row, 'ciclo.ciclo')     → row.ciclo.ciclo
  */
 function getNestedValue(obj, path) {
-  return path.split('.').reduce((acc, key) => acc?.[key], obj);
+  return path?.split('.')?.reduce((acc, key) => acc?.[key], obj) ?? null;
 }
 
 
+/**
+ * resolveTemplate
+ *
+ * Risolve un template in base al suo tipo:
+ *   - Funzione:              invocata con `row`, deve restituire una stringa.
+ *   - Stringa mustache-like ([[key]]): i segnaposto vengono sostituiti con i
+ *                            valori corrispondenti dell'oggetto riga.
+ *   - Stringa semplice:      restituita così com'è (utile per tooltip statici).
+ *
+ * Quando `row` è null/undefined (caso intestazioni) le funzioni vengono
+ * comunque chiamate con null; la stringa mustache-like viene restituita
+ * letteralmente perché non ci sono dati da interpolare.
+ *
+ * @param {string|Function} tpl           Template da risolvere.
+ * @param {object|null}     row           Oggetto riga corrente (null per le intestazioni).
+ * @param {object}          [opts]        Opzioni aggiuntive.
+ * @param {string}          [opts.nullAs] Stringa da usare come fallback per i segnaposto
+ *                                        che si risolvono a null (default: `''`).
+ *                                        Se non fornita i segnaposto non trovati diventano ''.
+ * @param {number}          [opts.warnColIdx] Se fornito, emette console.error quando una
+ *                                        chiave foglia non esiste sul padre (indica un errore
+ *                                        di configurazione, non un dato assente).
+ * @returns {string|null}                 Stringa risolta, oppure null se `tpl` è falsy.
+ */
+function resolveTemplate(tpl, row, { nullAs = '', warnColIdx } = {}) {
+  if (!tpl) return null;
+
+  if (typeof tpl === 'function') {
+    return tpl(row) ?? null;
+  }
+
+  // Stringa mustache-like: interpola solo se row è disponibile
+  if (row != null && /\[\[.*?\]\]/.test(tpl)) {
+    return decodeURIComponent(tpl).replace(
+      /\[\[(.*?)\]\]/g,
+      (_, key) => {
+        const resolved  = getNestedValue(row, key);
+        if (warnColIdx !== undefined) {
+          const pathParts = key.split('.');
+          const parentObj = pathParts.length > 1
+            ? getNestedValue(row, pathParts.slice(0, -1).join('.'))
+            : row;
+          if (parentObj != null && !Object.prototype.hasOwnProperty.call(parentObj, pathParts.at(-1))) {
+            // eslint-disable-next-line no-console
+            console.error(`[s-datatable] Chiave "${key}" non trovata nella struttura dati (colonna ${warnColIdx})`);
+          }
+        }
+        return resolved ?? nullAs;
+      }
+    );
+  }
+
+  return tpl;
+}
 
 class SimpleDatatableAdapter extends HTMLElement {
   constructor() {
@@ -296,9 +387,10 @@ class SimpleDatatableAdapter extends HTMLElement {
 
     this.innerHTML = '<div class="spinner"><span class="visually-hidden">Caricamento dati...</span></div>';
 
-    const inlineData = this._getParam('data');
-    const jsonUrl    = this._getParam('json');
-    const cols       = this._getParam('cols', []);
+    const inlineData     = this._getParam('data');
+    const jsonUrl        = this._getParam('json');
+    const cols           = this._getParam('cols', []);
+    const globalNullAs   = this._getParam('renderNullAs', '\u2014');
 
     if (inlineData == null && !jsonUrl) {
       if (this._initCalledProgrammatically) {
@@ -320,11 +412,12 @@ class SimpleDatatableAdapter extends HTMLElement {
         rawData = parsed.data;
       }
 
-      this.headings = cols.map(item =>
-        item._title
-          ? `<abbr title="${item._title}">${item._heading}</abbr>`
-          : item._heading
-      );
+      this.headings = cols.map(item => {
+        const title = resolveTemplate(item._headingTitle, null);
+        return title
+          ? `<abbr title="${title}">${item._heading}</abbr>`
+          : item._heading;
+      });
 
       this.data = rawData.map((row, idx) => ({
         attributes: { 'data-jidx': idx },
@@ -332,30 +425,75 @@ class SimpleDatatableAdapter extends HTMLElement {
         cells: cols.map((col_item, col_idx) => {
           let value = getNestedValue(row, col_item._field);
 
-          if (col_item._renderTpl) {
-            value = decodeURIComponent(col_item._renderTpl).replace(
-              /\[\[(.*?)\]\]/g,
-              (match, key) => {
-                const resolved  = getNestedValue(row, key);
-                const pathParts = key.split('.');
-                const parentObj = pathParts.length > 1
-                  ? getNestedValue(row, pathParts.slice(0, -1).join('.'))
-                  : row;
+          // _renderNullAs: stringa da mostrare quando il valore è null/undefined.
+          // Precedenza: _renderNullAs di colonna > renderNullAs globale > '&mdash;'
+          const nullAs = col_item._renderNullAs !== undefined
+            ? col_item._renderNullAs
+            : globalNullAs;
 
-                // Segnala solo se il padre esiste ma la chiave foglia manca
-                // (errore di configurazione). Se il padre è null il dato è
-                // semplicemente assente (es. Symfony restituisce owner: null).
-                if (parentObj != null && !Object.prototype.hasOwnProperty.call(parentObj, pathParts.at(-1))) {
-                  // eslint-disable-next-line no-console
-                  console.error(`[s-datatable] Chiave "${key}" non trovata nella struttura dati (colonna ${col_idx})`);
-                }
+          // _sortValue: valore alternativo per l'ordinamento.
+          // Accetta un percorso stringa o una funzione (row) => string|number.
+          const sortValue = col_item._sortValue
+            ? typeof col_item._sortValue === 'function'
+              ? (col_item._sortValue(row) ?? '')
+              : (getNestedValue(row, col_item._sortValue) ?? '')
+            : null;
 
-                return resolved ?? '';
-              }
-            );
+
+          // _cellRender: template per il rendering del valore.
+          // Accetta stringa mustache-like ([[key]]) o funzione (row) => string.
+          // Delega a resolveTemplate, passando nullAs e l'indice di colonna
+          // per i warning di chiavi mancanti.
+          if (col_item._cellRender) {
+            col_item.render = null; // se presente lo annulla ad evitare conflitti
+            value = resolveTemplate(col_item._cellRender, row, { nullAs, warnColIdx: col_idx });
+
           } else if (col_item._renderMode === 'sf_datetime' && value != null) {
             value = value.date.replace(' ', 'T') +
               (value.timezone === 'UTC' ? 'Z' : '');
+          }
+
+          // Applica _renderNullAs al valore della cella se null/undefined
+          // e la cella non ha già un template che gestisce la visualizzazione.
+          if (value == null && col_item._cellRender == null) {
+            value = nullAs;
+          }
+
+          // _searchValue: valore alternativo per la ricerca
+          // Viene scritto come testo nascosto nella cella così la funzione
+          // search personalizzata della colonna può leggerlo direttamente
+          // dal contenuto, senza dipendere da attributi non supportati.
+          const searchValue = col_item._searchValue
+            ? typeof col_item._searchValue === 'function'
+              ? (col_item._searchValue(row) ?? '')
+              : col_item._searchValue.split(' ')
+                .map(path => getNestedValue(row, path.trim()) ?? '')
+                .filter(Boolean)
+                .join(' ')
+            : null;
+
+          // Se sono definiti _sortValue o _searchValue, restituisce un
+          // oggetto cellType secondo le API di simple-datatables:
+          //   { data, order?, attributes? }
+          // - `data`  → contenuto visualizzato (obbligatorio)
+          // - `order` → valore alternativo per l'ordinamento (campo nativo)
+          // - `attributes['data-search']` → stringa su cui opera searchMethod
+          // - `attributes['title']`       → tooltip della cella (_cellTitle)
+
+          // Risolvi _cellTitle: stringa semplice, mustache-like o funzione(row)
+          const cellTitle = resolveTemplate(col_item._cellTitle, row);
+
+          if (sortValue !== null || searchValue !== null || cellTitle !== null) {
+            const cellObj = { data: value ?? '' };
+            if (sortValue !== null)   cellObj.order = sortValue;
+
+            // Unifica data-search e title in un unico oggetto attributes
+            const attrs = {};
+            if (searchValue !== null) attrs['data-search'] = searchValue;
+            if (cellTitle   !== null) attrs['title']       = cellTitle;
+            if (Object.keys(attrs).length) cellObj.attributes = attrs;
+
+            return cellObj;
           }
 
           return value;
@@ -365,7 +503,7 @@ class SimpleDatatableAdapter extends HTMLElement {
       this.columns = cols.map((col_settings, idx) => {
         col_settings = parseCols(col_settings);
 
-        return {
+        const colObj = {
           ...(Object.fromEntries(
             Object.entries(col_settings).filter(([key]) => !key.startsWith('_'))
           )),
@@ -374,6 +512,25 @@ class SimpleDatatableAdapter extends HTMLElement {
           searchable: col_settings.searchable ?? true,
           sortable:   col_settings.sortable   ?? true,
         };
+
+        // _searchValue: funzione searchMethod personalizzata che opera su
+        // cell.attributes['data-search'] invece che sul testo visualizzato.
+        // L'API simple-datatables prevede: (terms, cell, row, colIdx, source)
+        // - terms: array di stringhe (uno per parola cercata)
+        // - cell:  oggetto cella dai dati originali (con .text e .attributes)
+        // La funzione deve restituire true se la riga è da includere.
+        // Comportamento AND: tutti i termini devono essere presenti (come
+        // nella demo https://fiduswriter.github.io/simple-datatables/demos/22-and-search/).
+        if (col_settings._searchValue) {
+          colObj.searchMethod = (terms, cell) => {
+            const haystack = (
+              cell.attributes?.['data-search'] ?? cell.text ?? ''
+            ).toLowerCase();
+            return terms.every(term => haystack.includes(term.toLowerCase()));
+          };
+        }
+
+        return colObj;
       });
 
     } catch (err) {
