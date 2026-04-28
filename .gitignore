@@ -16,5 +16,6 @@ vendor
 # frontend
 node_modules
 _private
+_wrk
 public/_dev
 unresolved-props.md

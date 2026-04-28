@@ -40,6 +40,8 @@ import caretRightIcon from '../../icons/caret-right.svg?inline';
  *                                             (sostituiti con i valori dell'oggetto riga;
  *                                              i segnaposto non trovati usano `_renderNullAs`)
  *                                           - funzione `(row) => string`
+ *                                           - se sono impostate sia `_cellRender` che l'opzione `render` di simple-datatable
+ *                                             quest'ultima viene annullata per evitare potenziali conflitti
  * @property {string|Function} [_sortValue]   Percorso del campo da usare per l'ORDINAMENTO al posto
  *                                           del contenuto visualizzato, oppure una funzione
  *                                           `(row) => string|number` per casi complessi
