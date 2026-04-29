@@ -88,6 +88,13 @@ import caretRightIcon from '../../icons/caret-right.svg?inline';
  *                                           in tutte le colonne. Può essere sovrascritto per singola
  *                                           colonna con `_renderNullAs`.
  *                                           Default: `\u2014` (em dash)
+ *
+ * @param {string[]}      refs  Elenco di percorsi URL da cui, se si proviene,
+ *                                           la pagina corrente viene ripristinata dal cookie
+ *                                           di sessione `sd-pag`. Se il referrer non è tra
+ *                                           quelli indicati, il cookie viene eliminato.
+ *                                           Confronto su `pathname` (query string e hash ignorati).
+ *                                           Esempio: `['/utenti', '/utenti/nuovo']`
  */
 
 
@@ -377,6 +384,51 @@ class SimpleDatatableAdapter extends HTMLElement {
     if (!this._config) this._config = {};
     this._config[name] = value;
   }
+
+  /**
+   * Restituisce true se il referrer corrisponde a uno dei percorsi in `refs`.
+   * Il confronto avviene su `pathname` per ignorare query string e hash.
+   */
+  _isReferrer() {
+    let allowed = this._getParam('refs', []);
+
+    if (typeof allowed === 'string') {
+      try {
+        allowed = JSON.parse(allowed);
+      } catch (e) {
+        // eslint-disable-next-line no-console
+        console.error('[s-datatable] Errore nel parsing di \'refs\':', e);
+        return false;
+      }
+    }
+    if (!Array.isArray(allowed) || !allowed.length || !document.referrer) {
+      return false;
+    }
+    const referrerPath = new URL(document.referrer).pathname;
+
+    // Ritorna true se il path del referrer è contenuto in una delle stringhe di 'allowed'
+    return allowed.some(allowedUrl =>
+      (typeof allowedUrl === 'string') && (referrerPath.includes(allowedUrl))
+    );
+  }
+
+
+  /** Salva la pagina corrente nel cookie di sessione `sd-pag`. */
+  _savePageCookie(page) {
+    document.cookie = `sd-pag=${page}; path=${location.pathname}`;
+  }
+
+  /** Legge la pagina dal cookie `sd-pag`. Restituisce null se assente. */
+  _readPageCookie() {
+    const match = document.cookie.match(/(?:^|;\s*)sd-pag=(\d+)/);
+    return match ? parseInt(match[1], 10) : null;
+  }
+
+  /** Elimina il cookie `sd-pag`. */
+  _deletePageCookie() {
+    document.cookie = `sd-pag=; path=${location.pathname}; max-age=0`;
+  }
+
 
   /**
    * Ritorna true se questo elemento è il target dell'evento.
@@ -685,6 +737,16 @@ class SimpleDatatableAdapter extends HTMLElement {
       pagination.querySelectorAll(`.${styles.paginationListItemBtn}:has(svg)`)
         .forEach(btn => btn.classList.add(styles.hasSvg));
 
+      // Ripristino pagina dal cookie di sessione (se referrer autorizzato)
+      if (this._isReferrer()) {
+        const savedPage = this._readPageCookie();
+        if (savedPage !== null) {
+          this._dt.page(savedPage);
+        }
+      } else {
+        this._deletePageCookie();
+      }
+
       // Applica eventuale filtro contestuale passato via reload({ search: … })
       // Lo facciamo qui, dentro datatable.init, per essere certi che
       // simple-datatables abbia completato il render dei nuovi dati.
@@ -698,6 +760,11 @@ class SimpleDatatableAdapter extends HTMLElement {
           this._dt.search(ps.term, ps.columns);
         }
       }
+    });
+
+    // Salva la pagina corrente nel cookie ad ogni cambio di pagina
+    this._dt.on('datatable.page', page => {
+      this._savePageCookie(page);
     });
 
   } // end _render
