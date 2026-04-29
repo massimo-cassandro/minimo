@@ -22,71 +22,125 @@ export function svgRules({
     useSvgo = false;
   }
 
+  /**
+   * Restituisce i loader SVGO tenendo conto sia dell'opzione globale `useSvgo`
+   * sia delle modalità di opt-out per singolo file/import:
+   *
+   *  1. resourceQuery `?noSVGO` (combinabile con altre query):
+   *       import icon from './icon.svg?noSVGO';
+   *       import icon from './icon.svg?cssInline&noSVGO';
+   *
+   *  2. Suffisso `-noSVGO` nel nome file (si applica a tutti gli import di quel file):
+   *       import icon from './icon-noSVGO.svg';
+   *
+   * Il parametro `resourceQuery` è la stringa raw della query dell'import corrente
+   * (es. "?cssInline&noSVGO"). Quando non disponibile a compile-time, la verifica
+   * sul suffisso del file viene delegata a `test: /-noSVGO\.svg$/i` sulla regola.
+   *
+   * @param {boolean} [skipSvgo=false] - true se la regola ha già rilevato noSVGO
+   */
+  const svgoLoaders = (skipSvgo = false) =>
+    (useSvgo && !skipSvgo) ? [ { loader: 'svgo-loader', options: svgoConfig } ] : [];
+
+  /**
+   * Dato un set di condizioni (resourceQuery, test, ...) e i loader "core" della regola,
+   * restituisce una coppia di regole: una normale e una con `?noSVGO` che bypassa SVGO.
+   * Questo permette di combinare liberamente ?noSVGO con qualsiasi altra query.
+   *
+   * @param {object} baseRule  - la regola senza i loader SVGO
+   * @param {function} makeUse - funzione (skipSvgo: bool) => loader array
+   */
+  const withNoSVGOVariant = (baseRule, makeUse) => [
+    // Variante con ?noSVGO: stessa regola ma senza SVGO.
+    // La resourceQuery combina il match originale con la presenza di noSVGO.
+    {
+      ...baseRule,
+      resourceQuery: {
+        and: [ baseRule.resourceQuery, /noSVGO/ ],
+      },
+      use: makeUse(true),
+    },
+    // Variante normale (senza ?noSVGO).
+    {
+      ...baseRule,
+      use: makeUse(false),
+    },
+  ];
+
   return [{
     test: /(\.svg)$/i,
     exclude: favicons_path_regexp?? undefined,
     oneOf: [
-      // 1. svg inline dataUri per css (con `?cssInline`)
-      {
-        resourceQuery: /cssInline/, // ex inline-dataURI
-        type: 'asset/source',
-        use: [
 
+      // 1. svg inline dataUri per css (con `?cssInline`)
+      //    Supporta anche `?cssInline&noSVGO` per saltare SVGO su quel singolo import.
+      ...withNoSVGOVariant(
+        {
+          resourceQuery: /cssInline/, // ex inline-dataURI
+          type: 'asset/source',
+        },
+        (skipSvgo) => [
           // Loader wrapper per Data URI compatto (Mini-SVG-Data-URI-Loader)
           {
             loader: path.resolve(this_dirname, './mini-svg-data-uri-loader.cjs'),
           },
-          
           // Loader di ottimizzazione SVGO
-          ...(useSvgo? [ {
-            loader: 'svgo-loader',
-            options: svgoConfig,
-          } ] : []),
+          ...svgoLoaders(skipSvgo),
         ],
-      },
+      ),
 
-      // as react component -> https://react-svgr.com/docs/webpack/
+      // 2. as react component -> https://react-svgr.com/docs/webpack/
+      //    Supporta anche `?react&noSVGO`.
       ...(useSvgr
-        ? [{
-          resourceQuery: /react/,
-          issuer: /\.[jt]sx?$/,
-          use: [
+        ? withNoSVGOVariant(
+          {
+            resourceQuery: /react/,
+            issuer: /\.[jt]sx?$/,
+          },
+          (skipSvgo) => [
             {
               loader: '@svgr/webpack',
               options: {
-                ...(useSvgo
+                ...((useSvgo && !skipSvgo)
                   ? {
-                    svgo: true, // false: Disable SVGO inside SVGR if svgo-loader already ran
+                    svgo: true,
                     svgoConfig: svgoConfig,
                   }
                   : {
-                    svgo: false
+                    svgo: false,
                   }
-
-                )
+                ),
                 // Altre opzioni utili di SVGR
                 // titleProp: true,
                 // ref: true,
-              }
+              },
             },
-            // {
-            //   loader: 'svgo-loader',
-            //   options: svgoConfig,
-            // },
           ],
-        }]
+        )
         : []
       ),
 
-      // svg inline (con `?inline`)
+      // 3. svg inline (con `?inline`)
+      //    Supporta anche `?inline&noSVGO`.
+      ...withNoSVGOVariant(
+        {
+          resourceQuery: /inline/,
+          type: 'asset/source',
+        },
+        (skipSvgo) => svgoLoaders(skipSvgo),
+      ),
+
+      // 4. svg file con suffisso `-noSVGO` nel nome (es. `icon-noSVGO.svg`).
+      //    Si applica a tutti gli import di quel file, senza bisogno di ?noSVGO.
       {
-        resourceQuery: /inline/,
-        type: 'asset/source',
-        // Ottimizzazione SVGO
-        use: useSvgo ? [ { loader: 'svgo-loader', options: svgoConfig } ] : [],
+        test: /-noSVGO\.svg$/i,
+        type: 'asset/resource',
+        generator: {
+          filename: 'imgs/[name].[contenthash][ext]'
+        },
       },
 
-      // svg file (copy image files to build folder)
+      // 5. svg file (copy image files to build folder)
       {
         type: 'asset/resource',
         exclude: [ /cssInline/, /inline/ ],
@@ -94,15 +148,6 @@ export function svgRules({
         generator: {
           filename: 'imgs/[name].[contenthash][ext]'
         },
-
-        // TODO presumibilmente errore sui file già ottimizzati
-        // Ottimizzazione SVGO
-        // use: useSvgo ? [
-        //   {
-        //     loader: 'svgo-loader',
-        //     options: svgoConfig,
-        //   },
-        // ] : []
       }
     ]
   }];

@@ -21,7 +21,7 @@ export function snackbar(message, options = {}){
   options = {
 
     status       : null, // danger, warning, info, success
-    duration     : 6000, // ms or false/null to avoid autoclose
+    duration     : 4000, // ms or false/null to avoid autoclose
     close_btn    : true, // true | false
 
     action       : null, // null or function

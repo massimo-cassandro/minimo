@@ -252,6 +252,36 @@ class SimpleDatatableAdapter extends HTMLElement {
   }
 
   /**
+   * Distrugge l'istanza DataTable interna e svuota il componente.
+   * Equivale a datatable.destroy() di simple-datatables.
+   * Dopo la chiamata è possibile richiamare init() per reinizializzare
+   * la tabella con nuovi dati o colonne, senza ricreare l'elemento.
+   */
+  destroy() {
+    if (this._dt) {
+      this._dt.destroy();
+      this._dt = null;
+    }
+    this._loadStarted = false;
+    this._loadGeneration++;
+    this.innerHTML = '';
+  }
+
+  /**
+   * Restituisce l'istanza DataTable interna di simple-datatables.
+   * Utile per operazioni non coperte dall'API del componente.
+   * Restituisce null se la tabella non è ancora stata inizializzata.
+   *
+   * Esempio:
+   *   const instance = dt.getDataTable();
+   *   instance.page(2);
+   *   instance.on('datatable.sort', (col, dir) => console.log(col, dir));
+   */
+  getDataTable() {
+    return this._dt ?? null;
+  }
+
+  /**
    * Ricerca testuale su una o più colonne.
    * @param {string}   term
    * @param {number[]} [columns]  indici di colonna; se omesso cerca su tutto
@@ -455,9 +485,13 @@ class SimpleDatatableAdapter extends HTMLElement {
               (value.timezone === 'UTC' ? 'Z' : '');
           }
 
+
+// TODO rendere più snella la gestione di questoi casi (???)
+// TODO pasare il valore `nullAs` al render predefinito
           // Applica _renderNullAs al valore della cella se null/undefined
           // e la cella non ha già un template che gestisce la visualizzazione.
-          if (value == null && col_item._cellRender == null) {
+          // se _renderMode è impostato, il valore null è gestito direttamente dal gestore predefinito
+          if (value == null && col_item._cellRender == null && col_item._renderMode == null) {
             value = nullAs;
           }
 
