@@ -94,7 +94,16 @@ import caretRightIcon from '../../icons/caret-right.svg?inline';
  *                                           di sessione `sd-pag`. Se il referrer non è tra
  *                                           quelli indicati, il cookie viene eliminato.
  *                                           Confronto su `pathname` (query string e hash ignorati).
- *                                           Esempio: `['/utenti', '/utenti/nuovo']`
+ *                                           Esempio: `['/utenti']`
+ *                                           NB: il match è positivo anche se il referrer è parte di una delle stringhe permesse
+ *                                           quindi, ad esempio, `['/utenti']` intercetta sia `/utenti` che `/utenti/1234`
+ *
+
+ ------------ DA VALUTARE NON IMPLEMENTATO -----------
+ * @param {string[]}      refsCallback  callback da eseguire in seguito al match di refs.
+ *                                      È invocato con l'argomento isRef (true | false) che indica se la pagina referrer
+ *                                      è tra quelle mappate in refs, quindi `['/utenti']`.
+ *                                      Utilizzabile solo nella configurazione via script
  */
 
 
@@ -738,6 +747,8 @@ class SimpleDatatableAdapter extends HTMLElement {
         .forEach(btn => btn.classList.add(styles.hasSvg));
 
       // Ripristino pagina dal cookie di sessione (se referrer autorizzato)
+      // const isRefUrl = this._isReferrer(), refsCallback = this._getParam('refsCallback', null);
+      // if (isRefUrl) {
       if (this._isReferrer()) {
         const savedPage = this._readPageCookie();
         if (savedPage !== null) {
@@ -746,6 +757,10 @@ class SimpleDatatableAdapter extends HTMLElement {
       } else {
         this._deletePageCookie();
       }
+
+      // if(refsCallback && typeof refsCallback === 'function') {
+      //   refsCallback(isRefUrl);
+      // }
 
       // Applica eventuale filtro contestuale passato via reload({ search: … })
       // Lo facciamo qui, dentro datatable.init, per essere certi che

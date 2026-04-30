@@ -29,7 +29,7 @@ export function parseDomString(domString) {
 
   // versione con groups
   // const regex = new RegExp(
-  //   /^(?<tag>[a-zA-Z]+)?/.source +                // tag
+  //   /^(?<tag>[a-zA-Z][a-zA-Z0-9-]*)?/.source +    // tag
   //   /(?:#(?<id>[a-zA-Z0-9_-]+))?/.source +        // id
   //   /(?<classes>(?:\.[a-zA-Z0-9_-]+)*)?/.source + // classi
   //   /(?<attrs>[([{].*?[)\]}])?/.source +          // attrs
@@ -37,11 +37,11 @@ export function parseDomString(domString) {
   // );
 
   const regex = new RegExp(
-    /^([a-zA-Z]+)?/.source +            // tag
-    /(?:#([a-zA-Z0-9_-]+))?/.source +   // id
-    /((?:\.[a-zA-Z0-9_-]+)*)?/.source + // classi
-    /([([{].*?[)\]}])?/.source +        // attrs
-    /(?: +(.*))?$/.source               // content
+    /^([a-zA-Z][a-zA-Z0-9-]*)?/.source +  // tag (accetta anche nomi di web components)
+    /(?:#([a-zA-Z0-9_-]+))?/.source +     // id
+    /((?:\.[a-zA-Z0-9_-]+)*)?/.source +   // classi
+    /([([{].*?[)\]}])?/.source +          // attrs
+    /(?: +(.*))?$/.source                 // content
   );
 
   const matches = domString.match(regex);
