@@ -10,5 +10,5 @@
       "@minimo/*": ["../src/*"]
     }
   },
-  "exclude": ["node_modules", "dist", "docs", "build", "public"]
+  "exclude": ["../node_modules"]
 }
