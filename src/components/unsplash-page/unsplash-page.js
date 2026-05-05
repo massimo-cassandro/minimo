@@ -1,7 +1,7 @@
 import imageIcon from '../../icons/image-duotone.svg';
-import arrowIcon from '../icons/arrow-fat-lines-left-duotone.svg';
-import { breakpoints } from './img-breakpoints';
-import { fetchUnsplashData } from './fetch-unsplash-data';
+import arrowIcon from '../../icons/arrow-fat-lines-left-duotone.svg';
+import { breakpoints } from './img-breakpoints.js';
+import { fetchUnsplashData } from './fetch-unsplash-data.js';
 import { decode } from 'blurhash';
 
 export function unsplashPageJS(settings) {
