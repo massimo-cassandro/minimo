@@ -41,6 +41,8 @@
   --btn-lg-font-size: var(--font-size-lg);
   --btn-lg-padding-block: var(--size-base);
   --btn-lg-padding-inline: var(--size-md);
+  --btn-link-disabled-color: var(--text-muted);
+  --btn-link-disabled-font-style: italic;
   --btn-md-focus-outline-width: .1875rem;
   --btn-md-font-size: var(--font-size-md);
   --btn-md-padding-block: var(--size-xs);

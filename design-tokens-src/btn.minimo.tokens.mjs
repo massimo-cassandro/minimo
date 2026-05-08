@@ -192,6 +192,21 @@ export default {
           }
         }
       }
+    },
+
+    link: {
+      disabled: {
+        font: {
+          style: {
+            $value: 'italic',
+            $type: 'string'
+          }
+        },
+        color: {
+          $value: '{text.muted}',
+          $type: 'color'
+        }
+      }
     }
 
   } // end btn

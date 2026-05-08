@@ -17,6 +17,13 @@ button, [role='button'], .btn, .btn-reset {
   box-shadow: none;
 }
 
+.btn-link[disabled] {
+  /* stylelint-disable declaration-no-important */
+  font-style: var(--btn-link-disabled-font-style) !important;
+  color: var(--btn-link-disabled-color) !important;
+  /* stylelint-enable declaration-no-important */
+}
+
 a.btn {
   &:focus {
     outline: none;

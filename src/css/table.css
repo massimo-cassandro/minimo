@@ -7,6 +7,7 @@
   overflow-x: auto;
 }
 
+/* TODO opzione per attivare/disattuvare alternate color */
 .table {
 
   --_alternate-row-bg: var(--table-body-tr-alt-bg-color);

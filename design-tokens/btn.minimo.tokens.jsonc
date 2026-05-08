@@ -191,6 +191,20 @@
           }
         }
       }
+    },
+    "link": {
+      "disabled": {
+        "font": {
+          "style": {
+            "$type": "string",
+            "$value": "italic"
+          }
+        },
+        "color": {
+          "$type": "color",
+          "$value": "{text.muted}"
+        }
+      }
     }
   }
 }
