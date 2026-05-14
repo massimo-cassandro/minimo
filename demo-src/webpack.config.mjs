@@ -35,7 +35,7 @@ const isDevelopment = process.env.NODE_ENV === 'development'
   ,useSvgr = false // svg per react
   ,svgoConfig = useSvgo? (await import('../webpack-setup/webpack-modules/svgo.config.mjs')).default : null
   ,postcssConfig_path = path.resolve(__dirname, './postcss.config.mjs')
-  ,output_dir = path.resolve(__dirname, '../../demo-build')
+  ,output_dir = path.resolve(__dirname, '../demo-build')
   // ,output_dir = isDevelopment? '_dev' : 'build' // symfony
   // ,favicons_path = null //'frontend/favicons/output'
   ,favicons_path_regexp = null //new RegExp(favicons_path) // source pattern per le favicons (regexp o null)

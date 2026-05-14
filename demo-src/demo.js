@@ -1,7 +1,6 @@
 import './demo.css';
 
-import buttons from './pages/buttons.html';
-import { snackbarsDemo } from './pages/snackbars/snackbars-demo.js';
+import { routes } from 'routes.js';
 
 const root = document.getElementById('root')
   ,h1 = document.getElementById('title')
@@ -10,31 +9,22 @@ const root = document.getElementById('root')
   ,titleCase = str => str.substring(0,1).toUpperCase() + str.substring(1)
 ;
 
-const routes = [
-  {
-    key: 'buttons',
-    incl: buttons
-  },
-  {
-    key: 'snackbars',
-    callback: snackbarsDemo
-  },
-
+routes.push(
   {
     key: 'home',
     title: 'Minimo Demo',
     callback: () => {
       const routeList = routes.filter(r => r.key !== 'home');
-      routeList.sort((a,b) => {
-        return (a.title?? a.key).toLowerCase().localeCompare((b.title?? b.key).toLowerCase());
-      });
+      // routeList.sort((a,b) => {
+      //   return (a.title?? a.key).toLowerCase().localeCompare((b.title?? b.key).toLowerCase());
+      // });
 
       root.innerHTML = '<ul>' +
         routeList.map(r => `<li><a href="/#/${r.key}">${r.title?? titleCase(r.key)}</a></li>`).join('') +
-        '</ul>'
+        '</ul>';
     }
   }
-];
+);
 
 const routeObj = routes.filter(r => r.key === route)[0];
 
@@ -44,11 +34,11 @@ if(!routeObj) {
 
 
 
-h1.innerHTML =  routeObj.title?? titleCase(route);
+h1.innerHTML =  routeObj.title?? titleCase(routeObj.key);
 document.title = h1.innerText + (route !== 'home'? ' | Minimo Demo' : '');
 
 if(routeObj.incl) {
-  root.innerHTML = buttons;
+  root.innerHTML = routeObj.incl;
 }
 
 if(routeObj.callback) {
