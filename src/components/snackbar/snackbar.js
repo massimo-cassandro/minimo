@@ -31,19 +31,20 @@ export function snackbar(message, options = {}){
     ...options
   };
 
-  let _popover, _timeoutID;
+  let _popover, _timeoutID, _isRemoving = false;
 
   const removePopover = () => {
-    if (_popover?.matches(':popover-open')) {
-      if (_timeoutID) clearTimeout(_timeoutID);
+    if (_isRemoving || !_popover?.matches(':popover-open')) return;
+    _isRemoving = true; // evita sovrapposizioni nel caso in cui removePopover sia chiamato più volte durante l'animazione di chiusura
 
-      _popover.classList.add(styles.isHiding);
+    if (_timeoutID) clearTimeout(_timeoutID);
 
-      _popover.addEventListener('animationend', () => {
-        _popover.hidePopover();
-        _popover.remove();
-      }, { once: true });
-    }
+    _popover.classList.add(styles.isHiding);
+
+    _popover.addEventListener('animationend', () => {
+      _popover.hidePopover();
+      _popover.remove();
+    }, { once: true }); // `once` già evita duplicati sul listener, ma il flag protegge prima
   };
 
   _popover = domBuilder([
