@@ -1,4 +1,4 @@
-import './index.css';
+import './demo.css';
 
 import buttons from './pages/buttons.html';
 import { snackbarsDemo } from './pages/snackbars/snackbars-demo.js';
@@ -65,7 +65,7 @@ document.body.addEventListener('click', e => {
     e.target.getAttribute('href').includes('/#/')
   ) {
 
-    console.log(e.target.getAttribute('href'));
+    // console.log(e.target.getAttribute('href'));
     window.location.href = e.target.getAttribute('href');
     window.location.reload();
   }

@@ -65,7 +65,7 @@
   --btn-close-active-background-color: var(--snackbar-btn-close-active-background-color);
   --btn-close-active-icon-color: var(--snackbar-btn-close-active-icon-color);
 
-
+  flex-shrink: 0;
   border: none;
 
   &:active {

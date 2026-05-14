@@ -61,7 +61,7 @@ const isDevelopment = process.env.NODE_ENV === 'development'
 
 // =>> entries
 const entries = {
-  'index': path.resolve(__dirname, './index.js'),
+  'demo': path.resolve(__dirname, './demo.js'),
 };
 
 
@@ -189,7 +189,7 @@ const config = {
     // =>> plugins: HtmlWebpackPlugin
     new HtmlWebpackPlugin({
       filename: 'index.html',
-      template: path.resolve(__dirname, './index.ejs'),
+      template: path.resolve(__dirname, './demo.ejs'),
       inject: 'body',
       // title: 'Buttons Demo',
       minify: false //!isDevelopment

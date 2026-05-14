@@ -18,7 +18,7 @@ export function snackbarsDemo(){
   ], root);
 
   btns.toast.addEventListener('click', () => {
-    snackbar('Toast message'), {duration: 8000};
+    snackbar('A really very very very long snackbar message. Lorem ipsum dolor sit amet consectetur adipisicing elit. Molestias, repudiandae.'), {duration: 8000};
   });
 
 }
