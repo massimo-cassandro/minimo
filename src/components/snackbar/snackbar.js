@@ -97,4 +97,8 @@ export function snackbar(message, options = {}){
     });
 
   }
+
+  return {
+    close: removePopover
+  };
 }
