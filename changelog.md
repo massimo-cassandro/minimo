@@ -15,3 +15,4 @@
 * 0.13.0 (03 mag 2026) - Unsplash page
 * 0.14.0 (05 mag 2026) - autocomplete
 * 0.15.0 (14 mag 2026) - Snackbar: metodo `close`
+* 0.16.0 (15 mag 2026) - s-datatable: footer, totale records, custom top element

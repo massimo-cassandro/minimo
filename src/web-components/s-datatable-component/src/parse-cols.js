@@ -110,6 +110,15 @@ export function parseCols(col_obj){
 
         }
       };
+
+    // TODO completare, aggiungere formattazione
+    } else if(col_obj._renderMode === 'numeric') {
+      return {
+
+        cellClass: 'text-end text-numeric',
+        headerClass: 'text-end',
+      };
+
     }
   } // end if not render
 

@@ -9,7 +9,7 @@ import caretRightIcon from '../../icons/caret-right.svg?inline';
 
 
 /**
- * Impementazione di simple-datatable (https://fiduswriter.github.io/simple-datatables/documentation/)
+ * Implementazione di simple-datatable (https://fiduswriter.github.io/simple-datatables/documentation/)
  * per generare una tabella da dati json e da un oggetto `cols` di configurazione
  *
  * ─────────────────────────────────────────────────────────────────────────────
@@ -42,6 +42,16 @@ import caretRightIcon from '../../icons/caret-right.svg?inline';
  *                                           - funzione `(row) => string`
  *                                           - se sono impostate sia `_cellRender` che l'opzione `render` di simple-datatable
  *                                             quest'ultima viene annullata per evitare potenziali conflitti
+ * @property {string|Function} [_footerRender] Contenuto della cella <td> nel <tfoot> per questa colonna.
+ *                                           Accetta:
+ *                                           - funzione `(data) => string` dove `data` è l'array dei
+ *                                             record visibili (filtrati dalla ricerca corrente, ma non
+ *                                             limitati alla pagina attuale): ideale per somme, medie, conteggi.
+ *                                           - stringa statica (es. etichetta fissa "Totale:")
+ *                                           Le colonne senza `_footerRender` producono una <td> vuota.
+ *                                           Il <tfoot> viene aggiunto solo se almeno una colonna lo definisce.
+ *                                           La cella eredita le classi CSS (allineamento) della colonna.
+ *
  * @property {string|Function} [_sortValue]   Percorso del campo da usare per l'ORDINAMENTO al posto
  *                                           del contenuto visualizzato, oppure una funzione
  *                                           `(row) => string|number` per casi complessi
@@ -88,6 +98,23 @@ import caretRightIcon from '../../icons/caret-right.svg?inline';
  *                                           in tutte le colonne. Può essere sovrascritto per singola
  *                                           colonna con `_renderNullAs`.
  *                                           Default: `\u2014` (em dash)
+ *
+ * @param {boolean}       updateFooterOnPageChange     Se true, la callback `_footerRender` riceve i soli record
+ *                                           della pagina corrente (subtotale di pagina). Se false
+ *                                           (default), riceve l'intero set filtrato indipendentemente
+ *                                           dalla paginazione (totale complessivo).
+ *                                           Quando è false il footer si aggiorna solo al cambio di
+ *                                           filtro, non al cambio pagina.
+ *
+ * @param {Element|string} topSlot          Elemento DOM o stringa HTML da inserire nell'area in alto
+ *                                           a sinistra del datatable (lo spazio del selettore righe/pagina,
+ *                                           qui disabilitato). Utile per pulsanti contestuali, filtri
+ *                                           aggiuntivi o qualsiasi controllo da affiancare alla search box.
+ *                                           Viene avvolto in un `<div class="datatable-top-slot">`.
+ *                                           Accetta:
+ *                                           - `Element`: un nodo DOM già costruito
+ *                                           - stringa HTML: parsata via innerHTML
+ *                                           Non è leggibile da attributo HTML (solo via script).
  *
  * @param {string[]}      refs  Elenco di percorsi URL da cui, se si proviene,
  *                                           la pagina corrente viene ripristinata dal cookie
@@ -597,6 +624,10 @@ class SimpleDatatableAdapter extends HTMLElement {
         })
       }));
 
+      // Conserva i dati grezzi e le definizioni di colonna per il tfoot
+      this._rawData    = rawData;
+      this._footerCols = cols;
+
       this.columns = cols.map((col_settings, idx) => {
         col_settings = parseCols(col_settings);
 
@@ -775,14 +806,218 @@ class SimpleDatatableAdapter extends HTMLElement {
           this._dt.search(ps.term, ps.columns);
         }
       }
+
+      // Renderizza il tfoot (se almeno una colonna ha _footerRender)
+      this._renderTfoot();
+
+      // Aggiorna il testo info con il totale assoluto
+      this._updateInfo();
+
+      // Inietta l'elemento nello slot top-sinistra (se configurato)
+      this._injectTopSlot();
     });
 
-    // Salva la pagina corrente nel cookie ad ogni cambio di pagina
+    // Salva la pagina corrente nel cookie ad ogni cambio di pagina;
+    // aggiorna il tfoot solo se updateFooterOnPageChange è attivo.
     this._dt.on('datatable.page', page => {
       this._savePageCookie(page);
+      if (this._getParam('updateFooterOnPageChange', false)) this._renderTfoot();
+      this._updateInfo();
     });
 
+    // Aggiorna il tfoot ad ogni cambio di filtro (ricerca / multisearch).
+    // Il sort non altera il set filtrato: il footer non deve cambiare.
+    this._dt.on('datatable.search',      () => { this._renderTfoot(); this._updateInfo(); });
+    this._dt.on('datatable.multisearch', () => { this._renderTfoot(); this._updateInfo(); });
+
   } // end _render
+
+
+  // ─── Footer (tfoot) ──────────────────────────────────────────────────────────
+
+  /**
+   * Costruisce o aggiorna la riga <tfoot> della tabella.
+   *
+   * Chiamato dopo il render iniziale, ad ogni cambio di filtro (ricerca /
+   * multisearch) e — se `updateFooterOnPageChange` è true — anche ad ogni cambio pagina.
+   *
+   * Dataset passato alla callback `_footerRender(data)`:
+   *
+   *   updateFooterOnPageChange: false (default)
+   *     → l'intero set filtrato, indipendente dalla pagina corrente.
+   *       I totali non cambiano navigando tra le pagine.
+   *       Se non c'è ricerca attiva, viene passato il dataset completo.
+   *
+   *   updateFooterOnPageChange: true
+   *     → solo i record della pagina corrente.
+   *       Utile per subtotali di pagina.
+   *
+   * `searchData` di simple-datatables è un array di indici nel dataset
+   * originale, disponibile (e non vuoto) solo quando `dt.searching === true`.
+   * Quando la ricerca è attiva ma non trova nulla, `searchData` è `[]`:
+   * in quel caso la callback riceve un array vuoto, non il dataset completo.
+   */
+  _renderTfoot() {
+    const cols    = this._footerCols;
+    const rawData = this._rawData;
+
+    if (!cols?.length || !rawData) return;
+
+    const hasFooter = cols.some(c => c._footerRender != null);
+    if (!hasFooter) return;
+
+    const table = this.querySelector('table');
+    if (!table) return;
+
+    const dt           = this._dt;
+    const updateFooterOnPageChange = this._getParam('updateFooterOnPageChange', false);
+
+    let visibleData;
+
+    if (updateFooterOnPageChange) {
+      // Dati della pagina corrente: ogni "pagina" in dt.pages è un array
+      // di oggetti riga; ciascuno ha una proprietà data-index che punta
+      // all'indice nel dataset originale.
+      const pageRows = dt.pages?.[dt.currentPage - 1] ?? [];
+      visibleData = pageRows
+        .map(row => rawData[row['data-index']])
+        .filter(Boolean);
+    } else {
+      // Dataset filtrato completo (ignorando la paginazione).
+      // dt.searching è true solo quando c'è una ricerca attiva;
+      // in quel caso searchData contiene gli indici dei match (può essere []).
+      visibleData = dt.searching
+        ? dt.searchData.map(idx => rawData[idx]).filter(Boolean)
+        : rawData;
+    }
+
+    // Riutilizza tfoot esistente o ne crea uno nuovo
+    let tfoot = table.querySelector('tfoot');
+    if (!tfoot) {
+      tfoot = document.createElement('tfoot');
+      table.appendChild(tfoot);
+    }
+
+    const tr = document.createElement('tr');
+
+    cols.forEach(col => {
+      const td = document.createElement('td');
+
+      if (col._footerRender != null) {
+        if (typeof col._footerRender === 'function') {
+          td.innerHTML = col._footerRender(visibleData) ?? '';
+        } else {
+          // Stringa statica (es. etichetta fissa "Totale:")
+          td.innerHTML = col._footerRender;
+        }
+      }
+
+      // Propaga le classi di allineamento della colonna per coerenza visiva
+      const cellClass = col.cellClass ?? col.headerClass ?? '';
+      if (cellClass) td.className = cellClass;
+
+      tr.appendChild(td);
+    });
+
+    tfoot.replaceChildren(tr);
+  }
+
+  // ─── Info label ──────────────────────────────────────────────────────────────
+
+  /**
+   * Sovrascrive il testo dell'area `.info` generato da simple-datatables per
+   * includere sempre il totale assoluto dei record (indipendente dal filtro).
+   *
+   * Comportamento:
+   *   - Senza ricerca attiva:
+   *       "Stai visualizzando le righe da {start} a {end}, su un totale di {total}."
+   *   - Con ricerca attiva:
+   *       "Stai visualizzando le righe da {start} a {end} dei {filtered} record filtrati,
+   *        su un totale di {total}."
+   *   - Nessun risultato (ricerca attiva, 0 match):
+   *       "Nessun risultato per la ricerca corrente (totale record: {total})."
+   *
+   * Viene chiamato da datatable.init, datatable.page, datatable.search,
+   * datatable.multisearch.
+   */
+  _updateInfo() {
+    const infoEl = this.querySelector(`.${styles.info}`);
+    if (!infoEl) return;
+
+    const dt      = this._dt;
+    const total   = this._rawData?.length ?? 0;
+
+    // Numero di record nel set corrente (filtrati o tutti)
+    const filtered = dt.searching ? dt.searchData.length : total;
+
+    if (filtered === 0 && dt.searching) {
+      infoEl.textContent = `Nessun risultato per la ricerca corrente (totale record: ${total}).`;
+      return;
+    }
+
+    // Calcola start/end della pagina corrente
+    const perPage    = dt.options.perPage;
+    const currentPage = dt.currentPage;                  // 1-based
+    const start      = (currentPage - 1) * perPage + 1;
+    const end        = Math.min(currentPage * perPage, filtered);
+
+    if (dt.searching) {
+      infoEl.textContent =
+        `Stai visualizzando le righe da ${start} a ${end} ` +
+        `dei ${filtered} record filtrati, su un totale di ${total}.`;
+    } else {
+      infoEl.textContent =
+        `Stai visualizzando le righe da ${start} a ${end}, ` +
+        `su un totale di ${total}.`;
+    }
+  }
+
+
+  // ─── Top slot ────────────────────────────────────────────────────────────────
+
+  /**
+   * Inietta un elemento DOM o del markup HTML nell'area in alto a sinistra
+   * del datatable — lo spazio normalmente occupato dal selettore "righe per
+   * pagina" (qui disabilitato con `perPageSelect: false`).
+   *
+   * Il parametro `topSlot` accetta:
+   *   - un `Element` (già costruito fuori dal componente)
+   *   - una stringa HTML (viene parsata con `innerHTML`)
+   *
+   * L'elemento viene inserito come primo figlio dell'area `.topArea`,
+   * prima della search box, avvolto in un `<div class="datatable-top-slot">`.
+   * Se `topSlot` non è definito, non viene inserito nulla.
+   *
+   * Esempio – stringa HTML:
+   *   el.init({
+   *     topSlot: '<button class="btn btn-sm btn-primary">Esporta CSV</button>',
+   *   });
+   *
+   * Esempio – elemento DOM:
+   *   const btn = document.createElement('button');
+   *   btn.textContent = 'Nuova commessa';
+   *   el.init({ topSlot: btn });
+   */
+  _injectTopSlot() {
+    const topSlot = this._getParam('topSlot', null);
+    if (topSlot == null) return;
+
+    const topArea = this.querySelector(`.${styles.topArea}`);
+    if (!topArea) return;
+
+    const wrapper = document.createElement('div');
+    wrapper.className = 'datatable-top-slot';
+
+    if (topSlot instanceof Element) {
+      wrapper.appendChild(topSlot);
+    } else {
+      wrapper.innerHTML = topSlot;
+    }
+
+    // Inserisce prima della search box (primo figlio esistente)
+    topArea.insertBefore(wrapper, topArea.firstChild);
+  }
+
 
 } // end component
 

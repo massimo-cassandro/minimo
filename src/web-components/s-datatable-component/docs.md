@@ -222,6 +222,32 @@ cols: [
                    //   cerca su entrambi i campi concatenati; "rossi mario" trova solo
                    //   le righe che contengono entrambe le parole, in qualsiasi ordine.
 
+    _footerRender, // Callback o stringa per il contenuto della cella nel <tfoot>.
+                   // Il <tfoot> (una sola riga) viene aggiunto automaticamente se
+                   // almeno una colonna definisce questa proprietà; le colonne senza
+                   // _footerRender producono una <td> vuota.
+                   //
+                   // Accetta:
+                   //   - funzione (data) => string
+                   //     `data` è l'array dei record da considerare per il calcolo.
+                   //     Il contenuto di `data` dipende dall'opzione `updateFooterOnPageChange`
+                   //     del componente (default false = dataset filtrato completo,
+                   //     indipendente dalla pagina corrente).
+                   //   - stringa statica (es. etichetta fissa "Totale:")
+                   //
+                   // La cella eredita le classi CSS di allineamento della colonna
+                   // (cellClass / headerClass), in modo da risultare visivamente coerente.
+                   //
+                   // Aggiornamenti automatici:
+                   //   - sempre: al cambio di filtro (ricerca / multisearch)
+                   //   - solo se updateFooterOnPageChange: true: al cambio di pagina
+                   //
+                   // Esempio – somma di una colonna numerica:
+                   //   _footerRender: (data) => {
+                   //     const tot = data.reduce((s, r) => s + (r.importo ?? 0), 0);
+                   //     return `<strong>${tot.toLocaleString('it-IT')} €</strong>`;
+                   //   }
+
     // ── Proprietà native simple-datatables (senza prefisso _) ────────────
 
     type,          // Tipo di dato: 'string' | 'number' | 'date' | 'boolean' | 'html' | 'other'
@@ -256,4 +282,108 @@ const cols = [
     type: 'number',
   }
 ];
+```
+
+### Esempio con tfoot – somma e conteggio
+
+```javascript
+// updateFooterOnPageChange: false (default) – il footer mostra il totale del set filtrato,
+// indipendente dalla pagina. Non si aggiorna al cambio pagina.
+const el = document.querySelector('s-datatable');
+el.init({
+  json: '/api/commesse.json',
+  cols: [
+    {
+      _field: 'commessa',
+      _heading: 'Commessa',
+      _footerRender: '<strong>Totale:</strong>',   // etichetta fissa
+    },
+    {
+      _field: 'importo',
+      _heading: 'Importo',
+      type: 'number',
+      cellClass: 'text-end',
+      headerClass: 'text-end',
+      // data = tutti i record filtrati (intera ricerca, non solo la pagina corrente)
+      _footerRender: (data) => {
+        const tot = data.reduce((s, r) => s + (r.importo ?? 0), 0);
+        return `<strong>${tot.toLocaleString('it-IT', { style: 'currency', currency: 'EUR' })}</strong>`;
+      },
+    },
+    {
+      _field: 'stato',
+      _heading: 'Stato',
+      _footerRender: (data) => `${data.length} record`,
+    },
+  ],
+});
+
+// updateFooterOnPageChange: true – il footer mostra il subtotale della sola pagina corrente.
+// Si aggiorna sia al cambio filtro sia al cambio pagina.
+el.init({
+  json: '/api/commesse.json',
+  updateFooterOnPageChange: true,
+  cols: [ /* stesse colonne di sopra */ ],
+});
+```
+
+Il `<tfoot>` viene aggiunto solo se almeno una colonna definisce `_footerRender`.
+
+Con `updateFooterOnPageChange: false` (default) la callback riceve l'intero set filtrato: i totali
+non cambiano navigando tra le pagine e si aggiornano solo quando cambia la ricerca.
+
+Con `updateFooterOnPageChange: true` la callback riceve i record della pagina corrente: utile per
+subtotali di pagina; il footer si aggiorna sia al cambio filtro sia al cambio pagina.
+
+## Testo info
+
+Il componente sovrascrive il testo dell'area informativa (in basso a sinistra) per includere
+sempre il numero totale assoluto di record, distinto dal conteggio filtrato.
+
+Senza ricerca attiva:
+
+> Stai visualizzando le righe da 1 a 25, su un totale di 100.
+
+Con ricerca attiva:
+
+> Stai visualizzando le righe da 1 a 25 dei 50 record filtrati, su un totale di 100.
+
+Ricerca senza risultati:
+
+> Nessun risultato per la ricerca corrente (totale record: 100).
+
+Il testo si aggiorna automaticamente ad ogni cambio pagina, ricerca e multisearch.
+
+## Parametro `topSlot`
+
+Permette di inserire un elemento DOM o del markup HTML nell'area in alto a sinistra
+del datatable — lo spazio normalmente occupato dal selettore "righe per pagina"
+(qui disabilitato). È utile per aggiungere pulsanti contestuali, filtri aggiuntivi
+o qualsiasi controllo da affiancare alla search box.
+
+L'elemento viene avvolto in un `<div class="datatable-top-slot">` e inserito
+come primo figlio dell'area superiore, prima della search box.
+
+È configurabile solo via script (non da attributo HTML), perché accetta sia
+stringhe HTML che elementi DOM già costruiti.
+
+```javascript
+// Stringa HTML
+el.init({
+  json: '/api/data.json',
+  cols: [...],
+  topSlot: '<button class="btn btn-sm btn-primary" onclick="...">Esporta CSV</button>',
+});
+
+// Elemento DOM (utile quando si vuole mantenere un riferimento al nodo)
+const btn = document.createElement('button');
+btn.className = 'btn btn-sm btn-outline-secondary';
+btn.textContent = 'Nuova commessa';
+btn.addEventListener('click', () => { /* … */ });
+
+el.init({
+  json: '/api/commesse.json',
+  cols: [...],
+  topSlot: btn,
+});
 ```
