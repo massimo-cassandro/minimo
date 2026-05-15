@@ -22,10 +22,21 @@
   tr {
     border-bottom: var(--_border);
   }
+
   thead {
     background-color: var(--table-thead-background-color);
     tr:last-child {
       border-width: var(--table-thead-border-width);
+    }
+  }
+
+  tfoot {
+    background-color: var(--table-tfoot-background-color);
+    tr:first-child {
+      border-block-start: var(--table-tfoot-border-width) solid var(--_border-color);
+    }
+    th, td {
+      font-weight: var(--table-tfoot-font-weight);
     }
   }
 

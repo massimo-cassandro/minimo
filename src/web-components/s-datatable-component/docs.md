@@ -358,7 +358,7 @@ Il testo si aggiorna automaticamente ad ogni cambio pagina, ricerca e multisearc
 
 Entrambi occupano l'area in alto a sinistra del datatable — lo spazio normalmente
 riservato al selettore "righe per pagina" (qui disabilitato). I due parametri si
-escludono: se `showInfoAtTop` è `true`, `topSlot` viene ignorato.
+escludono: se `showInfoAtTop` è `true` (default), `topSlot` viene ignorato.
 
 ### `showInfoAtTop`
 

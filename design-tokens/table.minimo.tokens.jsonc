@@ -20,6 +20,26 @@
         }
       }
     },
+    "tfoot": {
+      "background": {
+        "color": {
+          "$type": "color",
+          "$value": "{table.thead.background.color}"
+        }
+      },
+      "border": {
+        "width": {
+          "$type": "dimension",
+          "$value": "{table.thead.border.width}"
+        }
+      },
+      "font": {
+        "weight": {
+          "$type": "fontWeight",
+          "$value": "{font.weight.semibold}"
+        }
+      }
+    },
     "body": {
       "border": {
         "width": {

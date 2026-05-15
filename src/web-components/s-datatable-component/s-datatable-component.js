@@ -123,7 +123,7 @@ import caretRightIcon from '../../icons/caret-right.svg?inline';
  *                                           automaticamente quando non ci sono record o la ricerca
  *                                           non produce risultati. Ha precedenza su `topSlot`:
  *                                           se entrambi sono definiti, `topSlot` viene ignorato.
- *                                           Default: false.
+ *                                           Default: true.
  *
  * @param {string[]}      refs  Elenco di percorsi URL da cui, se si proviene,
  *                                           la pagina corrente viene ripristinata dal cookie
@@ -413,8 +413,27 @@ class SimpleDatatableAdapter extends HTMLElement {
     // 2. Attributo HTML
     const attr = this.getAttribute(name);
     if (attr !== null) {
-      // Auto-parse JSON per array e oggetti (es. cols='[…]')
+      // Auto-parse booleani quando il defaultValue è boolean e il valore
+      // è una delle stringhe canoniche true/false/0/1, oppure true/false.
+      // Casi supportati:
+      //   showInfoAtTop         (attributo senza valore → attr === '')  → true
+      //   showInfoAtTop="true"  / showInfoAtTop="1"                     → true
+      //   showInfoAtTop="false" / showInfoAtTop="0"                     → false
+      // Auto-parse booleani solo quando il parametro è dichiaratamente booleano
+      // (defaultValue === true | false). Copre tutti i formati HTML idiomatici:
+      //   showInfoAtTop            (attributo senza valore → '')  → true
+      //   showInfoAtTop="true"  /  showInfoAtTop="1"              → true
+      //   showInfoAtTop="false" /  showInfoAtTop="0"              → false
+      // I valori "1" e "0" NON vengono intercettati qui se defaultValue non è
+      // boolean, per non interferire con parametri numerici (es. perPage="1").
       const trimmed = attr.trim();
+      if (typeof defaultValue === 'boolean') {
+        const lower = trimmed.toLowerCase();
+        // Stringa vuota '' = attributo presente senza valore → true (standard HTML)
+        return lower !== 'false' && lower !== '0';
+      }
+
+      // Auto-parse JSON per array e oggetti (es. cols='[…]')
       if (trimmed.startsWith('[') || trimmed.startsWith('{')) {
         try { return JSON.parse(trimmed); } catch { /* restituisce la stringa grezza */ }
       }
@@ -1038,7 +1057,7 @@ class SimpleDatatableAdapter extends HTMLElement {
     const topArea = this.querySelector(`.${styles.topArea}`);
     if (!topArea) return;
 
-    const showInfoAtTop = this._getParam('showInfoAtTop', false);
+    const showInfoAtTop = this._getParam('showInfoAtTop', true);
 
     if (showInfoAtTop) {
       // Crea il nodo info top (il testo verrà scritto da _updateInfo)
