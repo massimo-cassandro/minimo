@@ -114,7 +114,16 @@ import caretRightIcon from '../../icons/caret-right.svg?inline';
  *                                           Accetta:
  *                                           - `Element`: un nodo DOM già costruito
  *                                           - stringa HTML: parsata via innerHTML
+ *                                           Ignorato se `showInfoAtTop` è true.
  *                                           Non è leggibile da attributo HTML (solo via script).
+ *
+ * @param {boolean}        showInfoAtTop    Se true, mostra nell'area superiore (spazio top-sinistra)
+ *                                           lo stesso testo dell'area `.info` in basso, mantenuto in
+ *                                           sync ad ogni cambio pagina/filtro. Il nodo viene nascosto
+ *                                           automaticamente quando non ci sono record o la ricerca
+ *                                           non produce risultati. Ha precedenza su `topSlot`:
+ *                                           se entrambi sono definiti, `topSlot` viene ignorato.
+ *                                           Default: false.
  *
  * @param {string[]}      refs  Elenco di percorsi URL da cui, se si proviene,
  *                                           la pagina corrente viene ripristinata dal cookie
@@ -760,24 +769,25 @@ class SimpleDatatableAdapter extends HTMLElement {
     });
 
     this._dt.on('datatable.init', () => {
+      // ── Icone paginazione ─────────────────────────────────────────────────
       const pagination = this.querySelector(`.${styles.paginationList}`);
-      if (!pagination) return;
+      if (pagination) {
+        const items = pagination.querySelectorAll(`.${styles.paginationListItem}`);
+        if (items.length) {
+          pagination.querySelector(
+            `.${styles.paginationListItem}:first-child .${styles.paginationListItemBtn}`
+          ).innerHTML = caretLeftIcon;
 
-      const items = pagination.querySelectorAll(`.${styles.paginationListItem}`);
-      if (!items.length) return;
+          pagination.querySelector(
+            `.${styles.paginationListItem}:last-child .${styles.paginationListItemBtn}`
+          ).innerHTML = caretRightIcon;
 
-      pagination.querySelector(
-        `.${styles.paginationListItem}:first-child .${styles.paginationListItemBtn}`
-      ).innerHTML = caretLeftIcon;
+          pagination.querySelectorAll(`.${styles.paginationListItemBtn}:has(svg)`)
+            .forEach(btn => btn.classList.add(styles.hasSvg));
+        }
+      }
 
-      pagination.querySelector(
-        `.${styles.paginationListItem}:last-child .${styles.paginationListItemBtn}`
-      ).innerHTML = caretRightIcon;
-
-      pagination.querySelectorAll(`.${styles.paginationListItemBtn}:has(svg)`)
-        .forEach(btn => btn.classList.add(styles.hasSvg));
-
-      // Ripristino pagina dal cookie di sessione (se referrer autorizzato)
+      // ── Ripristino pagina dal cookie di sessione (se referrer autorizzato) ─
       // const isRefUrl = this._isReferrer(), refsCallback = this._getParam('refsCallback', null);
       // if (isRefUrl) {
       if (this._isReferrer()) {
@@ -793,6 +803,7 @@ class SimpleDatatableAdapter extends HTMLElement {
       //   refsCallback(isRefUrl);
       // }
 
+      // ── Filtro contestuale post-reload ────────────────────────────────────
       // Applica eventuale filtro contestuale passato via reload({ search: … })
       // Lo facciamo qui, dentro datatable.init, per essere certi che
       // simple-datatables abbia completato il render dei nuovi dati.
@@ -807,14 +818,11 @@ class SimpleDatatableAdapter extends HTMLElement {
         }
       }
 
-      // Renderizza il tfoot (se almeno una colonna ha _footerRender)
+      // ── Tfoot, info, top slot ─────────────────────────────────────────────
+      // Eseguiti sempre, indipendentemente dalla presenza della paginazione.
       this._renderTfoot();
-
-      // Aggiorna il testo info con il totale assoluto
+      this._injectTopSlot();   // va prima di _updateInfo per creare il nodo top-info
       this._updateInfo();
-
-      // Inietta l'elemento nello slot top-sinistra (se configurato)
-      this._injectTopSlot();
     });
 
     // Salva la pagina corrente nel cookie ad ogni cambio di pagina;
@@ -927,83 +935,122 @@ class SimpleDatatableAdapter extends HTMLElement {
   /**
    * Sovrascrive il testo dell'area `.info` generato da simple-datatables per
    * includere sempre il totale assoluto dei record (indipendente dal filtro).
+   * Se `showInfoAtTop` è attivo, aggiorna in sincronia anche il nodo `.info`
+   * nell'area superiore (creato da `_injectTopSlot`).
+   *
+   * Calcolo di start/end: si conta il numero di righe renderizzate nel tbody
+   * (`dt.pages[currentPage - 1]`) invece di fare aritmetica su perPage,
+   * perché `dt.currentPage` può essere undefined al primo render.
    *
    * Comportamento:
    *   - Senza ricerca attiva:
    *       "Stai visualizzando le righe da {start} a {end}, su un totale di {total}."
-   *   - Con ricerca attiva:
-   *       "Stai visualizzando le righe da {start} a {end} dei {filtered} record filtrati,
-   *        su un totale di {total}."
+   *   - Con ricerca attiva (risultati > 0):
+   *       "Stai visualizzando le righe da {start} a {end} dei {filtered} record
+   *        filtrati, su un totale di {total}."
    *   - Nessun risultato (ricerca attiva, 0 match):
    *       "Nessun risultato per la ricerca corrente (totale record: {total})."
    *
-   * Viene chiamato da datatable.init, datatable.page, datatable.search,
-   * datatable.multisearch.
+   * Il nodo top-info viene nascosto quando filtered = 0 o total = 0.
    */
   _updateInfo() {
-    const infoEl = this.querySelector(`.${styles.info}`);
-    if (!infoEl) return;
+    const infoEl    = this.querySelector(`.${styles.info}`);
+    const topInfoEl = this.querySelector('.datatable-top-info');
 
-    const dt      = this._dt;
-    const total   = this._rawData?.length ?? 0;
+    if (!infoEl && !topInfoEl) return;
 
-    // Numero di record nel set corrente (filtrati o tutti)
+    const dt       = this._dt;
+    const total    = this._rawData?.length ?? 0;
     const filtered = dt.searching ? dt.searchData.length : total;
 
-    if (filtered === 0 && dt.searching) {
-      infoEl.textContent = `Nessun risultato per la ricerca corrente (totale record: ${total}).`;
+    let text;
+
+    if (total === 0 || (filtered === 0 && dt.searching)) {
+      // Nessun risultato — nasconde il nodo top-info se presente
+      if (topInfoEl) topInfoEl.hidden = true;
+
+      text = filtered === 0 && dt.searching
+        ? `Nessun risultato per la ricerca corrente (totale record: ${total}).`
+        : `Nessun record trovato.`;
+
+      if (infoEl) infoEl.textContent = text;
       return;
     }
 
-    // Calcola start/end della pagina corrente
-    const perPage    = dt.options.perPage;
-    const currentPage = dt.currentPage;                  // 1-based
-    const start      = (currentPage - 1) * perPage + 1;
-    const end        = Math.min(currentPage * perPage, filtered);
+    // Calcola start/end dalla pagina corrente in dt.pages (più affidabile di
+    // currentPage * perPage, che può dare NaN se currentPage è undefined
+    // al primo render oppure quando non c'è paginazione).
+    const currentPage  = dt.currentPage ?? 1;
+    const pageRows     = dt.pages?.[currentPage - 1] ?? [];
+    const perPage      = dt.options?.perPage ?? filtered;
+    const start        = pageRows.length > 0
+      ? (currentPage - 1) * perPage + 1
+      : 1;
+    const end          = pageRows.length > 0
+      ? start + pageRows.length - 1
+      : filtered;
 
     if (dt.searching) {
-      infoEl.textContent =
+      text =
         `Stai visualizzando le righe da ${start} a ${end} ` +
         `dei ${filtered} record filtrati, su un totale di ${total}.`;
     } else {
-      infoEl.textContent =
+      text =
         `Stai visualizzando le righe da ${start} a ${end}, ` +
         `su un totale di ${total}.`;
     }
+
+    if (infoEl)    infoEl.textContent    = text;
+    if (topInfoEl) { topInfoEl.textContent = text; topInfoEl.hidden = false; }
   }
 
 
   // ─── Top slot ────────────────────────────────────────────────────────────────
 
   /**
-   * Inietta un elemento DOM o del markup HTML nell'area in alto a sinistra
-   * del datatable — lo spazio normalmente occupato dal selettore "righe per
-   * pagina" (qui disabilitato con `perPageSelect: false`).
+   * Inietta nell'area in alto a sinistra del datatable il contenuto configurato.
    *
-   * Il parametro `topSlot` accetta:
-   *   - un `Element` (già costruito fuori dal componente)
-   *   - una stringa HTML (viene parsata con `innerHTML`)
+   * Modalità:
    *
-   * L'elemento viene inserito come primo figlio dell'area `.topArea`,
-   * prima della search box, avvolto in un `<div class="datatable-top-slot">`.
-   * Se `topSlot` non è definito, non viene inserito nulla.
+   *   showInfoAtTop: true  (ha precedenza su topSlot)
+   *     Inserisce un nodo `.datatable-top-info` con la stessa stringa dell'area
+   *     `.info` in basso, mantenuta in sync da `_updateInfo`. Viene nascosto
+   *     automaticamente quando filtered = 0 o total = 0.
+   *     Il parametro `topSlot`, se presente, viene ignorato.
    *
-   * Esempio – stringa HTML:
-   *   el.init({
-   *     topSlot: '<button class="btn btn-sm btn-primary">Esporta CSV</button>',
-   *   });
+   *   topSlot: Element | string  (usato solo se showInfoAtTop è false/assente)
+   *     Inserisce un elemento DOM o markup HTML arbitrario, avvolto in un
+   *     `<div class="datatable-top-slot">`.
    *
-   * Esempio – elemento DOM:
+   * In entrambi i casi l'elemento viene inserito come primo figlio di `.topArea`,
+   * prima della search box.
+   *
+   * Esempi:
+   *   el.init({ showInfoAtTop: true });
+   *
+   *   el.init({ topSlot: '<button class="btn btn-sm btn-primary">Esporta</button>' });
+   *
    *   const btn = document.createElement('button');
-   *   btn.textContent = 'Nuova commessa';
+   *   btn.textContent = 'Nuovo';
    *   el.init({ topSlot: btn });
    */
   _injectTopSlot() {
-    const topSlot = this._getParam('topSlot', null);
-    if (topSlot == null) return;
-
     const topArea = this.querySelector(`.${styles.topArea}`);
     if (!topArea) return;
+
+    const showInfoAtTop = this._getParam('showInfoAtTop', false);
+
+    if (showInfoAtTop) {
+      // Crea il nodo info top (il testo verrà scritto da _updateInfo)
+      const infoTop = document.createElement('div');
+      infoTop.className = `datatable-top-info ${styles.info}`;
+      infoTop.hidden = true;   // nascosto finché _updateInfo non lo popola
+      topArea.insertBefore(infoTop, topArea.firstChild);
+      return;
+    }
+
+    const topSlot = this._getParam('topSlot', null);
+    if (topSlot == null) return;
 
     const wrapper = document.createElement('div');
     wrapper.className = 'datatable-top-slot';
@@ -1014,7 +1061,6 @@ class SimpleDatatableAdapter extends HTMLElement {
       wrapper.innerHTML = topSlot;
     }
 
-    // Inserisce prima della search box (primo figlio esistente)
     topArea.insertBefore(wrapper, topArea.firstChild);
   }
 

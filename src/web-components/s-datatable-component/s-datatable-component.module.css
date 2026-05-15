@@ -19,6 +19,11 @@
   align-items: center;
   justify-content: flex-end;
   padding-block-end: var(--size-xs);
+
+  /* stylelint-disable-next-line selector-class-pattern */
+  &:has(:global(.datatable-top-info)), &:has(:global(.datatable-top-slot)) {
+    justify-content: space-between;
+  }
 }
 
 .searchWrapper {

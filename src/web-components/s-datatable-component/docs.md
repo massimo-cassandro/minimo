@@ -354,28 +354,43 @@ Ricerca senza risultati:
 
 Il testo si aggiorna automaticamente ad ogni cambio pagina, ricerca e multisearch.
 
-## Parametro `topSlot`
+## Parametri `topSlot` e `showInfoAtTop`
 
-Permette di inserire un elemento DOM o del markup HTML nell'area in alto a sinistra
-del datatable — lo spazio normalmente occupato dal selettore "righe per pagina"
-(qui disabilitato). È utile per aggiungere pulsanti contestuali, filtri aggiuntivi
-o qualsiasi controllo da affiancare alla search box.
+Entrambi occupano l'area in alto a sinistra del datatable — lo spazio normalmente
+riservato al selettore "righe per pagina" (qui disabilitato). I due parametri si
+escludono: se `showInfoAtTop` è `true`, `topSlot` viene ignorato.
 
-L'elemento viene avvolto in un `<div class="datatable-top-slot">` e inserito
-come primo figlio dell'area superiore, prima della search box.
+### `showInfoAtTop`
 
-È configurabile solo via script (non da attributo HTML), perché accetta sia
-stringhe HTML che elementi DOM già costruiti.
+Replica nell'area superiore lo stesso testo dell'area `.info` in basso,
+mantenuto in sincronia ad ogni cambio pagina o filtro. Il nodo viene nascosto
+automaticamente quando non ci sono record o la ricerca non produce risultati
+(evita di mostrare "Nessun risultato…" in due posti).
+
+```javascript
+el.init({
+  json: '/api/data.json',
+  cols: [...],
+  showInfoAtTop: true,
+});
+```
+
+### `topSlot`
+
+Inserisce un elemento DOM o markup HTML arbitrario, avvolto in un
+`<div class="datatable-top-slot">`. Accetta sia una stringa HTML che un `Element`
+già costruito (utile per mantenere un riferimento al nodo e aggiungervi listener).
+Non è leggibile da attributo HTML, solo via `init()`.
 
 ```javascript
 // Stringa HTML
 el.init({
   json: '/api/data.json',
   cols: [...],
-  topSlot: '<button class="btn btn-sm btn-primary" onclick="...">Esporta CSV</button>',
+  topSlot: '<button class="btn btn-sm btn-primary">Esporta CSV</button>',
 });
 
-// Elemento DOM (utile quando si vuole mantenere un riferimento al nodo)
+// Elemento DOM
 const btn = document.createElement('button');
 btn.className = 'btn btn-sm btn-outline-secondary';
 btn.textContent = 'Nuova commessa';
