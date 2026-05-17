@@ -1,0 +1,14 @@
+/* reset padding e margin */
+/* tenuto separato in caso di conflitti con altre impostazioni */
+
+html, body {
+  height: 100%;
+  padding: 0;
+  margin: 0;
+
+}
+
+*, *::before, *::after {
+  /* stylelint-disable declaration-no-important */
+  box-sizing: border-box !important;
+}

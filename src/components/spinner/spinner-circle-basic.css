@@ -1,0 +1,16 @@
+.spinner {
+  display: block;
+  width: var(--spinner-size);
+  height: var(--spinner-size);
+  margin: .5rem auto;
+  color: var(--spinner-color);
+  text-indent: -99999em;
+  border: var(--spinner-stroke-width) solid;
+  border-color: currentColor currentColor transparent;
+  border-radius: 50%;
+  animation: spinner-border .7s linear infinite;
+}
+
+@keyframes spinner-border {
+  to { transform: rotate(360deg); }
+}

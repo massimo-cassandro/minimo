@@ -1,0 +1,146 @@
+/* basato sul css di @tarekraafat/autocomplete.js */
+
+
+.hmenu-subsection-emulazione {
+  overflow-y: visible;
+}
+
+.ac-autocomplete-wrapper { /* assegnato all'elemento .form-group */
+
+  --ac-color: #333;
+  --ac-bg-color: #fff;
+  --ac-border-color: #666;
+  --ac-danger-color: #c00;
+  --ac-box-shadow: 0 0 10px rgb(0 0 0 / .6);
+  --ac-list-item-bg: #fff;
+  --ac-hover-color: var(--secondary-100);
+
+  position: relative;
+
+  ul {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    left: 0;
+    z-index: 1000;
+    max-height: 14rem;
+    padding: 0;
+    margin: .2rem 0 0;
+    overflow-y: scroll;
+    color: var(--ac-color);
+    outline: none;
+    background-color: var(--ac-bg-color);
+    border: 1px solid var(--ac-border-color);
+    border-radius: .6rem;
+    box-shadow: var(--ac-box-shadow);
+
+    &[hidden],
+    &:empty {
+      display: block;
+      opacity: 0;
+      transform: scale(0);
+    }
+
+    li {
+      padding: 0;
+      margin: .3rem;
+      text-align: left;
+      list-style: none;
+
+      /* stylelint-disable declaration-no-important, max-nesting-depth, selector-max-compound-selectors */
+      > div {
+
+        padding: .3rem .5rem;
+        background-color: var(--ac-list-item-bg);
+        border-radius: .35rem;
+        transition: all .2s ease;
+
+        .badge {
+          color: #fff;
+          background-color: var(--ac-hover-color);
+        }
+
+        &:hover {
+          cursor: pointer;
+          background-color: var(--ac-hover-color) !important;
+          &, .text-muted {
+            color: #fff !important;
+          }
+          .badge {
+            color: var(--ac-hover-color) !important;
+            background-color: color-mix(in srgb, #fff 70%, transparent) !important;
+          }
+
+          mark {
+            border-color: currentColor;
+          }
+        }
+
+        &.alert-item{
+
+
+          &, .text-muted {
+            color: var(--text-muted) !important;
+          }
+          background-color: color-mix(in srgb, var(--ac-danger-color) 1%, transparent);
+          &:hover {
+            &, .text-muted {
+              color: rgb(255 255 255) !important;
+            }
+          }
+        }
+
+        mark {
+          padding: 0;
+          color: currentColor;
+          background-color: transparent;
+          border-bottom: 4px double var(--ac-danger-color);
+
+          /* stylelint-disable-next-line max-nesting-depth  selector-max-type */
+          /* &::selection {
+            color: rgba(#ffffff, 0);
+            background-color: rgba(#ffffff, 0);
+          } */
+        }
+      }
+      /* stylelint-enable declaration-no-important, max-nesting-depth, selector-max-compound-selectors */
+
+      /* &[aria-selected='true'] {
+        background-color: var(--ada-grigio-2);
+      } */
+    }
+  }
+
+  .no-result {
+    padding: .4rem .6rem;
+    color: var(--ac-danger-color);
+  }
+}
+
+
+/* badge multiple select */
+.ac-badge {
+  margin: 0 .5rem .2rem 0;
+  font-size: .85rem;
+  line-height: 1;
+  white-space: nowrap;
+
+  &:has(.ac-badge-btn:hover) {
+    /* stylelint-disable-next-line declaration-no-important */
+    background-color: var(--ac-danger-color) !important;
+  }
+}
+.ac-badge-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  margin-left: 4px;
+  font-size: 1.2em;
+  line-height: 1;
+  color: currentColor;
+  background-color: transparent;
+  border: none;
+  border-radius: 50%;
+
+}

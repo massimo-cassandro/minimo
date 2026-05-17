@@ -1,0 +1,11 @@
+.inner-nav-main, .inner-nav {
+  display: flex;
+  gap: var(--size-lg);
+  justify-content: flex-end;
+  margin-block: var(--size-base);
+  /* text-align: end; */
+
+  @media print {
+    display: none;
+  }
+}

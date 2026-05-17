@@ -1,0 +1,85 @@
+/* wrapper per le tabelle per evitare che superino la larghezza dello spazio disponibile */
+
+/* purgecss start ignore */
+
+.table-responsive {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+/* TODO opzione per attivare/disattuvare alternate color */
+.table {
+
+  --_alternate-row-bg: var(--table-body-tr-alt-bg-color);
+  --_hover-row-bg: var(--table-body-tr-hover-bg-color);
+  --_border-color: var(--table-border-color);
+  --_border: 1px solid var(--_border-color);
+
+  width: 100%;
+  margin: 1rem 0;
+  border-collapse: collapse;
+
+  tr {
+    border-bottom: var(--_border);
+  }
+
+  thead {
+    background-color: var(--table-thead-background-color);
+    tr:last-child {
+      border-width: var(--table-thead-border-width);
+    }
+  }
+
+  tfoot {
+    background-color: var(--table-tfoot-background-color);
+    tr:first-child {
+      border-block-start: var(--table-tfoot-border-width) solid var(--_border-color);
+    }
+    th, td {
+      font-weight: var(--table-tfoot-font-weight);
+    }
+  }
+
+  tbody {
+    tr:nth-child(even) {
+      background-color: var(--_alternate-row-bg);
+    }
+
+    @media (hover: hover) {
+      tr:hover {
+        background-color: var(--_hover-row-bg);
+      }
+    }
+  }
+
+
+  th, td {
+    padding: var(--table-cell-padding-block) var(--table-cell-padding-inline);
+    line-height: var(--table-cell-line-height);
+    vertical-align: top;
+    text-align: start;
+  }
+
+  &.table-bordered {
+    border: var(--_border);
+
+    th, td {
+      &:not(:first-child) {
+        border-inline-start: var(--_border);
+      }
+    }
+  }
+
+}
+
+/*
+@media (prefers-color-scheme: dark) {
+  .table {
+    --_border-color: var(--_stone-8);
+    --_alternate-row-bg: color-mix(in srgb, var(--_stone-12) 60%, transparent);
+    --_hover-row-bg: color-mix(in srgb, var(--_blue-12) 60%, transparent);
+  }
+}
+*/
+
+/* purgecss end ignore */

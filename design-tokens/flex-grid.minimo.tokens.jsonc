@@ -1,0 +1,24 @@
+// -----------------------------------------------------------------------
+// Generated file — do not edit manually.
+// This file is produced by the design-token build pipeline.
+// Source of truth: the token files in the project source directory.
+// Re-generate with: node build-tokens.mjs --config <path/to/config>
+// -----------------------------------------------------------------------
+{
+  "flex-grid": {
+    "gap": {
+      "$type": "dimension",
+      "$value": "1.5rem"
+    }
+  },
+  "grid": {
+    "cols": {
+      "$type": "number",
+      "$value": 3
+    },
+    "min-col-width": {
+      "$type": "dimension",
+      "$value": "6rem"
+    }
+  }
+}

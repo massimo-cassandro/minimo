@@ -1,0 +1,55 @@
+
+/* da bs5 */
+.input-group {
+  position: relative;
+  display: flex;
+  gap: 0;
+  align-items: stretch;
+  justify-content: center;
+  width: 100%;
+
+  > .form-control {
+    z-index: 2;
+    flex: 1;
+    border-inline-end: none;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+
+
+  > .input-group-text {
+    padding: var(--form-control-padding-block) var(--form-control-padding-inline);
+    font-size: var(--btn-font-size);
+    background-color: var(--form-input-group-background-color);
+    border: 1px solid var(--form-control-border-color);
+    border-radius: var(--form-control-border-radius);
+  }
+
+  > .btn, > .input-group-text {
+    z-index: 1;
+    line-height: 1;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+  }
+
+  > * {
+    &:focus {
+      outline: none;
+    }
+
+    &:focus-visible, &:focus-within {
+      z-index: 5;
+    }
+  }
+
+  &:has([disabled]) {
+    > .btn, .input-group-text {
+      font-style: italic;
+      color: var(--text-muted);
+      background-color: var(--form-control-disabled-background-color);
+      /* opacity: .6; */
+    }
+  }
+
+
+}

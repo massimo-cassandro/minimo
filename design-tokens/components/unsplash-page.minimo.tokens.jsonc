@@ -1,0 +1,132 @@
+// -----------------------------------------------------------------------
+// Generated file — do not edit manually.
+// This file is produced by the design-token build pipeline.
+// Source of truth: the token files in the project source directory.
+// Re-generate with: node build-tokens.mjs --config <path/to/config>
+// -----------------------------------------------------------------------
+{
+  "up": {
+    "bg": {
+      "color": {
+        "$type": "color",
+        "$value": "hsl(0deg 0% 0% / .7)"
+      }
+    },
+    "text": {
+      "color": {
+        "$type": "color",
+        "$value": "#fff"
+      }
+    },
+    "line-height": {
+      "$type": "number",
+      "$value": "{line-height.sm}"
+    },
+    "font": {
+      "family": {
+        "$type": "fontFamily",
+        "$value": "{font.family}"
+      },
+      "size": {
+        "$type": "dimension",
+        "$value": "{font.size.base}"
+      },
+      "weight": {
+        "$type": "fontWeight",
+        "$value": "{font.weight.regular}"
+      },
+      "variation-settings": {
+        "$type": "string",
+        "$value": "unset"
+      }
+    },
+    "credits": {
+      "font": {
+        "size": {
+          "$type": "dimension",
+          "$value": "{font.size.xs}"
+        },
+        "weight": {
+          "$type": "fontWeight",
+          "$value": "{font.weight.regular}"
+        }
+      },
+      "line-height": {
+        "$type": "number",
+        "$value": "{line-height.xs}"
+      }
+    },
+    "h1": {
+      "color": {
+        "$type": "color",
+        "$value": "{up.text.color}"
+      },
+      "font": {
+        "size": {
+          "$type": "dimension",
+          "$value": "{font.size.xl}"
+        },
+        "weight": {
+          "$type": "fontWeight",
+          "$value": "{font.weight.bold}"
+        },
+        "variation-settings": {
+          "$type": "string",
+          "$value": "unset"
+        }
+      },
+      "line-height": {
+        "$type": "number",
+        "$value": "{line-height.xs}"
+      }
+    },
+    "icon": {
+      "box": {
+        "bg": {
+          "$type": "color",
+          "$value": "{up.link.color}"
+        }
+      },
+      "fill": {
+        "color": {
+          "$type": "color",
+          "$value": "#333"
+        }
+      },
+      "hover": {
+        "box": {
+          "bg": {
+            "$type": "color",
+            "$value": "#fff"
+          }
+        }
+      }
+    },
+    "link": {
+      "color": {
+        "$type": "color",
+        "$value": "#fc0"
+      },
+      "decoration": {
+        "$type": "string",
+        "$value": "none"
+      },
+      "hover": {
+        "color": {
+          "$type": "color",
+          "$value": "#fc0"
+        },
+        "decoration": {
+          "$type": "string",
+          "$value": "underline"
+        }
+      }
+    },
+    "loader": {
+      "color": {
+        "$type": "color",
+        "$value": "hsl(0deg 0% 100% / .6)"
+      }
+    }
+  }
+}

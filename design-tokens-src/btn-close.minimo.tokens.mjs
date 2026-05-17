@@ -1,0 +1,101 @@
+export default {
+  btn: {
+    close: {
+      size: {
+        $value: '1.5rem',
+        $type: 'dimension'
+      },
+      padding: {
+        $value: '3px',
+        $type: 'dimension'
+      },
+      border: {
+        width: {
+          $value: '2px',
+          $type: 'dimension'
+        },
+        color: {
+          $value: '{btn.close.icon.color}',
+          $type: 'color'
+        },
+        radius: {
+          $value: '50%',
+          $type: 'dimension'
+        }
+
+      },
+      background: {
+        color: {
+          $value: '{body.background.color}',
+          $type: 'color'
+        },
+
+      },
+      icon: {
+        color: {
+          $value: '{text.color}',
+          $type: 'color'
+        },
+        bar: {
+          size: {
+            $value: '2px',
+            $type: 'dimension'
+          }
+        }
+
+      },
+
+      hover: {
+        background: {
+          color: {
+            $value: '{btn.close.icon.color}',
+            $type: 'color'
+          }
+        },
+        border: {
+          color: {
+            $value: '{btn.close.icon.color}',
+            $type: 'color'
+          }
+        },
+        icon: {
+          color: {
+            $value: '{btn.close.background.color}',
+            $type: 'color'
+          }
+        }
+      },
+
+      focus: {
+        outline: {
+          width: {
+            $value: '2px',
+            $type: 'dimension'
+          },
+          offset: {
+            $value: '2px',
+            $type: 'dimension'
+          },
+          color: {
+            $value: '{link.focus.outline.color}',
+            $type: 'color'
+          }
+        }
+      },
+      active: {
+        background: {
+          color: {
+            $value: '{btn.close.background.color}',
+            $type: 'color'
+          }
+        },
+        icon: {
+          color: {
+            $value: '{link.active.color}',
+            $type: 'color'
+          }
+        }
+      }
+    } // end close
+  } // end btn
+};

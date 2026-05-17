@@ -1,0 +1,21 @@
+{
+  "__help": "https://code.visualstudio.com/docs/languages/jsconfig",
+  "compilerOptions": {
+    "target": "es2023",
+    "baseUrl": ".",
+    "allowSyntheticDefaultImports": false,
+    "module": "ES6",
+    "paths": {
+      "@frontend/*": ["./frontend/*"],
+      "@src/*": ["frontend/src/*"],
+      "@imgs/*": ["./frontend/imgs/*"],
+      "@icone/*": ["./frontend/icone/*"],
+      "@backoffice/*": ["./frontend/backoffice/*"],
+      "@minimo/*": ["./node_modules/@massimo-cassandro/minimo/src/*"]
+    }
+
+
+
+  },
+  "exclude": ["node_modules", "dist", "docs", "build", "public"]
+}

@@ -1,0 +1,41 @@
+{
+  "link": {
+    "color": {
+      "$type": "color",
+      "$value": "#0d12ae"
+    },
+    "visited": {
+      "color": {
+        "$type": "color",
+        "$value": "#ae0da3"
+      },
+    },
+    "hover": {
+      "color": null
+    },
+    "focus": {
+      "outline": {
+        "color": {
+          "$type": "color",
+          "$value": "{link.color}"
+        },
+        "width": {
+          "$type": "dimension",
+          "$value": "2px"
+        },
+      }
+    },
+    "active": {
+      "color": {
+        "$type": "color",
+        "$value": "#51054C"
+      },
+      "background": {
+        "color": {
+          "$type": "color",
+          "$value": "transparent"
+        }
+      }
+    }
+  }
+}

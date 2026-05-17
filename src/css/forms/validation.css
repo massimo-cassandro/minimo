@@ -1,0 +1,31 @@
+/* da BS5 */
+.was-validated {
+
+  /* includes static field which container has is-valid / is-invalid class */
+  .form-group:has(:valid), .form-group:has(.is-valid), .form-group.is-valid .form-control-static{
+    --_status-color: var(--status-success-color);
+  }
+  .form-group:has(:invalid), .form-group:has(.is-invalid), .form-group.is-invalid .form-control-static{
+    --_status-color: var(--status-danger-color);
+  }
+
+  .form-label {
+    color: var(--_status-color);
+  }
+
+  .form-control, .form-control-static {
+    outline: var(--form-validation-outline-width) solid var(--_status-color);
+    outline-offset: var(--form-validation-outline-offset);
+
+    &:focus {
+      outline: none;
+    }
+
+    &:focus-visible {
+      /* background-color: var(--_status-color); */
+      outline: var(--form-control-focus-outline-width) solid var(--_status-color);
+      outline-offset: var(--form-control-focus-outline-offset);
+    }
+  }
+
+}

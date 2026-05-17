@@ -1,0 +1,46 @@
+// -----------------------------------------------------------------------
+// Generated file — do not edit manually.
+// This file is produced by the design-token build pipeline.
+// Source of truth: the token files in the project source directory.
+// Re-generate with: node build-tokens.mjs --config <path/to/config>
+// -----------------------------------------------------------------------
+{
+  "size": {
+    "xs": {
+      "$type": "dimension",
+      "$value": ".5rem"
+    },
+    "md": {
+      "$type": "dimension",
+      "$value": "1.2rem"
+    },
+    "3xl": {
+      "$type": "dimension",
+      "$value": "4rem"
+    },
+    "2xl": {
+      "$type": "dimension",
+      "$value": "3rem"
+    },
+    "base": {
+      "$type": "dimension",
+      "$value": "1rem"
+    },
+    "lg": {
+      "$type": "dimension",
+      "$value": "1.5rem"
+    },
+    "xxs": {
+      "$type": "dimension",
+      "$value": ".25rem"
+    },
+    "xl": {
+      "$type": "dimension",
+      "$value": "2rem"
+    },
+    "sm": {
+      "$type": "dimension",
+      "$value": ".75rem"
+    }
+  }
+}

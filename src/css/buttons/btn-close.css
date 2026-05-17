@@ -1,0 +1,72 @@
+/*
+<button type="button" class="btn-close" aria-label="Chiudi">Chiudi</button>
+<button type="button" class="btn-close">Chiudi</button>
+*/
+
+/* TODO controllare allineamento x interna - prob. valutare meglio l'ingombro dello spessore */
+
+.btn-close  {
+  --_icon-bar-width: calc(var(--btn-close-size) - (var(--btn-close-padding) * 2) - (var(--btn-close-border-width) * 2));
+
+  position: relative;
+
+  display: inline-block;
+  width: var(--btn-close-size);
+  height: var(--btn-close-size);
+  padding: var(--btn-close-padding);
+  color: var(--btn-close-icon-color);
+  text-indent: -999em;
+  cursor: pointer;
+  background-color: var(--btn-close-background-color);
+  border: var(--btn-close-border-width) solid var(--btn-close-border-color);
+  border-radius: var(--btn-close-border-radius);
+
+  &::before, &::after {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    display: block;
+    width: var(--_icon-bar-width);
+    height: var(--btn-close-icon-bar-size);
+    content: '';
+    background: currentColor;
+    transform-origin: center;
+    /* translate: var(--btn-close-padding) -50%; */
+    translate: -50% -50%;
+  }
+  &::before {
+    rotate: 45deg;
+  }
+  &::after {
+    rotate: -45deg;
+  }
+
+  &:focus {
+    outline: none;
+  }
+
+  &:focus-visible {
+    outline: var(--btn-close-focus-outline-width) solid var(--btn-close-focus-outline-color);
+    outline-offset: var(--btn-close-focus-outline-offset);
+  }
+
+  @media (hover: hover) {
+    &:hover {
+
+      background-color: var(--btn-close-hover-background-color);
+      border-color: var(--btn-close-hover-border-color);
+
+      &::before, &::after {
+        background-color: var(--btn-close-hover-icon-color);
+      }
+    }
+  }
+
+  &:active {
+    background-color: var(--btn-close-active-background-color);
+    &::before, &::after {
+      background-color: var(--btn-close-active-icon-color);
+    }
+
+  }
+}

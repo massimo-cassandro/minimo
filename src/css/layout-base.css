@@ -1,0 +1,14 @@
+html, body {
+  /* height: 100%; */
+  padding: 0;
+  margin: 0;
+  scroll-behavior: smooth;
+  font-family: var(--font-family);
+  font-size: var(--font-size-base);
+  font-style: var(--font-style-base);
+  line-height: var(--line-height-base);
+  color: var(--text-color);
+  accent-color: var(--accent-color);
+  background-color: var(--body-background-color);
+
+}

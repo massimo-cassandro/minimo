@@ -1,0 +1,22 @@
+// -----------------------------------------------------------------------
+// Generated file — do not edit manually.
+// This file is produced by the design-token build pipeline.
+// Source of truth: the token files in the project source directory.
+// Re-generate with: node build-tokens.mjs --config <path/to/config>
+// -----------------------------------------------------------------------
+{
+  "form": {
+    "validation": {
+      "outline": {
+        "width": {
+          "$type": "dimension",
+          "$value": "3px"
+        },
+        "offset": {
+          "$type": "dimension",
+          "$value": "-3px"
+        }
+      }
+    }
+  }
+}
