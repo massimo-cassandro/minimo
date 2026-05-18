@@ -724,37 +724,23 @@ class SimpleDatatableAdapter extends HTMLElement {
         pageTitle: 'Pagina {page}',
         perPage: 'Righe per pagina',
         noRows: 'Nessun record trovato',
-        info: 'Stai visualizzando le righe da {start} a {end}, su un totale di {rows}',
+        info: 'Stai visualizzando le righe da {start} a {end}, su un totale di {rows} record trovati',
         noResults: 'Nessun risultato per la ricerca',
       },
 
-      template: (options, dom) => `<div class='${options.classes.top}'>
-    ${
-    options.paging && options.perPageSelect ?
-        `<div class='${options.classes.dropdown}'>
-            <label>
-                <select class='${options.classes.selector}'></select> ${options.labels.perPage}
-            </label>
-        </div>` :
-        ""
-}
-          ${
-          options.searchable ?
-              `<div class='${options.classes.search}'>
-                  <input class='${options.classes.input}' placeholder='${options.labels.placeholder}' type='search' title='${options.labels.searchTitle}'${dom.id ? ` aria-controls="${dom.id}"` : ""}>
-              </div>` :
-              ""
-      }
-      </div>
-      <div class='${options.classes.container}'${options.scrollY.length ? ` style='height: ${options.scrollY}; overflow-Y: auto;'` : ""}></div>
-      <div class='${options.classes.bottom}'>
-          ${
-          options.paging ?
-              `<div class='${options.classes.info}'></div>` :
-              ""
-      }
-          <nav class='${options.classes.pagination}'></nav>
-      </div>`,
+      template: (options, dom) => `<div class='${options.classes.top}'>`+
+        `<div class='${options.classes.info}'></div>` +
+        (options.searchable
+          ? `<div class='${options.classes.search}'>` +
+              `<input class='${options.classes.input}' placeholder='${options.labels.placeholder}' type='search' title='${options.labels.searchTitle}'${dom.id ? ` aria-controls="${dom.id}"` : ''}>` +
+          '</div>'
+          : '') +
+        '</div>' +
+        `<div class='${options.classes.container}'${options.scrollY.length ? ` style='height: ${options.scrollY}; overflow-Y: auto;'` : ""}></div>`+
+        `<div class='${options.classes.bottom}'>`+
+          `<nav class='${options.classes.pagination}'></nav>` +
+        '</div>'
+      ,
 
       classes: {
         wrapper                 : styles.datatableWrapper,

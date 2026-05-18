@@ -14,6 +14,6 @@
 * 0.12.0 (27 apr 2026) - text utilities
 * 0.13.0 (03 mag 2026) - Unsplash page
 * 0.14.0 (05 mag 2026) - autocomplete
-* 0.15.0 (14 mag 2026) - Snackbar: metodo `close`
+* 0.15.0 (14 mag 2026) - Snackbar: `close` method
 * 0.16.0 (15 mag 2026) - s-datatable: footer, totale records, custom top element
 * 1.0.0 (17 mag 2026) - First production release

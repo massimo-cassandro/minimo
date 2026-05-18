@@ -136,7 +136,7 @@
   gap: var(--size-md);
   align-content: center;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
   margin-block-start: var(--size-xs);
 }
 .info {
