@@ -70,3 +70,6 @@
 .justify-self-end {
   justify-self: end;
 }
+.justify-self-start {
+  justify-self: start;
+}
