@@ -1,0 +1,50 @@
+/* stylelint-disable declaration-no-important */
+
+/* purgecss start ignore */
+.visually-hidden {
+  display: block;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+  clip-path: rect(0 0 0 0) !important;
+}
+.visibility-hidden {
+  visibility: hidden;
+}
+/* purgecss end ignore */
+
+
+/*  TODO da rivedere  */
+/* @media (--media-xlarge-viewport-up) {
+  .xlg-visually-hidden {
+    display: block;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    white-space: nowrap !important;
+    border: 0 !important;
+    clip-path: rect(0 0 0 0) !important;
+  }
+}
+@media (--media-large-viewport-up) {
+  .lg-visually-hidden {
+    display: block;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    white-space: nowrap !important;
+    border: 0 !important;
+    clip-path: rect(0 0 0 0) !important;
+  }
+}
+
+ */
+

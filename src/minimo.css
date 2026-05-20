@@ -33,5 +33,11 @@
 @import '@minimo/css/flex.css';
 @import '@minimo/css/grid.css';
 @import '@minimo/css/details.css';
-@import '@minimo/css/utilities.css';
+
+@import '@minimo/css/dimensions.css';
+@import '@minimo/css/display.css';
+@import '@minimo/css/margin-padding.css';
+@import '@minimo/css/overflow.css';
+@import '@minimo/css/position.css';
+@import '@minimo/css/visibility.css';
 

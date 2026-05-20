@@ -74,12 +74,22 @@ em, .italic {
 .font-italic {
   font-style: italic;
 }
-.font-bold {
-  font-weight: var(--font-weight-bold);
+.font-light {
+  font-weight: var(--font-weight-light);
+}
+.font-regular {
+  font-weight: var(--font-weight-regular);
+}
+.font-medium {
+  font-weight: var(--font-weight-medium);
 }
 .font-semibold {
   font-weight: var(--font-weight-semibold);
 }
+.font-bold {
+  font-weight: var(--font-weight-bold);
+}
+
 .text-xs {
   font-size: var(--font-size-xs);
 }

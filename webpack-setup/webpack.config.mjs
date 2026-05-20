@@ -159,13 +159,14 @@ const config = {
           enforce: true
         },
 
-        vendors: {
-          test: /[\\/]node_modules[\\/]/,
+        shared: {
+          test: /[\\/]node_modules[\\/]|[\\/]frontend[\\/]src[\\/]js[\\/]/,
+          // test: /[\\/]node_modules[\\/]/,
 
-          // alternativa: non include nel chunk vendor i path che contengono la stringa `blurhash`
+          // alternativa: non include nel chunk shared i path che contengono la stringa `blurhash`
           // test: /[\\/]node_modules[\\/](?!.*blurhash)/i,
 
-          // alternativa: verifica se l'import ha una query specifica (?exclude-vendor-chunk)
+          // alternativa: verifica se l'import ha una query specifica (?exclude-shared-chunk)
           // test(module) {
           //   const resource = module.nameForCondition && module.nameForCondition();
           //   if (!resource) return false;
@@ -174,16 +175,15 @@ const config = {
           //   const isNodeModule = /[\\/]node_modules[\\/]/.test(resource);
 
           //   // module.resource è il percorso completo + query string
-          //   const hasExcludeQuery = module.resource && module.resource.includes('exclude-vendor-chunk');
+          //   const hasExcludeQuery = module.resource && module.resource.includes('exclude-shared-chunk');
 
-          //   // Include nel chunk vendor solo se è un node_module E NON ha la query
+          //   // Include nel chunk shared solo se è un node_module E NON ha la query
           //   return isNodeModule && !hasExcludeQuery;
           // },
-
-          name: 'vendors',
+          // test: /[\\/]node_modules[\\/](?!.*blurhash)(?!.*@massimo-cassandro\/unsplash-page)/i,
+          name: 'shared',
           chunks: 'all'
-        },
-
+        }
 
 
         // separazione @massimo-cassandro da node_modules:
@@ -192,7 +192,7 @@ const config = {
         //   name: 'mc',
         //   chunks: 'all'
         // },
-        // vendor: {
+        // shared: {
         //   // test: /[\\/]node_modules[\\/]/,
         //   test(module) {
         //     // `module.resource` contains the absolute path of the file on disk.
@@ -203,7 +203,7 @@ const config = {
         //       !module.resource.includes(`${path.sep}@massimo-cassandro${path.sep}`)
         //     );
         //   },
-        //   name: 'vendors',
+        //   name: 'shareds',
         //   chunks: 'all'
         // },
       }

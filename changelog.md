@@ -18,3 +18,4 @@
 * 0.16.0 (15 mag 2026) - s-datatable: footer, totale records, custom top element
 * 1.0.0 (17 mag 2026) - First production release
 * 1.1.0 (18 mag 2026) - ValidationError Class
+* 1.2.0 (20 mag 2026) - upd css files names

@@ -1,0 +1,7 @@
+/* stylelint-disable declaration-no-important */
+.w-100 {
+  width: 100% !important;
+}
+.w-auto {
+  width: auto !important;
+}
