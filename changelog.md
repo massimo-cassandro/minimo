@@ -19,3 +19,4 @@
 * 1.0.0 (17 mag 2026) - First production release
 * 1.1.0 (18 mag 2026) - ValidationError Class
 * 1.2.0 (20 mag 2026) - upd css files names
+* 1.3.0 (22 mag 2026) - Charts (partial)

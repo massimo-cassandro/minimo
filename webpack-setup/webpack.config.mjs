@@ -44,6 +44,18 @@ const isDevelopment = process.env.NODE_ENV === 'development'
   // ,manifest_shared_seed = {}
 ;
 
+// path delle directory da utilizzare nel chunk `shared`
+const sep = '[\\\\/]'; // stringa che produce [\\/] nel pattern
+const shared_chunk_paths =
+  new RegExp([
+    'node_modules',
+    'frontend/src/js',
+    'frontend/src/web-components',
+    'frontend/src/components',
+  ].map(p => `${sep}${p.replace(/\//g, sep)}${sep}`).join('|')
+  );
+
+
 // hash: https://medium.com/@web_developer/hash-vs-chunkhash-vs-contenthash-e94d38a32208
 
 // =>> CopyWebpackPlugin patterns
@@ -160,7 +172,7 @@ const config = {
         },
 
         shared: {
-          test: /[\\/]node_modules[\\/]|[\\/]frontend[\\/]src[\\/]js[\\/]/,
+          test: shared_chunk_paths,
           // test: /[\\/]node_modules[\\/]/,
 
           // alternativa: non include nel chunk shared i path che contengono la stringa `blurhash`

@@ -1,6 +1,6 @@
 {
   "name": "@massimo-cassandro/minimo",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "description": "Light css framework & utilities",
   "type": "module",
   "homepage": "https://github.com/massimo-cassandro/minimo#readme",
@@ -38,7 +38,8 @@
     "src/**/*.{js,mjs,css,svg,md}",
     "design-tokens/**/*.{tokens.json,tokens.jsonc}",
     "design-tokens-src/**/*.{tokens.json,tokens.jsonc,mjs,js,md}",
-    "design-tokens-utilities/**/*.{mjs,md}"
+    "design-tokens-utilities/**/*.{mjs,md}",
+    "charts/**/*.{js,md}"
   ],
   "devDependencies": {
     "@babel/core": "^7.29.0",
