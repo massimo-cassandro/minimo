@@ -26,7 +26,7 @@ Test ed esempi nella directory `test`.
 ## Uso (JS)
 
 ```javascript
-import { MinimoCharts, barsChart } from '@MinimoCharts/index.js';
+import { MinimoCharts, barsChart } from '@minimo/charts/index.js';
 
 const chartInstance = new MinimoCharts();
 
