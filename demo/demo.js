@@ -1,4 +1,5 @@
 import './demo.css';
+import './demo-files/charts/charts.css';
 
 import { routes } from 'routes.js';
 

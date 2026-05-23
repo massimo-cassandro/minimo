@@ -1,7 +1,5 @@
 // https://stackblitz.com/edit/vitejs-vite-acphht?file=main.js
 
-import opentype from 'opentype.js';
-
 /*
 // Example usage:
 const fontUrl = './Rubik Moonrocks.ttf';
@@ -20,6 +18,7 @@ textToSvgPath(fontUrl, text, fontSize)
 
 export async function textToSvgPath(fontUrl, text, fontSize) {
   try {
+    const opentype = (await import(/* webpackIgnore: true */ 'opentype.js')).default;
     const font = await opentype.load(fontUrl);
 
     // Define the x and y coordinates where the text should start

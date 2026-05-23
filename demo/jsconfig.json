@@ -7,8 +7,9 @@
     "module": "ES6",
     "paths": {
       "@src/*": ["../src/*"],
-      "@minimo/*": ["../src/*"]
+      "@minimo/*": ["../src/*"],
+      "@minimoCharts/*": ["../charts/*"]
     }
   },
-  "exclude": ["../node_modules"]
+  "exclude": ["../node_modules", "node_modules"]
 }
