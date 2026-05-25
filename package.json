@@ -1,6 +1,6 @@
 {
   "name": "@massimo-cassandro/minimo",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "description": "Light css framework & utilities",
   "type": "module",
   "homepage": "https://github.com/massimo-cassandro/minimo#readme",
@@ -27,7 +27,12 @@
   "publishConfig": {
     "access": "public"
   },
-  "main": "./index.js",
+  "exports": {
+    ".": "./index.js",
+    "./charts": "./charts/index.js",
+    "./css/*": "./src/css/*",
+    "./tokens/*": "./design-tokens/*"
+  },
   "sideEffects": [
     "**/s-datatable-component/**/*"
   ],
