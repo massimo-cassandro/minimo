@@ -587,13 +587,13 @@ class SimpleDatatableAdapter extends HTMLElement {
             col_item.render = null; // se presente lo annulla ad evitare conflitti
             value = resolveTemplate(col_item._cellRender, row, { nullAs, warnColIdx: col_idx });
 
-          } else if (col_item._renderMode === 'sf_datetime' && value != null) {
+          // sf_date o sf_datetime -> si prende il solo valore di date
+          } else if ((col_item._renderMode === 'sf_datetime' || col_item._renderMode === 'sf_date') && value != null) {
             value = value.date.replace(' ', 'T') +
               (value.timezone === 'UTC' ? 'Z' : '');
           }
 
-
-// TODO rendere più snella la gestione di questoi casi (???)
+// TODO rendere più snella la gestione di questi casi (???)
 // TODO pasare il valore `nullAs` al render predefinito
           // Applica _renderNullAs al valore della cella se null/undefined
           // e la cella non ha già un template che gestisce la visualizzazione.

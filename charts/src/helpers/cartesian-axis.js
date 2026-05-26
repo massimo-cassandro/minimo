@@ -39,7 +39,7 @@ export async function cartesianAxis(chartInstance, {
   // se true le etichette sono posizionate in corrispondenza dei ticks
   // altrimenti sono centrate nello spazio corispondente a stepX_size
   xLabelsOnTicks = true,
-  labelYFormatter = null // funzione
+  labelYFormatter = null, // funzione
 }) {
 
   try {

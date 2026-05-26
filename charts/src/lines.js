@@ -157,7 +157,8 @@ const default_params = {
   */
   data_lines_widths: null,
 
-
+  // aggiiunge un attributo data-title in corrispondenza dei punti
+  addValuesTitle: true,
 
   /**
     Funzione per formattare le etichette dei valori dell'asse Y.
@@ -220,9 +221,10 @@ export async function lines(params) {
 
     // =>> legenda
     // costruzione delle opzioni per la legenda
-    const opts_legenda = {
+    if(params.legenda != null) {
 
-      ...{
+      params.legenda = {
+
         /** altezza legenda */
         height: 20,
 
@@ -239,25 +241,26 @@ export async function lines(params) {
           'font-weight': 400
         },
         fontFilePath: null,
-      },
 
-      ...params.legenda
-    };
 
-    // legenda.items (elementi della legenda)
-    // il ciclo viene eseguito su params.data_lines_attrs per essere certi che il numero di elementi coincida
-    // è utilizzato in ordine inverso in modo che il primo elmento della legenda corrisponda alla linea in primo piano
-    opts_legenda.items = params.data_lines_attrs.toReversed().map((line_attr, idx) => {
-      const thisLegendaItem = params.legenda.items.toReversed()[idx]?? {};
-      return {
-        ...thisLegendaItem,
-        shape: 'line',
-        attrs: {
-          ...(thisLegendaItem.attrs?? {}),
-          ...line_attr
-        }
+        ...(params.legenda??[])
       };
-    });
+
+      // legenda.items (elementi della legenda)
+      // il ciclo viene eseguito su params.data_lines_attrs per essere certi che il numero di elementi coincida
+      // è utilizzato in ordine inverso in modo che il primo elmento della legenda corrisponda alla linea in primo piano
+      params.legenda.items = params.data_lines_attrs.toReversed().map((line_attr, idx) => {
+        const thisLegendaItem = params.legenda.items.toReversed()[idx]?? {};
+        return {
+          ...thisLegendaItem,
+          shape: 'line',
+          attrs: {
+            ...(thisLegendaItem.attrs?? {}),
+            ...line_attr
+          }
+        };
+      });
+    }
 
 
     // numero di step dell'asse X
@@ -281,7 +284,7 @@ export async function lines(params) {
       max_value: params.max_value,
       min_value: params.min_value,
       values: flatValues,
-      legenda: opts_legenda,
+      legenda: params.legenda,
       padding: params.padding,
       width: params.width,
       height: params.height,
@@ -324,11 +327,15 @@ export async function lines(params) {
 
       lineDataArray.forEach((pointValue, pointIdx) => {
         // trasformazione valore in coordinate
+        // i valori null vengono ignorati
 
-        const x = chart_area.left + stepX_size * pointIdx,
-          y = chart_area.top + chart_area.height - (((pointValue - min_value) * chart_area.height) / (max_value - min_value));
+        if(pointValue != null) {
 
-        coords.push([x,y]);
+          const x = chart_area.left + stepX_size * pointIdx,
+            y = chart_area.top + chart_area.height - (((pointValue - min_value) * chart_area.height) / (max_value - min_value));
+
+          coords.push([x,y]);
+        }
       });
 
       thisLineGroup.polyline(coords).attr(params.data_lines_attrs[idx]);
@@ -347,7 +354,8 @@ export async function lines(params) {
             fill: params.data_lines_attrs[idx].stroke,
             cx: point[0],
             cy: point[1],
-            'data-debug-info': params.debug? `Valore: ${params.values[idx][coord_idx]}` : null
+            'data-debug-info': params.debug? `Valore: ${params.values[idx][coord_idx]}` : null,
+            // 'data-title': params.addValuesTitle? params.values[idx][coord_idx] : null // TODO ricontrollare correttezza indici
           });
       });
 
@@ -356,19 +364,21 @@ export async function lines(params) {
 
 
     // =>> Legenda
-    const legendaEl = await legenda(chartInstance, opts_legenda);
-    legendaEl.attr({ 'data-cfg.debug-info': params.debug? 'Legenda' : null });
-    const legendaBbox = legendaEl.bbox();
+    if(params.legenda) {
+      const legendaEl = await legenda(chartInstance, params.legenda);
+      legendaEl.attr({ 'data-cfg.debug-info': params.debug? 'Legenda' : null });
+      const legendaBbox = legendaEl.bbox();
 
-    legendaEl.dmove(
-      (params.width - legendaBbox.width) / 2,
-      params.padding
-    );
-    legendaEl.y(params.padding);
+      legendaEl.dmove(
+        (params.width - legendaBbox.width) / 2,
+        params.padding
+      );
+      legendaEl.y(params.padding);
 
-    legendaEl.x((params.width - legendaBbox.width) / 2);
+      legendaEl.x((params.width - legendaBbox.width) / 2);
 
-    svgCanvas.add(legendaEl);
+      svgCanvas.add(legendaEl);
+    }
 
 
     if(!params.container) {

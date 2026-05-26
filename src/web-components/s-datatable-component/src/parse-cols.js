@@ -10,7 +10,7 @@ import checkIcon from '../../../icons/check-bold.svg?inline';
 import xIcon from '../../../icons/x-bold.svg?inline';
 
 // col_obj è l'oggetto che descrive una singola colonna del datatable
-// vine utilizzato per produrre l'oggetto columns di simple-datatable
+// viene utilizzato per produrre l'oggetto columns di simple-datatable
 export function parseCols(col_obj){
 
 
@@ -70,8 +70,12 @@ export function parseCols(col_obj){
         }
       };
 
-    // gestione campi data symfony
-    } else if(col_obj._renderMode === 'sf_datetime') {
+    // campi date e datetime, symfony e no
+    // nel caso di datetime/date symfony, il valore è stato già preelaborato da _load
+    } else if(['sf_datetime', 'sf_date', 'date', 'datetime'].includes(col_obj._renderMode)) {
+
+      const _isDatetime = ['sf_datetime', 'datetime'].includes(col_obj._renderMode);
+
       return {
         ...col_obj,
         type: 'string',
@@ -85,27 +89,29 @@ export function parseCols(col_obj){
             "timezone": "UTC"
           } */
 
-
           if(value == null) {
             cell.attributes['data-order'] = ' ';
             return '\u2014';
 
           } else {
 
-            cell.attributes['data-order'] = value;
-
             const dateObj = new Date(value);
+
+
+            cell.attributes['data-order'] = _isDatetime? value : value.substring(0,10);
 
             return `<span class="text-nowrap">${dateObj.toLocaleString('it-IT', {
               year: '2-digit',
               month: 'short',
               day: 'numeric',
             })}</span>` +
-            `\u2009<span class="text-xs">${dateObj.toLocaleString('it-IT', {
-              hour12: false,
-              hour:'2-digit',
-              minute:'2-digit'
-            })}</span>`;
+              (_isDatetime
+                ? `\u2009<span class="text-xs">${dateObj.toLocaleString('it-IT', {
+                  hour12: false,
+                  hour:'2-digit',
+                  minute:'2-digit'
+                })}</span>`
+                : '');
           }
 
         }

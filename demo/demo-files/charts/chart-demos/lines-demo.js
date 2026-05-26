@@ -68,6 +68,19 @@ export async function linesTest(chartInstance, nodeCfg = null) {
   const max = Math.ceil(Math.max(0, ...opts.values.flat()) / 1000) * 1000;
   const min = Math.floor(Math.min(max, ...opts.values.flat()) / 1000) * 1000;
 
+  // versione senza titoli
+  linesChart(chartInstance, { // il return è necessario per i test node
+    ...opts,
+    yAxisTitle: null,
+    xAxisTitle: null,
+    legenda: null,
+    max_value: max,
+    min_value: min,
+    container: '#lines2',
+
+    ...(nodeCfg??{})
+  });
+
   return linesChart(chartInstance, { // il return è necessario per i test node
     ...opts,
     max_value: max,
@@ -76,6 +89,7 @@ export async function linesTest(chartInstance, nodeCfg = null) {
 
     ...(nodeCfg??{})
   });
+
 
 }
 

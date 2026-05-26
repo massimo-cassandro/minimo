@@ -14,7 +14,8 @@ export function parseStdAxisOpts(params = {} ) {
   try {
 
 
-
+    // TODO eti_asseX_height e eti_asseY_width capire se è possibile inserire un calcolo dinamico delle dimensioni
+    //     mettere quindi auto (o null) come default che innesci il calcolo automatico
     const parsed = {};
 
     // default
@@ -61,8 +62,9 @@ export function parseStdAxisOpts(params = {} ) {
       parsed.min_value = params.min_value;
     }
 
-    const legenda_height = params.legenda.height?? 0;
+    const legenda_height = params.legenda?.height?? 0;
     const gap_legenda = legenda_height? 10 : 0; // spazio tra legenda e grafico
+
 
     // =>> chart area
     // coordinate e dimensioni del rettangolo interno all'svg entro cui viene disegnato il grafico
