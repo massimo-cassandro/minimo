@@ -6,7 +6,7 @@
 
   display: grid;
   /* grid-template-columns: repeat(var(--_cols), minmax(var(--grid-min-col-width), 1fr)); */
-  grid-template-columns: repeat(var(--_cols), 1fr);
+  grid-template-columns: repeat(var(--_cols), minmax(0, 1fr));
   grid-auto-flow: row;
   gap: var(--flex-grid-gap);
   /* align-items: center; */
