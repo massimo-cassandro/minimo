@@ -112,7 +112,7 @@ select.form-control {
 
 input[type='checkbox'] {
   color: var(--form-control-text-color);
-  accent-color: var(--accent-100);
+  accent-color: var(--accent-color);
   transform-origin: center;
   scale: 1.3;
 }
