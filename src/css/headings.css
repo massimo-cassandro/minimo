@@ -6,11 +6,11 @@ h1, h2, h3, .h3, h4, .h4 {
 }
 
 h1 {
-  margin: 0 0 2rem;
+  margin: 0 0 var(--font-size-xl);
   font-size: var(--headings-h1-font-size);
   font-weight: var(--headings-h1-font-weight);
 
-  small, .small, .text-sm {
+  small {
     display: block;
     font-size: .85em;
     color: var(--text-muted);
@@ -21,15 +21,15 @@ h2, h3, .h3, h4, .h4 {
   font-weight: var(--headings-font-weight);
 }
 h2 {
-  margin: 0 0 2rem;
+  margin: var(--font-size-xl) 0 var(--font-size-md);
   font-size: var(--headings-h2-font-size);
 }
 
 h3, .h3 {
-  margin: 0 0 1.5rem;
+  margin: var(--font-size-lg) 0 var(--font-size-base);
   font-size: var(--headings-h3-font-size);
 }
 h4, .h4 {
-  margin: 0 0 1.5rem;
+  margin: var(--font-size-base) 0 var(--font-size-sm);
   font-size: var(--headings-h4-font-size);
 }

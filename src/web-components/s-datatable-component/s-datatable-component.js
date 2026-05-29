@@ -572,10 +572,21 @@ class SimpleDatatableAdapter extends HTMLElement {
 
           // _sortValue: valore alternativo per l'ordinamento.
           // Accetta un percorso stringa o una funzione (row) => string|number.
+          // Quando col_item.type è 'string' (default), simple-datatables confronta
+          // `order` come stringa: se il valore letto è un numero (es. un id numerico
+          // usato come chiave di lookup) viene convertito a stringa per garantire
+          // che il comparatore string di simple-datatables operi correttamente.
+          // Per colonne con type 'number' o 'date' il valore viene lasciato invariato.
           const sortValue = col_item._sortValue
-            ? typeof col_item._sortValue === 'function'
-              ? (col_item._sortValue(row) ?? '')
-              : (getNestedValue(row, col_item._sortValue) ?? '')
+            ? (() => {
+                const raw = typeof col_item._sortValue === 'function'
+                  ? (col_item._sortValue(row) ?? '')
+                  : (getNestedValue(row, col_item._sortValue) ?? '');
+                const colType = col_item.type ?? 'string';
+                return (colType === 'string' && typeof raw === 'number')
+                  ? String(raw)
+                  : raw;
+              })()
             : null;
 
 
@@ -661,17 +672,20 @@ class SimpleDatatableAdapter extends HTMLElement {
         };
 
         // _searchValue: funzione searchMethod personalizzata che opera su
-        // cell.attributes['data-search'] invece che sul testo visualizzato.
+        // data-search invece che sul testo visualizzato.
         // L'API simple-datatables prevede: (terms, cell, row, colIdx, source)
         // - terms: array di stringhe (uno per parola cercata)
-        // - cell:  oggetto cella dai dati originali (con .text e .attributes)
+        // - cell:  nodo DOM <td> della riga renderizzata
         // La funzione deve restituire true se la riga è da includere.
+        // NOTA: `cell` è un nodo DOM, quindi va usato cell.getAttribute()
+        // e NON cell.attributes?.['data-search'] (che leggerebbe la NamedNodeMap
+        // come plain object, restituendo sempre undefined).
         // Comportamento AND: tutti i termini devono essere presenti (come
         // nella demo https://fiduswriter.github.io/simple-datatables/demos/22-and-search/).
         if (col_settings._searchValue) {
           colObj.searchMethod = (terms, cell) => {
             const haystack = (
-              cell.attributes?.['data-search'] ?? cell.text ?? ''
+              cell.getAttribute?.('data-search') ?? cell.textContent ?? ''
             ).toLowerCase();
             return terms.every(term => haystack.includes(term.toLowerCase()));
           };

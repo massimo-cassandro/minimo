@@ -115,6 +115,15 @@ li {
   margin-left: 1.5rem;
 }
 
+.text-primary {
+  color: var(--primary-100);
+}
+.text-secondary {
+  color: var(--secondary-100);
+}
+.text-accent {
+  color: var(--accent-100);
+}
 .text-danger {
   color: var(--status-danger-color);
 }

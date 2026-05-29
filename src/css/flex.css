@@ -10,6 +10,10 @@
     align-items: center;
   }
 
+  &.gap-0 {
+    gap: 0;
+  }
+
   &.gap-2 {
     gap: calc(var(--flex-grid-gap) * 2);
   }
