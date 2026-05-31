@@ -117,12 +117,33 @@ export function parseCols(col_obj){
         }
       };
 
-    // TODO completare, aggiungere formattazione
     } else if(col_obj._renderMode === 'numeric') {
       return {
 
         cellClass: 'text-end text-numeric',
         headerClass: 'text-end',
+      };
+
+    } else if(col_obj._renderMode === 'euro_no_dec') {
+      return {
+        render: (value, cell) => {
+          console.log(value);
+          if(value == null || isNaN(value)) {
+            cell.attributes['data-order'] = '';
+            return '\u2014';
+
+          } else {
+            cell.attributes['data-order'] = value;
+            return Number(value).toLocaleString('it-IT', {
+              minimumFractionDigits: 0,
+              maximumFractionDigits: 0,
+              useGrouping: 'always',
+            });
+          }
+        },
+        cellClass: 'text-nowrap text-end text-numeric',
+        headerClass: 'text-end',
+        type: 'number'
       };
 
     }

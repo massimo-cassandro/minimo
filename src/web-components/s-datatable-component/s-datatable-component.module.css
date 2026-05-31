@@ -44,7 +44,7 @@
 /* cella unica per indicare l'assenza di record */
 .empty {
   /* stylelint-disable-next-line declaration-no-important */
-  padding: var(--size-sm) !important;
+  padding-block: var(--size-sm) !important;
   font-style: italic;
   color: var(--text-muted);
   /* stylelint-disable-next-line declaration-no-important */

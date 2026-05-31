@@ -74,7 +74,7 @@ export function unsplashPageJS(settings) {
                 // https://docs.imgix.com/apis/rendering/format/q
 
                 let url = photo.base_url + (/\?/.test(photo.base_url)? '&' : '?') +
-                  'fit=crop&crop=focalpoint' + // top, bottom, left, right, faces, focalpoint, edges, and entropy
+                  'fit=crop&crop=faces,entropy,edges' + // top, bottom, left, right, faces, focalpoint, edges, and entropy
                   '&q=60' +
                   `&w=${brk.w}&h=${brk.h}` +
                   `&fm=${fmt}`;
