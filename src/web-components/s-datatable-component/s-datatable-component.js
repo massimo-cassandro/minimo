@@ -579,14 +579,14 @@ class SimpleDatatableAdapter extends HTMLElement {
           // Per colonne con type 'number' o 'date' il valore viene lasciato invariato.
           const sortValue = col_item._sortValue
             ? (() => {
-                const raw = typeof col_item._sortValue === 'function'
-                  ? (col_item._sortValue(row) ?? '')
-                  : (getNestedValue(row, col_item._sortValue) ?? '');
-                const colType = col_item.type ?? 'string';
-                return (colType === 'string' && typeof raw === 'number')
-                  ? String(raw)
-                  : raw;
-              })()
+              const raw = typeof col_item._sortValue === 'function'
+                ? (col_item._sortValue(row) ?? '')
+                : (getNestedValue(row, col_item._sortValue) ?? '');
+              const colType = col_item.type ?? 'string';
+              return (colType === 'string' && typeof raw === 'number')
+                ? String(raw)
+                : raw;
+            })()
             : null;
 
 

@@ -44,8 +44,8 @@
     }
   },
   "devDependencies": {
-    "@massimo-cassandro/dev-updater": "^3.0.4",
-    "@massimo-cassandro/eslint-config": "^3.0.7",
-    "@massimo-cassandro/stylelint-config": "^2.3.7"
+    "@massimo-cassandro/dev-updater": "^3.0.6",
+    "@massimo-cassandro/eslint-config": "^3.0.9",
+    "@massimo-cassandro/stylelint-config": "^2.3.9"
   }
 }

@@ -51,11 +51,12 @@ export function parseCols(col_obj){
       };
 
     // campi booleani
-    } else if (col_obj.type === 'boolean') {
+    } else if (col_obj.type === 'boolean' || col_obj._renderMode === 'bool_true_only') {
       // TODO caso in cui il valore è null nel caso si voglia differenziarlo da false
 
       return {
         ...col_obj,
+        type: 'boolean',
         cellClass: styles.hasIcon,
         headerClass: 'text-center',
         render: (value, td) => {
@@ -65,7 +66,7 @@ export function parseCols(col_obj){
             return checkIcon;
           } else {
             td.attributes.class = classnames(td.attributes.class, 'text-danger');
-            return xIcon;
+            return col_obj._renderMode === 'bool_true_only'? '' : xIcon;
           }
         }
       };
@@ -121,13 +122,13 @@ export function parseCols(col_obj){
       return {
 
         cellClass: 'text-end text-numeric',
-        headerClass: 'text-end',
+        headerClass: 'text-end text-numeric', // NB: usata anche per il footer
       };
 
     } else if(col_obj._renderMode === 'euro_no_dec') {
       return {
         render: (value, cell) => {
-          console.log(value);
+          // console.log(value);
           if(value == null || isNaN(value)) {
             cell.attributes['data-order'] = '';
             return '\u2014';
@@ -142,7 +143,7 @@ export function parseCols(col_obj){
           }
         },
         cellClass: 'text-nowrap text-end text-numeric',
-        headerClass: 'text-end',
+        headerClass: 'text-nowrap text-end text-numeric', // NB: usata anche per il footer
         type: 'number'
       };
 
