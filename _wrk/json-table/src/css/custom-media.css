@@ -1,0 +1,16 @@
+/*
+90rem    : 1440px
+64rem    : 1024px
+47.5rem  : 760px
+*/
+
+@custom-media --media-xlarge-viewport-up (width > 90rem);
+@custom-media --media-large-viewport-up (width > 64rem);
+@custom-media --media-medium-viewport-up (width > 47.5rem);
+
+@custom-media --media-large-viewport-only (64rem < width <= 90rem);
+@custom-media --media-medium-viewport-only (47.5rem < width <= 64rem);
+@custom-media --media-small-viewport-only (width <= 47.5rem);
+
+@custom-media --media-xlarge-viewport-down (max-width: 90rem);
+@custom-media --media-large-viewport-down (max-width: 64rem);

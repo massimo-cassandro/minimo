@@ -1,0 +1,6 @@
+
+.wrapper {
+  position: relative;
+  display: block;
+  margin-block: var(--jt-wrapper-margin-block, 1rem);
+}

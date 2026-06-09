@@ -1,0 +1,9 @@
+.centerAlign {
+  text-align: center;
+}
+.endAlign {
+  text-align: end;
+}
+.nowrap {
+  white-space: nowrap;
+}

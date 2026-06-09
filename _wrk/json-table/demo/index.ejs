@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="data:;base64,=">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>JSON Table demo</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+  </head>
+  <body>
+    <div class="container content">
+
+      <h1>JsonTable demo</h1>
+
+      <div class="alert alert-info" role="alert">
+        Table styles from Bootstrap 5.3.8
+      </div>
+
+      <div id="toc"></div>
+
+      <div class="demo-wrapper">
+        <h2>Ajax table</h2>
+        <p>Table built with json requested via Ajax. The table parameters are defined in <code>demo/js/demo-ajax-table.js</code>.</p>
+
+        <p class="text-danger">Run the json server before. See demo readme.</p>
+        <p class="text-danger">Search has no effect in this version</p>
+
+        <ul>
+          <li>The <code>isActive</code> field contains some non boolean values that are threated as boolean using
+          the <code>parse</code> function defined in the relative <code>columns</code> parameter.</li>
+          <li>Numbers less than 3000 are highlighted in red using the <code>trCallBack</code> parameter</li>
+          <li>This example has two custom dataTypes: the first one overrides the default <code>string</code> type and adds
+          the <code>fst-italic</code> class (from Bootstrap) to the containing table cells.<br>
+          The second one creates a brand new data-type, <code>boolWithNull</code>,
+          applied to the <code>boolCustomized</code> key of the Json.</li>
+        </ul>
+
+        <div id="ajax-table-demo"></div>
+      </div>
+
+
+
+<p class="text-danger fw-bold">NB: static table da terminare. Per riattivare: decommentare l'import di `staticDataSorting` in index.js e di `./js/demo-static-table.js` in demo.js</p>
+
+      <div class="demo-wrapper">
+        <h2>Static table</h2>
+
+
+
+        <p>Table built with static json. The table parameters are defined in <code>demo/js/demo-static-table.js</code>.</p>
+        <p>The json file is  <em>demo/demo-data/json-static-table-demo-data.js</em>, and it's embedded in the output code.</p>
+        <p>See the <em>static-table.js</em> file and the browser console for more details</p>
+        <ul>
+          <li>The <code>isActive</code> field contains some non boolean values that are threated as boolean using
+          the <code>parse</code> function defined in the relative <code>columns</code> parameter.</li>
+          <li>Numbers less than 3000 are highlighted in red using the <code>trCallBack</code> parameter</li>
+          <li>This example has two custom dataTypes: the first one overrides the default <code>string</code> type and adds
+          the <code>fst-italic</code> class (from Bootstrap) to the containing table cells.<br>
+          The second one creates a brand new data-type, <code>boolWithNull</code>,
+          applied to the <code>boolCustomized</code> key of the Json.</li>
+        </ul>
+        <div id="static-table-demo"></div>
+      </div>
+
+
+      <div class="demo-wrapper">
+        <h2>Static table using `data-*` attributes</h2>
+        <p>TODO</p>
+        <div id="static-table-demo-data-attrs"></div>
+      </div>
+
+      <div class="demo-wrapper">
+        <h2>Static table fetching data from table markup</h2>
+        <p>TODO</p>
+        <div id="static-table-demo-markup-data"></div>
+      </div>
+
+    </div>
+
+  </body>
+</html>

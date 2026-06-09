@@ -1,0 +1,32 @@
+.content {
+  padding-block: 1.5rem;
+}
+
+h1 {
+  margin: 0 0 2rem;
+  font-size: 2rem;
+}
+
+h2 {
+  margin: 0 0 1.5rem;
+  font-size: 1.5rem;
+}
+
+.demo-wrapper {
+  padding: 1rem;
+  margin-block: 2rem;
+  border: 1px solid #ccc;
+  border-radius: 1rem;
+}
+
+.toc-anchor {
+  svg {
+    width: 1em;
+    aspect-ratio: 1;
+    fill: currentColor;
+  }
+}
+
+th {
+  white-space: nowrap;
+}

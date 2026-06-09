@@ -36,6 +36,9 @@ export function parseDomString(domString) {
   //   /(?: +(?<content>.*))?$/.source               // content
   // );
 
+
+// FIX non funziona se la stringa contine id e classi in quest'ordine: <TAG>.<CLASSE>#<ID>, se l'id è prima della classe, funziona
+
   const regex = new RegExp(
     /^([a-zA-Z][a-zA-Z0-9-]*)?/.source +  // tag (accetta anche nomi di web components)
     /(?:#([a-zA-Z0-9_-]+))?/.source +     // id

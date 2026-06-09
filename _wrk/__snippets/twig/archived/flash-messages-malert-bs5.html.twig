@@ -1,0 +1,79 @@
+{#
+
+  js & css: percorsi dei file js/css da caricare contestualmente all'attivazione
+  del messaggio
+  null (default) per non caricare nulla
+
+  {% include '@includes/flash_messages_malert.html.twig' with {
+    js: null,
+    css: null
+  }%}
+
+  TODO multiple messages
+#}
+
+{% set flash_messages = app.flashes|default() %}
+{%- if flash_messages -%}
+  <!-- googleoff: all -->
+  {%- if js|default(null) -%}
+    <script src="{{ js }}"></script>
+  {%- endif -%}
+
+  {%- if css|default(null) -%}
+    <script>document.head.insertAdjacentHTML('beforeend', '<link rel="stylesheet" href="{{ css }}">');</script>
+  {%- endif -%}
+
+  {% set type = '' %}
+  {% set title = '' %}
+  {% set mes = '' %}
+  {% set mes_array = [] %}
+
+  {% for label, messages in flash_messages %}
+    {% set type = label %}
+    {% for message in messages %}
+      {% set mes_array = mes_array|merge([message]) %}
+    {% endfor %}
+  {% endfor %}
+
+  {% set mes = mes_array|join('<br>') %}
+
+  {%- if type == 'success' -%}
+    {% set title = 'Operazione completata' %}
+
+  {%- elseif type == 'error' or type == 'notice' -%}
+    {% set title = 'Si è verificato un errore' %}
+    {% set type = 'error' %}
+
+  {%- elseif type == 'warning' -%}
+    {% set title = 'Attenzione!' %}
+
+  {%- else -%}
+    {% set title = '' %}
+    {% set type = 'info' %}
+
+  {%- endif -%}
+
+  <script>
+
+    {%- if app.environment != 'prod' -%}
+      console.groupCollapsed('Flash message');
+      console.warn({
+        type        : '{{ type }}',
+        title       : '{{ title|e('js')  }}',
+        mes         : '{{ mes|e('js') }}',
+        timer       : null,
+        ok_btn_text : 'OK'
+      });
+      console.groupEnd();
+    {%- endif -%}
+
+    mAlert({
+      type        : '{{ type }}',
+      title       : '{{ title|e('js') }}',
+      mes         : '{{ mes|e('js') }}',
+      timer       : null,
+      ok_btn_text : 'OK'
+    });
+  </script>
+  <!-- googleon: all -->
+{%- endif -%}

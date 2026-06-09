@@ -1,0 +1,33 @@
+{#-
+https://symfony.com/doc/current/controller/error_pages.html#testing-error-pages-during-development
+
+test errori: https://governance.local:8890/_error/<error code>
+-#}
+<!DOCTYPE html>
+<html lang="it" data-err-code="{{ status_code }}" data-err-text="{{ status_text}}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <title>Errore {{ status_code }}</title>
+  <meta name="robots" content="noindex, nofollow, noarchive">
+  {%- include 'incl/favicons.incl.html.twig'-%}
+  <link rel="preload" href="{{ asset('governance.css') }}" as="style">
+  <link rel="stylesheet" href="{{ asset('governance.css') }}" media="all">
+  <link rel="preload" href="{{ asset('error-pages.css') }}" as="style">
+  <link rel="stylesheet" href="{{ asset('error-pages.css') }}" media="all">
+  <link rel="preload" href="{{ asset('error-pages.js') }}" as="script">
+
+  <link rel="preload" href="{{ asset('vendors.js') }}" as="script">
+  <link rel="preload" href="{{ asset('runtime.js') }}" as="script">
+  <link rel="preload" href="{{ asset('vendors.css') }}" as="style">
+  <link rel="stylesheet" href="{{ asset('vendors.css') }}" type="text/css" media="all">
+</head>
+<body>
+  <div id="root"></div>
+
+  <script src="{{ asset('runtime.js') }}"></script>
+  <script src="{{ asset('vendors.js') }}"></script>
+  <script src="{{ asset('error-pages.js') }}"></script>
+</body>
+</html>

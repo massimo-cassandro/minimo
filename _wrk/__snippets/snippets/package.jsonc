@@ -1,0 +1,50 @@
+{
+  "name": "@massimo-cassandro/xxxxx",
+  "description": "",
+  "version": "0.1.0",
+  "license": "MIT",
+  "author": "Massimo Cassandro",
+  "main": "index.js",
+  // "type":"module",
+  // "private": true,
+  "publishConfig": {
+    "access": "public"
+  },
+
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/massimo-cassandro/xxxxxx.git#main"
+  },
+  "bugs": {
+    "url": "https://github.com/massimo-cassandro/xxxxxx/issues"
+  },
+
+  // "homepage": "https://github.com/massimo-cassandro/xxxxxx#readme",
+  "keywords": [],
+  "scripts": {
+
+    "sass+postcss": "npm run sass-cli & npm run postcss-cli",
+    "sass-cli": "npx sass ./source/:./target/ --load-path=./node_modules/ --load-path=./front-end/icone/ --style=compressed --watch",
+
+
+    "email-css": "npx sass ./front-end/email/:./AppBundle/Resources/views/_email/_tpl --load-path=./node_modules/ --no-source-map --style=compressed --watch",
+    "presass": "npm run 'build-breakpoints-scss'",
+    "sass-script": "sh ./frontend-src/run-sass.sh",
+    "postcss-script": "sh ./frontend-src/postcss/run-postcss.sh",
+
+
+    "npm-update": "npm update",
+    "npm-publish": "npm publish"
+
+  },
+  "files": [
+    "dist/**/*.{css,js,map}",
+    "src/**/*.{scss,css,js,map}",
+    "js/**/*.{js,map}",
+    "scss/**/*.scss",
+    "index.js"
+  ],
+  "dependencies": {},
+  "devDependencies": {}
+
+}

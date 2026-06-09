@@ -1,0 +1,122 @@
+[
+  {
+    "id": 350,
+    "isActive": true,
+    "number1": 1081.55,
+    "number2": 4411.51,
+    "date": "2017-06-20",
+    "datetime": "2015-02-21T01:23:49",
+    "text": "sit officia in",
+    "perc": 42.33,
+    "percDecimal": 0.19,
+    "euro": 879.21
+  },
+  {
+    "id": 1197,
+    "isActive": true,
+    "number1": 1955.62,
+    "number2": 4670.17,
+    "date": "2016-09-18",
+    "datetime": "2016-10-29T02:05:34",
+    "text": "deserunt velit",
+    "perc": 8,
+    "percDecimal": 0.22,
+    "euro": 215.68
+  },
+  {
+    "id": 859,
+    "isActive": true,
+    "number1": 1228.38,
+    "number2": 4113.09,
+    "date": "2018-05-16",
+    "datetime": "2017-11-12T11:09:41",
+    "text": "tempor excepteur aliqua anim",
+    "perc": 95.48,
+    "percDecimal": 0.24,
+    "euro": 683.96
+  },
+  {
+    "id": 1117,
+    "isActive": false,
+    "number1": 1665.42,
+    "number2": 3383.84,
+    "date": "2020-09-09",
+    "datetime": "2015-10-04T07:22:20",
+    "text": "cupidatat voluptate velit culpa aute irure sint mollit pariatur",
+    "perc": 78.04,
+    "percDecimal": 0.5,
+    "euro": 472.4
+  },
+  {
+    "id": 747,
+    "isActive": false,
+    "number1": 2766.94,
+    "number2": 3354.79,
+    "date": "2016-10-11",
+    "datetime": "2015-01-08T08:27:17",
+    "text": "consectetur consequat reprehenderit",
+    "perc": 34.14,
+    "percDecimal": 0.73,
+    "euro": 139.89
+  },
+  {
+    "id": 1152,
+    "isActive": true,
+    "number1": 3032.02,
+    "number2": 4221.56,
+    "date": "2016-01-09",
+    "datetime": "2016-11-23T05:59:33",
+    "text": "nulla sunt laborum deserunt ad dolore",
+    "perc": 30.4,
+    "percDecimal": 0.71,
+    "euro": 962.93
+  },
+  {
+    "id": 669,
+    "isActive": false,
+    "number1": 1986.34,
+    "number2": 4387.46,
+    "date": "2016-02-10",
+    "datetime": "2018-02-20T01:06:30",
+    "text": "irure do",
+    "perc": 14.09,
+    "percDecimal": 0.41,
+    "euro": 898.72
+  },
+  {
+    "id": 1217,
+    "isActive": true,
+    "number1": 1404.1,
+    "number2": 3851.32,
+    "date": "2016-06-04",
+    "datetime": "2021-01-09T12:26:32",
+    "text": "exercitation id exercitation labore aliquip aute anim sit aliqua",
+    "perc": 7.38,
+    "percDecimal": 0.09,
+    "euro": 720.57
+  },
+  {
+    "id": 759,
+    "isActive": true,
+    "number1": 3971.08,
+    "number2": 4353.08,
+    "date": "2016-06-13",
+    "datetime": "2018-11-11T09:59:47",
+    "text": "ut sint et cillum",
+    "perc": 44.13,
+    "percDecimal": 0.97,
+    "euro": 460.9
+  },
+  {
+    "id": 1227,
+    "isActive": true,
+    "number1": 1272.38,
+    "number2": 4272.35,
+    "date": "2017-11-10",
+    "datetime": "2021-02-20T05:06:51",
+    "text": "sint sunt proident occaecat eu",
+    "perc": 8.41,
+    "percDecimal": 0.14,
+    "euro": 128.43
+  }
+]

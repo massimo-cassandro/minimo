@@ -1,0 +1,154 @@
+/* stylelint-disable selector-max-compound-selectors */
+/* stylelint-disable max-nesting-depth */
+.tableWrapper {
+  max-width: 100%;
+  overflow-x: auto;
+
+  /* TODO ombra su scroll vedi pannello staff e  https://css-tricks.com/books/greatest-css-tricks/scroll-shadows/ */
+
+}
+
+.table {
+  width: 100%;
+  margin-block: var(--jt-table-margin-block, 1rem);
+  caption-side: var(--jt-table-caption-side, bottom);
+  border-spacing: 0;
+  border-collapse: collapse;
+  border-color: var(--jt-table-border-color, #999);
+  border-style: var(--jt-table-border-style, solid);
+  border-width: var(--jt-table-border-width, 1px);
+
+  caption {
+    padding-block: .2rem;
+    margin-block: 0;
+  }
+
+  th, td {
+    padding: var(--jt-table-cell-padding-y, .5rem) var(--jt-table-cell-padding-x, .5rem);
+    vertical-align: top;
+    background-color: var(--jt-table-cell-bg-color, #fff);
+    border-color: var(--jt-table-cell-border-color, #999);
+    border-style: var(--jt-table-cell-border-style, solid);
+    border-bottom-width: var(--jt-table-cell-border-width, 1px);
+
+    &:not(:last-child) {
+      border-right-width: var(--jt-table-cell-vertical-border-width, 1px);
+    }
+  }
+  thead {
+
+    th, td {
+      font-weight: 700;
+      vertical-align: bottom;
+      background-color: var(--jt-table-thead-cell-bg-color, #e4e4e4);
+    }
+
+    /* currently only one tr is expected for thead, but the pseudo class `:last-child`
+       is used anyway, for compatibility with any future developments */
+    tr:last-child {
+      th, td {
+        border-bottom-color: var(--jt-table-thead-cell-border-color, #666);
+        border-bottom-width: var(--jt-table-thead-cell-border-width, 4px);
+      }
+
+      th {
+        /* sort feature is available */
+        &.sort {
+          > div {
+            display: flex;
+            flex-flow: row nowrap;
+            gap: .5rem;
+            align-items: flex-end;
+            justify-content: space-between;
+          }
+          @media (hover: hover) { /* @media (any-hover: hover) { */
+            &:has(.sortArrows > span:hover) {
+              background-color: var(--jt-table-thead-sort-cell-hover, #ebb8b8);
+            }
+          }
+        }
+
+        /* sorting has been activated */
+        &.sortingOn {
+          border-bottom-color: var(--jt-table-sort-color, #c00);
+        }
+
+        /* sorting ASC activated */
+        &.sortingAsc {
+          .sortArrowUp {
+            color: var(--jt-table-sort-arrow-on, #c00);
+          }
+        }
+
+        /* sorting DESC activated */
+        &.sortingDesc {
+          color: blue;
+        }
+
+      }
+    }
+  }
+
+  /*
+    sticky headers don't work if table wrapper is present since it has overflow
+    so this feature is added only if table is not wrapped
+  */
+  &.stickyHeaders {
+    position: relative;
+    thead {
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+  }
+
+  tfoot {
+    th, td {
+      font-weight: 700;
+      background-color: var(--jt-table-tfoot-cell-bg-color, #f4f4f4);
+    }
+    tr:first-child {
+      th, td {
+        border-top-color: var(--jt-table-tfoot-cell-border-color, #666);
+        border-top-width: var(--jt-table-tfoot-cell-border-width, 3px);
+      }
+    }
+  }
+}
+
+/* sort arrows container */
+.sortArrows {
+  display: flex;
+  flex: 0;
+  flex-flow: column nowrap;
+  gap: 4px;
+  align-items: center;
+  justify-content: center;
+  padding-block-end: .2em;
+  color: var(--jt-table-sort-arrow-off, #333);
+
+
+  > span {
+    flex: 0;
+    @media (hover: hover) { /* @media (any-hover: hover) { */
+      &:hover {
+        color: var(--jt-table-sort-arrow-hover, #c00);
+      }
+    }
+  }
+  svg {
+    display: block;
+    width: .5em;
+    aspect-ratio: 1;
+    cursor: pointer;
+    fill: currentColor;
+  }
+
+}
+/* inside `.sortArrows` element */
+/* .sortArrowUp {} */
+.sortArrowDn {
+  svg {
+    rotate: .5turn;
+  }
+}

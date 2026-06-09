@@ -1,0 +1,13 @@
+DATABASE_URL=mysql://root:mysql8root@127.0.0.1:3306/xxxx?serverVersion=8.0
+
+APP_ENV=dev
+APP_DEBUG=1
+
+### mailHog
+MAILER_DSN=smtp://localhost:1025
+
+### supporto webpack
+# cartella, dentro public, in cui webpack salva js, css immagini ecc
+ASSETS_DIR=_dev
+
+

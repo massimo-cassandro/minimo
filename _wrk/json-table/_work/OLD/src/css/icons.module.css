@@ -1,0 +1,22 @@
+.icon { /* applied to the td */
+  text-align: center;
+
+  svg {
+    position: relative;
+    top: -3px;
+    width: var(--jt-bool-icon-size, 1.3em);
+    aspect-ratio: 1;
+    fill: none;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 8px;
+  }
+
+  &.true {
+    color: var(--jt-bool-true-color, #0a7202);
+  }
+  &.false {
+    color: var(--jt-bool-false-color, #c00);
+  }
+}

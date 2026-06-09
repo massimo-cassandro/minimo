@@ -1,0 +1,131 @@
+/* frontend/src/web-components/ui-button.css */
+/* import delle custom properties gestito da jit-props */
+
+/* purgecss start ignore */
+
+
+:host {
+  display: inline-block;
+
+  --_btn-padding: var(--btn-padding-block) var(--btn-padding-inline);
+  --_btn-font-size: var(--font-size-base);
+  --_focus-ring-size: 3px;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+/* Varianti e Dimensioni */
+.variant-primary {
+  --_overlay-color: var(--btn-primary-overlay);
+  --_color: var(--btn-primary-color);
+  --_background-color: var(--btn-primary-background-color);
+  --_hover-background-color: var(--btn-primary-hover-background-color);
+  --_focus-ring-color: var(--btn-primary-focus-outline-color);
+}
+/* .variant-secondary {
+  color: white;
+  background-color: #007bff;
+} */
+.variant-login {
+  --_overlay-color: var(--btn-login-overlay);
+  --_color: var(--btn-login-color);
+  --_background-color: var(--btn-login-background-color);
+  --_hover-background-color: var(--btn-login-hover-background-color);
+  --_focus-ring-color: var(--btn-login-focus-ring-color);
+}
+.size-sm {
+  --_btn-padding: var(--btn-sm-padding-block) var(--btn-sm-padding-inline);
+  --_btn-font-size: var(--btn-sm-font-size);
+  --_focus-ring-size: 2px;
+}
+.size-lg {
+  --_btn-padding: var(--btn-lg-padding-block) var(--btn-lg-padding-inline);
+  --_btn-font-size: var(--btn-lg-font-size);
+  --_focus-ring-size: 4px;
+}
+.size-xl {
+  --_btn-padding: var(--btn-xl-padding-block) var(--btn-xl-padding-inline);
+  --_btn-font-size: var(--btn-xl-font-size);
+  --_focus-ring-size: 6px;
+}
+
+a.ui-btn {
+  &:link, &:focus, &:visited {
+    color: var(--_color);
+    text-decoration: none;
+  }
+}
+
+.ui-btn {
+  position: relative;
+  display: inline-flex;
+  gap: var(--size-xl);
+  align-items: center;
+  justify-content: center;
+  padding: var(--_btn-padding);
+  font-family: inherit;
+  font-size: var(--_btn-font-size);
+  color: var(--_color);
+  cursor: pointer;
+  background-color: var(--_background-color);
+  border: none;
+  border-radius: var(--btn-border-radius);
+  transition: all .2s ease;
+
+  &::before {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 0;
+    display: block;
+    width: 62%;
+    content: '';
+    background-color: var(--_overlay-color);
+    border-radius: 0 var(--btn-border-radius) var(--btn-border-radius);
+    box-shadow: var(--btn-overlay-drop-shadow-default);
+  }
+
+  &:focus, &:focus-visible {
+    outline: var(--_focus-ring-size) solid color-mix(in srgb, var(--_focus-ring-color) 70%, transparent);
+    outline-offset: 2px;
+  }
+  @media (hover: hover) {
+    &:hover {
+      &, &::before {
+        background-color: var(--_hover-background-color);
+      }
+
+      &::before {
+        box-shadow: var(--btn-overlay-drop-shadow-hover);
+      }
+    }
+  }
+  &:active {
+
+    &::before {
+      box-shadow: var(--btn-overlay-drop-shadow-active);
+    }
+  }
+}
+
+.ui-btn-label {
+  z-index: 1;
+}
+
+.ui-btn-icon, ::slotted([slot='custom-icon']) {
+  display: flex;
+  align-items: center;
+  width: 1.2em;
+  height: 1.2em;
+  fill: currentColor;
+}
+
+::slotted(svg) {
+  width: 100%;
+  height: 100%;
+}
+
+/* purgecss end ignore */

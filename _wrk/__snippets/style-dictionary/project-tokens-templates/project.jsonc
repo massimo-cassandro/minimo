@@ -1,0 +1,24 @@
+{
+  "radius": {
+
+    "base-esterno": {
+      "$type": "dimension",
+      "$value": "20px"
+    },
+    "btn-overlay": {
+      "$type": "dimension",
+      "$value": "28px"
+    }
+  },
+
+  "font": {
+
+    "family": {
+      "$type": "string",
+      "$value": "'Rubik Variable', sans-serif"
+    }
+
+  }
+}
+
+

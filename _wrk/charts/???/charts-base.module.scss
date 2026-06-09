@@ -1,0 +1,265 @@
+@import '@css/ada-global-variables';
+
+
+.chart { // svg
+  display: block;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+}
+
+
+// sfondo aree (mesi) alternato
+.xOddAreas {
+  fill: color-mix(in srgb, var(--ada-grigio-2) 50%, transparent);
+}
+.xEvenAreas {
+  fill: transparent;
+}
+
+// seconda serie di etichette asse X
+.xLabels2 {
+  font-family: var(--ada-body-font-family);
+  font-size: var(--ada-font-size-xsmall);
+  font-weight: var(--ada-font-weight-light);
+  text-anchor: middle;
+  fill: var(--ada-grigio-3);
+}
+
+// assi grafico svg
+.assi {
+  fill: none;
+  stroke: var(--ada-grigio-4);
+  stroke-width: 1px;
+}
+
+.ticks {
+  fill: none;
+  stroke: var(--ada-grigio-4);
+  stroke-width: .5px;
+}
+.gridLines {
+  fill: none;
+  stroke: var(--ada-grigio-4);
+  stroke-dasharray: .4 2;
+  stroke-width: .8px;
+}
+.gridLineCurrentWeek {
+  fill: none;
+  stroke: var(--ada-grigio-4);
+  stroke-dasharray: 12 4;
+  stroke-width: 2px;
+}
+
+.labelY, .labelX {
+  font-family: var(--ada-heading-font-family);
+  font-weight: var(--ada-heading-font-weight-regular);
+  font-feature-settings: 'lnum', 'tnum';
+  font-variant-numeric: lining-nums tabular-nums;
+  fill: var(--ada-grigio-4);
+}
+.labelY {
+  font-size: var(--ada-font-size-small);
+  text-anchor: end;
+}
+.labelX {
+  font-size: var(--ada-font-size-xsmall);
+  text-anchor: middle;
+}
+.axisLabel {
+  font-family: var(--ada-heading-font-family);
+  font-size: var(--ada-body-font-size);
+  font-weight: var(--ada-heading-font-weight-semibold);
+  text-anchor: middle;
+  fill: var(--ada-grigio-3);
+}
+
+// linee
+.line {
+  fill: none;
+  stroke-linecap: round;
+  stroke-width: 1px;
+}
+
+// punti
+.dataPoint {
+  r: 4px;
+  opacity: 0;
+  transition: all .2s linear;
+
+}
+
+.legenda {
+  // transform: translate(50%, var(--ty));
+  // transform-origin: center;
+
+  text {
+    font-size: var(--ada-font-size-small);
+  }
+
+  // solo grafico con aree
+  circle {
+    stroke-width: .5px;
+    &.areaStandard {
+      stroke: var(--budget-standard);
+    }
+    &.areaPositivo {
+      stroke: var(--budget-positivo);
+    }
+    &.areaNegativo {
+      stroke: var(--budget-negativo);
+    }
+  }
+
+}
+
+// dataGroups (linee e punti evidenziati su hover)
+.dataGroup {
+  pointer-events: bounding-box;
+  cursor: context-menu;
+  transition: opacity .3s linear;
+
+  .isHover &:not(.dataGroupOn) {
+    opacity: .2;
+  }
+}
+
+.dataGroupOn {
+  .gridLines {
+    stroke-dasharray: none;
+    stroke-width: 2px;
+  }
+  .dataPoint {
+    opacity: 1;
+  }
+
+  .xOddAreas, .xEvenAreas {
+    fill: color-mix(in srgb, var(--dashboard-section-primary) 15%, transparent); /* https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/color-mix */
+  }
+}
+
+// infoBox
+$arrow-size: 6px;
+$arrow-margin: $arrow-size * 1.3;
+.infoBoxWrapper {
+  visibility: hidden;
+  opacity: 0;
+  transition: all .1s linear;
+  // display: none;
+
+  .infoBoxWrapperOn & {
+    visibility: visible;
+    opacity: 1;
+    // display: block;
+  }
+
+  &[data-side='left'] > div {
+    margin-right: $arrow-margin;
+    // &::after {
+    //   right: -$arrow-size;
+    //   left: auto;
+    //   transform: rotate(-135deg);
+    // }
+  }
+  &[data-side='right'] > div {
+    margin-left: $arrow-margin;
+    // &::after {
+    //   right: auto;
+    //   left: -$arrow-size;
+    //   transform: rotate(45deg);
+    // }
+  }
+
+  > div {
+    position: relative;
+    padding: 5px 8px;
+    color: #fff;
+    background-color: color-mix(in srgb, var(--ada-grigio-4) 90%, transparent);
+    border-radius: var(--ada-border-radius);
+
+    .chartSettimanale & {
+      min-height: 180px;
+    }
+
+    // &, &::after {
+    //   background-color: color-mix(in srgb, var(--ada-grigio-4) 90%, transparent);
+    // }
+
+    // &::after {
+    //   position: absolute;
+    //   top: 45%;
+    //   display: block;
+    //   width: $arrow-size;
+    //   height: $arrow-size;
+    //   scale: 1.2 3;
+    //   clip-path: polygon(0 100%, 100% 100%, 0 0);
+    //   content: '';
+
+    // }
+  }
+}
+.infoBoxTitle {
+  @include font-axis-variation($weight: semibold, $italic: false, $usa-font-heading: true);
+  font-family: var(--ada-heading-font-family);
+  font-size: var(--ada-font-size-lead);
+  line-height: 1.1;
+}
+.infoBoxDescr {
+  margin: .3rem 0;
+  font-size: var(--ada-font-size-small);
+  line-height: 1.2;
+}
+.infoBoxNote {
+  @include font-axis-variation($weight: light, $italic: false, $usa-font-heading: false);
+  margin-top: 1rem;
+  font-size: var(--ada-font-size-xsmall);
+  line-height: 1.2;
+  color: var(--ada-grigio-1);
+}
+
+.infoBoxTable {
+  width: 100%;
+  margin: .5rem 0 .2rem;
+  font-size: var(--ada-font-size-small);
+  border-collapse: collapse;
+
+  th, td {
+    padding: .3rem .2rem;
+    white-space: nowrap;
+    border-top: .5px solid currentColor;
+    // border: 1px solid #fc0;
+
+    &.infoBoxTableConsolidato {
+      font-weight: var(--ada-font-weight-bold);
+    }
+  }
+  tr:last-child {
+    th, td {
+      border-bottom: .5px solid currentColor;
+    }
+  }
+  th {
+    @include font-axis-variation($weight: regular, $italic: false, $usa-font-heading: false);
+  }
+  td {
+    // padding-left: .4rem;
+    text-align: right;
+  }
+}
+.infoBoxFlag {
+  position: relative;
+  top: 3px;
+  display: inline-block;
+  width: 1.1em;
+  height: 1.1em;
+  margin-right: .6em;
+  // border: 1px solid currentColor;
+  border-radius: 50%;
+  // box-shadow:
+  //   1px -1px currentColor,
+  //   1px 1px currentColor,
+  //   -1px -1px currentColor,
+  //   -1px 1px currentColor;
+  outline: solid 1px currentColor;
+
+}

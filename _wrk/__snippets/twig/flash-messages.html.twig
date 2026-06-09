@@ -1,0 +1,34 @@
+{# TEST: #}
+
+{# {%- for state in ['danger', 'success', 'warning', 'info'] -%}
+  <div class="bg-{{ state }}">
+    <div class="container">
+      <div class="alert alert-{{ state }}">
+        <button type="button" class="btn-close" data-dismiss="alert" aria-label="Chiudi"></button>
+        <h2>{{ state }}</h2>
+        <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Asperiores vitae in rerum consequatur iure atque dolores beatae doloremque, debitis dolore optio odit, tempore explicabo? Necessitatibus magnam magni repudiandae velit voluptates? Fuga ab vel delectus voluptatem sequi, consectetur amet, quos placeat cupiditate incidunt nobis in labore. Est, aspernatur? Quo, qui voluptatem!</p>
+      </div>
+    </div>
+  </div>
+{%- endfor -%} #}
+
+
+{#
+
+  message labels:
+  - success
+  - notice
+  - error
+  - warning
+
+#}
+
+
+{% for label, messages in app.flashes %}
+  {% for message in messages %}
+    <div class="alert alert-{{ label }}">
+      <button type="button" class="btn-close" data-dismiss="alert" aria-label="Chiudi"></button>
+      {{ message|raw }}
+    </div>
+  {% endfor %}
+{% endfor %}

@@ -1,0 +1,172 @@
+/* stylelint-disable max-nesting-depth */
+
+.tableWrapper {
+  position: relative;
+  max-width: 100%;
+  height: var(--js-table-wrapper-height, auto);
+  overflow-x: auto;
+  overflow-y: visible;
+
+  /* TODO ombra laterale su overflow della tabella (vedi pannello staff dashboard) */
+}
+
+.table {
+
+  --sort-arrows-wrapper-translate-x: -2px;
+
+  /* TODO fix thead sticky -> vedi TODO in main-builder per impostare l'altezza di tableWrapper */
+  /* TODO ombra a sostituire il bordo che scompare nello scroll sticky */
+  /* TODO attivare sticky su info e thead con due opzioni default true */
+  thead  {
+    position: sticky;
+    top: var(--js-thead-sticky-top, 0);
+    z-index: var(--js-thead-zindex, 10);
+    /* background-clip: padding-box; */
+
+    th  {
+      &.sort {
+        position: relative;
+
+      }
+
+      &.sortingOn {
+        .sortArrowsWrapper {
+          display: flex;
+        }
+      }
+
+      /* sorting ASC activated */
+      &.sortingAsc {
+        .sortDesc {
+          display: none;
+        }
+      }
+
+      /* sorting DESC activated */
+      &.sortingDesc {
+        .sortAsc {
+          display: none;
+        }
+      }
+    }
+
+    &:hover, &:focus, &:focus-within {
+
+      /* only needed to maintan hover status while hovering mouse from a column to the other  */
+      &::after {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        z-index: 1;
+        display: block;
+        width: 100%;
+        height: calc(var(--jt-sort-arrows-size, .9rem) * 1.5);
+        content: '';
+        background-color: var(--jt-thead-sort-overlay-bg, rgb(0 0 0 / .1));
+        filter: blur(1rem);
+      }
+
+      .sortArrowsWrapper {
+        z-index: 2;
+        box-shadow: var(--jt-sort-arrows-wrapper-hover-box-shadow, 0 2px 1rem rgb(0 0 0 / .6));
+        scale: 1.4;
+        translate: var(--sort-arrows-wrapper-translate-x) 100%;
+
+        .sortArrow {
+          display: block;
+
+          &.sortActive {
+            color: var(--jt-sort-arrows-active-fill, #33ef15);
+          }
+
+          @media (hover: hover) {
+            &:hover {
+              color: var(--jt-sort-arrows-hover-fill, #000);
+              background-color: var(--jt-sort-arrows-hover-bg, #fff);
+
+            }
+          }
+
+          &:active {
+            color: var(--jt-sort-arrows-btn-active-color, #000);
+            background-color: var(--jt-sort-arrows-btn-active-bg, #33ef15);
+          }
+        }
+      }
+    } /* end hover... thead */
+
+  }
+}
+
+
+/* sort */
+.sortBtn {
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  margin: 0;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+.sortArrowsWrapper {
+  position: absolute;
+  top: auto;
+  right: 0;
+  bottom: 0;
+  left: auto;
+
+  display: flex;
+  flex-flow: row nowrap;
+  gap: .3rem;
+  align-items: center;
+  justify-content: flex-end;
+
+  background-color: var(--jt-sort-arrows-wrapper-bg-color, #000);
+  border: var(--jt-sort-arrows-wrapper-border, 1px solid #666);
+  border-radius: 99rem;
+  box-shadow: var(--jt-sort-arrows-wrapper-box-shadow, 0 0 5px rgb(0 0 0 / .4));
+  transition: scale, translate .1s linear;
+  transform-origin: bottom right;
+  scale: 0;
+  translate: var(--sort-arrows-wrapper-translate-x) 35%;
+
+  /* sorting has been activated for this col */
+  .sortingOn & {
+    scale: 1;
+  }
+}
+
+.sortArrow { /* role button */
+  position: relative;
+  width: var(--jt-sort-arrows-size, .9rem);
+  aspect-ratio: 1;
+  padding: var(--jt-sort-arrows-wrapper-padding, 3px);
+  color: var(--jt-sort-arrows-fill, #fff);
+  /* cursor: pointer; */
+  border-radius: 50%;
+
+  svg {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 100%;
+    fill: currentColor;
+    transform-origin: center;
+    translate: -50% -50%;
+  }
+
+}
+
+.sortAsc {
+  svg {
+    /* top: var(--jt-sort-asc-arrow-svg-vertical-adjust, 3px); */
+    rotate: var(--jt-sort-asc-arrow-rotate, 180deg);
+  }
+}
+.sortDesc {
+  svg {
+    /* top: var(--jt-sort-desc-arrow-svg-vertical-adjust, -3px); */
+    rotate: var(--jt-sort-desc-arrow-rotate, 0);
+  }
+}

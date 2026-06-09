@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="it">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Date Relative test</title>
+    <link rel="icon" href="data:;base64,=">
+    <style>
+      body {
+        font-family: sans-serif;
+      }
+      .rif {
+        color: #666;
+        font-style: italic;
+        font-size: .85em;
+      }
+      time {
+        color: #c00;
+      }
+      .time-info {
+        font-style: italic;
+
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Date Utilities test</h1>
+    <div id="test"></div>
+
+    <script type="module">
+      import relativeNextDate from '../src/date-relative.js';
+
+      const wrapper = document.getElementById('test')
+
+        ,formatDate = (d, brackets = true) => {
+          const str = d.toLocaleString('it-IT', {
+              year: '2-digit', // 'numeric',
+              month: 'short', // '2-digit',
+              day: 'numeric', // '2-digit',
+              hour12: false,
+              hour:'2-digit',
+              minute:'2-digit'
+            });
+
+          return '<span class="rif">' + (brackets? `(data evento: ${str})` : str) + '</span>';
+        }
+
+        ,oggi = new Date()
+        ,eventoOggi = new Date(new Date(oggi).setMinutes(oggi.getMinutes() + 40))
+        ,eventoOggi2 = new Date(new Date(oggi).setHours(oggi.getHours() + 3))
+        ,eventoOggi3 = new Date(new Date(oggi).setMinutes(oggi.getMinutes() +32))
+        ,ieri = new Date(new Date(eventoOggi).setDate(eventoOggi.getDate() - 1))
+        ,domani = new Date(new Date(eventoOggi).setDate(eventoOggi.getDate() + 1))
+        ,dopodomani = new Date(new Date(eventoOggi).setDate(eventoOggi.getDate() + 2))
+        ,dueGiorniFa = new Date(new Date(eventoOggi).setDate(eventoOggi.getDate() - 2))
+        ,fraTreGiorni = new Date(new Date(eventoOggi).setDate(eventoOggi.getDate() + 3))
+        ,traDieciMinuti = new Date(new Date(oggi).setMinutes(oggi.getMinutes() + 10))
+        ,ventiMinutiFa = new Date(new Date(oggi).setMinutes(oggi.getMinutes() - 20))
+        ,ventottoMinutiFa = new Date(new Date(oggi).setMinutes(oggi.getMinutes() - 28))
+      ;
+
+      wrapper.innerHTML = `
+        <p><span class="rif">Adesso:</span> ${formatDate(new Date(), false)}</p>
+        <p>${relativeNextDate(eventoOggi)} ${formatDate(eventoOggi)}</p>
+        <p>${relativeNextDate(eventoOggi2)} ${formatDate(eventoOggi2)}</p>
+        <p>${relativeNextDate(eventoOggi3)} ${formatDate(eventoOggi3)}</p>
+        <p>${relativeNextDate(ieri)} ${formatDate(ieri)}</p>
+        <p>${relativeNextDate(domani)} ${formatDate(domani)}</p>
+        <p>${relativeNextDate(dopodomani)} ${formatDate(dopodomani)}</p>
+        <p>${relativeNextDate(dueGiorniFa)} ${formatDate(dueGiorniFa)}</p>
+        <p>${relativeNextDate(fraTreGiorni)} ${formatDate(fraTreGiorni)}</p>
+        <p>&nbsp</p>
+        <p>${relativeNextDate(oggi)} ${formatDate(oggi)}</p>
+        <p>${relativeNextDate(traDieciMinuti)} ${formatDate(traDieciMinuti)}</p>
+        <p>${relativeNextDate(ventiMinutiFa)} ${formatDate(ventiMinutiFa)}</p>
+        <p>${relativeNextDate(ventottoMinutiFa)} ${formatDate(ventottoMinutiFa)}</p>
+      `;
+
+    </script>
+  </body>
+</html>
