@@ -146,7 +146,9 @@ function getNestedValue(obj, path) {
  * resolveTemplate
  *
  * Risolve un template in base al suo tipo:
- *   - Funzione:              invocata con `row`, deve restituire una stringa.
+ *   - Elemento DOM:          restituisce `outerHTML` dell'elemento.
+ *   - Funzione:              invocata con `row`, può restituire una stringa o un elemento DOM
+ *                            (in tal caso viene serializzato con `outerHTML`).
  *   - Stringa mustache-like ([[key]]): i segnaposto vengono sostituiti con i
  *                            valori corrispondenti dell'oggetto riga.
  *   - Stringa semplice:      restituita così com'è (utile per tooltip statici).
@@ -155,7 +157,7 @@ function getNestedValue(obj, path) {
  * comunque chiamate con null; la stringa mustache-like viene restituita
  * letteralmente perché non ci sono dati da interpolare.
  *
- * @param {string|Function} tpl           Template da risolvere.
+ * @param {string|Function|Node} tpl      Template da risolvere.
  * @param {object|null}     row           Oggetto riga corrente (null per le intestazioni).
  * @param {object}          [opts]        Opzioni aggiuntive.
  * @param {string}          [opts.nullAs] Stringa da usare come fallback per i segnaposto
@@ -169,8 +171,14 @@ function getNestedValue(obj, path) {
 function resolveTemplate(tpl, row, { nullAs = '', warnColIdx } = {}) {
   if (!tpl) return null;
 
+  if (tpl instanceof Node) {
+    return tpl.outerHTML;
+  }
+
   if (typeof tpl === 'function') {
-    return tpl(row) ?? null;
+    const result = tpl(row);
+    if (result instanceof Node) return result.outerHTML;
+    return result ?? null;
   }
 
   // Stringa mustache-like: interpola solo se row è disponibile
@@ -591,7 +599,8 @@ class SimpleDatatableAdapter extends HTMLElement {
 
 
           // _cellRender: template per il rendering del valore.
-          // Accetta stringa mustache-like ([[key]]) o funzione (row) => string.
+          // Accetta stringa mustache-like ([[key]]), funzione (row) => string|Node,
+          // oppure un elemento DOM direttamente (serializzato via outerHTML).
           // Delega a resolveTemplate, passando nullAs e l'indice di colonna
           // per i warning di chiavi mancanti.
           if (col_item._cellRender) {
@@ -605,7 +614,7 @@ class SimpleDatatableAdapter extends HTMLElement {
           }
 
 // TODO rendere più snella la gestione di questi casi (???)
-// TODO pasare il valore `nullAs` al render predefinito
+// TODO passare il valore `nullAs` al render predefinito
           // Applica _renderNullAs al valore della cella se null/undefined
           // e la cella non ha già un template che gestisce la visualizzazione.
           // se _renderMode è impostato, il valore null è gestito direttamente dal gestore predefinito
