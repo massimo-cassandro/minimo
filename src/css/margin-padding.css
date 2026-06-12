@@ -64,6 +64,9 @@
 .mie {
   margin-inline-end: var(--size-base) !important;
 }
+.mie-auto {
+  margin-inline-end: auto !important;
+}
 .mie-xs {
   margin-inline-end: var(--size-xs) !important;
 }

@@ -1,0 +1,104 @@
+/*
+NB:
+`--_modal-popup-width` and `--_modal-popup-height` are used with a fallback value
+but can be set with a desired value caso per caso
+
+*/
+
+.dialog {
+
+  position: fixed;
+
+  display: flex;
+  flex-direction: column;
+
+  width: var(--_modal-popup-width, max-content);
+  min-width: 400px;
+  max-width: 98dvw;
+  height: var(--_modal-popup-height, max-content);
+  min-height: 300px;
+  max-height: 90dvh;
+  padding: 0;
+  margin: auto;
+  overflow: visible;
+  background-color: var(--body-background-color);
+  border: none;
+  border-radius: var(--modal-popup-border-radius);
+  box-shadow: var(--modal-popup-drop-shadow);
+  scale: 0;
+  transition: scale .2s ease-out;
+
+  &::backdrop {
+    overscroll-behavior: contain;
+    background-color: var(--modal-popup-backdrop-color);
+  }
+
+  &.on {
+    scale: 1;
+  }
+
+}
+
+.closeButton  {
+
+  position: absolute;
+  top: calc(-1 * var(--modal-popup-btn-close-size) / 3);
+  right: calc(-1 * var(--modal-popup-btn-close-size) / 3);
+}
+
+.contentWrapper {
+  display: flex;
+  flex: 1;
+  flex-flow: column nowrap;
+  gap: 0;
+  align-items: stretch;
+  justify-content: flex-start;
+  min-height: 0;
+}
+
+
+.content {
+  flex: 1;
+  /* width: 100%;
+  height: 100%; */
+  min-height: 0;
+  padding: var(--size-base) var(--size-sm) var(--size-sm);
+  overflow-x: hidden;
+  overflow-y: auto;
+  scrollbar-gutter: stable;
+
+  .scrollBarPadding & {
+    padding-inline-end: var(--size-md);
+  }
+
+}
+
+.iframe {
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  margin: 0;
+  overscroll-behavior: contain;
+  border: none;
+}
+
+.header {
+  padding: var(--modal-popup-header-padding);
+  font-size: var(--modal-popup-header-font-size);
+  color: var(--modal-popup-header-color);
+  background-color: var(--modal-popup-header-background-color);
+  border-radius: var(--modal-popup-border-radius) var(--modal-popup-border-radius) 0 0;
+}
+.footer {
+  padding: var(--modal-popup-footer-padding);
+  font-size: var(--modal-popup-footer-font-size);
+  color: var(--modal-popup-footer-color);
+  background-color: var(--modal-popup-footer-background-color);
+  border-radius: 0 0 var(--modal-popup-border-radius) var(--modal-popup-border-radius);
+}
+
+.header, .footer {
+  * {
+    color: inherit;
+  }
+}

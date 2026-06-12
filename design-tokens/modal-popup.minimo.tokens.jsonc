@@ -1,0 +1,82 @@
+// -----------------------------------------------------------------------
+// Generated file — do not edit manually.
+// This file is produced by the design-token build pipeline.
+// Source of truth: the token files in the project source directory.
+// Re-generate with: node build-tokens.mjs --config <path/to/config>
+// -----------------------------------------------------------------------
+{
+  "modal-popup": {
+    "drop-shadow": {
+      "$type": "shadow",
+      "$value": [
+        {
+          "offsetX": "0",
+          "offsetY": "0",
+          "blur": "12px",
+          "spread": "2px",
+          "color": "rgba(0 0 0 / .25)"
+        }
+      ]
+    },
+    "backdrop-color": {
+      "$type": "color",
+      "$value": "rgb(0 0 0 / .6)"
+    },
+    "border": {
+      "radius": {
+        "$type": "dimension",
+        "$value": "{size.base}"
+      }
+    },
+    "btn-close": {
+      "size": {
+        "$type": "dimension",
+        "$value": "1.6rem"
+      }
+    },
+    "header": {
+      "padding": {
+        "$type": "dimension",
+        "$value": "{size.xs}"
+      },
+      "color": {
+        "$type": "color",
+        "$value": "{text.color}"
+      },
+      "background": {
+        "color": {
+          "$type": "color",
+          "$value": "#ddd"
+        }
+      },
+      "font": {
+        "size": {
+          "$type": "dimension",
+          "$value": "{font.size.xl}"
+        }
+      }
+    },
+    "footer": {
+      "padding": {
+        "$type": "dimension",
+        "$value": "{size.xs}"
+      },
+      "color": {
+        "$type": "color",
+        "$value": "{text.color}"
+      },
+      "background": {
+        "color": {
+          "$type": "color",
+          "$value": "#ddd"
+        }
+      },
+      "font": {
+        "size": {
+          "$type": "dimension",
+          "$value": "{font.size.base}"
+        }
+      }
+    }
+  }
+}

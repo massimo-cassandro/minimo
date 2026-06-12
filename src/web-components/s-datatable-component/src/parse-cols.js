@@ -120,7 +120,7 @@ export function parseCols(col_obj){
 
     } else if(col_obj._renderMode === 'numeric') {
       return {
-
+// TODO implementare merge con classi presenti nei parametri definiti dall'utente
         cellClass: 'text-end text-numeric',
         headerClass: 'text-end text-numeric', // NB: usata anche per il footer
       };

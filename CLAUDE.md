@@ -2,7 +2,7 @@
 
 ## Contesto di dominio
 
-Framework leggero JS + CSS (`@massimo-cassandro/minimo`, v1.4.11) con componenti e utilità gestibili on-demand. Pubblicato su npm come pacchetto pubblico ES module.
+Framework leggero JS + CSS (`@massimo-cassandro/minimo`) con componenti e utilità gestibili on-demand. Pubblicato su npm come pacchetto pubblico ES module.
 
 Progettato per essere usato con **webpack** (configurazione starter inclusa in `webpack-setup/`). Importazioni SVG e CSS modules dipendono dalla configurazione webpack fornita.
 
@@ -56,6 +56,7 @@ minimo/
 │   │   ├── form-reset-submit.js
 │   │   ├── inner-nav/
 │   │   ├── modal-alert/            # dialog modale (usa HTMLDialogElement)
+│   │   ├── modal-popup/            # popup — nuova versione in produzione
 │   │   ├── overlay/
 │   │   ├── sf-macro/               # integrazione form Symfony
 │   │   ├── snackbar/               # usa Popover API
@@ -221,7 +222,7 @@ TODO aperti su json-table ([_wrk/json-table/TODO.md](_wrk/json-table/TODO.md)):
 | `js-utilities/` | da valutare | Utilità JS varie — da integrare o cestinare |
 | `charts/` | da rifattorizzare | Vecchia versione (1a vers) con chart `settimanale-mensile` e altre non ancora migrate |
 | `spinner/` | da valutare | Componente spinner (attualmente in minimo solo come CSS) |
-| `modal-popup/`, `popup-page/` | da valutare | Componenti popup — da integrare o cestinare |
+| `popup-page/` | da valutare | Componente popup page — da integrare o cestinare |
 | `vanilla-cookie-consent/` | da valutare | Integrazione cookie consent — da integrare o cestinare |
 | `recaptcha/` | da valutare | Integrazione reCAPTCHA — da integrare o cestinare |
 | `alert-autoclose.js` | da valutare | Da integrare o cestinare |

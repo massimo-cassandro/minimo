@@ -19,7 +19,6 @@ Nothing here should be considered stable or production-ready.
 | `js-utilities/` | Miscellaneous JS utilities | To be evaluated |
 | `charts/` | Older version of the charts module, to be refactored | To be refactored |
 | `spinner/` | Spinner component | To be evaluated |
-| `modal-popup/` | Modal popup component | To be evaluated |
 | `popup-page/` | Popup page component | To be evaluated |
 | `vanilla-cookie-consent/` | Cookie consent integration | To be evaluated |
 | `recaptcha/` | reCAPTCHA integration | To be evaluated |

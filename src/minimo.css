@@ -41,3 +41,6 @@
 @import '@minimo/css/position.css';
 @import '@minimo/css/visibility.css';
 
+
+/* spinner: include the css of the choosen spinner only */
+@import '@minimo/components/spinner/spinner-circle-basic.css';

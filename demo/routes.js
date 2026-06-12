@@ -2,6 +2,7 @@ import buttons from './demo-files/buttons.html';
 import datetime_test from './demo-files/datetime-fields-test.html';
 import { snackbarsDemo } from './demo-files/snackbars-demo.js';
 import { domBuilderDemo } from './demo-files/domBuilder-demo.js';
+import { modalPopupDemo } from './demo-files/modal-popup-demo.js';
 
 import chartsHTML  from './demo-files/charts/charts.html';
 import { chartsDemo } from './demo-files/charts/charts-demo.js';
@@ -14,6 +15,10 @@ export const routes = [
   {
     key: 'snackbars',
     callback: snackbarsDemo
+  },
+  {
+    key: 'modalPopup',
+    callback: modalPopupDemo
   },
   {
     key: 'buttons',

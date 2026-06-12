@@ -23,7 +23,7 @@ import { parseDomString } from './parseDomString.js';
  *     className: 'xxx' | ['class1', 'class2'], // anche `class`
  *     id: 'element-id',
  *     attrs: [attr_name, attr_value] | [[...], [...]] | {name: value},
- *     content: 'xxx' | 123 | function | Element,
+ *     content: 'xxx' | 123 | domBuilder Array | function | Element,
  *     condition: true | false,
  *     callback: el => ...,
  *     children: [...]
@@ -136,6 +136,9 @@ export function domBuilder(structureArray = [], parent, options = {}) {
         let content = '';
         if (typeof item.content === 'function') {
           content = item.content();
+
+        } else if (Array.isArray(item.content)) {
+          content = domBuilder(item.content);
 
         } else if (item.content != null) {
           content = String(item.content);

@@ -119,6 +119,7 @@ input[type='checkbox'] {
 
 /* da bs5 */
 /* versione con label a destra */
+/* TODO rivedere. sostituire float con flex? */
 .form-check {
   display: block;
   padding-left: 1.5em;
@@ -128,7 +129,7 @@ input[type='checkbox'] {
     float: left;
     display: inline-block;
     width: auto;
-    margin: 4px 0  0 -1.5em;
+    margin: 4px 0 0 -1.5em;
   }
 }
 

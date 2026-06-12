@@ -21,3 +21,4 @@
 * 1.2.0 (20 mag 2026) - upd css files names
 * 1.3.0 (22 mag 2026) - Charts (partial)
 * 1.4.0 (23 mag 2026) - Demo setup
+* 1.5.0 (12 giu 2026) - Modal-popup

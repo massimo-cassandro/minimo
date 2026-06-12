@@ -1,0 +1,105 @@
+/* TODO completare, aggiungere focus, vedere soluzione bootstrap
+
+
+.form-switch {
+  padding-left: $form-switch-padding-start;
+
+  .form-check-input {
+    --#{$prefix}form-switch-bg: #{escape-svg($form-switch-bg-image)};
+
+    width: $form-switch-width;
+    margin-left: $form-switch-padding-start * -1;
+    background-image: var(--#{$prefix}form-switch-bg);
+    background-position: left center;
+    @include border-radius($form-switch-border-radius, 0);
+    @include transition($form-switch-transition);
+
+    &:focus {
+      --#{$prefix}form-switch-bg: #{escape-svg($form-switch-focus-bg-image)};
+    }
+
+    &:checked {
+      background-position: $form-switch-checked-bg-position;
+
+      @if $enable-gradients {
+        --#{$prefix}form-switch-bg: #{escape-svg($form-switch-checked-bg-image)}, var(--#{$prefix}gradient);
+      } @else {
+        --#{$prefix}form-switch-bg: #{escape-svg($form-switch-checked-bg-image)};
+      }
+    }
+  }
+
+  &.form-check-reverse {
+    padding-right: $form-switch-padding-start;
+    padding-left: 0;
+
+    .form-check-input {
+      margin-right: $form-switch-padding-start * -1;
+      margin-left: 0;
+    }
+  }
+}
+
+
+*/
+
+/*
+<div class="switch">
+  <input type="checkbox">
+  <span class="switch-track"></span>
+  <label>Abilita notifiche</label>
+</div>
+*/
+
+.switch {
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.switch input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.switch-track {
+  position: relative;
+  width: 2.5em;
+  height: 1.5em;
+  background-color: var(--switch-background-color);
+  border-radius: 1.5em;
+  transition: background-color 0.2s;
+}
+
+.switch label {
+  margin-left: .5em;
+  user-select: none;
+}
+
+.switch-track::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 2em;
+  height: 2em;
+  background: var(--switch-cursor-background-color);
+  border-radius: 50%;
+  transition: translate 0.2s;
+}
+
+.switch input:checked + .switch-track {
+  background-color: var(--switch-checked-background-color);
+}
+
+.switch input:checked + .switch-track::after {
+  translate: 20px 0;
+}
+
+/* accessibilità */
+.switch input:focus-visible + .switch-track {
+  outline: 2px solid var(--switch-checked-background-color);
+  outline-offset: 2px;
+}

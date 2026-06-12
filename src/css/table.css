@@ -58,6 +58,10 @@
     line-height: var(--table-cell-line-height);
     vertical-align: top;
     text-align: start;
+
+    .valign-middle &, &.valign-middle {
+      vertical-align: middle;
+    }
   }
 
   &.table-bordered {

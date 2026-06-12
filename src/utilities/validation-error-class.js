@@ -1,6 +1,6 @@
 
 // uso
-// throw new ValidationError('Sono presenti cicli duplicati', campiErrore );
+// throw new ValidationError('Sono presenti valori duplicati', campiErrore );
 
 /*
 esempio:

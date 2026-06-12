@@ -190,6 +190,18 @@
   --link-focus-outline-color: var(--link-color);
   --link-focus-outline-width: .125rem;
   --link-visited-color: #ae0da3;
+  --modal-popup-backdrop-color: rgb(0 0 0 / .6);
+  --modal-popup-border-radius: var(--size-base);
+  --modal-popup-btn-close-size: 1.6rem;
+  --modal-popup-drop-shadow: 0 0 .75rem .125rem rgb(0 0 0 / .25);
+  --modal-popup-footer-background-color: #ddd;
+  --modal-popup-footer-color: var(--text-color);
+  --modal-popup-footer-font-size: var(--font-size-base);
+  --modal-popup-footer-padding: var(--size-xs);
+  --modal-popup-header-background-color: #ddd;
+  --modal-popup-header-color: var(--text-color);
+  --modal-popup-header-font-size: var(--font-size-xl);
+  --modal-popup-header-padding: var(--size-xs);
   --neutral-100: #666;
   --neutral-100-fg: #fff;
   --overlay-color: rgb(0 0 0 / .6);
@@ -273,6 +285,9 @@
   --status-warning-border-color: var(--status-warning-color);
   --status-warning-color: #fc0;
   --status-warning-fg: #4f2900;
+  --switch-background-color: var(--neutral-100);
+  --switch-checked-background-color: var(--primary-100);
+  --switch-cursor-background-color: var(--body-background-color);
   --table-body-border-width: .0625rem;
   --table-body-tr-alt-bg-color: #efefef;
   --table-body-tr-hover-bg-color: #cbcbcb;

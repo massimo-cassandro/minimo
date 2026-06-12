@@ -289,7 +289,8 @@ const config = {
     // =>> plugins: MiniCssExtractPlugin
     new MiniCssExtractPlugin({
       filename: '[name].[contenthash].css',
-      chunkFilename: '[id].[contenthash].css'
+      chunkFilename: '[id].[contenthash].css',
+      ignoreOrder: true
     }),
 
     // =>> plugins: HtmlWebpackPlugin (manifest)
