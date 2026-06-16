@@ -1,18 +1,14 @@
-const characters_to_escape = {
-  '&': '&amp;',
-  '"': '&quot;',
-  '\'': '&#039;',
-  '<': '&lt;',
-  '>': '&gt;'
+const ESCAPE_MAP = {
+  '&'  : '&amp;',
+  '"'  : '&quot;',
+  '\'' : '&#039;',
+  '<'  : '&lt;',
+  '>'  : '&gt;'
 };
-export function escapeHTML(str) {
-  const regexp = new RegExp(`[${Object.keys(characters_to_escape).join('')}]`, 'g');
-  return str?.replace(regexp, m => characters_to_escape[m])?? '';
-}
+const UNESCAPE_MAP = Object.fromEntries(Object.entries(ESCAPE_MAP).map(([k, v]) => [v, k]));
 
-export function unescapeHTML(str) {
-  const regexp = new RegExp(Object.values(characters_to_escape).join('|'), 'g'),
-    entities_to_unescape = Object.fromEntries(Object.entries(characters_to_escape).map(a => a.reverse()));
+const ESCAPE_RE = /[&"'<>]/g;
+const UNESCAPE_RE = /&amp;|&quot;|&#039;|&lt;|&gt;/g;
 
-  return str?.replace(regexp, m => entities_to_unescape[m] )?? '';
-}
+export const escapeHTML = str => str?.replace(ESCAPE_RE, m => ESCAPE_MAP[m]) ?? '';
+export const unescapeHTML = str => str?.replace(UNESCAPE_RE, m => UNESCAPE_MAP[m]) ?? '';

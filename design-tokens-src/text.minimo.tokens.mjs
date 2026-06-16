@@ -1,24 +1,4 @@
 export default {
-  layout: {
-    container: {
-      'max-width': {
-        $type: 'dimension',
-        $value: '80rem'
-      }
-    }
-  },
-  body: {
-    background: {
-      color: {
-        $type: 'color',
-        $value: '#fff'
-      }
-    },
-    text: {
-      $type: 'color',
-      $value: '{text.color}'
-    }
-  },
   accent: {
     color: {
       $value: '{accent.100}',

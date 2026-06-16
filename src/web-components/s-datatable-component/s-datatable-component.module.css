@@ -15,11 +15,12 @@
 .topArea {
   display: flex;
   flex-flow: row nowrap;
-  /* gap: 1rem; */
+  gap: 2rem;
   align-items: center;
   justify-content: flex-end;
   padding-block-end: var(--size-xs);
 
+  /* stylelint-disable-next-line selector-class-pattern */
   &:has(.info), &:has(:global(.datatable-top-slot)) {
     justify-content: space-between;
   }

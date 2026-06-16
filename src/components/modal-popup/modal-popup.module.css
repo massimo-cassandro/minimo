@@ -1,7 +1,9 @@
 /*
 NB:
-`--_modal-popup-width` and `--_modal-popup-height` are used with a fallback value
-but can be set with a desired value caso per caso
+`--modal-popup-width` and `--modal-popup-height` are used with a fallback value,
+but can be set to the desired value on a case-by-case basis.
+
+Same for min/max-width and min/max-height
 
 */
 
@@ -13,11 +15,11 @@ but can be set with a desired value caso per caso
   flex-direction: column;
 
   width: var(--_modal-popup-width, max-content);
-  min-width: 400px;
-  max-width: 98dvw;
+  min-width: var(--_modal-popup-min-width, 400px);
+  max-width: var(--_modal-popup-max-width, 98dvw);
   height: var(--_modal-popup-height, max-content);
-  min-height: 300px;
-  max-height: 90dvh;
+  min-height: var(--_modal-popup-min-height, 300px);
+  max-height: var(--_modal-popup-min-height, 90dvh);
   padding: 0;
   margin: auto;
   overflow: visible;

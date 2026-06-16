@@ -5,26 +5,6 @@
 // Re-generate with: node build-tokens.mjs --config <path/to/config>
 // -----------------------------------------------------------------------
 {
-  "layout": {
-    "container": {
-      "max-width": {
-        "$type": "dimension",
-        "$value": "80rem"
-      }
-    }
-  },
-  "body": {
-    "background": {
-      "color": {
-        "$type": "color",
-        "$value": "#fff"
-      }
-    },
-    "text": {
-      "$type": "color",
-      "$value": "{text.color}"
-    }
-  },
   "accent": {
     "color": {
       "$type": "color",
