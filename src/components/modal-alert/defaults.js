@@ -3,9 +3,10 @@ export const defaults = {
   // settings to be applied to all dialog types
   // can be reassigned on single types
   globals: {
+    extra_class: null,
     onOpen: null,
     onClose: null,
-    cssFile: null,    // css file to be automatically loaded
+    cssFile: null,    // css file to be automatically loaded // TODO remove
     animation: true,
     showMarks: true,
     callback: null,

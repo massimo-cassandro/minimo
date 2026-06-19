@@ -11,11 +11,11 @@ import * as styles from './modal-popup.module.css';
 
 let dialogEl, dialogContentEl;
 
-function closeDialog() {
-  dialogEl.classList.remove(styles.on);
+function closeDialog(el) {
+  el.classList.remove(styles.on);
 
-  dialogEl.addEventListener('transitionend', () => {
-    dialogEl.close();
+  el.addEventListener('transitionend', () => {
+    el.close();
   }, { once: true });
 }
 
@@ -165,39 +165,41 @@ export function modalPopup({
     }
   ], document.body);
 
+  // snapshot: dialogEl potrebbe essere sovrascritto da una seconda chiamata a modalPopup
+  const thisDialog = dialogEl;
 
   // listener sul pulsante di chiusura
-  dialogEl.querySelector(`.${styles.closeButton}`).addEventListener('click', () => {
-    closeDialog();
+  thisDialog.querySelector(`.${styles.closeButton}`).addEventListener('click', () => {
+    closeDialog(thisDialog);
   }, false);
 
   // // Esc e clic sul backdrop
-  // dialogEl.addEventListener('cancel', (e) => {
+  // thisDialog.addEventListener('cancel', (e) => {
   //   e.preventDefault();
-  //   closeDialog();
+  //   closeDialog(thisDialog);
   // }, false);
 
 
 
-  dialogEl.addEventListener('close', () => {
+  thisDialog.addEventListener('close', () => {
 
     document.body.classList.remove('overflow-hidden');
 
     if(closeCallback) {
-      closeCallback(dialogEl);
+      closeCallback(thisDialog);
     }
-    dialogEl.remove();
+    thisDialog.remove();
 
   }, false);
 
 
   document.body.classList.add('overflow-hidden');
-  dialogEl.showModal();
-  dialogEl.focus();
+  thisDialog.showModal();
+  thisDialog.focus();
 
-  dialogEl.classList.add(styles.on);
+  thisDialog.classList.add(styles.on);
 
 
-  return dialogEl;
+  return thisDialog;
 
 }

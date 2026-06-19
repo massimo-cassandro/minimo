@@ -4,6 +4,7 @@ import {defaults} from './defaults.js';
 // https://developer.mozilla.org/en-US/docs/Web/API/HTMLDialogElement
 
 // TODO rewrite as async
+// TODO rivedere completamente, riscrivere con domBuilder
 
 export default function (params, custom_defaults = {}, marks = default_marks) {
 
@@ -65,7 +66,7 @@ export default function (params, custom_defaults = {}, marks = default_marks) {
     const closedByAny = ['success', 'info'].indexOf(params.type) !== -1? ' closedBy="any"' : '';
 
     document.body.insertAdjacentHTML('beforeend',
-      `<dialog class="modal-alert modal-alert-${params.type}${params.animation? ' modal-alert-animated' : ''}"${closedByAny}>
+      `<dialog class="modal-alert modal-alert-${params.type}${params.animation? ' modal-alert-animated' : ''} ${params.extra_class??''}"${closedByAny}>
         <div class="malert-inner">
           ${params.showMarks? `<div class="malert-mark">${icon}</div>` : ''}
           <div class="malert-body">
