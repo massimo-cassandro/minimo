@@ -71,9 +71,10 @@ minimo/
 │       ├── helpers/                # cartesian-axis, chart-utils, core, create-svg-canvas, legenda, ...
 │       ├── node-helpers/           # rendering SVG lato server (richiede opentype)
 │       └── rating-display/         # grafico gauge (commentato in index, WIP)
-├── design-tokens/                  # token compilati (JSONC, W3C DTCG format)
-├── design-tokens-src/              # sorgenti token (.mjs e .jsonc)
-├── design-tokens-utilities/        # script Node.js per build token (Style Dictionary v5)
+├── design-tokens/
+│   ├── _src/                       # sorgenti token (.mjs e .jsonc)
+│   └── tokens/                     # token compilati (JSONC, W3C DTCG format) — generati da build-tokens
+├── design-tokens/utilities/        # script Node.js per build token (Style Dictionary v5)
 │   ├── build-tokens.mjs            # → CLI: buildTokens
 │   └── check-unresolved-custom-props.mjs  # → CLI: checkUnresolvedProps
 ├── webpack-setup/                  # configurazione webpack starter + script d'installazione
@@ -103,9 +104,9 @@ minimo/
 Dal `files` di `package.json`:
 - `./index.js`
 - `src/**/*.{js,mjs,css,svg,md}`
-- `design-tokens/**/*.{tokens.json,tokens.jsonc}`
-- `design-tokens-src/**/*.{tokens.json,tokens.jsonc,mjs,js,md}`
-- `design-tokens-utilities/**/*.{mjs,md}`
+- `design-tokens/tokens/**/*.{tokens.json,tokens.jsonc}`
+- `design-tokens/_src/**/*.{tokens.json,tokens.jsonc,mjs,js,md}`
+- `design-tokens/utilities/**/*.{mjs,md}`
 - `charts/**/*.{js,md}`
 
 **Nota:** la cartella `_wrk/` non viene pubblicata.
@@ -162,8 +163,8 @@ Ogni nuovo componente che introduce una dipendenza esterna deve seguire questa s
 ## CLI tools (bin)
 
 ```bash
-npx buildTokens --config ./tokens-config.mjs
-npx checkUnresolvedProps --config ./tokens-config.mjs
+npx buildTokens --config ./design-tokens/tokens-config.mjs
+npx checkUnresolvedProps --config ./design-tokens/tokens-config.mjs
 ```
 
 ---
@@ -238,18 +239,13 @@ TODO aperti su json-table ([_wrk/json-table/TODO.md](_wrk/json-table/TODO.md)):
 
 Traccia dei TODO/FIX sparsi nel codice, da risolvere alla prima occasione utile.
 
+### jsconfig.json / type checking
+
+- **TODO** — Aggiungere `"checkJs": true` al `jsconfig.json` del progetto per abilitare il type checking su tutti gli script JS
+- **TODO** — Verificare che tutti gli script siano validati correttamente e aggiungere i JSDoc mancanti dove necessario (parametri, tipi di ritorno, ecc.)
+
 ### package.json / root
 
-- **TODO** — Aggiungere blocco `exports` a `package.json`:
-  ```json
-  "exports": {
-    ".": "./index.js",
-    "./charts": "./charts/index.js",
-    "./css/*": "./src/css/*",
-    "./tokens/*": "./design-tokens/*"
-  }
-  ```
-  Vedere [TODO.md](TODO.md).
 - **TODO** — Aggiungere `blurhash` come peer dependency ([TODO.md](TODO.md)).
 
 ### CSS
@@ -307,8 +303,8 @@ Traccia dei TODO/FIX sparsi nel codice, da risolvere alla prima occasione utile.
 
 | File | Riga | Nota |
 |---|---|---|
-| [design-tokens-src/btn-color-themes.minimo.tokens.mjs](design-tokens-src/btn-color-themes.minimo.tokens.mjs#L1) | 1 | TODO: aggiungere temi neutral e accent |
-| [design-tokens-src/form.minimo.tokens.mjs](design-tokens-src/form.minimo.tokens.mjs#L292) | 292 | TODO: importazione automatica SVG (problemi con svgo) |
+| [design-tokens/_src/btn-color-themes.minimo.tokens.mjs](design-tokens/_src/btn-color-themes.minimo.tokens.mjs#L1) | 1 | TODO: aggiungere temi neutral e accent |
+| [design-tokens/_src/form.minimo.tokens.mjs](design-tokens/_src/form.minimo.tokens.mjs#L292) | 292 | TODO: importazione automatica SVG (problemi con svgo) |
 
 ### TODO dai file TODO.md dei componenti
 

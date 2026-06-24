@@ -1,20 +1,20 @@
 // path relativi a questo file
 
 const config = {
-  stylelintConfigPath: './stylelint.config.mjs',
-  buildPath: './src',
+  stylelintConfigPath: '../stylelint.config.mjs',
+  buildPath: '../src',
   destFile: 'custom-properties.css',
   source: [
-    './design-tokens-src/**/*.tokens.{mjs,jsonc}',
-    '!./design-tokens-src/_cfg/**',
+    './_src/**/*.tokens.mjs',
+    '!./_src/_cfg/**',
   ],
 
   penpotExpressions: 'resolve', // or 'calc' or 'keep'
   penpotFormat: 'jsonc',
-  penpotBuildPath: './design-tokens',
+  penpotBuildPath: './tokens',
   penpotDestFile: null,
 
-  dir_to_check: './src',
+  dir_to_check: '../src',
   exclude_pattern: [
     /^--_/,
   ]

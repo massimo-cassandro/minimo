@@ -8,3 +8,7 @@ export function classnames(...args) {
     return Boolean(x);
   }).join(' ');
 }
+
+export function classnamesNull(...args) {
+  return classnames(...args) || null;
+}

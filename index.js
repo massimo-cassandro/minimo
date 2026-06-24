@@ -1,6 +1,6 @@
 
 // utilities
-export { classnames } from './src/utilities/classnames.js';
+export { classnames, classnamesNull } from './src/utilities/classnames.js';
 export { domBuilder } from './src/utilities/dom-builder/dom-builder.js';
 export { enableSubmitBtns } from './src/utilities/enable-submit-btns.js';
 export { titleCase } from './src/utilities/title-case.js';

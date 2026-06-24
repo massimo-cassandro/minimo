@@ -1,11 +1,10 @@
 {
   "__help": "https://code.visualstudio.com/docs/languages/jsconfig",
   "compilerOptions": {
-    "target": "es2023",
-    "ignoreDeprecations": "6.0",
+    "target": "ES2023",
+    "module": "ESNext",
     "baseUrl": ".",
     "allowSyntheticDefaultImports": false,
-    "module": "ES6",
     "paths": {
       "@src/*": ["../src/*"],
       "@minimo/*": ["../src/*"],

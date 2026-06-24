@@ -1,0 +1,16 @@
+{
+  "__help": "https://code.visualstudio.com/docs/languages/jsconfig",
+  "compilerOptions": {
+    "checkJs": true,
+    "target": "ES2023",
+    "module": "ESNext",
+    "allowSyntheticDefaultImports": true
+  },
+  "include": [
+    "index.js",
+    "src/**/*.js",
+    "charts/**/*.js",
+    "design-tokens/utilities/**/*.mjs"
+  ],
+  "exclude": ["node_modules", "demo", "demo-build", "_wrk", "archived", "snippets-and-utilities"]
+}

@@ -7,7 +7,7 @@
 
 /* globals process */
 
-import path from 'path';
+import * as path from 'node:path';
 import { pathToFileURL } from 'url';
 
 // ---------------------------------------------------------------------------

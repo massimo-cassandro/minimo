@@ -45,25 +45,6 @@ export function polarToCartesianString(degrees_angle, cx, cy, circleRadius) {
 }
 
 
-// TODO unificare con classnames globale
-/**
- * Concatena i nomi delle classi filtrando i valori falsy.
- * @param {...any} args - I nomi delle classi o condizioni.
- * @returns {string} Una stringa di nomi di classi separati da spazio.
- */
-export function classnames(...args) {
-  return args.filter(Boolean).join(' ');
-}
-
-/**
- * Concatena i nomi delle classi filtrando i valori falsy; restituisce null se il risultato è una stringa vuota.
- * @param {...any} args - I nomi delle classi o condizioni.
- * @returns {string|null} Una stringa di nomi di classi o null.
- */
-export function classnamesNull(...args) {
-  return args.filter(Boolean).join(' ') || null;
-}
-
 /**
  * Calcola le coordinate per un elemento `path` di tipo arco (arc).
  * Lo `start_angle` è il punto di inizio e `percentage` è la lunghezza percentuale dell'arco rispetto a `max_angle`.

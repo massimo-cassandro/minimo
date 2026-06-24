@@ -13,7 +13,7 @@
 //   build-tokens-src/platforms.mjs      <- builds the platforms object (css + optional penpot)
 
 import StyleDictionary from 'style-dictionary';
-import path from 'path';
+import * as path from 'node:path';
 import { styleText } from 'node:util';
 import { homedir } from 'os';
 import stylelint from 'stylelint';

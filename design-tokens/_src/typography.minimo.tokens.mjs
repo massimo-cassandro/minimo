@@ -1,0 +1,123 @@
+export default {
+  font: {
+    family: {
+      $value: 'sans-serif',
+      $type: 'fontFamily'
+    },
+    'family-mono': {
+      $value: "'Monaspace Neon Var', 'Monaspace Neon', 'Aptos Mono', 'Roboto Mono', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'Liberation Mono', 'Andale Mono', 'Courier New', monospace",
+      $type: 'fontFamily'
+    },
+
+    size: {
+      base: {
+        $value: 'clamp(.9rem, .6538rem + .3846vw, 1rem)',
+        $type: 'string'
+      },
+      xxs: {
+        $value: 'clamp(.6rem, .3538rem + .3846vw, .7rem)',
+        $type: 'string'
+      },
+      xs: {
+        $value: 'clamp(.7rem, .4538rem + .3846vw, .8rem)',
+        $type: 'string'
+      },
+      sm: {
+        $value: 'clamp(.8rem, .5538rem + .3846vw, .9rem)',
+        $type: 'string'
+      },
+      // lead: {
+      //   $value: 'clamp(1rem, 0.6923rem + 0.4808vw, 1.125rem)',
+      //   $type: 'string'
+      // },
+      md: {
+        $value: 'clamp(1.05rem, .6808rem + .5769vw, 1.2rem)',
+        $type: 'string'
+      },
+      lg: {
+        $value: 'clamp(1.2rem, .7077rem + .7692vw, 1.4rem)',
+        $type: 'string'
+      },
+      xl: {
+        $value: 'clamp(1.6rem, 1.1077rem + .7692vw, 1.8rem)',
+        $type: 'string'
+      },
+      '2xl': {
+        $value: 'clamp(2rem, .7692rem + 1.9231vw, 2.5rem)',
+        $type: 'string'
+      },
+      '3xl': {
+        $value: 'clamp(2.2rem, .2308rem + 3.0769vw, 3rem)',
+        $type: 'string'
+      }
+    },
+
+    style: {
+      base: {
+        $value: 'normal',
+        $type: 'string'
+      }
+    },
+
+    weight: {
+      xxlight: {
+        $value: '100',
+        $type: 'string',
+        $description: ''
+      },
+      xlight: {
+        $value: '200',
+        $type: 'string',
+        $description: ''
+      },
+      light: {
+        $value: '300',
+        $type: 'string',
+        $description: ''
+      },
+      regular: {
+        $value: '400',
+        $type: 'string',
+        $description: ''
+      },
+      medium: {
+        $value: '500',
+        $type: 'string',
+        $description: ''
+      },
+      semibold: {
+        $value: '600',
+        $type: 'string',
+        $description: ''
+      },
+      bold: {
+        $value: '700',
+        $type: 'string',
+        $description: ''
+      },
+      xbold: {
+        $value: '900',
+        $type: 'string',
+        $description: ''
+      }
+    }
+  }, // end font
+
+  // Rhythm in Web Typography | Better Web Type <https://betterwebtype.com/articles/2018/10/15/rhythm-in-web-typography/>
+  // The good line-height <https://www.thegoodlineheight.com/>
+
+  'line-height': {
+    base: {
+      $value: 1.5,
+      $type: 'number'
+    },
+    sm: {
+      $value: 1.4,
+      $type: 'number'
+    },
+    xs: {
+      $value: 1.25,
+      $type: 'number'
+    }
+  },
+};

@@ -1,0 +1,8 @@
+export default {
+  overlay: {
+    color: {
+      $value: 'rgb(0 0 0 / .6)',
+      $type: 'color'
+    }
+  }
+};

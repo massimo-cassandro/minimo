@@ -11,8 +11,8 @@
 
 /* globals process */
 
-import path from 'path';
-import fs from 'node:fs';
+import * as path from 'node:path';
+import * as fs from 'node:fs';
 import { /* fileURLToPath,  */pathToFileURL } from 'url';
 // import { dirname } from 'path';
 import { glob } from 'node:fs/promises';

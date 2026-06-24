@@ -17,7 +17,7 @@ vendor
 node_modules
 _private
 public/_dev
-unresolved-props.md
+design-tokens/unresolved-props.md
 
 **/TODO*
 !_wrk/**/TODO*

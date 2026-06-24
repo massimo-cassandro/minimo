@@ -1,0 +1,18 @@
+export default {
+  spinner: {
+    size: {
+      $value: '{size.lg}',
+      $type: 'dimension'
+    },
+    color: {
+      $value: '{primary.100}',
+      $type: 'color'
+    },
+    stroke: {
+      width: {
+        $value: '2px',
+        $type: 'dimension'
+      }
+    },
+  }
+};
