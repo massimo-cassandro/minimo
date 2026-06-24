@@ -1,8 +1,13 @@
 {
   "name": "@massimo-cassandro/minimo",
-  "version": "1.5.9",
+  "version": "1.5.12",
   "description": "Light css framework & utilities",
   "type": "module",
+  "main": "./index.js",
+  "exports": {
+    ".": "./index.js",
+    "./*": "./*"
+  },
   "homepage": "https://github.com/massimo-cassandro/minimo#readme",
   "bugs": {
     "url": "https://github.com/massimo-cassandro/minimo/issues"
