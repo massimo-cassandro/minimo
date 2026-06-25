@@ -23,3 +23,4 @@
 * 1.4.0 (23 mag 2026) - Demo setup
 * 1.5.0 (12 giu 2026) - Modal-popup
 * 1.6.0 (24 giu 2026) - design tokens paths update
+* 1.7.0 (25 giu 2026) - Added utility functions from older js-utilities

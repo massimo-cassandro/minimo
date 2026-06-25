@@ -39,7 +39,10 @@ import {defaults} from './defaults.js';
  * @param {Record<string, string>} [marks=default_marks] - SVG icon map keyed by dialog type.
  * @returns {void}
  */
-export default function (params, custom_defaults = {}, marks = default_marks) {
+
+//TODO refactoring
+
+export function modalAlert(params, custom_defaults = {}, marks = default_marks) {
 
   try {
 
