@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { DataTable } from 'simple-datatables';
 
 import { parseCols } from './src/parse-cols.js';

@@ -1,6 +1,13 @@
-// import './form.css'; //incorporato nel css principale
+// import './form.css'; // included in the main CSS entry point
 import { enableSubmitBtns } from '../../index.js';
 
+/**
+ * Wires up submit validation and button-disabling behaviour on all forms.
+ * - Adds `was-validated` class on submit (unless `data-no-was-validated` is present).
+ * - Clears `.is-invalid` / `.is-valid` classes before each submission attempt.
+ * - Disables submit buttons on valid submission (unless `data-no-disabling` is present).
+ * @returns {void}
+ */
 export function formResetSubmit(){
 
   document.querySelectorAll('form').forEach( form => {
@@ -26,13 +33,14 @@ export function formResetSubmit(){
         enableSubmitBtns();
 
       } else {
-        if(!form.hasAttribute('data-no-disabling') && !form.hasAttribute('data-disable-submit')) { /* 'data-disable-submit' per compatibilitò con verioni precedenti */
+        // 'data-disable-submit' kept for backwards compatibility
+        if(!form.hasAttribute('data-no-disabling') && !form.hasAttribute('data-disable-submit')) {
           form.querySelectorAll('[type="submit"]').forEach(btn => {
-            btn.disabled = true;
+            const button = /** @type {HTMLButtonElement} */ (btn);
+            button.disabled = true;
           });
         }
       }
     }, false);
   });
 }
-

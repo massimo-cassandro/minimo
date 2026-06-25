@@ -1,26 +1,29 @@
 
+/** @typedef {import('./dom-builder.js').DomBuilderItem} DomBuilderItem */
+
 /**
- * Esegue le operazione di base del domBuilder: assegnazione classi, id ecc...
+ * Applies basic domBuilder configuration to an element: classes, id, and attributes.
+ * @param {HTMLElement} element - The element to configure.
+ * @param {DomBuilderItem} domBuilderItem - The domBuilder configuration object.
+ * @returns {HTMLElement}
  */
 export function domBuilderBasicSetup (element, domBuilderItem) {
 
-  // classi
-  // possibili denominazioni: class o className
-  // se presente className, class viene ignorato
+  // class aliases: accept both `class` and `className`; `className` takes precedence
   if (domBuilderItem.class && !domBuilderItem.className) {
     domBuilderItem.className = domBuilderItem.class;
   }
 
-  // se item.attrs è un array singolo viene trattato come singolo elemento
+  // normalize attrs: a single flat array is treated as a single [name, value] pair
   if (domBuilderItem.attrs && Array.isArray(domBuilderItem.attrs) && !Array.isArray(domBuilderItem.attrs[0])) {
     domBuilderItem.attrs = [ domBuilderItem.attrs ];
 
-  // item.attrs può essere un oggetto del tipo {attr_name: attr_value}
+  // attrs can also be a plain object: {attr_name: attr_value}
   } else if (typeof domBuilderItem.attrs === 'object' && !Array.isArray(domBuilderItem.attrs) && domBuilderItem.attrs !== null) {
     domBuilderItem.attrs = Object.entries(domBuilderItem.attrs);
   }
 
-  // gli attributi booleani non vengono aggiunti se il loro valore è false
+  // boolean attributes are omitted when their value is explicitly false
   const boolAttrs = [
     'allowfullscreen',
     'async',
@@ -54,13 +57,13 @@ export function domBuilderBasicSetup (element, domBuilderItem) {
 
 
 
-  (domBuilderItem.attrs ?? []).forEach(attr => {
+  (/** @type {[string, unknown][]} */ (domBuilderItem.attrs ?? [])).forEach(attr => {
     if (attr[1] != null && !(boolAttrs.includes(attr[0]) && attr[1]=== false)) {
       element.setAttribute(attr[0], String(attr[1]));
     }
   });
 
-  // assegnazioen classi e id (dopo attrs in modo che le proprietà a livello di oggetto prevalgano)
+  // assign classes and id after attrs so object-level properties take precedence
   if(domBuilderItem.className) {
     element.className = Array.isArray(domBuilderItem.className)
       ? domBuilderItem.className.filter(Boolean).join(' ')

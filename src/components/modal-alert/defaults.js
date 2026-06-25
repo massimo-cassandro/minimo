@@ -1,7 +1,10 @@
+/**
+ * Default configuration for all modal-alert dialog types.
+ * Type-specific blocks can override any `globals` setting.
+ */
 export const defaults = {
 
-  // settings to be applied to all dialog types
-  // can be reassigned on single types
+  // settings applied to all dialog types; can be overridden per type
   globals: {
     extra_class: null,
     onOpen: null,
@@ -44,7 +47,7 @@ export const defaults = {
   },
   confirm: {
     title: 'Confermi?',
-    use_warning_icon: false, // se true usa l'icona warning
+    use_warning_icon: false, // when true, uses the warning icon instead of the confirm icon
     ok_btn_text: 'OK',
     cancel_btn_text: 'Annulla',
     cancel_focus: true, // false to give focus to the ok button

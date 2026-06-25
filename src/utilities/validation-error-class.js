@@ -1,9 +1,8 @@
-
-// uso
-// throw new ValidationError('Sono presenti valori duplicati', campiErrore );
+// usage:
+// throw new ValidationError('Duplicate values found', errorFields);
 
 /*
-esempio:
+example:
 
 const form = document.getElementById('form-__xxxx___');
 form.addEventListener('submit', e => {
@@ -13,7 +12,7 @@ form.addEventListener('submit', e => {
   form.classList.add('was-validated');
   try {
     if( ... ) {
-      throw new ValidationError('__messaggio__', [campiErrore, ...] );
+      throw new ValidationError('__message__', [errorFields, ...] );
     }
   } catch( error ) {
     e.preventDefault();
@@ -35,10 +34,18 @@ form.addEventListener('submit', e => {
 });
 */
 
+/**
+ * Custom error class for form validation failures.
+ * Extends the native Error with an array of invalid form fields.
+ */
 export class ValidationError extends Error {
+  /**
+   * @param {string} message - Error message.
+   * @param {Element[]} fields - Array of invalid form field elements.
+   */
   constructor(message, fields) {
-    super(message); // Passa il messaggio alla classe Error originale
+    super(message);
     this.name = 'ValidationError';
-    this.fields = fields; // Parametro custom
+    this.fields = fields;
   }
 }

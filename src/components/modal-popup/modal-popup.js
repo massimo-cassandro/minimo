@@ -7,10 +7,17 @@ import * as styles from './modal-popup.module.css';
 // https://developer.mozilla.org/en-US/docs/Web/API/HTMLDialogElement
 
 
-// TODO testare la modalità iframe
+// TODO test iframe mode
 
-let dialogEl, dialogContentEl;
+/** @type {HTMLDialogElement | undefined} */
+let dialogEl;
+/** @type {HTMLElement | undefined} */
+let dialogContentEl;
 
+/**
+ * @param {HTMLDialogElement} el
+ * @returns {void}
+ */
 function closeDialog(el) {
   el.classList.remove(styles.on);
 
@@ -21,43 +28,55 @@ function closeDialog(el) {
 
 /**
  * modalPopup
- * Mostra un popup con il contenuto indicato
- * il contentuo può essere in forma di:
- *  - array domBuilder oppure plain text oppure HTML (parametro `content`)
- *  - contenuto caricato via Ajax  (parametri `ajaxUrl` e `ajaxCallback`)
- *  - iframe (parametro `iframeUrl`)
+ * Opens a popup dialog with the given content.
  *
- * in presenza di più impostazioni in conflitto, viene scelta la prima opzione utile
- * nell'ordine di priorità riportato nella lista precedente.
+ * Content can be provided as:
+ *  - a domBuilder array, plain text, or HTML (via `content`)
+ *  - content loaded via Ajax (via `ajaxUrl` and `ajaxCallback`)
+ *  - an iframe (via `iframeUrl`)
+ *
+ * When multiple options conflict, the first applicable one in the list above takes precedence.
+ *
+ * @param {Object} params
+ * @param {string | null} [params.dialogExtraClassName=null] - Extra class added to the dialog element.
+ * @param {string | null} [params.contentExtraClassName=null] - Extra class added to the content wrapper.
+ * @param {string | null} [params.iframeUrl=null] - URL to load in an iframe.
+ * @param {string | any[] | null} [params.content=null] - Plain text, HTML, or a domBuilder array.
+ * @param {string | null} [params.ajaxUrl=null] - URL for Ajax content loading.
+ * @param {((data: *, el: Element) => void) | null} [params.ajaxCallback=null] - Called with the Ajax response and the content element.
+ * @param {((el: HTMLDialogElement) => void) | null} [params.closeCallback=null] - Called with the dialog element just before it is removed.
+ * @param {boolean} [params.addScrollbarPadding=false] - Adds right padding to compensate for the scrollbar.
+ * @param {string | null} [params.headerContent=null] - Header content: plain text or HTML.
+ * @param {string | null} [params.footerContent=null] - Footer content: plain text or HTML.
+ * @returns {HTMLDialogElement} The dialog element.
  */
-
 export function modalPopup({
 
   /** dialog extra class */
   dialogExtraClassName = null,
 
-  /** extra classname added to  dialogInner */
+  /** extra classname added to dialogInner */
   contentExtraClassName = null,
 
   /** iframe url */
   iframeUrl = null,
 
-  /** content: plain text, html or  domBuilder array */
+  /** content: plain text, html or domBuilder array */
   content = null,
 
-  /** url ajax e relatuva funzione di callback.
-   * Quest'ultima viene invocata con argomenti i dati restituiti dalla chiamata ajax
-   * e con l''elemento contenitore (`ajaxCallback(data, dialogContentEl)`)
+  /** Ajax url and callback.
+   * The callback is invoked with the response data and the content container element
+   * (`ajaxCallback(data, dialogContentEl)`)
   */
   ajaxUrl = null,
   ajaxCallback = null,
 
-  /** eventuale callback da invocare alla chiusra del dialog
-   * Viene invocato con il le'elento dialog (`closeCallback(dialogEl)`)
-   * NB: `dialogEl` viene eliminato subito dopo
+  /** optional callback invoked when the dialog closes;
+   * receives the dialog element (`closeCallback(dialogEl)`)
+   * NB: `dialogEl` is removed immediately after
    */
   closeCallback = null,
-  addScrollbarPadding = false, // aggiunge un padding extra a destra per la barra di scorrimento
+  addScrollbarPadding = false, // adds extra right padding to compensate for the scrollbar
 
   /** header content: plain text or HTML */
   headerContent = null,
@@ -86,6 +105,9 @@ export function modalPopup({
     mode = 'iframe';
   }
 
+  // capture for use in the ajax callback closure (ajaxUrl is non-null when mode === 'ajax')
+  const safeAjaxUrl = /** @type {string} */ (ajaxUrl);
+
   domBuilder([
     {
       tag: 'dialog',
@@ -93,7 +115,7 @@ export function modalPopup({
       attrs: {
         'closedby': 'any'
       },
-      callback: el => dialogEl = el,
+      callback: el => { dialogEl = /** @type {HTMLDialogElement} */ (el); },
       children: [
         {
           tag: 'button',
@@ -121,7 +143,7 @@ export function modalPopup({
                   : null,
 
               children: [
-                ...(mode === 'domBuilder'? content : []),
+                ...(mode === 'domBuilder'? /** @type {any[]} */ (content) : []),
                 {
                   condition: mode === 'iframe',
                   className: styles.iframe,
@@ -138,15 +160,15 @@ export function modalPopup({
                   try {
 
                     (async () => {
-                      const response = await fetch(ajaxUrl),
+                      const response = await fetch(safeAjaxUrl),
                         data = await response.json();
                       el.innerHTML = '';
-                      ajaxCallback(data, dialogContentEl);
+                      ajaxCallback?.(data, dialogContentEl);
                     })();
 
                   } catch(err) {
                     /* eslint-disable no-console */
-                    console.error(ajaxUrl);
+                    console.error(safeAjaxUrl);
                     console.error(err);
                     /* eslint-enable no-console */
                   }
@@ -165,15 +187,15 @@ export function modalPopup({
     }
   ], document.body);
 
-  // snapshot: dialogEl potrebbe essere sovrascritto da una seconda chiamata a modalPopup
-  const thisDialog = dialogEl;
+  // snapshot: dialogEl could be overwritten by a subsequent modalPopup call
+  const thisDialog = /** @type {HTMLDialogElement} */ (dialogEl);
 
-  // listener sul pulsante di chiusura
-  thisDialog.querySelector(`.${styles.closeButton}`).addEventListener('click', () => {
+  // close button listener
+  thisDialog.querySelector(`.${styles.closeButton}`)?.addEventListener('click', () => {
     closeDialog(thisDialog);
   }, false);
 
-  // // Esc e clic sul backdrop
+  // // Esc and backdrop click
   // thisDialog.addEventListener('cancel', (e) => {
   //   e.preventDefault();
   //   closeDialog(thisDialog);

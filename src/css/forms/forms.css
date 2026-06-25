@@ -148,6 +148,10 @@ input::-webkit-calendar-picker-trigger-icon { /* solo in chromium, non in safari
 textarea.form-control {
   flex: 1;
   min-height: calc(3.5lh + var(--form-control-padding-block) * 2);
+
+  &.autosize {
+    field-sizing: content;
+  }
 }
 
 

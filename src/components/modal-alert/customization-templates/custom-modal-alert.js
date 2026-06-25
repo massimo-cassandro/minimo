@@ -80,6 +80,10 @@ const marks = {
   confirm: confirmIcon
 };
 
+/**
+ * @param {Record<string, *>} params
+ * @returns {void}
+ */
 export function mAlert(params) {
   modalAlert(params, custom_defaults, marks);
 }

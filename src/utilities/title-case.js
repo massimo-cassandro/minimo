@@ -1,4 +1,8 @@
-// imposta un testo in cui ogni parola è minuscola tranne la prima lettera
+/**
+ * Converts a string to title case (first letter of each word uppercase, rest lowercase).
+ * @param {string | null | undefined} str
+ * @returns {string | null | undefined}
+ */
 export function titleCase(str) {
 
   if(str) {
@@ -11,4 +15,4 @@ export function titleCase(str) {
   }
 
   return str;
-} // end title_case
+}

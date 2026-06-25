@@ -1,4 +1,25 @@
 
+/**
+ * @typedef {Object} UnsplashPhoto
+ * @property {string} id
+ * @property {string} color
+ * @property {number} width
+ * @property {number} height
+ * @property {string} alt_description
+ * @property {string} date
+ * @property {string} base_url
+ * @property {string} unsplash_url
+ * @property {string} author
+ * @property {string} author_profile
+ * @property {string} blur_hash
+ * @property {string} image_description
+ */
+
+/**
+ * Fetches and normalises Unsplash photo data from the given URL.
+ * @param {{ unsplash_data_url: string | null }} settings
+ * @returns {Promise<UnsplashPhoto | undefined>}
+ */
 export async function fetchUnsplashData(settings) {
 
   const default_settings = {
@@ -13,11 +34,13 @@ export async function fetchUnsplashData(settings) {
       throw new Error( 'Unsplash data url must be defined' );
     }
 
+    const url = settings.unsplash_data_url; // const preserves narrowing inside the IIFE closure
+
     const imgData = await (async () => {
-      const response = await fetch(settings.unsplash_data_url);
+      const response = await fetch(url);
       if (!response.ok) {
         /* eslint-disable no-console */
-        console.error('Ajax error on: ' + settings.unsplash_data_url);
+        console.error('Ajax error on: ' + url);
         console.error(response);
         /* eslint-enable no-console */
         throw new Error( `Loading error: ${response.status}` );

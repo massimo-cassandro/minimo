@@ -4,28 +4,59 @@ import {defaults} from './defaults.js';
 // https://developer.mozilla.org/en-US/docs/Web/API/HTMLDialogElement
 
 // TODO rewrite as async
-// TODO rivedere completamente, riscrivere con domBuilder
+// TODO refactor entirely, rewrite using domBuilder
 
+/**
+ * @typedef {Object} ModalAlertParams
+ * @property {string} type - Dialog type: `success`, `error`, `warning`, `info`, or `confirm`.
+ * @property {string | null} [extra_class]
+ * @property {(() => void) | null} [onOpen]
+ * @property {(() => void) | null} [onClose]
+ * @property {string | null} [cssFile]
+ * @property {boolean} [animation]
+ * @property {boolean} [showMarks]
+ * @property {((arg?: *) => void) | null} [callback]
+ * @property {number | null} [timer]
+ * @property {string | null} [mes]
+ * @property {string | null} [heading_class]
+ * @property {string | null} [text_class]
+ * @property {string | null} [extra_btn]
+ * @property {string | null} [extra_btn_selector]
+ * @property {boolean} [extra_btn_focus]
+ * @property {string | null} [title]
+ * @property {string} [ok_btn_text]
+ * @property {string} [ok_btn_class]
+ * @property {string} [cancel_btn_text]
+ * @property {string} [cancel_btn_class]
+ * @property {boolean} [cancel_focus]
+ * @property {boolean} [use_warning_icon]
+ */
+
+/**
+ * Renders and opens a modal alert dialog.
+ * @param {ModalAlertParams} params - Dialog parameters (merged with defaults by type).
+ * @param {Record<string, any>} [custom_defaults={}] - Per-project overrides for the default settings.
+ * @param {Record<string, string>} [marks=default_marks] - SVG icon map keyed by dialog type.
+ * @returns {void}
+ */
 export default function (params, custom_defaults = {}, marks = default_marks) {
 
   try {
 
     // garbage collection
-    let dialog = document.querySelector('.modal-alert');
-    if(dialog) {
-      dialog.remove();
-    }
+    document.querySelector('.modal-alert')?.remove();
 
+    const typedDefaults = /** @type {Record<string, any>} */ (defaults);
 
-    params = {
-      ...(defaults.globals?? {}),
-      ...(custom_defaults.globals?? {}),
-      ...(defaults[params.type]?? {}),
-      ...(custom_defaults[params.type]?? {}),
+    params = /** @type {ModalAlertParams} */ ({
+      ...(typedDefaults.globals ?? {}),
+      ...(custom_defaults.globals ?? {}),
+      ...(typedDefaults[params.type] ?? {}),
+      ...(custom_defaults[params.type] ?? {}),
       ...params
-    };
+    });
 
-    // per compatibilità
+    // backwards compatibility: 'danger' is an alias for 'error'
     if(params.type === 'danger') {
       params.type = 'error';
     }
@@ -53,7 +84,7 @@ export default function (params, custom_defaults = {}, marks = default_marks) {
       );
     }
 
-    // icona warning opzionale per confirm
+    // confirm type can optionally use the warning icon instead of the confirm icon
     let icon = marks[params.type];
     if(params.type === 'confirm' && params.use_warning_icon) {
       icon = marks.warning;
@@ -88,14 +119,16 @@ export default function (params, custom_defaults = {}, marks = default_marks) {
       </dialog>`
     );
 
-    dialog = document.querySelector('.modal-alert');
+    const dialog = /** @type {HTMLDialogElement} */ (document.querySelector('.modal-alert'));
 
     dialog.showModal();
 
-    // btn focus
-    const ok_btn = dialog.querySelector('.malert-ok'),
-      cancel_btn = dialog.querySelector('.malert-cancel'),
-      extra_btn = (params.extra_btn && params.extra_btn_selector)? dialog.querySelector(params.extra_btn_selector) : null;
+    // button focus
+    const ok_btn = /** @type {HTMLElement | null} */ (dialog.querySelector('.malert-ok')),
+      cancel_btn = /** @type {HTMLElement | null} */ (dialog.querySelector('.malert-cancel')),
+      extra_btn = /** @type {HTMLElement | null} */ (
+        (params.extra_btn && params.extra_btn_selector)? dialog.querySelector(params.extra_btn_selector) : null
+      );
 
     if(extra_btn && params.extra_btn_focus) {
       extra_btn.focus();
@@ -111,9 +144,14 @@ export default function (params, custom_defaults = {}, marks = default_marks) {
       params.onOpen();
     }
 
+    /** @type {number | undefined} */
     let timeoutID;
 
-    const dialogDismiss = (btn) => {
+    /**
+     * @param {HTMLElement | null} [btn]
+     * @returns {void}
+     */
+    const dialogDismiss = (btn = null) => {
       dialog.remove();
 
       if(params.onClose && typeof params.onClose === 'function') {

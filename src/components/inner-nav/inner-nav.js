@@ -1,4 +1,4 @@
-// navigazione scheda / elenco
+// tab / list navigation — copies the primary nav markup into all `.inner-nav` containers
 /*
 <p class="inner-nav-main">...</p>
 ...
@@ -7,6 +7,10 @@
 
 import './inner-nav.css';
 
+/**
+ * Copies the inner HTML of `.inner-nav-main` into every `.inner-nav` element on the page.
+ * @returns {void}
+ */
 export function innerNav(){
 
   const nav_primary = document.querySelector('.inner-nav-main');

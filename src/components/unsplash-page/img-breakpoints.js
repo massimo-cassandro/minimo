@@ -1,3 +1,14 @@
+/**
+ * @typedef {Object} Breakpoint
+ * @property {string} name - Breakpoint identifier.
+ * @property {string} mq - Media query string.
+ * @property {number} w - Image width in pixels.
+ * @property {number} h - Image height in pixels.
+ * @property {boolean} dpr2 - Whether to include a 2× DPR srcset entry.
+ * @property {string} [ar] - Aspect ratio (e.g. '16/9').
+ */
+
+/** @type {Breakpoint[]} */
 export const breakpoints = [
   {
     name: 'xxl',

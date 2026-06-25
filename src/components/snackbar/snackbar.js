@@ -14,9 +14,19 @@ References
 */
 
 // TODO snackbar action
-// TODO gestione snackbar multiple (NO stacking)
+// TODO handle multiple simultaneous snackbars (no stacking)
 
-
+/**
+ * Displays a snackbar / toast notification using the Popover API.
+ * @param {string} message - The message to display.
+ * @param {Object} [options={}]
+ * @param {string | null} [options.status=null] - Status variant: `danger`, `warning`, `info`, or `success`.
+ * @param {number | false | null} [options.duration=4000] - Auto-close delay in ms; `false` or `null` disables auto-close.
+ * @param {boolean} [options.close_btn=true] - Whether to show the close button.
+ * @param {Function | null} [options.action=null] - Action callback.
+ * @param {string | null} [options.action_text=null] - Label for the action button.
+ * @returns {{ close: function(): void }}
+ */
 export function snackbar(message, options = {}){
 
   options = {
@@ -31,20 +41,24 @@ export function snackbar(message, options = {}){
     ...options
   };
 
-  let _popover, _timeoutID, _isRemoving = false;
+  /** @type {HTMLElement | null} */
+  let _popover = null;
+  /** @type {ReturnType<typeof setTimeout> | undefined} */
+  let _timeoutID;
+  let _isRemoving = false;
 
   const removePopover = () => {
     if (_isRemoving || !_popover?.matches(':popover-open')) return;
-    _isRemoving = true; // evita sovrapposizioni nel caso in cui removePopover sia chiamato più volte durante l'animazione di chiusura
+    _isRemoving = true; // prevents double-removal if called multiple times during the close animation
 
     if (_timeoutID) clearTimeout(_timeoutID);
 
-    _popover.classList.add(styles.isHiding);
+    _popover?.classList.add(styles.isHiding);
 
-    _popover.addEventListener('animationend', () => {
-      _popover.hidePopover();
-      _popover.remove();
-    }, { once: true }); // `once` già evita duplicati sul listener, ma il flag protegge prima
+    _popover?.addEventListener('animationend', () => {
+      _popover?.hidePopover();
+      _popover?.remove();
+    }, { once: true }); // 'once' prevents duplicate listeners; the flag guards against calls before animation ends
   };
 
   _popover = domBuilder([
@@ -52,7 +66,7 @@ export function snackbar(message, options = {}){
       className: classnames(styles.snackbarOuter, options.status? styles[`status-${options.status}`] : null),
       attrs: {
         popover: 'manual',
-        role: (options.action || ['danger','warning'].includes(options.status)) ? 'alert' : 'status'
+        role: (options.action || (options.status != null && ['danger','warning'].includes(options.status))) ? 'alert' : 'status'
       },
       children: [
         {
@@ -85,16 +99,17 @@ export function snackbar(message, options = {}){
     }
   ], document.body);
 
-  _popover.showPopover();
+  _popover?.showPopover();
 
 
   if(options.duration) {
-    _timeoutID = setTimeout(removePopover, options.duration);
+    const duration = options.duration; // const preserves narrowing inside closures
+    _timeoutID = setTimeout(removePopover, duration);
 
-    // mette in pausa il timeout sull'hover
-    _popover.addEventListener('mouseenter', () => clearTimeout(_timeoutID));
-    _popover.addEventListener('mouseleave', () => {
-      _timeoutID = setTimeout(removePopover, options.duration);
+    // pause the auto-close timeout on hover
+    _popover?.addEventListener('mouseenter', () => clearTimeout(_timeoutID));
+    _popover?.addEventListener('mouseleave', () => {
+      _timeoutID = setTimeout(removePopover, duration);
     });
 
   }

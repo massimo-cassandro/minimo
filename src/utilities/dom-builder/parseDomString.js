@@ -1,48 +1,47 @@
 /**
- * Analizza una stringa per estrarre il nome del tag, l'ID, le classi e gli attributi.
+ * Parses a string to extract tag name, ID, classes, and attributes.
  *
- * * Il formato della stringa atteso è:
+ * Expected string format:
  *
- * `tag#id.classe1.classe2.classeN(attributo1: valore1, attributo2=valore2) Lorem ipsum`
+ * `tag#id.class1.class2.classN(attr1: val1, attr2=val2) text content`
  *
- * In cui:
- * * `tag` è il nome dell'elemento, se non specificato si assume che sia un `div`
- * * `id` è l'id, facoltativo, da assegnare all'elemento, deve essere preeceduto da `#` e deve essere posizionato subito dopo il tag
- * * `classe1, classe2...` sono le classi, facoltative, devono essere precedute da `.`
- * * `(...)` è il blocco degli attributi, facoltativo. Oltre che dalle parentesi tonde, questa parte può essere delimitata dalle quadre e dalle graffe.
- *   Ogni coppia _nome-valore_ va separata con `:` o `=`. Se presente solo il nome, si assume che il valore sia `true`.
- * * `Lorem ipsum` indica un eventuale contenuto testuale, separato dal blocco precedente da uno spazio
+ * Where:
+ * * `tag` is the element name; defaults to `div` if omitted
+ * * `#id` is the optional element id; must immediately follow the tag
+ * * `.class1, .class2...` are optional CSS classes, each preceded by `.`
+ * * `(...)` is the optional attribute block; can also use `[...]` or `{...}`.
+ *   Each name–value pair is separated by `:` or `=`. A bare name (no value) defaults to `true`.
+ * * Text content follows after a space
  *
- * Restituisce un oggetto *child* domBuilder
+ * Returns a domBuilder child object.
  *
- * Esempio:
+ * Examples:
  * > p#main-info.info.active{data-id:123,role=button} text content
  *
- * oppure
  * > input#search-field[type=text,disabled]
  *
- * @param {string} domString La stringa DOM Builder da analizzare.
- * @returns {{tagName: string, id: string, classes: string[], attributes: {[key: string]: string}}}
+ * @param {string} domString - The domBuilder string to parse.
+ * @returns {{tag: string, id: string|null, className: string, attrs: Object<string, string|true>, content: string|null}|null}
  */
 
 export function parseDomString(domString) {
 
-  // versione con groups
+  // version using named capture groups (kept for reference)
   // const regex = new RegExp(
   //   /^(?<tag>[a-zA-Z][a-zA-Z0-9-]*)?/.source +    // tag
   //   /(?:#(?<id>[a-zA-Z0-9_-]+))?/.source +        // id
-  //   /(?<classes>(?:\.[a-zA-Z0-9_-]+)*)?/.source + // classi
+  //   /(?<classes>(?:\.[a-zA-Z0-9_-]+)*)?/.source + // classes
   //   /(?<attrs>[([{].*?[)\]}])?/.source +          // attrs
   //   /(?: +(?<content>.*))?$/.source               // content
   // );
 
 
-// FIX non funziona se la stringa contine id e classi in quest'ordine: <TAG>.<CLASSE>#<ID>, se l'id è prima della classe, funziona
+// FIX: does not work when id follows classes: <TAG>.<CLASS>#<ID>; id must precede classes
 
   const regex = new RegExp(
-    /^([a-zA-Z][a-zA-Z0-9-]*)?/.source +  // tag (accetta anche nomi di web components)
+    /^([a-zA-Z][a-zA-Z0-9-]*)?/.source +  // tag (also accepts web component names)
     /(?:#([a-zA-Z0-9_-]+))?/.source +     // id
-    /((?:\.[a-zA-Z0-9_-]+)*)?/.source +   // classi
+    /((?:\.[a-zA-Z0-9_-]+)*)?/.source +   // classes
     /([([{].*?[)\]}])?/.source +          // attrs
     /(?: +(.*))?$/.source                 // content
   );
@@ -54,12 +53,12 @@ export function parseDomString(domString) {
     return null;
   }
 
-  // Nuovi gruppi di cattura (match array):
-  // [0]: intera stringa
-  // [1]: Tag
-  // [2]: ID
-  // [3]: Classi
-  // [4]: Attributi (raw)
+  // Capture group indices:
+  // [0]: full match
+  // [1]: tag
+  // [2]: id
+  // [3]: classes
+  // [4]: raw attributes
   // [5]: content
 
   const tag = (matches[1] || 'div').toLowerCase(),
@@ -69,7 +68,7 @@ export function parseDomString(domString) {
     content =  matches[5]?.trim() || null
   ;
 
-  // versione con uso di `groups`
+  // version using named capture groups (kept for reference)
   // const tag = (matches.groups.tag || 'div').toLowerCase(),
   //   id = matches.groups.id?.trim() || null,
   //   classes = matches.groups.classes? matches[3].slice(1).split('.').map(c => c.trim()) : [],
@@ -77,6 +76,7 @@ export function parseDomString(domString) {
   //   content =  matches.groups.content?.trim() || null
   // ;
 
+  /** @type {Record<string, string | true>} */
   const attrs = {};
   if (rawAttrs) {
     const attrsContent = rawAttrs.substring(1, rawAttrs.length - 1);
@@ -86,10 +86,12 @@ export function parseDomString(domString) {
       if (!pair) return;
       if (pair.includes('=') || pair.includes(':')) {
         const parts = pair.split(/[:=]/, 2),
-          name = parts[0]?.trim(),
+          name = parts[0]?.trim() ?? '',
           value = parts[1] != null ? parts[1].trim() : true;
 
-        attrs[name] = value;
+        if (name) {
+          attrs[name] = value;
+        }
 
       } else {
 

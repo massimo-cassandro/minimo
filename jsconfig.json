@@ -4,9 +4,11 @@
     "checkJs": true,
     "target": "ES2023",
     "module": "ESNext",
-    "allowSyntheticDefaultImports": true
+    "allowSyntheticDefaultImports": true,
+    "moduleResolution": "bundler"
   },
   "include": [
+    "declarations.d.ts",
     "index.js",
     "src/**/*.js",
     "charts/**/*.js",

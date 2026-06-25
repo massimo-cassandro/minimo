@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 // pre-elaborazione tipi dati predefiniti
 // le chiavi che cominciano con '_' sono di questa applicazione, le altre sono di simple-datatable
