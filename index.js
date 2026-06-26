@@ -3,11 +3,13 @@
 export { betterText } from './src/utilities/better-text.js';
 export { classnames, classnamesNull } from './src/utilities/classnames.js';
 export { createId } from './src/utilities/create-id.js';
+export { disableBtnsOnSubmit } from './src/utilities/disable-btns-on-submit.js';
 export { domBuilder } from './src/utilities/dom-builder/dom-builder.js';
 export { enableSubmitBtns } from './src/utilities/enable-submit-btns.js';
 export { escapeHTML, unescapeHTML } from './src/utilities/escape-html.js';
 export { getCookie, setCookie } from './src/utilities/cookies.js';
 export { linkedDates } from './src/utilities/linked-dates.js';
+export { randomId } from './src/utilities/random-id.js';
 export { relativeDate } from './src/utilities/relative-date.js';
 export { sentenceCase } from './src/utilities/sentence-case.js';
 export { stripTags } from './src/utilities/strip-tags.js';
