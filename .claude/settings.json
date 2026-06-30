@@ -4,7 +4,8 @@
       "Bash(tsc --noEmit -p jsconfig.json)",
       "Bash(awk -F'\\(' '{print $1}')",
       "Bash(python3 -c ' *)",
-      "Bash(python3)"
+      "Bash(python3)",
+      "Bash(git -C /Users/mazz/Sites/minimo status --short)"
     ]
   }
 }

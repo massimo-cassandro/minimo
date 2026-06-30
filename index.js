@@ -7,6 +7,7 @@ export { disableBtnsOnSubmit } from './src/utilities/disable-btns-on-submit.js';
 export { domBuilder } from './src/utilities/dom-builder/dom-builder.js';
 export { enableSubmitBtns } from './src/utilities/enable-submit-btns.js';
 export { escapeHTML, unescapeHTML } from './src/utilities/escape-html.js';
+export { generatePwd } from './src/utilities/generate-pwd.js';
 export { getCookie, setCookie } from './src/utilities/cookies.js';
 export { linkedDates } from './src/utilities/linked-dates.js';
 export { randomId } from './src/utilities/random-id.js';

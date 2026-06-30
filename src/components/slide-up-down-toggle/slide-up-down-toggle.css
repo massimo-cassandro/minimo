@@ -1,0 +1,35 @@
+/*
+ * Companion CSS for slide-up-down-toggle.js
+ *
+ * `interpolate-size: allow-keywords` enables `height: auto` transitions,
+ * so no JS measurement is needed — the browser resolves the intrinsic size.
+ *
+ * Mark collapsible elements with [data-slide]:
+ *   data-slide="closed"  →  collapsed (height: 0)
+ *   data-slide="open"    →  expanded  (height: auto)
+ *
+ * Override the default duration per-element with a CSS custom property:
+ *   style="--slide-duration: 300ms"
+ *
+ * If the element is display: flex or display: grid, declare --slide-display:
+ *   style="--slide-display: flex"
+ */
+
+[data-slide] {
+  interpolate-size: allow-keywords;
+  /*
+   * !important overrides any display: none coming from other stylesheets.
+   * --slide-display defaults to block; set it to flex/grid if needed.
+   */
+  display: var(--slide-display, block) !important;
+  height: auto;
+  overflow: hidden;
+  transition:
+    height var(--slide-duration, 500ms) ease,
+    margin-block var(--slide-duration, 500ms) ease;
+}
+
+[data-slide='closed'] {
+  height: 0;
+  margin-block: 0;
+}
