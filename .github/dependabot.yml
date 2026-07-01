@@ -1,0 +1,10 @@
+version: 2
+updates:
+  - package-ecosystem: "npm" # Indica che stiamo usando NPM
+    directory: "/"           # Dove si trova il package.json
+    schedule:
+      interval: "monthly"     # Può essere: daily, weekly, monthly
+    open-pull-requests-limit: 15 # Massimo 10 PR aperte contemporaneamente
+    labels:
+      - "dependencies"
+      - "javascript"
