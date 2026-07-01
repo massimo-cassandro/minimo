@@ -1,0 +1,15 @@
+.slide {
+  padding: 1rem;
+  margin-block: 1rem;
+  border: 1px solid #ccc;
+  background-color: #e8e6e6;
+  border-radius: .5rem;
+}
+
+.btnsWrapper {
+  display: flex;
+  flex-flow: row wrap;
+  gap: 1rem;
+  align-items: center;
+  justify-content: flex-start;
+}

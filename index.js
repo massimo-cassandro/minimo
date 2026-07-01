@@ -19,12 +19,13 @@ export { truncateString } from './src/utilities/truncate-string.js';
 export { ValidationError } from './src/utilities/validation-error-class.js';
 
 // components
-export { modalAlert } from './src/components/modal-alert/modal-alert.js';
 export { dismissAlerts } from './src/components/dismiss-alerts.js';
 export { formResetSubmit } from './src/components/form-reset-submit.js';
 export { innerNav } from './src/components/inner-nav/inner-nav.js';
+export { modalAlert } from './src/components/modal-alert/modal-alert.js';
+export { modalPopup } from './src/components/modal-popup/modal-popup.js';
 export { overlay, removeOverlay } from './src/components/overlay/overlay.js';
 export { sf_macro } from './src/components/sf-macro/sf-macro.js';
+export { slideToggle, slideUp, slideDown } from './src/components/slide-up-down-toggle/slide-up-down-toggle.js';
 export { snackbar } from './src/components/snackbar/snackbar.js';
-export { modalPopup } from './src/components/modal-popup/modal-popup.js';
 export { unsplashPageJS } from './src/components/unsplash-page/unsplash-page.js';

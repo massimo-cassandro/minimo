@@ -47,7 +47,7 @@ if(routeObj.callback) {
 }
 
 if( route !== 'home') {
-  root.insertAdjacentHTML('afterend', '<p class="mt-lg"><a href="/">Home</a></p>');
+  root.insertAdjacentHTML('afterend', '<p class="mbs-lg"><a href="/">Home</a></p>');
 }
 
 document.body.addEventListener('click', e => {

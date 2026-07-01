@@ -1,0 +1,97 @@
+/*
+ * CSS Module for slide-up-down-toggle.js
+ *
+ * Three modern CSS features work together to animate height without JS measurement:
+ *
+ *   interpolate-size: allow-keywords
+ *     Enables transitioning to/from `height: auto` — the browser resolves the
+ *     intrinsic size, so JS never reads offsetHeight or scrollHeight.
+ *
+ *   transition-behavior: allow-discrete  (via `allow-discrete` in shorthand)
+ *     Allows `display` to participate in a transition. On collapse: height
+ *     animates to 0, then `display: none` snaps at the very end. On expand:
+ *     `display: block` snaps at the very start, then height animates to auto.
+ *
+ *   @starting-style
+ *     Defines the initial state for elements entering from `display: none`.
+ *     Without it, the browser has no "before" value to transition from and
+ *     the expand animation would not play.
+ *
+ * ─── Usage ────────────────────────────────────────────────────────────────────
+ *
+ *   wrap: true (default)
+ *     JS generates a wrapper <div class="slide"> around the target.
+ *     The target element is completely free — any display, padding, margin.
+ *     No changes to HTML required; initial open state is the default.
+ *     For an element that should start collapsed, add data-slide="closed" to
+ *     the target BEFORE calling any slide function — JS transfers it to the wrapper.
+ *
+ *   wrap: false
+ *     JS adds .slide directly to the target element.
+ *     The target must be a plain block wrapper (no padding, no flex/grid).
+ *     All layout, padding and margin must live on an inner child element.
+ *     Initial collapsed state: add data-slide="closed" directly to the target in HTML.
+ *
+ * ─── FOUC prevention ──────────────────────────────────────────────────────────
+ *
+ *   Elements with data-slide="closed" are hidden via a :global rule below,
+ *   so they start invisible even before JS adds the .slide class.
+ *
+ * ─── Duration override ────────────────────────────────────────────────────────
+ *
+ *   Set --slide-duration on the element or pass `duration` in JS options:
+ *     style="--slide-duration: 300ms"
+ */
+
+/* applied to the animation wrapper (generated or the target itself) */
+.slide {
+  interpolate-size: allow-keywords;
+  /*
+   * !important overrides any external display: none (inline or CSS rule without !important).
+   * .slide[data-slide='closed'] below has higher specificity (0,2,0 vs 0,1,0) so its
+   * display: none !important still wins when the element is collapsed.
+   */
+  /* stylelint-disable-next-line declaration-no-important */
+  display: block !important;
+  height: auto;
+  overflow: hidden;
+  transition:
+    height var(--slide-duration, 500ms) ease,
+    display var(--slide-duration, 500ms) allow-discrete;
+}
+
+/* collapsed state: height animates to 0, then display snaps to none */
+.slide[data-slide='closed'] {
+  /* stylelint-disable-next-line declaration-no-important */
+  display: none !important;
+  height: 0;
+}
+
+/*
+ * Entry state for the expand transition.
+ * When .slide transitions from display:none → display:block, the browser needs
+ * a starting value for height. @starting-style provides height:0 so the
+ * animation plays from zero to auto instead of snapping instantly.
+ */
+/*
+ * @starting-style targets only [data-slide='open'] — not :not([data-slide='closed']).
+ * The broader selector would also match newly inserted wrappers (which have no
+ * data-slide attribute), causing an unwanted entry animation from height:0 that
+ * conflicts with the first collapse call and makes the transition invisible.
+ * Using [data-slide='open'] restricts this to the expand animation triggered by
+ * slideDown(), which always sets data-slide="open" on a previously hidden element.
+ */
+@starting-style {
+  .slide[data-slide='open'] {
+    height: 0;
+  }
+}
+
+/*
+ * FOUC prevention — global, no class required.
+ * Hides elements with data-slide="closed" before JS has run and added .slide.
+ * Uses :global so CSS Modules does not hash this selector.
+ */
+:global([data-slide='closed']) {
+  display: none;
+}

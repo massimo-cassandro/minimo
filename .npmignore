@@ -1,0 +1,25 @@
+# (replaces .gitignore for npm; entries below are redundant with the `files`
+#  allowlist in package.json but kept for clarity)
+*~
+.DS_Store
+
+vendor
+
+# env
+.env.dev
+.env.local
+.env.development
+.env.test
+.env.development.local
+.env.test.local
+.env.production.local
+
+# frontend
+node_modules
+_private
+public/_dev
+design-tokens/unresolved-props.md
+design-tokens/tokens-config.mjs
+
+# Exclude files and directories starting with "TODO"
+**/TODO*

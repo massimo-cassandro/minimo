@@ -3,7 +3,8 @@ import { DataTable } from 'simple-datatables';
 
 import { parseCols } from './src/parse-cols.js';
 
-import * as styles from './s-datatable-component.module.css';
+import * as _sdatatableCss from './s-datatable-component.module.css';
+const styles = /** @type {Record<string, string>} */ (/** @type {any} */ (_sdatatableCss).default ?? _sdatatableCss);
 
 import caretLeftIcon from '../../icons/caret-left.svg?inline';
 import caretRightIcon from '../../icons/caret-right.svg?inline';

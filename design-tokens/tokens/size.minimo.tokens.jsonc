@@ -6,41 +6,41 @@
 // -----------------------------------------------------------------------
 {
   "size": {
+    "xxs": {
+      "$type": "dimension",
+      "$value": ".25rem"
+    },
     "xs": {
       "$type": "dimension",
       "$value": ".5rem"
     },
-    "md": {
+    "sm": {
       "$type": "dimension",
-      "$value": "1.2rem"
-    },
-    "3xl": {
-      "$type": "dimension",
-      "$value": "4rem"
-    },
-    "2xl": {
-      "$type": "dimension",
-      "$value": "3rem"
+      "$value": ".75rem"
     },
     "base": {
       "$type": "dimension",
       "$value": "1rem"
     },
+    "md": {
+      "$type": "dimension",
+      "$value": "1.2rem"
+    },
     "lg": {
       "$type": "dimension",
       "$value": "1.5rem"
-    },
-    "xxs": {
-      "$type": "dimension",
-      "$value": ".25rem"
     },
     "xl": {
       "$type": "dimension",
       "$value": "2rem"
     },
-    "sm": {
+    "2xl": {
       "$type": "dimension",
-      "$value": ".75rem"
+      "$value": "3rem"
+    },
+    "3xl": {
+      "$type": "dimension",
+      "$value": "4rem"
     }
   }
 }

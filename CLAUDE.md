@@ -239,11 +239,6 @@ TODO aperti su json-table ([_wrk/json-table/TODO.md](_wrk/json-table/TODO.md)):
 
 Traccia dei TODO/FIX sparsi nel codice, da risolvere alla prima occasione utile.
 
-### jsconfig.json / type checking
-
-- **TODO** — Aggiungere `"checkJs": true` al `jsconfig.json` del progetto per abilitare il type checking su tutti gli script JS
-- **TODO** — Verificare che tutti gli script siano validati correttamente e aggiungere i JSDoc mancanti dove necessario (parametri, tipi di ritorno, ecc.)
-
 ### package.json / root
 
 - **TODO** — Aggiungere `blurhash` come peer dependency ([TODO.md](TODO.md)).

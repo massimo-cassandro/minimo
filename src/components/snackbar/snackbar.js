@@ -1,6 +1,7 @@
 import { domBuilder } from '../../utilities/dom-builder/dom-builder.js';
 import { classnames } from '../../utilities/classnames.js';
-import * as styles from './snackbar.module.css';
+import * as _snackbarCss from './snackbar.module.css';
+const styles = /** @type {Record<string, string>} */ (/** @type {any} */ (_snackbarCss).default ?? _snackbarCss);
 
 /*
 References

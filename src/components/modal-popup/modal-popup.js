@@ -1,7 +1,8 @@
 import { domBuilder } from '../../utilities/dom-builder/dom-builder.js';
 import { classnames } from '../../utilities/classnames.js';
 import { spinner } from '../spinner/spinner.js';
-import * as styles from './modal-popup.module.css';
+import * as _modalCss from './modal-popup.module.css';
+const styles = /** @type {Record<string, string>} */ (/** @type {any} */ (_modalCss).default ?? _modalCss);
 
 
 // https://developer.mozilla.org/en-US/docs/Web/API/HTMLDialogElement
