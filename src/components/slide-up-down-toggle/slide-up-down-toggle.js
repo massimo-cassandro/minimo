@@ -1,15 +1,6 @@
 // @ts-check
 
-import * as _css from './slide-up-down-toggle.module.css';
-
-/*
- * css-loader exposes class names differently depending on webpack config:
- *   modules.namedExport: true  → named exports  → import * as _css  → _css.slide
- *   default (namedExport off)  → default export  → import styles     → styles.slide
- *                                                                       (= _css.default.slide)
- * The fallback chain below handles both without changing any other code.
- */
-const styles = { slide: _css.slide ?? /** @type {any} */ (_css).default?.slide ?? 'slide' };
+import * as styles from './slide-up-down-toggle.module.css';
 
 /**
  * @module slide-up-down-toggle

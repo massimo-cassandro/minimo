@@ -3,8 +3,7 @@ import { DataTable } from 'simple-datatables';
 
 import { parseCols } from './src/parse-cols.js';
 
-import * as _sdatatableCss from './s-datatable-component.module.css';
-const styles = /** @type {Record<string, string>} */ (/** @type {any} */ (_sdatatableCss).default ?? _sdatatableCss);
+import * as styles from './s-datatable-component.module.css';
 
 import caretLeftIcon from '../../icons/caret-left.svg?inline';
 import caretRightIcon from '../../icons/caret-right.svg?inline';
@@ -13,6 +12,8 @@ import caretRightIcon from '../../icons/caret-right.svg?inline';
 /**
  * Implementazione di simple-datatable (https://fiduswriter.github.io/simple-datatables/documentation/)
  * per generare una tabella da dati json e da un oggetto `cols` di configurazione
+ *
+ * @deprecated Componente destinato alla dismissione
  *
  * ─────────────────────────────────────────────────────────────────────────────
  * PARAMETRI
@@ -207,10 +208,22 @@ function resolveTemplate(tpl, row, { nullAs = '', warnColIdx } = {}) {
   return tpl;
 }
 
+let _deprecationWarned = false;
+
+/**
+ * @deprecated Componente destinato alla dismissione, verrà sostituito da `json-table`.
+ * Vedi la documentazione all'inizio del file per i dettagli.
+ */
 class SimpleDatatableAdapter extends HTMLElement {
   constructor() {
     super();
     // this.attachShadow({ mode: 'open' }); // commentare per light dom
+
+    if (!_deprecationWarned) {
+      _deprecationWarned = true;
+      // eslint-disable-next-line no-console
+      console.warn('[s-datatable] componente deprecato');
+    }
 
     this._config = null;
     this._initCalledProgrammatically = false;

@@ -5,8 +5,7 @@
 
 import { classnames } from '../../../../index.js';
 
-import * as _sdatatableCss from '../s-datatable-component.module.css';
-const styles = /** @type {Record<string, string>} */ (/** @type {any} */ (_sdatatableCss).default ?? _sdatatableCss);
+import * as styles from '../s-datatable-component.module.css';
 
 import checkIcon from '../../../icons/check-bold.svg?inline';
 import xIcon from '../../../icons/x-bold.svg?inline';

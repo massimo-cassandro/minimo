@@ -5,7 +5,10 @@
       "Bash(awk -F'\\(' '{print $1}')",
       "Bash(python3 -c ' *)",
       "Bash(python3)",
-      "Bash(git -C /Users/mazz/Sites/minimo status --short)"
+      "Bash(git -C /Users/mazz/Sites/minimo status --short)",
+      "Bash(npm init *)",
+      "Bash(npm install *)",
+      "Bash(node_modules/.bin/webpack --config webpack.config.js)"
     ]
   }
 }

@@ -243,6 +243,14 @@ Traccia dei TODO/FIX sparsi nel codice, da risolvere alla prima occasione utile.
 
 - **TODO** — Aggiungere `blurhash` come peer dependency ([TODO.md](TODO.md)).
 
+### Import CSS module (priorità bassa)
+
+Componenti/web-component che importano un `*.module.css` (spinner, modal-popup, snackbar, slide-up-down-toggle, s-datatable-component) usano `import * as styles from './x.module.css'` e leggono le classi come export nominati (`styles.nomeClasse`). Questo assume che il consumer usi css-loader con `modules.namedExport` attivo (di fatto il comportamento effettivo di default in `webpack-setup`, dato che non viene mai impostato esplicitamente).
+
+Con configurazioni diverse (`namedExport: false`, o `esModule: false`) le classi finiscono sotto `.default`/`.default.locals`/`.locals` invece che come export diretti, e `styles.nomeClasse` risulterebbe `undefined` (nessun errore in build, solo classi mancanti a runtime). In passato si era tentato un fallback tipo `_css.default ?? _css` per coprire più casi, ma genera un errore di build ("export 'default' ... was not found") non appena il consumer usa `MiniCssExtractPlugin` + `namedExport` (perché webpack analizza staticamente l'accesso `.default` sul binding dell'import): per questo è stato rimosso, tornando all'import diretto.
+
+Da affrontare con calma in futuro (eventualmente con una utility condivisa che risolva l'accesso a `.default`/`.locals` dentro una funzione, non sul binding dell'import, per non far scattare l'analisi statica di webpack).
+
 ### CSS
 
 | File | Riga | Nota |

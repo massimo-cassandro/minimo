@@ -45,7 +45,7 @@ Riferimento centralizzato dei prossimi interventi. Le dir con prefisso `TODO ` i
 - [ ] unsplash page: Aggiungere `blurhash` come `peerDependency` opzionale (cfr. `_wrk/TODO.md`)
 - [ ] capire come organizzare la dir snippet-and-utilities, recupero di quanto utile da `_wrk/__snippets`
 - [ ] completare readme
-- [ ] docs
+- [ ] docs -> build with jsDoc
 - [ ] spinner vedi anche `_wrk/spinner`
 - [ ] `_wrk/create-blurhash-canvas.js`
 - [ ] `_wrk/img-viewer-dom-builder.js`
