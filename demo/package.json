@@ -9,8 +9,8 @@
   "private": true,
 
   "devDependencies": {
-    "@babel/core": "^7.29.0",
-    "@babel/preset-env": "^7.29.5",
+    "@babel/core": "^8.0.1",
+    "@babel/preset-env": "^8.0.2",
     "@csstools/postcss-global-data": "^4.0.0",
     "autoprefixer": "^10.5.0",
     "babel-loader": "^10.1.1",
