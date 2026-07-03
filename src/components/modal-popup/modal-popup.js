@@ -40,6 +40,8 @@ function closeDialog(el) {
  * @param {Object} params
  * @param {string | null} [params.dialogExtraClassName=null] - Extra class added to the dialog element.
  * @param {string | null} [params.contentExtraClassName=null] - Extra class added to the content wrapper.
+ * @param {string | null} [params.headerExtraClassName=null] - Extra class added to the header wrapper.
+ * @param {string | null} [params.footerExtraClassName=null] - Extra class added to the footer wrapper.
  * @param {string | null} [params.iframeUrl=null] - URL to load in an iframe.
  * @param {string | any[] | null} [params.content=null] - Plain text, HTML, or a domBuilder array.
  * @param {string | null} [params.ajaxUrl=null] - URL for Ajax content loading.
@@ -57,6 +59,12 @@ export function modalPopup({
 
   /** extra classname added to dialogInner */
   contentExtraClassName = null,
+
+  /** extra classname added to header */
+  headerExtraClassName = null,
+
+  /** extra classname added to footer */
+  footerExtraClassName = null,
 
   /** iframe url */
   iframeUrl = null,
@@ -129,7 +137,7 @@ export function modalPopup({
           className: styles.contentWrapper,
           children: [
             {
-              className: styles.header,
+              className: classnames(styles.header, headerExtraClassName),
               condition: headerContent != null,
               content: Array.isArray(headerContent) ? null : headerContent,
               children: Array.isArray(headerContent) ? headerContent : undefined
@@ -177,7 +185,7 @@ export function modalPopup({
               },
             },
             {
-              className: styles.footer,
+              className: classnames(styles.footer, footerExtraClassName),
               condition: footerContent != null,
               content: Array.isArray(footerContent) ? null : footerContent,
               children: Array.isArray(footerContent) ? footerContent : undefined
