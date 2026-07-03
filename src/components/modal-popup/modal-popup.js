@@ -60,12 +60,6 @@ export function modalPopup({
   /** extra classname added to dialogInner */
   contentExtraClassName = null,
 
-  /** extra classname added to header */
-  headerExtraClassName = null,
-
-  /** extra classname added to footer */
-  footerExtraClassName = null,
-
   /** iframe url */
   iframeUrl = null,
 
@@ -89,8 +83,15 @@ export function modalPopup({
   /** header content: plain text, HTML or domBuilder array */
   headerContent = null,
 
+  /** extra classname added to header */
+  headerExtraClassName = null,
+
   /** footer content: plain text, HTML or domBuilder array */
   footerContent = null,
+
+  /** extra classname added to footer */
+  footerExtraClassName = null,
+
 }) {
 
 

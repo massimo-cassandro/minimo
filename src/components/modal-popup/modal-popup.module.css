@@ -19,7 +19,7 @@ Same for min/max-width and min/max-height
   max-width: var(--_modal-popup-max-width, 98dvw);
   height: var(--_modal-popup-height, max-content);
   min-height: var(--_modal-popup-min-height, 300px);
-  max-height: var(--_modal-popup-min-height, 90dvh);
+  max-height: var(--_modal-popup-max-height, 90dvh);
   padding: 0;
   margin: auto;
   overflow: visible;
