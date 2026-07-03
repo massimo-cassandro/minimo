@@ -46,8 +46,8 @@ function closeDialog(el) {
  * @param {((data: *, el: Element) => void) | null} [params.ajaxCallback=null] - Called with the Ajax response and the content element.
  * @param {((el: HTMLDialogElement) => void) | null} [params.closeCallback=null] - Called with the dialog element just before it is removed.
  * @param {boolean} [params.addScrollbarPadding=false] - Adds right padding to compensate for the scrollbar.
- * @param {string | null} [params.headerContent=null] - Header content: plain text or HTML.
- * @param {string | null} [params.footerContent=null] - Footer content: plain text or HTML.
+ * @param {string | any[] | null} [params.headerContent=null] - Header content: plain text, HTML, or a domBuilder array.
+ * @param {string | any[] | null} [params.footerContent=null] - Footer content: plain text, HTML, or a domBuilder array.
  * @returns {HTMLDialogElement} The dialog element.
  */
 export function modalPopup({
@@ -78,10 +78,10 @@ export function modalPopup({
   closeCallback = null,
   addScrollbarPadding = false, // adds extra right padding to compensate for the scrollbar
 
-  /** header content: plain text or HTML */
+  /** header content: plain text, HTML or domBuilder array */
   headerContent = null,
 
-  /** footer content: plain text or HTML  */
+  /** footer content: plain text, HTML or domBuilder array */
   footerContent = null,
 }) {
 
@@ -131,11 +131,11 @@ export function modalPopup({
             {
               className: styles.header,
               condition: headerContent != null,
-              content: headerContent
+              content: Array.isArray(headerContent) ? null : headerContent,
+              children: Array.isArray(headerContent) ? headerContent : undefined
             },
             {
               className: classnames(styles.content, contentExtraClassName),
-
               content: mode === 'html'
                 ? content
                 : mode === 'ajax'
@@ -179,7 +179,8 @@ export function modalPopup({
             {
               className: styles.footer,
               condition: footerContent != null,
-              content: footerContent
+              content: Array.isArray(footerContent) ? null : footerContent,
+              children: Array.isArray(footerContent) ? footerContent : undefined
             },
           ]
         }

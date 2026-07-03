@@ -78,8 +78,6 @@ safe_cat "${TEMPLATES_DIR}/jsconfig.json"              jsconfig.json
 safe_cat "${TEMPLATES_DIR}/__project__.code-workspace" __project__.code-workspace
 
 
-npm i -D @massimo-cassandro/dev-updater
-
 echo -e "\n${GREEN}...eslint${NC}"
 npm i -D @massimo-cassandro/eslint-config
 safe_cat "${TEMPLATES_DIR}/eslint.config.mjs" eslint.config.mjs

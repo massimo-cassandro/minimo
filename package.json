@@ -1,6 +1,6 @@
 {
   "name": "@massimo-cassandro/minimo",
-  "version": "1.8.1",
+  "version": "1.8.2",
   "description": "Light css framework & utilities",
   "type": "module",
   "main": "./index.js",
@@ -57,6 +57,6 @@
     "@massimo-cassandro/dev-updater": "^3.0.7",
     "@massimo-cassandro/eslint-config": "^3.0.11",
     "@massimo-cassandro/stylelint-config": "^2.3.11",
-    "style-dictionary": "^5.4.4"
+    "style-dictionary": "^5.5.0"
   }
 }

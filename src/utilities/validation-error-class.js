@@ -6,8 +6,12 @@ example:
 
 const form = document.getElementById('form-__xxxx___');
 form.addEventListener('submit', e => {
+
+  // TODO disableBtnOnSubmit ??
+
   form.querySelectorAll('.is-invalid').forEach(item => {
     item.classList.remove('is-invalid');
+    item.setCustomValidity('');
   });
   form.classList.add('was-validated');
   try {
@@ -16,12 +20,22 @@ form.addEventListener('submit', e => {
     }
   } catch( error ) {
     e.preventDefault();
-    form.querySelector('[type="submit"]').disabled = false;
+    enableSubmitBtns();
 
     if (error instanceof ValidationError) {
 
       (error.fields??[]).forEach(field => {
         field.classList.add('is-invalid');
+        field.setCustomValidity(error.message);
+
+        // rimuove il setCustomValidity alla modifica del campo
+        field.addEventListener('input', () => {
+          field.setCustomValidity('');
+          field.classList.remove('is-invalid');
+
+          // rimuove la classe che attiva la visualizzaione
+          form.classList.remove('was-validated');
+        }, {once: true});
       });
 
       error.fields[0]?.focus({preventScroll:false});

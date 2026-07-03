@@ -7,6 +7,7 @@ Riferimento centralizzato dei prossimi interventi. Le dir con prefisso `TODO ` i
 ## da completare / rivedere
 
 * [x] `src/components/slide-up-down-toggle/`
+* [ ] aggiungre dir dev-tools (anche in files di package-json) e aggiungere `dev-updater`, `create-favicons` e `svg-tools`
 * [ ] `src/components/TODO form-multiselect/`
 * [ ] `src/web-components/TODO json-table/`
 * [ ] `src/components/TODO vanilla-cookie-consent/`
@@ -14,6 +15,13 @@ Riferimento centralizzato dei prossimi interventi. Le dir con prefisso `TODO ` i
 * [ ] `src/components/modal-alert/` unificare con `_wrk/popup-page`?
 * [ ] `src/components/unsplash-page/`
 * [ ] `src/components/snackbar/`
+* [ ] includere e riscrivere `js-file-uploader` come web-component
+* [ ] includere anche stylelint ed eslint config??
+* [ ] includere e successivamente archiviare `auto-datatables-bs5` e `ckeditor-utilities`
+* [ ] Includere layout-tools? è adattabile a minimo?
+* [ ] starter kit: prevedere merge tra package json esistente e tpl, se chiavi esistono già, aggiungerle con `_` in modo di non sovrascrivere nulla
+* [ ] nuovo componente che combini la parte di gestione del submit del form in un unico componente. Da valutare. In caso positivo valutare se marcare come @deprecated le vecchie funzioni, ma manternerle per compatubilità (in una nuova dir `deprecated`?) (vedi commento in validation-error-class). Considerare che `disableBtnsOnSubmit` ha senso in tutte le situazioni in cui non sia necessario un listener submit ad hoc
+
 
 
 ## da completare quando necessario
