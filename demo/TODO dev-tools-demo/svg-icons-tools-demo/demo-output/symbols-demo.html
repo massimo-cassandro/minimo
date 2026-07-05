@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Icons demo</title>
+    <link rel="icon" href="data:;base64,=">
+    <style type="text/css" media="all">
+      :root {
+        --icon-size: 6rem;
+        --icon-color: #4c4c4c;
+      }
+
+      body {
+        font-family: sans-serif;
+        font-size: 14px;
+        color: #333;
+      }
+
+      h1, h2 {
+        margin-left: 1rem;
+      }
+
+      .icon-wrapper {
+        display: flex;
+        flex-wrap: wrap;
+
+      }
+
+      .icon {
+        flex: 0 0 var(--icon-size);
+        max-width: var(--icon-size);
+        margin: 1rem;
+        text-align: center;
+
+        svg {
+          width: var(--icon-size);
+          aspect-ratio: 1;
+          margin: 0;
+          background: #ddd;
+        }
+      }
+
+      .fill-icon {
+        fill: var(--icon-color);
+        stroke: none;
+      }
+      .stroke-icon {
+        fill: none;
+        stroke: var(--icon-color);
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        stroke-width: 16px;
+      }
+
+      .duotone-light {
+        fill-opacity: .2;
+      }
+      .duotone-medium {
+        fill-opacity: .4;
+      }
+      .duotone-dark {
+        fill-opacity: .7;
+      }
+
+
+      .icon-caption {
+        /* overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis; */
+        max-width: 100%;
+      }
+    </style>
+
+  </head>
+  <body>
+    <h1>Icons demo</h1>
+
+    <div class="icon-wrapper"></div>
+
+    <script>const icons_list = [
+  'airplane-tilt',
+  'android-logo-w-pallet',
+  'arrow-bend-left-down-w-pallet',
+  'arrow-right-circle-line-w-pallet',
+  'arrow-right-down-line',
+  'beer-stein-duotone',
+  'bell-simple-ringing-duotone',
+  'heroicons-arrow-down-tray'
+];
+</script><?xml version="1.0" encoding="UTF-8"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg xmlns="http://www.w3.org/2000/svg" hidden="hidden"><symbol id="heroicons-arrow-down-tray" viewBox="0 0 24 24" class="fill-icon"><path d="M12 2.25a.75.75 0 0 1 .75.75v11.69l3.22-3.22a.75.75 0 1 1 1.06 1.06l-4.5 4.5a.75.75 0 0 1-1.06 0l-4.5-4.5a.75.75 0 1 1 1.06-1.06l3.22 3.22V3a.75.75 0 0 1 .75-.75Zm-9 13.5a.75.75 0 0 1 .75.75v2.25a1.5 1.5 0 0 0 1.5 1.5h13.5a1.5 1.5 0 0 0 1.5-1.5V16.5a.75.75 0 0 1 1.5 0v2.25a3 3 0 0 1-3 3H5.25a3 3 0 0 1-3-3V16.5a.75.75 0 0 1 .75-.75Z"/></symbol><symbol id="airplane-tilt" viewBox="0 0 256 256" class="fill-icon"><path d="M185.33,114.21l29.14-27.42.17-.17a32,32,0,0,0-45.26-45.26c0,.06-.11.11-.17.17L141.79,70.67l-83-30.2a8,8,0,0,0-8.39,1.86l-24,24a8,8,0,0,0,1.22,12.31l63.89,42.59L76.69,136H56a8,8,0,0,0-5.65,2.34l-24,24A8,8,0,0,0,29,175.42l36.82,14.73,14.7,36.75.06.16a8,8,0,0,0,13.18,2.47l23.87-23.88A8,8,0,0,0,120,200V179.31l14.76-14.76,42.59,63.89a8,8,0,0,0,12.31,1.22l24-24a8,8,0,0,0,1.86-8.39Zm-.07,97.23-42.59-63.88A8,8,0,0,0,136.8,144c-.27,0-.53,0-.79,0a8,8,0,0,0-5.66,2.35l-24,24A8,8,0,0,0,104,176v20.69L90.93,209.76,79.43,181A8,8,0,0,0,75,176.57l-28.74-11.5L59.32,152H80a8,8,0,0,0,5.66-2.34l24-24a8,8,0,0,0-1.22-12.32L44.56,70.74l13.5-13.49,83.22,30.26a8,8,0,0,0,8.56-2L180.78,52.6A16,16,0,0,1,203.4,75.23l-32.87,30.93a8,8,0,0,0-2,8.56l30.26,83.22Z"/></symbol><symbol id="beer-stein-duotone" viewBox="0 0 256 256" class="fill-icon"><path d="M192,72V208a8,8,0,0,1-8,8H56a8,8,0,0,1-8-8V72Z" class='duotone-light'/><path d="M104,104v80a8,8,0,0,1-16,0V104a8,8,0,0,1,16,0Zm40-8a8,8,0,0,0-8,8v80a8,8,0,0,0,16,0V104A8,8,0,0,0,144,96Zm96,16v64a24,24,0,0,1-24,24H200v8a16,16,0,0,1-16,16H56a16,16,0,0,1-16-16V72c0-30.88,28.71-56,64-56,16.77,0,32.91,5.8,44.82,16H160a40,40,0,0,1,40,40V88h16A24,24,0,0,1,240,112ZM57,64H182.62A24,24,0,0,0,160,48H145.74a8,8,0,0,1-5.53-2.22C131.06,37,117.87,32,104,32,80.82,32,61.43,45.76,57,64ZM184,208V192.17c0-.06,0-.11,0-.17s0-.11,0-.17V80H56V208H184Zm40-96a8,8,0,0,0-8-8H200v80h16a8,8,0,0,0,8-8Z"/></symbol><symbol id="bell-simple-ringing-duotone" viewBox="0 0 256 256" class="fill-icon"><path d="M208,192H48a8,8,0,0,1-6.88-12C47.71,168.6,56,147.81,56,112a72,72,0,0,1,144,0c0,35.82,8.3,56.6,14.9,68A8,8,0,0,1,208,192Z" class='duotone-light'/><path d="M168,224a8,8,0,0,1-8,8H96a8,8,0,0,1,0-16h64A8,8,0,0,1,168,224ZM227.39,60.32a111.36,111.36,0,0,0-39.12-43.08,8,8,0,1,0-8.54,13.53,94.13,94.13,0,0,1,33.46,36.91,8,8,0,0,0,14.2-7.36ZM35.71,72a8,8,0,0,0,7.1-4.32A94.13,94.13,0,0,1,76.27,30.77a8,8,0,1,0-8.54-13.53A111.36,111.36,0,0,0,28.61,60.32,8,8,0,0,0,35.71,72Zm186.1,103.94A16,16,0,0,1,208,200H48a16,16,0,0,1-13.79-24.06C43.22,160.39,48,138.28,48,112a80,80,0,0,1,160,0C208,138.27,212.78,160.38,221.81,175.94ZM208,184c-10.64-18.27-16-42.49-16-72a64,64,0,0,0-128,0c0,29.52-5.38,53.74-16,72Z"/></symbol><symbol id="arrow-right-circle-line-w-pallet" viewBox="0 0 24 24" class="fill-icon"><path d="M12 11V8L16 12L12 16V13H8V11H12ZM12 2C17.52 2 22 6.48 22 12C22 17.52 17.52 22 12 22C6.48 22 2 17.52 2 12C2 6.48 6.48 2 12 2ZM12 20C16.42 20 20 16.42 20 12C20 7.58 16.42 4 12 4C7.58 4 4 7.58 4 12C4 16.42 7.58 20 12 20Z"/></symbol><symbol id="arrow-right-down-line" viewBox="0 0 24 24" class="fill-icon"><path d="M14.5895 16.0032L5.98291 7.39664L7.39712 5.98242L16.0037 14.589V7.00324H18.0037V18.0032H7.00373V16.0032H14.5895Z"/></symbol><symbol id="android-logo-w-pallet" viewBox="0 0 256 256" class="stroke-icon"><circle cx="164" cy="148" r="12"/><circle cx="92" cy="148" r="12"/><path d="M24,184V161.13C24,103.65,70.15,56.2,127.63,56A104,104,0,0,1,232,160v24a8,8,0,0,1-8,8H32A8,8,0,0,1,24,184Z"/><line x1="32" y1="48" x2="63.07" y2="79.07"/><line x1="224" y1="48" x2="193.1" y2="78.9"/></symbol><symbol id="arrow-bend-left-down-w-pallet" viewBox="0 0 256 256" class="stroke-icon"><polyline points="152 176 104 224 56 176"/><path d="M200,32a96,96,0,0,0-96,96v96"/></symbol></svg>
+
+    <script>
+      var wrapper = document.querySelector('.icon-wrapper');
+
+      icons_list.forEach(function (item) {
+        let div_class = ['icon'];
+
+       /*  if (/-line$/.test(item)) {
+          div_class.push('line-icon');
+
+        } else if (/-fill$/.test(item)) {
+          div_class.push('fill-icon');
+        } */
+
+        wrapper.insertAdjacentHTML('beforeend',
+          `<div class="${div_class.join(' ')}">
+            <svg>
+              <title>${item}</title>
+              <use href="#${item}"></use>
+            </svg>
+            <p class="icon-caption" title="${item}"">
+              ${item.replace(/(_|\-)/g, '$1<wbr>')}
+            </p>
+          </div>`
+        );
+      });
+    </script>
+  </body>
+</html>

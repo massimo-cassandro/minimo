@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Icons demo</title>
+    <link rel="icon" href="data:;base64,=">
+    <style type="text/css" media="all">
+      :root {
+        --icon-size: 6rem;
+        --icon-color: #4c4c4c;
+      }
+
+      body {
+        font-family: sans-serif;
+        font-size: 14px;
+        color: #333;
+      }
+
+      h1, h2 {
+        margin-left: 1rem;
+      }
+
+      .icon-wrapper {
+        display: flex;
+        flex-wrap: wrap;
+
+      }
+
+      .icon {
+        flex: 0 0 var(--icon-size);
+        max-width: var(--icon-size);
+        margin: 1rem;
+        text-align: center;
+
+        svg {
+          width: var(--icon-size);
+          aspect-ratio: 1;
+          margin: 0;
+          background: #ddd;
+        }
+      }
+
+      .fill-icon {
+        fill: var(--icon-color);
+        stroke: none;
+      }
+      .stroke-icon {
+        fill: none;
+        stroke: var(--icon-color);
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        stroke-width: 16px;
+      }
+
+      .duotone-light {
+        fill-opacity: .2;
+      }
+      .duotone-medium {
+        fill-opacity: .4;
+      }
+      .duotone-dark {
+        fill-opacity: .7;
+      }
+
+
+      .icon-caption {
+        /* overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis; */
+        max-width: 100%;
+      }
+    </style>
+
+  </head>
+  <body>
+    <h1>Icons demo</h1>
+
+    <div class="icon-wrapper"></div>
+
+    <!-- demo-data -->
+
+    <script>
+      var wrapper = document.querySelector('.icon-wrapper');
+
+      icons_list.forEach(function (item) {
+        let div_class = ['icon'];
+
+       /*  if (/-line$/.test(item)) {
+          div_class.push('line-icon');
+
+        } else if (/-fill$/.test(item)) {
+          div_class.push('fill-icon');
+        } */
+
+        wrapper.insertAdjacentHTML('beforeend',
+          `<div class="${div_class.join(' ')}">
+            <svg>
+              <title>${item}</title>
+              <use href="#${item}"></use>
+            </svg>
+            <p class="icon-caption" title="${item}"">
+              ${item.replace(/(_|\-)/g, '$1<wbr>')}
+            </p>
+          </div>`
+        );
+      });
+    </script>
+  </body>
+</html>

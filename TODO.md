@@ -61,3 +61,9 @@ Riferimento centralizzato dei prossimi interventi. Le dir con prefisso `TODO ` i
 - [ ] `_wrk/alert-autoclose.js`
 - [ ] `_wrk/print-icon.js` eliminare???
 - [ ] rimozione `_wrk`, spostare autodatatable (anche il repo, da deprecare) in `archived`
+
+
+## Create favicons
+* Rivedere calcolo percorsi
+* Rivedere meccanismo parametri cli (fare come svg-icons-tools)
+* Opzione calcolo percorso file nello snippet, in base alla sua posizione

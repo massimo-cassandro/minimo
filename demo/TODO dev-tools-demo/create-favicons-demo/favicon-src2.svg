@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <g fill="none" fill-rule="evenodd">
+    <circle cx="256" cy="256" r="256" fill="#AE067C" />
+    <polygon fill="#F1C22B" points="256 359.825 132.565 425.894 157.257 288.084 56.278 191.106 194.973 172.004 256 46 317.027 172.004 455.722 191.106 354.743 288.084 379.435 425.894" />
+  </g>
+</svg>

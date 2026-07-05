@@ -1,6 +1,6 @@
 {
   "name": "@massimo-cassandro/minimo",
-  "version": "1.8.4",
+  "version": "1.9.0",
   "description": "Light css framework & utilities",
   "type": "module",
   "main": "./index.js",
@@ -15,9 +15,16 @@
   "bugs": {
     "url": "https://github.com/massimo-cassandro/minimo/issues"
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "bin": {
     "buildTokens": "./design-tokens/utilities/build-tokens.mjs",
-    "checkUnresolvedProps": "./design-tokens/utilities/check-unresolved-custom-props.mjs"
+    "checkUnresolvedProps": "./design-tokens/utilities/check-unresolved-custom-props.mjs",
+    "update-version": "./dev-tools/update-version/index.mjs",
+    "upd@m": "./dev-tools/upd@m/index.mjs",
+    "svgIconsTools": "./dev-tools/svg-icons-tools/index.mjs",
+    "create-favicons": "./dev-tools/create-favicons/index.mjs"
   },
   "repository": {
     "type": "git",
@@ -34,29 +41,40 @@
   },
   "license": "MIT",
   "author": "Massimo Cassandro",
-  "publishConfig": {
-    "access": "public"
-  },
   "sideEffects": [
     "**/s-datatable-component/**/*"
   ],
+  "engines": {
+    "node": ">= 18.0.0",
+    "npm": ">= 9.0.0"
+  },
   "files": [
     "./index.js",
     "src/**/*.{js,mjs,css,svg,md}",
     "design-tokens/tokens/**/*.{tokens.json,tokens.jsonc}",
     "design-tokens/_src/**/*.{tokens.json,tokens.jsonc,mjs,js,md}",
     "design-tokens/utilities/**/*.{mjs,md}",
-    "charts/**/*.{js,md}"
+    "charts/**/*.{js,md}",
+    "dev-tools/**/*.{js,mjs,md,html}"
   ],
   "peerDependenciesMeta": {
     "@svgdotjs/svg.js": {
       "optional": true
+    },
+    "style-dictionary": {
+      "optional": true
     }
   },
   "devDependencies": {
-    "@massimo-cassandro/dev-updater": "^3.0.7",
     "@massimo-cassandro/eslint-config": "^3.0.11",
     "@massimo-cassandro/stylelint-config": "^2.3.11",
     "style-dictionary": "^5.5.0"
+  },
+  "dependencies": {
+    "@inquirer/input": "^5.1.2",
+    "@inquirer/select": "^5.2.1",
+    "clipboardy": "^5.3.1",
+    "sharp": "^0.35.3",
+    "sharp-ico": "^0.1.5"
   }
 }
