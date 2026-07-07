@@ -59,7 +59,7 @@ export async function fetchUnsplashData(settings) {
           width              : data.width,
           height             : data.height,
           // description        : data.description,
-          // location           : data.location.name,
+          // location           : data.location?.name,
           alt_description    : data.alt_description,
           date               : data.created_at,
           base_url           : data.urls.raw,
@@ -68,7 +68,7 @@ export async function fetchUnsplashData(settings) {
           author_profile     : data.user.links.html,
           blur_hash          : data.blur_hash,
           image_description  : (() => {
-            let location = data.location.name,
+            let location = data.location?.name,
               description = data.description?? data.alt_description;
             if(data.description && location) {
               location = (new RegExp(location, 'i')).test(description)? null : location;

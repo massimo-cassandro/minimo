@@ -64,17 +64,22 @@ import { parseDomString } from './parseDomString.js';
  *
  * @function domBuilder
  * @param {Array<DomBuilderItem|string>} [structureArray=[]] - Configuration array. Accepts strings (shorthand per `parseDomString`) and/or configuration objects.
- * @param {HTMLElement} [parent] - Parent element to append the structure to.
+ * @param {HTMLElement} [parent] - Parent element the structure is attached to (see `options.insertMode`).
  * @param {Object} [options={}] - Configuration options.
  * @param {boolean} [options.emptyParent=false] - When true, the parent element is emptied before building.
+ * @param {'append'|'before'|'after'} [options.insertMode='append'] - How each root element of `structureArray` is attached to `parent`: `append` inserts it as a child (default), `before`/`after` insert it as a previous/next sibling of `parent`, preserving `structureArray` order. Only applies to the elements produced by this call — nested `domBuilder` calls (`content`, `children`) always append.
  * @returns {HTMLElement|null} The first created element, or null if nothing was created.
  */
 export function domBuilder(structureArray = [], parent, options = {}) {
 
   options = {
     emptyParent: false,
+    insertMode: 'append',
     ...options
   };
+
+  /** @type {Map<HTMLElement, HTMLElement>} tracks, for `insertMode: 'after'`, the last inserted sibling per parent node */
+  const afterAnchors = new Map();
 
   /** @type {HTMLElement | null} */
   let mainElement = null;
@@ -166,7 +171,7 @@ export function domBuilder(structureArray = [], parent, options = {}) {
 
       if (safeItem.children != null && !Array.isArray(safeItem.children)) {
         // eslint-disable-next-line no-console
-        console.error('Error: `item.children` must be an array → ' + safeItem.children);
+        console.error('[domBuilder]: `item.children` must be an array → ' + safeItem.children);
       }
       if (safeItem.children && Array.isArray(safeItem.children)) {
         domBuilder(safeItem.children, el, {emptyParent: false});
@@ -177,7 +182,17 @@ export function domBuilder(structureArray = [], parent, options = {}) {
       }
 
       if (parent) {
-        parent.appendChild(el);
+        if (options.insertMode === 'before') {
+          parent.parentNode?.insertBefore(el, parent);
+
+        } else if (options.insertMode === 'after') {
+          const anchor = afterAnchors.get(parent) ?? parent;
+          anchor.parentNode?.insertBefore(el, anchor.nextSibling);
+          afterAnchors.set(parent, el);
+
+        } else {
+          parent.appendChild(el);
+        }
       }
 
       // TODO callbacks that act on the element's children may not run when no parent is set
