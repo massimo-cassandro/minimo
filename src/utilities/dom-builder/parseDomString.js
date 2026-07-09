@@ -7,8 +7,9 @@
  *
  * Where:
  * * `tag` is the element name; defaults to `div` if omitted
- * * `#id` is the optional element id; must immediately follow the tag
+ * * `#id` is the optional element id, preceded by `#`
  * * `.class1, .class2...` are optional CSS classes, each preceded by `.`
+ * * `#id` and `.class` tokens can appear in any order and interleaved (e.g. `.class1#id.class2`)
  * * `(...)` is the optional attribute block; can also use `[...]` or `{...}`.
  *   Each name–value pair is separated by `:` or `=`. A bare name (no value) defaults to `true`.
  * * Text content follows after a space
@@ -26,24 +27,11 @@
 
 export function parseDomString(domString) {
 
-  // version using named capture groups (kept for reference)
-  // const regex = new RegExp(
-  //   /^(?<tag>[a-zA-Z][a-zA-Z0-9-]*)?/.source +    // tag
-  //   /(?:#(?<id>[a-zA-Z0-9_-]+))?/.source +        // id
-  //   /(?<classes>(?:\.[a-zA-Z0-9_-]+)*)?/.source + // classes
-  //   /(?<attrs>[([{].*?[)\]}])?/.source +          // attrs
-  //   /(?: +(?<content>.*))?$/.source               // content
-  // );
-
-
-// FIX: does not work when id follows classes: <TAG>.<CLASS>#<ID>; id must precede classes
-
   const regex = new RegExp(
-    /^([a-zA-Z][a-zA-Z0-9-]*)?/.source +  // tag (also accepts web component names)
-    /(?:#([a-zA-Z0-9_-]+))?/.source +     // id
-    /((?:\.[a-zA-Z0-9_-]+)*)?/.source +   // classes
-    /([([{].*?[)\]}])?/.source +          // attrs
-    /(?: +(.*))?$/.source                 // content
+    /^([a-zA-Z][a-zA-Z0-9-]*)?/.source +    // tag (also accepts web component names)
+    /((?:[#.][a-zA-Z0-9_-]+)*)?/.source +   // id and classes, in any order
+    /([([{].*?[)\]}])?/.source +            // attrs
+    /(?: +(.*))?$/.source                   // content
   );
 
   const matches = domString.match(regex);
@@ -53,28 +41,23 @@ export function parseDomString(domString) {
     return null;
   }
 
-  // Capture group indices:
+  // Capture group indexes:
   // [0]: full match
   // [1]: tag
-  // [2]: id
-  // [3]: classes
-  // [4]: raw attributes
-  // [5]: content
+  // [2]: id and classes (e.g. "#id.class1.class2" or ".class1#id.class2")
+  // [3]: raw attributes
+  // [4]: content
+
+  const idAndClasses = matches[2] || '',
+    idMatch = idAndClasses.match(/#([a-zA-Z0-9_-]+)/),
+    classMatches = [...idAndClasses.matchAll(/\.([a-zA-Z0-9_-]+)/g)];
 
   const tag = (matches[1] || 'div').toLowerCase(),
-    id = matches[2]?.trim() || null,
-    classes = matches[3] ? matches[3].slice(1).split('.').map(c => c.trim()) : [],
-    rawAttrs = matches[4]?.trim() || null,
-    content =  matches[5]?.trim() || null
+    id = idMatch?.[1] || null,
+    classes = classMatches.map(m => m[1]),
+    rawAttrs = matches[3]?.trim() || null,
+    content =  matches[4]?.trim() || null
   ;
-
-  // version using named capture groups (kept for reference)
-  // const tag = (matches.groups.tag || 'div').toLowerCase(),
-  //   id = matches.groups.id?.trim() || null,
-  //   classes = matches.groups.classes? matches[3].slice(1).split('.').map(c => c.trim()) : [],
-  //   rawAttrs = matches.groups.attrs?.trim() || null,
-  //   content =  matches.groups.content?.trim() || null
-  // ;
 
   /** @type {Record<string, string | true>} */
   const attrs = {};

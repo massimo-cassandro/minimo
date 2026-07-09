@@ -16,7 +16,7 @@ form.addEventListener('submit', e => {
   form.classList.add('was-validated');
   try {
     if( ... ) {
-      throw new ValidationError('__message__', [errorFields, ...] );
+      throw new ValidationError('__message__', [errorFields, ...] ); // errorFields is optional
     }
   } catch( error ) {
     e.preventDefault();
@@ -38,7 +38,7 @@ form.addEventListener('submit', e => {
         }, {once: true});
       });
 
-      error.fields[0]?.focus({preventScroll:false});
+      error.fields?.[0]?.focus({preventScroll:false});
     }
     mAlert({
       type  : 'error',

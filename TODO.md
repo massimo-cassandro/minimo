@@ -12,6 +12,24 @@ Riferimento centralizzato dei prossimi interventi. Le dir con prefisso `TODO ` i
 * [ ] `src/web-components/TODO json-table/`
 * [ ] `src/components/TODO vanilla-cookie-consent/`
 * [ ] `src/components/autocomplete/`
+
+****
+
+**problema con domBuilder callback:**
+al momento della chiamata il campo non è ancora attaccato al document — e autoComplete.js lo cerca con document.querySelector.
+In dom-builder.js:177 i children vengono costruiti (e i loro callback eseguiti, riga 199) prima che l'elemento radice del blocco venga appeso a params.root (riga 194 della chiamata esterna). Quindi quando scatta il callback su #ac-dest, l'input esiste ma vive in un sottoalbero staccato dal documento. Il TODO a dom-builder.js:198 accenna proprio ai limiti di timing dei callback.
+autocompleteEngine non passa l'elemento ad autoComplete.js, ma un selettore stringa: selector: '#' + params.autocomplete_field.id (autocomplete-engine.js:178).
+In autoComplete.js, select() fa document.querySelector(selector) → restituisce null perché l'elemento non è nel documento. Poi create(this.input, {'aria-controls': …}) esegue key in el su null → ecco il TypeError: Cannot use 'in' operator to search for 'aria-controls' in null.
+
+Risolvibile spostando la chiamata ad autocomplete dopo l'esexuione di dombuilder
+
+**Fix strutturale nel pacchetto autocomplete:**
+autoComplete.js accetta anche una funzione come selector (e come resultsList.destination): in autocomplete-engine.js potresti usare selector: () => params.autocomplete_field e destination: () => params.autocomplete_field, rendendo l'engine indipendente dal fatto che il campo sia già nel DOM. È una modifica al pacchetto @massimo-cassandro/autocomplete, quindi va fatta lì e ripubblicata — ma risolverebbe il problema per tutti i casi d'uso con domBuilder.
+
+Valutare autocomplete indipendente 
+
+*****
+
 * [ ] `src/components/modal-alert/` unificare con `_wrk/popup-page`?
 * [ ] `src/components/unsplash-page/` (eliminare breakpoints, usare sizes, vedi ict) controllora corretto uso parametro `fm` imgix (non `fmt`)
 * [ ] `src/components/snackbar/`
@@ -43,7 +61,6 @@ Riferimento centralizzato dei prossimi interventi. Le dir con prefisso `TODO ` i
 - [ ] css: `buttons/status-buttons.css` — rivedere tutto
 - [ ] css: `buttons/buttons.css` — dividere per variante; button solo-icona da completare o eliminare
 - [ ] css: `buttons/btn-close.css:6` — controllare allineamento `×` interna
-- [ ] `dom-builder/parseDomString.js:40` — **FIX**: non funziona con `<TAG>.<CLASSE>#<ID>` (l'id deve precedere le classi)
 - [ ] `dom-builder/dom-builder.js:4-5` — sintassi stringa multi-riga e nidificazione con indent
 - [ ] `dom-builder/dom-builder.js:169` — callback con azioni su children potrebbero non essere eseguiti in assenza di parent
 - [ ] design tokens: `btn-color-themes.minimo.tokens.mjs` — aggiungere temi `neutral` e `accent`
