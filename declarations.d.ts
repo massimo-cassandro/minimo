@@ -22,3 +22,10 @@ declare module '*.svg?inline' {
 declare module 'blurhash';
 declare module '@tarekraafat/autocomplete.js';
 declare module '@massimo-cassandro/modal-alert';
+
+// Sanitizer API (Element.setHTML / getHTML) — not yet in TypeScript's lib.dom.d.ts.
+// https://developer.mozilla.org/en-US/docs/Web/API/Element/setHTML
+interface Element {
+  setHTML?(input: string, options?: { sanitizer?: unknown }): void;
+  getHTML?(options?: { serializableShadowRoots?: boolean; shadowRoots?: ShadowRoot[] }): string;
+}

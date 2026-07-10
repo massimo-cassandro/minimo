@@ -26,6 +26,8 @@ Risolvibile spostando la chiamata ad autocomplete dopo l'esexuione di dombuilder
 **Fix strutturale nel pacchetto autocomplete:**
 autoComplete.js accetta anche una funzione come selector (e come resultsList.destination): in autocomplete-engine.js potresti usare selector: () => params.autocomplete_field e destination: () => params.autocomplete_field, rendendo l'engine indipendente dal fatto che il campo sia già nel DOM. È una modifica al pacchetto @massimo-cassandro/autocomplete, quindi va fatta lì e ripubblicata — ma risolverebbe il problema per tutti i casi d'uso con domBuilder.
 
+prevedere possibilità utilizzo anche senza framework minimo
+
 Valutare autocomplete indipendente 
 
 *****
@@ -82,3 +84,13 @@ Valutare autocomplete indipendente
 * Rivedere calcolo percorsi
 * Rivedere meccanismo parametri cli (fare come svg-icons-tools)
 * Opzione calcolo percorso file nello snippet, in base alla sua posizione
+
+## js-file-uplaoder
+* rifattorizzare (vedi todo nel repo)
+* prevedere possibilità di uso anche senza framework minimo
+
+
+## Ottimizzazioni
+ Miglioramenti perfomances e verifica componenti con css per far sì che possano essere usati anche frameowrk diversi da minimo
+
+ 

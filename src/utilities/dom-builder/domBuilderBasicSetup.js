@@ -1,6 +1,39 @@
 
 /** @typedef {import('./dom-builder.js').DomBuilderItem} DomBuilderItem */
 
+// boolean attributes are omitted when their value is explicitly false;
+// declared once at module level (Set for O(1) lookup) since the list never changes between calls
+const boolAttrs = new Set([
+  'allowfullscreen',
+  'async',
+  'autocomplete',
+  'autofocus',
+  'autoplay',
+  'border',
+  'checked',
+  'compact',
+  'contenteditable',
+  'controls',
+  'default',
+  'loop',
+  'defer',
+  'disabled',
+  'formnovalidate',
+  'hidden',
+  'inert',
+  'ismap',
+  'multiple',
+  'muted',
+  'novalidate',
+  'open',
+  'readonly',
+  'required',
+  'reversed',
+  'selected',
+  'spellcheck',
+  'translate'
+]);
+
 /**
  * Applies basic domBuilder configuration to an element: classes, id, and attributes.
  * @param {HTMLElement} element - The element to configure.
@@ -23,42 +56,8 @@ export function domBuilderBasicSetup (element, domBuilderItem) {
     domBuilderItem.attrs = Object.entries(domBuilderItem.attrs);
   }
 
-  // boolean attributes are omitted when their value is explicitly false
-  const boolAttrs = [
-    'allowfullscreen',
-    'async',
-    'autocomplete',
-    'autofocus',
-    'autoplay',
-    'border',
-    'checked',
-    'compact',
-    'contenteditable',
-    'controls',
-    'default',
-    'loop',
-    'defer',
-    'disabled',
-    'formnovalidate',
-    'hidden',
-    'inert',
-    'ismap',
-    'multiple',
-    'muted',
-    'novalidate',
-    'open',
-    'readonly',
-    'required',
-    'reversed',
-    'selected',
-    'spellcheck',
-    'translate'
-  ];
-
-
-
   (/** @type {[string, unknown][]} */ (domBuilderItem.attrs ?? [])).forEach(attr => {
-    if (attr[1] != null && !(boolAttrs.includes(attr[0]) && attr[1]=== false)) {
+    if (attr[1] != null && !(boolAttrs.has(attr[0]) && attr[1] === false)) {
       element.setAttribute(attr[0], String(attr[1]));
     }
   });

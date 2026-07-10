@@ -27,3 +27,4 @@
 * 1.8.0 (01 lug 2026) - Added: SlideUp/Down/Toggle
 * 1.9.0 (05 lug 2026) - Dev Tools added
 * 1.10.0 (07 lug 2026) - domBuilder: insertMode option
+* 1.11.0 (10 lug 2026) - domBuilder optimization

@@ -13,6 +13,9 @@ import { parseDomString } from './parseDomString.js';
  * @property {string | null} [id] - Unique element ID.
  * @property {[string, *] | [string, *][] | Object<string, *>} [attrs] - Attributes: a `[name, value]` pair, array of pairs, or `{name: value}` object.
  * @property {string | number | Function | Element | DomBuilderItem[] | null} [content] - Element content.
+ *   A string or number is set as plain text (`textContent`) unless it contains `<`, in which case it is
+ *   treated as markup: sanitized and inserted via the native Sanitizer API (`Element.setHTML`) where
+ *   supported, falling back to raw `innerHTML` on browsers without it.
  * @property {boolean} [condition=true] - When false, the element is skipped.
  * @property {function(HTMLElement): void} [callback] - Callback invoked after the element is created.
  * @property {DomBuilderItem[]} [children] - Configuration array for child elements.
@@ -35,7 +38,7 @@ import { parseDomString } from './parseDomString.js';
  *     className: 'xxx' | ['class1', 'class2'], // also `class`
  *     id: 'element-id',
  *     attrs: [attr_name, attr_value] | [[...], [...]] | {name: value},
- *     content: 'xxx' | 123 | domBuilder Array | function | Element,
+ *     content: 'xxx' | 'xxx <strong>yyy</strong>' | 123 | domBuilder Array | function | Element, // see DomBuilderItem.content above
  *     condition: true | false,
  *     callback: el => ...,
  *     children: [...]
@@ -78,19 +81,29 @@ export function domBuilder(structureArray = [], parent, options = {}) {
     ...options
   };
 
-  /** @type {Map<HTMLElement, HTMLElement>} tracks, for `insertMode: 'after'`, the last inserted sibling per parent node */
+  if(parent && options.emptyParent) {
+    parent.innerHTML = '';
+  }
+
+  // For the default 'append' insert mode, root-level siblings are accumulated into a
+  // DocumentFragment and attached to `parent` with a single appendChild at the end,
+  // instead of one appendChild per sibling. 'before'/'after' modes need `target` to stay
+  // the real, live parent node throughout the loop for anchor resolution (see afterAnchors
+  // below), so batching is skipped for those.
+  const useFragment = !!parent && options.insertMode === 'append';
+
+  /** @type {HTMLElement | DocumentFragment | null} */
+  let target = useFragment ? document.createDocumentFragment() : (parent ?? null);
+
+  /** @type {Map<HTMLElement | DocumentFragment, HTMLElement>} tracks, for `insertMode: 'after'`, the last inserted sibling per parent node */
   const afterAnchors = new Map();
 
   /** @type {HTMLElement | null} */
   let mainElement = null;
   /** @type {HTMLElement} */
   let el;
-  /** @type {HTMLElement | null} */
+  /** @type {HTMLElement | DocumentFragment | null} */
   let grand_parent = null;
-
-  if(parent && options.emptyParent) {
-    parent.innerHTML = '';
-  }
 
   structureArray.forEach(inputItem => {
 
@@ -112,7 +125,7 @@ export function domBuilder(structureArray = [], parent, options = {}) {
       // the last one receives the remaining object properties
       if (Array.isArray(safeItem.tag)) {
 
-        grand_parent = parent ?? null;
+        grand_parent = target;
         const tags = /** @type {string[]} */ (safeItem.tag);
 
         tags.forEach((tagItem, idx) => {
@@ -130,10 +143,10 @@ export function domBuilder(structureArray = [], parent, options = {}) {
           );
 
           if (!isLast) { // the last element is handled by the standard path below
-            if (parent) {
-              parent.appendChild(el);
+            if (target) {
+              target.appendChild(el);
             }
-            parent = el;
+            target = el;
           }
 
         });
@@ -148,23 +161,43 @@ export function domBuilder(structureArray = [], parent, options = {}) {
 
       if (safeItem.content != null) {
 
-        /** @type {string | Element | null} */
-        let content = null;
-        if (typeof safeItem.content === 'function') {
-          content = safeItem.content();
+        if (Array.isArray(safeItem.content)) {
+          // build directly into `el` (instead of passing no parent) so that every item of
+          // the array is actually inserted, not just the first one returned as `mainElement`
+          domBuilder(safeItem.content, el);
 
-        } else if (Array.isArray(safeItem.content)) {
-          content = domBuilder(safeItem.content);
+        } else {
 
-        } else if (safeItem.content != null) {
-          content = String(safeItem.content);
-        }
+          /** @type {string | Element | null} */
+          let content = null;
+          if (typeof safeItem.content === 'function') {
+            content = safeItem.content();
 
-        if (content instanceof Element) {
-          el.appendChild(content);
+          } else if (safeItem.content != null) {
+            content = String(safeItem.content);
+          }
 
-        } else if (content != null) {
-          el.innerHTML = content;
+          if (content instanceof Element) {
+            el.appendChild(content);
+
+          } else if (content != null) {
+
+            if (!content.includes('<')) {
+              // plain text: no HTML parsing needed, textContent is faster and safe by construction
+              el.textContent = content;
+
+            } else if (typeof el.setHTML === 'function') {
+              // markup: sanitize via the native Sanitizer API, stripping <script>, event handler
+              // attributes, javascript: URLs, etc. while still allowing harmless formatting tags
+              // (<strong>, <em>, <a>, ...)
+              el.setHTML(content);
+
+            } else {
+              // Sanitizer API not supported by this browser: fall back to the historical,
+              // unsanitized behavior
+              el.innerHTML = content;
+            }
+          }
         }
       }
 
@@ -181,17 +214,18 @@ export function domBuilder(structureArray = [], parent, options = {}) {
         mainElement = el;
       }
 
-      if (parent) {
+      if (target) {
         if (options.insertMode === 'before') {
-          parent.parentNode?.insertBefore(el, parent);
+          const anchor = /** @type {HTMLElement} */ (target);
+          anchor.parentNode?.insertBefore(el, anchor);
 
         } else if (options.insertMode === 'after') {
-          const anchor = afterAnchors.get(parent) ?? parent;
+          const anchor = afterAnchors.get(/** @type {HTMLElement} */ (target)) ?? /** @type {HTMLElement} */ (target);
           anchor.parentNode?.insertBefore(el, anchor.nextSibling);
-          afterAnchors.set(parent, el);
+          afterAnchors.set(/** @type {HTMLElement} */ (target), el);
 
         } else {
-          parent.appendChild(el);
+          target.appendChild(el);
         }
       }
 
@@ -201,11 +235,15 @@ export function domBuilder(structureArray = [], parent, options = {}) {
       }
 
       if (grand_parent) {
-        parent = grand_parent;
+        target = grand_parent;
       }
     }
 
   });
+
+  if (useFragment && parent && target) {
+    parent.appendChild(target);
+  }
 
   return mainElement;
 }

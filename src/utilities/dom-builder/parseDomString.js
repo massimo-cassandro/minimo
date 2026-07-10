@@ -1,3 +1,11 @@
+// compiled once at module load, since the pattern never changes between calls
+const DOM_STRING_REGEX = new RegExp(
+  /^([a-zA-Z][a-zA-Z0-9-]*)?/.source +    // tag (also accepts web component names)
+  /((?:[#.][a-zA-Z0-9_-]+)*)?/.source +   // id and classes, in any order
+  /([([{].*?[)\]}])?/.source +            // attrs
+  /(?: +(.*))?$/.source                   // content
+);
+
 /**
  * Parses a string to extract tag name, ID, classes, and attributes.
  *
@@ -24,17 +32,9 @@
  * @param {string} domString - The domBuilder string to parse.
  * @returns {{tag: string, id: string|null, className: string, attrs: Object<string, string|true>, content: string|null}|null}
  */
-
 export function parseDomString(domString) {
 
-  const regex = new RegExp(
-    /^([a-zA-Z][a-zA-Z0-9-]*)?/.source +    // tag (also accepts web component names)
-    /((?:[#.][a-zA-Z0-9_-]+)*)?/.source +   // id and classes, in any order
-    /([([{].*?[)\]}])?/.source +            // attrs
-    /(?: +(.*))?$/.source                   // content
-  );
-
-  const matches = domString.match(regex);
+  const matches = domString.match(DOM_STRING_REGEX);
 
 
   if (!matches) {
