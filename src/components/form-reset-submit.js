@@ -1,5 +1,5 @@
 // import './form.css'; // included in the main CSS entry point
-import { enableSubmitBtns } from '../../index.js';
+import { enableSubmitBtns } from '../utilities/enable-submit-btns.js';
 
 /**
  * Wires up submit validation and button-disabling behaviour on all forms.

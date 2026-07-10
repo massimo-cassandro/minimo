@@ -1,6 +1,6 @@
 {
   "name": "@massimo-cassandro/minimo",
-  "version": "1.11.0",
+  "version": "1.11.1",
   "description": "Light css framework & utilities",
   "type": "module",
   "main": "./index.js",
@@ -31,12 +31,12 @@
     "url": "git+https://github.com/massimo-cassandro/minimo.git"
   },
   "scripts": {
-    "test": "node --test \"test/**/*.test.mjs\"",
     "UPD-version": "npx update-version  # --config=./dev-utilities.config.mjs",
     "npm-publish": "npm publish",
     "upd@m": "npx upd@m",
     "build-tokens": "node ./design-tokens/utilities/build-tokens.mjs --config ./design-tokens/tokens-config.mjs",
     "check unresolved props": "node ./design-tokens/utilities/check-unresolved-custom-props.mjs --config ./design-tokens/tokens-config.mjs",
+    "test": "node --test \"test/**/*.test.mjs\"",
     "checkJS": "npx tsc --noEmit -p jsconfig.json",
     "checkJS ./src": "npx tsc --noEmit --allowJs --checkJs --target ES2023 --module ESNext --allowSyntheticDefaultImports --moduleResolution bundler declarations.d.ts src/**/*.js"
   },

@@ -1,5 +1,41 @@
 // @ts-check
 
+// Italian particles/articles (plus a few English and topographic terms) whose casing is
+// enforced and after which spaces are turned into non-breaking spaces. Hoisted to module
+// scope with the regexes/lookup built from it below, since none of this depends on the
+// function's arguments and was previously rebuilt on every single betterText() call.
+const PARTICELLE = [
+  'e', 'ed',
+  'di', 'a', 'da', 'in', 'per', 'con', 'su', 'per', 'tra', 'fra',
+  'il', 'lo', 'la', 'i', 'gli', 'le',
+  'un', 'uno', 'una',
+  'del', 'dello', 'della', 'dei', 'degli', 'delle',
+  'al', 'allo', 'alla', 'ai', 'agli', 'alle',
+  'dal', 'dallo', 'dalla', 'dai', 'dagli', 'dalle',
+  'nel', 'nello', 'nella', 'nei', 'negli', 'nelle',
+  'col', 'collo', 'colla', 'con', 'coi', 'cogli', 'colle',
+  'sul', 'sullo', 'sulla', 'sui', 'sugli', 'sulle',
+
+  // topographic terms
+  'C.so', 'Corso', 'Via', 'P.za', 'Piazza', 'L.go', 'Largo', 'V.le', 'Viale',
+  'De', 'San', 'c/o', 'Loc.',
+
+  // English
+  'the', 'a', 'an', 'at', 'out', 'of',
+
+  // words used in geonames
+  'isola', 'isole'
+];
+
+// matches a particle followed by one-or-more spaces, to be turned into non-breaking spaces
+const NBSP_AFTER_PARTICLE_REGEX = new RegExp('\\b(' + PARTICELLE.join('|') + ')\\b +', 'gmi');
+
+// matches any particle regardless of case, to enforce its exact casing in a single pass
+const PARTICLE_CASING_REGEX = new RegExp('\\b(' + PARTICELLE.join('|') + ')\\b', 'gmi');
+
+// lowercased particle → its exact casing, for the replacer used with PARTICLE_CASING_REGEX
+const PARTICLE_CASING_MAP = new Map(PARTICELLE.map(term => [term.toLowerCase(), term]));
+
 /**
  * Improves a text string by fixing punctuation spacing, multiple spaces,
  * typographic quotes, non-breaking spaces after Italian particles/articles,
@@ -10,29 +46,6 @@
  * @returns {string} processed string, or empty string if input is falsy
  */
 export function betterText(str, custom_words = []) {
-
-  const particelle = [
-    'e', 'ed',
-    'di', 'a', 'da', 'in', 'per', 'con', 'su', 'per', 'tra', 'fra',
-    'il', 'lo', 'la', 'i', 'gli', 'le',
-    'un', 'uno', 'una',
-    'del', 'dello', 'della', 'dei', 'degli', 'delle',
-    'al', 'allo', 'alla', 'ai', 'agli', 'alle',
-    'dal', 'dallo', 'dalla', 'dai', 'dagli', 'dalle',
-    'nel', 'nello', 'nella', 'nei', 'negli', 'nelle',
-    'col', 'collo', 'colla', 'con', 'coi', 'cogli', 'colle',
-    'sul', 'sullo', 'sulla', 'sui', 'sugli', 'sulle',
-
-    // topographic terms
-    'C.so', 'Corso', 'Via', 'P.za', 'Piazza', 'L.go', 'Largo', 'V.le', 'Viale',
-    'De', 'San', 'c/o', 'Loc.',
-
-    // English
-    'the', 'a', 'an', 'at', 'out', 'of',
-
-    // words used in geonames
-    'isola', 'isole'
-  ];
 
   if(str) {
     str = str.trim();
@@ -57,16 +70,12 @@ export function betterText(str, custom_words = []) {
     str = str.replace(/((^| )(l|un|d|all|dell|nell|sull)('|')) /gi, '$1' );
 
     // replace regular spaces with non-breaking spaces after Italian particles/articles
-    var re = new RegExp('\\b(' + particelle.join('|') + ')\\b +', 'gmi');
-    str = str.replace(re, function (match) {
+    str = str.replace(NBSP_AFTER_PARTICLE_REGEX, function (match) {
       return match.replace(/ +/g, '\u00A0');
     });
 
-    // enforce exact casing of each particle
-    particelle.forEach(term => {
-      const re = new RegExp('\\b(' + term + ')\\b', 'gmi');
-      str = str.replace(re, term);
-    });
+    // enforce exact casing of every particle in a single pass
+    str = str.replace(PARTICLE_CASING_REGEX, match => PARTICLE_CASING_MAP.get(match.toLowerCase()) ?? match);
 
     if(custom_words.length) {
       custom_words.forEach(item => {
