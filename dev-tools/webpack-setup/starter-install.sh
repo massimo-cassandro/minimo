@@ -10,6 +10,8 @@
 # %:h estrae l'header (ovvero la directory, come 'dirname')
 BASE_URL=${0:A:h}
 
+echo "BASE_URL: ${BASE_URL}"
+
 TEMPLATES_DIR="${BASE_URL}/templates"
 # WEBPACK_SOURCE_DIR="$BASE_URL/webpack-setup"
 WEBPACK_SOURCE_DIR="$BASE_URL"

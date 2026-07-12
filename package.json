@@ -1,6 +1,6 @@
 {
   "name": "@massimo-cassandro/minimo",
-  "version": "1.11.1",
+  "version": "1.12.0",
   "description": "Light css framework & utilities",
   "type": "module",
   "main": "./index.js",
@@ -56,7 +56,10 @@
     "design-tokens/_src/**/*.{tokens.json,tokens.jsonc,mjs,js,md}",
     "design-tokens/utilities/**/*.{mjs,md}",
     "charts/**/*.{js,md}",
-    "dev-tools/**/*.{js,mjs,md,html}"
+    "dev-tools/**/*.{js,mjs,md,html}",
+    "dev-tools/webpack-setup/**/*.{js,mjs,md,sh,json,ejs}",
+    "dev-tools/webpack-setup/**/_*",
+    "snippets/**/*.{php,js,md,twig}"
   ],
   "peerDependenciesMeta": {
     "@svgdotjs/svg.js": {

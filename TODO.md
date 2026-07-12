@@ -8,7 +8,6 @@ Numerazione progressiva (`N`, `N.N`, `N.N.N`...) per riferimento rapido ai singo
 
 ## 1. da completare / rivedere
 
-- [x] **1.1.** `src/components/slide-up-down-toggle/`
 - [ ] **1.2.** aggiungre dir dev-tools (anche in files di package-json) e aggiungere `dev-updater`, `create-favicons` e `svg-tools`
 - [ ] **1.3.** `src/components/TODO form-multiselect/`
 - [ ] **1.4.** `src/web-components/TODO json-table/`
@@ -36,7 +35,6 @@ Numerazione progressiva (`N`, `N.N`, `N.N.N`...) per riferimento rapido ai singo
 ## 3. completare e sistemare
 
 - [ ] **3.1.** Aggiungere `@tarekraafat/autocomplete.js` a `peerDependenciesMeta` come opzionale
-- [x] **3.2.** `jsconfig.json` — abilitare `"checkJs": true` e verificare/aggiungere JSDoc mancanti
 - [ ] **3.3.** css: `visibility.css:21` — da rivedere
 - [ ] **3.4.** css: `alerts.css:75` — links da completare
 - [ ] **3.5.** css: `grid.css` — unificare regole comuni con `flex.css`
@@ -84,10 +82,8 @@ Analisi di `src/components` e `src/utilities` (esclusi i sotto-dir con prefisso 
 
 ### 6.1. Performance
 
-- [x] **6.1.1.** `utilities/better-text.js` — `particelle` e le due regex derivate spostate a livello di modulo (`PARTICELLE`, `NBSP_AFTER_PARTICLE_REGEX`, `PARTICLE_CASING_REGEX`), compilate una sola volta invece che ad ogni chiamata. Il loop `particelle.forEach(...)` con una `new RegExp` + `.replace()` per ogni particella (~45 per call) è stato sostituito da un'unica regex con alternanza + lookup (`PARTICLE_CASING_MAP`). Verificata l'equivalenza di output con l'implementazione precedente su 16 casi (inclusi termini duplicati come "per"/"con", apostrofi elisi, `custom_words`, stringhe vuote/null).
 - [ ] **6.1.2.** `utilities/relative-date.js:85` — `new Intl.RelativeTimeFormat('it', ...)` è hardcoded a `'it'` invece di usare `opts.locale` (che invece viene usato correttamente per `toLocaleString`): bug di correttezza oltre che micro-perf (nessun riuso dell'istanza tra chiamate/tick del `setInterval`).
 - [ ] **6.1.3.** `utilities/generate-pwd.js:16` — usa `Math.random()` (non crittograficamente sicuro) invece di `crypto.getRandomValues`, a differenza di `utilities/random-id.js` che lo fa correttamente. Trattandosi di generazione password, andrebbe allineato.
-- [x] **6.1.4.** `components/form-reset-submit.js:2` — importava `enableSubmitBtns` da `'../../index.js'` (il barrel pubblico del pacchetto) invece che dal file diretto: unico caso nel repo, poteva ostacolare il tree-shaking lato consumer e accoppiava il codice interno alla superficie pubblica invece che alla posizione reale del modulo. Corretto in `'../utilities/enable-submit-btns.js'`.
 - [ ] **6.1.5.** `components/unsplash-page/unsplash-page.js` — costruzione di `<picture>` via `insertAdjacentHTML` con `map().join('')` annidati (7 breakpoint × 3 formati); non è un problema di perf reale (gira una volta per pagina) ma è l'unico componente rimasto che non usa `domBuilder` per costruire markup, disallineato dal resto del framework.
 - [ ] **6.1.6.** `components/spinner/spinner.js:11` — ritorna una stringa HTML con classe `.spinner` hardcoded (non passa dal CSS module `styles`), mentre `spinnerWrapper` sì: incoerenza nella stessa funzione tra classi scoped e globali (vedi anche **3.23**).
 

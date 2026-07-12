@@ -22,7 +22,7 @@ class UnsplashController extends AbstractController
       $orientation = 'landscape';
     }
 
-    $unsplash_access_key = 'MfLQb0hbg-7o4dAcbRCczGFmGeHXdMAme-lbUmi_t9g'; // mbn
+    $unsplash_access_key = 'xxxxxxx';
     $collections_ids = '3660951'; // comma separated list
     $count = null;
 
@@ -34,6 +34,32 @@ class UnsplashController extends AbstractController
 
     $json = file_get_contents($url);
 
+
+    $response = new Response();
+    $response->headers->set('Content-Type', 'application/json; charset=utf-8');
+    $response->setContent($json);
+
+    $env = $this->getParameter('kernel.environment');
+
+    return $response;
+
+  }
+
+  #[Route('/unsplash-browser', name: 'unsplash_browser')]
+  public function browse(Request $request)
+  {
+    $unsplash_access_key = 'xxxxxxx';
+
+    $get = $request->query->all();
+
+    $url = 'https://api.unsplash.com/search/photos' .
+      "?client_id={$unsplash_access_key}";
+
+    foreach($get as $key => $value) {
+      $url .= '&' . rawurlencode($key) . '=' . rawurlencode($value);
+    }
+
+    $json = file_get_contents($url);
 
     $response = new Response();
     $response->headers->set('Content-Type', 'application/json; charset=utf-8');
