@@ -5,10 +5,12 @@ export const default_params = {
 
   // tutti i percorsi sono relativi alla dir di lavoro
 
-  // immagine sorgente SVG o PNG 512x512
+  // immagine sorgente, min. 512x512
+  // formati accettati: svg, png, jpg/jpeg, webp, gif, tiff/tif, avif
+  // il file favicon.svg viene generato solo se la sorgente utilizzata è in formato svg
   src_img: 'favicon-src.svg',
 
-  // sorgente opzionale per immagini piccole (32px)
+  // sorgente opzionale per immagini piccole (32px), stessi formati di src_img
   small_src_img: null,
 
   // directory output (percorso relativo alla dir di lavoro)

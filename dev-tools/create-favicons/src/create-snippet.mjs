@@ -10,7 +10,7 @@ export async function createSnippet(params) {
     if (params.snippet_language === 'ejs') {
 
       snippet_content = '<link rel="icon" href="<%= require(\'./favicon.ico\') %>" sizes="32x32"/>\n' +
-        '<link rel="icon" href="<%= require(\'./favicon.svg\') %>" type="image/svg+xml"/>\n' +
+        (params.generate_svg_favicon? '<link rel="icon" href="<%= require(\'./favicon.svg\') %>" type="image/svg+xml"/>\n' : '') +
         '<link rel="apple-touch-icon" href="<%= require(\'./apple-touch-icon.png\') %>"/>\n' +
         '<link rel="manifest" href="./manifest.webmanifest"/>';
 
@@ -24,7 +24,7 @@ export async function createSnippet(params) {
 
 
       snippet_content = `<link rel="icon" href="${create_href('favicon.ico')}" sizes="32x32"/>\n` +
-        `<link rel="icon" href="${create_href('favicon.svg')}" type="image/svg+xml"/>\n` +
+        (params.generate_svg_favicon? `<link rel="icon" href="${create_href('favicon.svg')}" type="image/svg+xml"/>\n` : '') +
         `<link rel="apple-touch-icon" href="${create_href('apple-touch-icon.png')}"/>\n` +
         `<link rel="manifest" href="${create_href('manifest.webmanifest')}"/>`;
 
@@ -42,7 +42,7 @@ export async function createSnippet(params) {
         const targetFileContent = fs.readFileSync(params.snippet_target_file, 'utf8'),
           regexp = /<!-- ?favicon-snippet-start ?-->(.*?)<!-- ?favicon-snippet-end ?-->/mis;
 
-        fs.promises.writeFile(params.snippet_target_file,
+        await fs.promises.writeFile(params.snippet_target_file,
           targetFileContent.replace(regexp,
             `<!-- favicon-snippet-start -->\n${snippet_content}\n<!-- favicon-snippet-end -->`
           )
@@ -54,7 +54,7 @@ export async function createSnippet(params) {
 
     } else {
 
-      fs.promises.writeFile(
+      await fs.promises.writeFile(
         `${params.snippet_path}/${params.snippet_name}`,
         snippet_content
       );

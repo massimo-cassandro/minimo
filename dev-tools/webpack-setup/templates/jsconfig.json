@@ -1,22 +1,21 @@
 {
   "__help": "https://code.visualstudio.com/docs/languages/jsconfig",
   "compilerOptions": {
-    "checkJs": true,
-    "target": "ES2023",
-    "module": "ESNext",
+    "ignoreDeprecations": "6.0",
     "baseUrl": ".",
     "allowSyntheticDefaultImports": false,
+
+    "target": "es2023",
+    "module": "ES6",
     "paths": {
-      "@frontend/*": ["./frontend/*"],
-      "@src/*": ["frontend/src/*"],
+      "@css/*": ["./frontend/src/css/*"],
+      "@src/*": ["./frontend/src/*"],
+      "@icons/*": ["./frontend/icons/*"],
       "@imgs/*": ["./frontend/imgs/*"],
-      "@icone/*": ["./frontend/icone/*"],
-      "@backoffice/*": ["./frontend/backoffice/*"],
-      "@minimo/*": ["./node_modules/@massimo-cassandro/minimo/src/*"]
+      "@frontend/*": ["./frontend/*"],
+      "@minimo/*": ["./node_modules/@massimo-cassandro/minimo/src/*"],
+      "@minimoCharts/*": ["./node_modules/@massimo-cassandro/minimo/charts/*"]
     }
-
-
-
   },
   "exclude": ["node_modules", "dist", "docs", "build", "public"]
 }

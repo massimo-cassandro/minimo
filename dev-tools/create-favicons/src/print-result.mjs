@@ -21,7 +21,7 @@ export function printResult(params) {
   [
     'apple-touch-icon.png',
     'favicon.ico',
-    'favicon.svg',
+    ...(params.generate_svg_favicon? ['favicon.svg'] : []),
     'icon-192.png',
     'icon-512.png',
     params.manifest_file_name

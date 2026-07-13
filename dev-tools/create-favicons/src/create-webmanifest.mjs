@@ -1,7 +1,7 @@
 // web manifest
 
-// import * as fs from 'fs/promises';
 import * as fs from 'fs';
+import * as fsPromises from 'fs/promises';
 import { createHash } from 'node:crypto'
 
 
@@ -50,15 +50,9 @@ export async function createWebmanifest(params) {
     ...(params.webmanifest_extra?? {})
   };
 
-  // await fs.writeFile(`${params.output_dir}/manifest.webmanifest`, JSON.stringify(manifest, null, ' '));
-
-  await fs.writeFile(
+  await fsPromises.writeFile(
     `${params.output_dir}/${params.manifest_file_name}`,
-    JSON.stringify(manifest, null, ' '),
-    (err) => {
-      if (err) {throw err}
-      // console.log('The file has been saved!');
-    }
+    JSON.stringify(manifest, null, ' ')
   );
 
 }

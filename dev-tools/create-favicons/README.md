@@ -2,7 +2,7 @@
 
 Create favicon files as described in [How to Favicon in 2024](https://evilmartians.com/chronicles/how-to-favicon-in-2021-six-files-that-fit-most-needs).
 
-The files to be processed must be in SVG format, while the generated files are in SVG (favicon), PNG (apple-touch-icon and other Android files), and ICO (another favicon for compatibility with older browsers). The `manifest.webmanifest` files are also generated, along with an optional HTML snippet with `link` tags for inserting the generated elements.
+The source file can be SVG or a raster format (PNG, JPEG, WEBP, GIF, TIFF, AVIF). The generated files are PNG (apple-touch-icon and other Android files) and ICO (another favicon for compatibility with older browsers); an SVG favicon is also generated, but only when the source file itself is SVG (a vector favicon can't be derived from a raster source). The `manifest.webmanifest` files are also generated, along with an optional HTML snippet with `link` tags for inserting the generated elements (the snippet omits the SVG `link` tag when no SVG favicon was generated).
 
 Images are generated with [Sharp](https://sharp.pixelplumbing.com/), [SVGO](https://github.com/svg/svgo), and [sharp-ico](https://github.com/ssnangua/sharp-ico).
 
@@ -34,7 +34,7 @@ If it's missing, it searches for the `favicon-src.svg` file to use as the source
 
 Among others, you can specify the `small_src_img` parameter if you need to specify an image optimized for small dimensions (32px).
 
-The best format for source files is SVG, or alternatively PNG.
+The best format for source files is SVG, or alternatively PNG/JPEG/WEBP/GIF/TIFF/AVIF.
 
 If both files are missing, an error is returned.
 

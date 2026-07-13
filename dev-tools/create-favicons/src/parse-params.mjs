@@ -2,6 +2,15 @@ import { default_params } from './default-params.mjs';
 import * as path from 'path';
 import * as fs from 'fs';
 
+// formati accettati per le immagini sorgente (src_img / small_src_img)
+// vettoriale: svg
+// raster (letti tramite Sharp): png, jpg/jpeg, webp, gif, tiff/tif, avif
+const supported_img_ext = ['svg', 'png', 'jpg', 'jpeg', 'webp', 'gif', 'tiff', 'tif', 'avif'];
+
+function getImgExt(img_path) {
+  return path.extname(img_path).toLowerCase().replace(/^\./, '');
+}
+
 export function parseParams(config_params = null, work_dir = process.cwd()) {
 
   try {
@@ -31,6 +40,22 @@ export function parseParams(config_params = null, work_dir = process.cwd()) {
       params[item] = params[item]? path.resolve(params.work_dir, params[item]) : null
     );
 
+    // validazione formato immagini sorgente
+    [params.src_img, params.small_src_img].filter(Boolean).forEach(img_path => {
+      const ext = getImgExt(img_path);
+      if (!supported_img_ext.includes(ext)) {
+        throw new Error(
+          `Formato immagine non supportato: '${img_path}'. ` +
+          `Formati accettati: ${supported_img_ext.join(', ')}`
+        );
+      }
+    });
+
+    // il file favicon.svg viene generato solo se l'immagine sorgente utilizzata
+    // per le versioni piccole (small_src_img, o src_img in sua assenza) è già SVG:
+    // da un raster non è possibile ricavare una favicon vettoriale
+    params.generate_svg_favicon = getImgExt(params.small_src_img?? params.src_img) === 'svg';
+
     // creazione dir output se non esiste
     if (!fs.existsSync(params.output_dir)){
       fs.mkdirSync(params.output_dir);
@@ -56,6 +81,7 @@ export function parseParams(config_params = null, work_dir = process.cwd()) {
 
   } catch(e) {
     console.error( e ); // eslint-disable-line
+    process.exit(1);
   }
 
 }

@@ -18,13 +18,21 @@ export async function createFavicons(params) {
 
     log('green', 'Creating favicons...');
 
-    await Promise.all([
-      await createSvg(params),
-      await createPng(params),
-      await createIco(params),
-      await createWebmanifest(params), // after create png
-      await createSnippet(params),
-    ])
+    // createWebmanifest legge i png generati da createPng per calcolarne l'hash:
+    // deve quindi essere eseguito solo a scrittura completata
+    await createPng(params);
+
+    const tasks = [
+      createIco(params),
+      createWebmanifest(params),
+      createSnippet(params),
+    ];
+
+    if (params.generate_svg_favicon) {
+      tasks.push(createSvg(params));
+    }
+
+    await Promise.all(tasks)
       .then(result => {
         printResult(params);
 

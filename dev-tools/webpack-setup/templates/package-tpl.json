@@ -18,7 +18,7 @@
   ],
   "scripts": {
     "progetto JS webpack DEV": "npm 'launchChrome' && NODE_ENV=development webpack serve --config ./webpack.config.mjs #--open-app-name 'Google Chrome'",
-    "progettop sf webpack DEV": "rm -rf ./public/_dev && NODE_ENV=development webpack --config ./frontend/webpack.config.mjs",
+    "progetto sf webpack DEV": "rm -rf ./public/_dev && NODE_ENV=development webpack --config ./frontend/webpack.config.mjs",
     "webpack PROD": "NODE_ENV=production webpack --config ./webpack.config.mjs --stats minimal",
     "create-favicons INIT": "npx create-favicons init",
     "create-favicons": "npx create-favicons --dir=./src/favicons",

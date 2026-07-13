@@ -9,7 +9,7 @@ export async function createPng(params) {
     ['icon-192.png', 192],
     ['icon-512.png', 512]
   ].map(file => {
-    sharp(params.src_img)
+    return sharp(params.src_img)
       .resize({ width: file[1], fit: 'inside' })
       .png(params.png_parameters)
       .toFile(`${params.output_dir}/${file[0]}`)
