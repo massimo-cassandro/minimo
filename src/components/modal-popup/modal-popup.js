@@ -52,6 +52,9 @@ function closeDialog(el) {
  * @param {string | any[] | null} [params.footerContent=null] - Footer content: plain text, HTML, or a domBuilder array.
  * @returns {HTMLDialogElement} The dialog element.
  */
+
+// TODO attributi arua anche sul triggerm vedi ada-frontend/src/modal-dialog/modal-dialog.js
+
 export function modalPopup({
 
   /** dialog extra class */

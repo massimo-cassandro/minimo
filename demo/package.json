@@ -4,7 +4,8 @@
 
   "scripts": {
     "webpack DEMO dev": "NODE_ENV=development webpack serve --config ./webpack.config.mjs",
-    "webpack DEMO prod": "NODE_ENV=production webpack --config ./webpack.config.mjs"
+    "webpack DEMO prod": "NODE_ENV=production webpack --config ./webpack.config.mjs",
+    "create-favicons DEMO": "node ../dev-tools/create-favicons/index.mjs --dir=./dev-tools-demo/create-favicons-demo"
   },
   "private": true,
 

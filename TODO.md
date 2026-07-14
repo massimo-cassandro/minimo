@@ -6,6 +6,11 @@ Numerazione progressiva (`N`, `N.N`, `N.N.N`...) per riferimento rapido ai singo
 
 ---
 
+## 0.
+### css
+
+* custom preperties: aggiungere prefisso `minimo` (o abbreviazione)? in versione 2
+
 ## 1. da completare / rivedere
 
 - [ ] **1.2.** aggiungre dir dev-tools (anche in files di package-json) e aggiungere `dev-updater`, `create-favicons` e `svg-tools`
@@ -69,7 +74,7 @@ Numerazione progressiva (`N`, `N.N`, `N.N.N`...) per riferimento rapido ai singo
 - **4.2.** Rivedere meccanismo parametri cli (fare come svg-icons-tools)
 - **4.3.** Opzione calcolo percorso file nello snippet, in base alla sua posizione
 
-## 5. js-file-uplaoder
+## 5. js-file-uploader
 
 - **5.1.** rifattorizzare (vedi todo nel repo)
 - **5.2.** prevedere possibilità di uso anche senza framework minimo
@@ -92,6 +97,9 @@ Analisi di `src/components` e `src/utilities` (esclusi i sotto-dir con prefisso 
 Verificato se il CSS dei componenti è utilizzabile senza il resto di minimo. Il discriminante è se le `var(--...)` hanno un **fallback**: se sì, il componente è davvero standalone; se no, richiede comunque che sia caricato `custom-properties.css` (i design token) di minimo, anche senza usarne il resto.
 
 - [ ] **6.2.1.** **Standalone già oggi (var con fallback ovunque, buon riferimento per gli altri):** `modal-alert/modal-alert.css`, `slide-up-down-toggle/slide-up-down-toggle.module.css`, `unsplash-page/unsplash-page.module.css` (quasi completo — due colori hardcoded senza var: `.upContainer` `background-color: #333` e `.unsplashPhotoLink a` colori, righe ~67 e ~241-242: solo un limite di personalizzazione, non di portabilità).
+
+Valutare la possibiliuttà di inserire all'interno di ogni di ogni cartella componente che contiene un CSS, un estratto delle custom props necessarie al funzionamento del componente stesso e di quelli eventualmente collegati.
+
 - [ ] **6.2.2.** **Richiedono i design token di minimo (var senza fallback), da decidere se documentare come dipendenza minima o rendere standalone aggiungendo fallback:**
   - **6.2.2.1.** `inner-nav/inner-nav.css` (`--size-lg`, `--size-base`)
   - **6.2.2.2.** `overlay/overlay.css` (`--z-index-overlay`, `--text-color`, `--body-background-color` — senza token l'overlay diventa invisibile ma resta nel DOM, fallimento silenzioso)

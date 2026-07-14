@@ -46,7 +46,7 @@ const config = {
     custom_icon_builder: null,
 
     /* path to the folder where the jsx components will be saved */
-    dest_folder: './demo-output/jsx-icons',
+    dest_folder: './output/jsx-icons',
 
     /**
      * Clear dest_folder folder before save new files
@@ -59,7 +59,7 @@ const config = {
      * Optional file that contains all generated icons as named exports.
      * Leave empty o remove if you don't need it
      */
-    index_file: './demo-output/jsx-icons-index.jsx',
+    index_file: './output/jsx-icons-index.jsx',
   },
 
   /**
@@ -78,7 +78,7 @@ const config = {
     },
 
     /* path to the folder where the optimized files will be saved */
-    dest_folder: './demo-output/optimized-svg',
+    dest_folder: './output/optimized-svg',
 
     /**
      * Clear dest_folder folder before save new files
@@ -112,7 +112,7 @@ const config = {
     },
 
     /* path of the processed svg file */
-    dest_file: './demo-output/icons-as-symbols.svg',
+    dest_file: './output/icons-as-symbols.svg',
 
     /* if true, the xml declaration (`<?xml version...`) is added to the resulting file */
     add_xml_declaration: true,
@@ -131,7 +131,7 @@ const config = {
      * @example
      * icons_list_file: './path/to/icons-list.js',
      */
-    icons_list_file: './demo-output/icons-list.js',
+    icons_list_file: './output/icons-list.js',
 
     /**
      * optional template for building the icons demo file
@@ -157,7 +157,7 @@ const config = {
      * @example
      * demo_file_path: './symbols-demo.html',
      */
-    demo_file_path: './demo-output/symbols-demo.html',
+    demo_file_path: './output/symbols-demo.html',
   },
 
 
@@ -344,7 +344,7 @@ const config = {
     convert_to_css_url: true,
 
     /* path of the generated scss file */
-    scss_icons_file: './demo-output/_icons-svg.scss',
+    scss_icons_file: './output/_icons-svg.scss',
   }
 
 };

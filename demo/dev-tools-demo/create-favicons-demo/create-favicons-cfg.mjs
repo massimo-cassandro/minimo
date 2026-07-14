@@ -1,11 +1,12 @@
 const params = {
 
   // immagine sorgent. SVG o PNG 512x512
-  src_img: 'favicon-src.svg',
+  src_img: 'favicon-src.png',
+  // src_img: 'favicon-src.svg',
   // src_img: 'favicon-src2.svg',
 
   // sorgente opzionale per immagine piccole (32px)
-  small_src_img: 'favicon-small-src.svg',
+  // small_src_img: 'favicon-small-src.svg',
 
   // directory output (percorso relatuvo alla dir di lavoro)
   output_dir: './output',

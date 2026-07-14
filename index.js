@@ -1,6 +1,7 @@
 
 // utilities
 export { betterText } from './src/utilities/better-text.js';
+export { buildPictureTag } from './src/utilities/build-picture-tag.js';
 export { classnames, classnamesNull } from './src/utilities/classnames.js';
 export { createId } from './src/utilities/create-id.js';
 export { disableBtnsOnSubmit } from './src/utilities/disable-btns-on-submit.js';
