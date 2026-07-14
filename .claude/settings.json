@@ -15,7 +15,8 @@
       "Bash(npm test *)",
       "Bash(node --test test/dom-builder.test.mjs)",
       "Bash(npx eslint *)",
-      "Bash(node ../dev-tools/create-favicons/index.mjs --config ./dev-tools-demo/create-favicons-demo/create-favicons-cfg.mjs)"
+      "Bash(node ../dev-tools/create-favicons/index.mjs --config ./dev-tools-demo/create-favicons-demo/create-favicons-cfg.mjs)",
+      "Bash(node --input-type=module -e ' *)"
     ]
   }
 }

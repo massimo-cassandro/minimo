@@ -2,67 +2,85 @@ import { classnames } from './classnames.js';
 
 /** @typedef {import('./dom-builder/dom-builder.js').DomBuilderItem} DomBuilderItem */
 
+/**
+ * @typedef {Object} PictureSizeEntry
+ * @property {number} [from] - Breakpoint (px) the size applies from (`width >=` media condition); omitted in the (single) mobile-first default entry.
+ * @property {number | [number, number]} size - Rendered width (px, height computed with `ratio`, if set) or explicit `[width, height]` pair (px).
+ */
+
 // TODO aggiungere compatibilità con immagini Unsplash basate su imgix
+// TODO parametri viewer: le convenzioni attuali (`bb=WxH`, `bb=Wx` per il resize width-only,
+// `q`, `fd`, `f`) sono legate al viewer interno; prevedere un meccanismo di astrazione
+// per altri servizi con parametri diversi (es. imgix/Unsplash)
 
 /**
  * Creates a `picture` domBuilder item for an image rendered through the viewer.
  *
  * Every `source`/`img` `srcset` is built with width descriptors (`w`): for each entry
  * of `sizes`, a candidate is generated for every integer density from 1 to `dpr`.
- * The `sizes` attribute pairs each entry of `sizes` with the corresponding `breakpoints`
- * entry as a `(max-width: …)` media condition; the last entry (without breakpoint) is
- * the default, so `breakpoints` is expected to have one element less than `sizes`.
+ * The `sizes` attribute is built mobile-first: the entry without `from` is the
+ * default, and every other entry applies from its `from` breakpoint up, as a
+ * `(width >= …)` media condition (range syntax).
  *
  * @example
- * // fixed-width thumb (250px, 16:9 ratio, 1x and 2x candidates)
+ * // fixed-width thumb (250px, 1x and 2x candidates); with no `ratio` nor explicit
+ * // heights, the viewer gets a width-only resize (bb=250x) and the `img` has no
+ * // `height` attribute
  * buildPictureTag({ baseSrc: 'https://img-viewer.example.com/abc123', alt: '…' });
  * // sizes="250px", srcset="… 250w, … 500w"
  *
  * @example
- * // responsive image: 250px up to 576px, 500px up to 992px, 800px beyond.
- * // NB: `breakpoints` has one entry less than `sizes`: the missing one
- * // corresponds to the *last* `sizes` entry, used as default beyond the last breakpoint
+ * // responsive image: 250px by default, 500px from 576px, 800px from 992px.
+ * // NB: the entry without `from` is the mobile-first default (exactly one is
+ * // expected); a bare number or [width, height] pair is a shorthand for it
  * buildPictureTag({
  *   baseSrc,
- *   sizes: [250, 500, 800],
- *   breakpoints: [576, 992],
+ *   sizes: [250, { from: 576, size: 500 }, { from: 992, size: 800 }],
  * });
- * // sizes="(max-width: 576px) 250px, (max-width: 992px) 500px, 800px"
+ * // sizes="(width >= 992px) 800px, (width >= 576px) 500px, 250px"
  *
  * @example
- * // custom ratio for numeric entries and candidates up to 3x
+ * // custom ratio for numeric sizes and candidates up to 3x
  * buildPictureTag({
  *   baseSrc,
- *   sizes: [250, 500],
- *   breakpoints: [768],
+ *   sizes: [250, { from: 768, size: 500 }],
  *   ratio: 4/3,
  *   dpr: 3,
  * });
  *
  * @example
  * // different aspect ratio per breakpoint: explicit [width, height] pairs
- * // (can be mixed with numeric entries, which use `ratio`)
+ * // (can be mixed with numeric sizes, which use `ratio`)
  * buildPictureTag({
  *   baseSrc,
- *   sizes: [[250, 250], [800, 450]], // square on mobile, 16:9 on desktop
- *   breakpoints: [576],
+ *   sizes: [[250, 250], { from: 576, size: [800, 450] }], // square on mobile, 16:9 on desktop
  * });
  *
  * @example
  * // dev environment (no avif) and above-the-fold img (no loading="lazy")
  * buildPictureTag({ baseSrc, devMode: true, lazy: false });
  *
+ * @example
+ * // onLoad callback: reveal the image once it has finished loading
+ * buildPictureTag({
+ *   baseSrc,
+ *   imgExtraClass: 'img-loading',
+ *   onLoad: img => img.classList.remove('img-loading'),
+ * });
+ *
  * @param {Object} args
  * @param {string} args.baseSrc - Image base URL (viewer endpoint); its query params are preserved.
- * @param {(number | [number, number])[]} [args.sizes=[250]] - Rendered image sizes, in ascending width order, one per breakpoint plus the default (entries beyond `breakpoints.length + 1` are ignored in the `sizes` attribute). Each entry is a width (px, height computed with `ratio`) or an explicit `[width, height]` pair (px), allowing a different aspect ratio per breakpoint.
- * @param {number} [args.ratio=16/9] - Default aspect ratio (width / height, as in the CSS `aspect-ratio` property) used to compute the height of numeric `sizes` entries.
+ * @param {(number | [number, number] | PictureSizeEntry)[]} [args.sizes=[250]] - Rendered image sizes, in any order. Each entry is a `{from, size}` object (see {@link PictureSizeEntry}); a bare number or `[width, height]` pair is a shorthand for the mobile-first default entry (the one without `from`), expected exactly once.
+ * @param {number|null} [args.ratio=null] - Default aspect ratio (width / height, as in the CSS `aspect-ratio` property) used to compute the height of numeric sizes. When null, no height is computed: the height-related output (`height` attribute, height in the `bb` param) is omitted and the viewer preserves the image's own ratio.
  * @param {number} [args.dpr=2] - Maximum pixel density (integer): `srcset` candidates are generated for every density from 1 to `dpr`.
- * @param {number[]} [args.breakpoints=[]] - `max-width` breakpoints (px) paired with `sizes` (one element less than `sizes`).
- * @param {[string, string|number][]} [args.img_params=[['q','60'],['fd',1]]] - Query params (`[name, value]` pairs) added to every generated URL.
+ * @param {[string, string|number][]} [args.img_params=[['q','60']]] - Query params (`[name, value]` pairs) added to every generated URL.
  * @param {string[]} [args.formats=['avif','webp','pjpg']] - Image formats: the last one is used for the `img` fallback element, the others for the `source` elements.
  * @param {boolean} [args.devMode=false] - When true, `avif` is excluded from `formats` (not supported by the local dev environment).
  * @param {boolean} [args.lazy=true] - When true, the `img` element gets `loading="lazy"`.
+ * @param {'high'|'low'|null} [args.fetchpriority=null] - `fetchpriority` attribute for the `img` element: use `high` for the LCP/above-the-fold image (typically with `lazy: false`). When null the attribute is omitted (browser default `auto`).
+ * @param {((img: HTMLImageElement) => void) | null} [args.onLoad=null] - Called once the image has finished loading, receiving the `img` element (called immediately if the image is already complete).
  * @param {boolean} [args.condition=true] - When false, the function returns `null` without building anything.
+ * @param {boolean} [args.legacyMediaSyntax=false] - When true, the `sizes` media conditions use `(min-width: …)` instead of the range syntax `(width >= …)`, for older browsers (pre Chrome/Edge 104, Firefox 102, Safari 16.4).
  * @param {string|null} [args.pictureExtraClass=null] - Extra class(es) for the `picture` element.
  * @param {Object<string, *>} [args.pictureExtraAttrs={}] - Extra attributes for the `picture` element.
  * @param {string|null} [args.imgExtraClass=null] - Extra class(es) for the `img` element.
@@ -73,14 +91,16 @@ import { classnames } from './classnames.js';
 export function buildPictureTag({
   baseSrc,
   sizes = [250],
-  ratio = 16/9,
+  ratio = null,
   dpr = 2,
-  breakpoints = [],
   img_params = [ ['q', '60'] ],
   formats = ['avif', 'webp', 'pjpg'],
   devMode = false,
   lazy = true,
+  fetchpriority = null,
+  onLoad = null,
   condition = true,
+  legacyMediaSyntax = false,
   pictureExtraClass = null,
   pictureExtraAttrs = {},
   imgExtraClass = null,
@@ -100,46 +120,56 @@ export function buildPictureTag({
     formats = formats.filter(fmt => fmt !== 'avif');
   }
 
-  if(sizes.length > breakpoints.length + 1) {
-    // eslint-disable-next-line no-console
-    console.warn('[buildPictureTag] `sizes` should have one entry more than `breakpoints`: extra entries are ignored in the `sizes` attribute');
-  }
-
   // densità generate: da 1 a `dpr`
   const dprList = Array.from({length: dpr}, (_, i) => i + 1);
+
+  // entry di `sizes` normalizzate in oggetti {from, width, height}
+  // (per le size numeriche l'altezza è calcolata con `ratio`, se presente, altrimenti è null),
+  // ordinate per breakpoint, con il default (from = null) per primo
+  const sizeEntries = sizes.map(entry => {
+    if(typeof entry === 'object' && !Array.isArray(entry)) {
+      const [width, height] = Array.isArray(entry.size)? entry.size : [entry.size, ratio == null? null : Math.floor(entry.size / ratio)];
+      return { from: entry.from ?? null, width, height };
+    }
+    const [width, height] = Array.isArray(entry)? entry : [entry, ratio == null? null : Math.floor(entry / ratio)];
+    return { from: null, width, height };
+  }).sort((a, b) => (a.from ?? 0) - (b.from ?? 0));
+
+  // entry default (mobile-first, senza `from`): deve essere esattamente una
+  const defaultEntry = sizeEntries.find(e => e.from == null) ?? sizeEntries[0]
+    ,brkEntries = sizeEntries.filter(e => e.from != null && e !== defaultEntry);
+
+  if(sizeEntries.filter(e => e.from == null).length !== 1) {
+    // eslint-disable-next-line no-console
+    console.warn('[buildPictureTag] `sizes` must contain exactly one entry without `from` (the mobile-first default)');
+  }
 
   const base_url = new URL(baseSrc)
     ,searchParams = new URLSearchParams(base_url.search)
 
-    // sizes normalizzato in coppie [width, height]:
-    // per le entry numeriche l'altezza è calcolata con `ratio`
-    ,sizePairs = sizes.map(size => Array.isArray(size)
-      ? size
-      : /** @type {[number, number]} */ ([size, Math.floor(size / ratio)])
-    )
-
-    // dimensioni dei candidati srcset (una per ogni densità in `dpr`),
+    // dimensioni dei candidati srcset (una per ogni densità da 1 a `dpr`),
     // senza duplicati (per larghezza), in ordine crescente
-    ,srcsetSizes = sizePairs
-      .flatMap(([w, h]) => dprList.map(d => /** @type {[number, number]} */ ([w * d, h * d])))
+    ,srcsetSizes = sizeEntries
+      .flatMap(({width, height}) => dprList.map(d => /** @type {[number, number|null]} */ ([width * d, height == null? null : height * d])))
       .filter((pair, idx, arr) => arr.findIndex(p => p[0] === pair[0]) === idx)
       .sort((a, b) => a[0] - b[0])
 
-    // attributo `sizes`: ogni size è abbinata al breakpoint corrispondente (max-width),
-    // quella successiva all'ultimo breakpoint è il valore di default
-    // (le eventuali entry oltre `breakpoints.length + 1` vengono ignorate)
-    ,sizesAttr = sizePairs
-      .slice(0, breakpoints.length + 1)
-      .map(([w], i) => i < breakpoints.length? `(max-width: ${breakpoints[i]}px) ${w}px` : `${w}px`)
+    // attributo `sizes` (mobile-first): le entry con breakpoint in ordine decrescente
+    // (vince la prima condizione che matcha), il default per ultimo
+    ,sizesAttr = brkEntries
+      .map(({from, width}) => legacyMediaSyntax
+        ? `(min-width: ${from}px) ${width}px`
+        : `(width >= ${from}px) ${width}px`
+      )
+      .reverse()
+      .concat(`${defaultEntry.width}px`)
       .join(', ')
 
-    // dimensioni intrinseche dell'elemento img: la size più grande,
-    // indipendentemente dall'ordine delle entry
-    ,[imgWidth, imgHeight] = sizePairs.reduce((max, pair) => pair[0] > max[0]? pair : max)
+    // dimensioni intrinseche dell'elemento img: la size più grande
+    ,{width: imgWidth, height: imgHeight} = sizeEntries.reduce((max, entry) => entry.width > max.width? entry : max)
 
-    // larghezza 1x della size mediana (mediana inferiore se le size sono pari),
-    // indipendentemente dall'ordine delle entry
-    ,medianWidth = sizePairs.map(([w]) => w).sort((a, b) => a - b)[Math.floor((sizePairs.length - 1) / 2)]
+    // larghezza 1x della size mediana (mediana inferiore se le size sono pari)
+    ,medianWidth = sizeEntries.map(({width}) => width).sort((a, b) => a - b)[Math.floor((sizeEntries.length - 1) / 2)]
 
     // indice del candidato srcset usato come src di default dell'img
     ,defaultSrcIdx = srcsetSizes.findIndex(([w]) => w === medianWidth)
@@ -171,7 +201,8 @@ export function buildPictureTag({
       searchParams.set('f', fmt);
 
       srcsetSizes.forEach(([w, h]) => {
-        searchParams.set('bb', `${w}x${h}`);
+        // TODO senza altezza `bb=<w>x` vale per questo viewer: prevedere altre convenzioni (es. imgix)
+        searchParams.set('bb', `${w}x${h ?? ''}`);
         base_url.search = searchParams.toString();
         srcsetArray.push(`${base_url.toString()} ${w}w`);
       });
@@ -189,7 +220,17 @@ export function buildPictureTag({
             width: imgWidth,
             height: imgHeight,
             loading: lazy? 'lazy' : null,
+            decoding: 'async',
+            fetchpriority: fetchpriority,
             ...imgExtraAttrs
+          },
+          callback: onLoad == null? undefined : el => {
+            const img = /** @type {HTMLImageElement} */ (el);
+            if(img.complete) {
+              onLoad(img);
+            } else {
+              img.addEventListener('load', () => onLoad(img), {once: true});
+            }
           },
           // TODO classe popover, se attivato
           // callback: options.addPopover
