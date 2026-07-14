@@ -62,12 +62,13 @@ import { classnames } from './classnames.js';
  * @param {string[]} [args.formats=['avif','webp','pjpg']] - Image formats: the last one is used for the `img` fallback element, the others for the `source` elements.
  * @param {boolean} [args.devMode=false] - When true, `avif` is excluded from `formats` (not supported by the local dev environment).
  * @param {boolean} [args.lazy=true] - When true, the `img` element gets `loading="lazy"`.
+ * @param {boolean} [args.condition=true] - When false, the function returns `null` without building anything.
  * @param {string|null} [args.pictureExtraClass=null] - Extra class(es) for the `picture` element.
  * @param {Object<string, *>} [args.pictureExtraAttrs={}] - Extra attributes for the `picture` element.
  * @param {string|null} [args.imgExtraClass=null] - Extra class(es) for the `img` element.
  * @param {Object<string, *>} [args.imgExtraAttrs={}] - Extra attributes for the `img` element.
  * @param {string} [args.alt=''] - `alt` text for the `img` element.
- * @returns {DomBuilderItem|null} The `picture` domBuilder item, or `null` when `baseSrc` is missing.
+ * @returns {DomBuilderItem|null} The `picture` domBuilder item, or `null` when `baseSrc` is missing or `condition` is false.
  */
 export function buildPictureTag({
   baseSrc,
@@ -79,6 +80,7 @@ export function buildPictureTag({
   formats = ['avif', 'webp', 'pjpg'],
   devMode = false,
   lazy = true,
+  condition = true,
   pictureExtraClass = null,
   pictureExtraAttrs = {},
   imgExtraClass = null,
@@ -89,7 +91,7 @@ export function buildPictureTag({
 
 }){
 
-  if(baseSrc == null) {
+  if(baseSrc == null || !condition) {
     return null;
   }
 
