@@ -54,7 +54,7 @@ import { classnames } from './classnames.js';
  *
  * @param {Object} args
  * @param {string} args.baseSrc - Image base URL (viewer endpoint); its query params are preserved.
- * @param {(number | [number, number])[]} [args.sizes=[250]] - Rendered image sizes, in ascending width order, one per breakpoint plus the default. Each entry is a width (px, height computed with `ratio`) or an explicit `[width, height]` pair (px), allowing a different aspect ratio per breakpoint.
+ * @param {(number | [number, number])[]} [args.sizes=[250]] - Rendered image sizes, in ascending width order, one per breakpoint plus the default (entries beyond `breakpoints.length + 1` are ignored in the `sizes` attribute). Each entry is a width (px, height computed with `ratio`) or an explicit `[width, height]` pair (px), allowing a different aspect ratio per breakpoint.
  * @param {number} [args.ratio=16/9] - Default aspect ratio (width / height, as in the CSS `aspect-ratio` property) used to compute the height of numeric `sizes` entries.
  * @param {number} [args.dpr=2] - Maximum pixel density (integer): `srcset` candidates are generated for every density from 1 to `dpr`.
  * @param {number[]} [args.breakpoints=[]] - `max-width` breakpoints (px) paired with `sizes` (one element less than `sizes`).
@@ -100,6 +100,11 @@ export function buildPictureTag({
     formats = formats.filter(fmt => fmt !== 'avif');
   }
 
+  if(sizes.length > breakpoints.length + 1) {
+    // eslint-disable-next-line no-console
+    console.warn('[buildPictureTag] `sizes` should have one entry more than `breakpoints`: extra entries are ignored in the `sizes` attribute');
+  }
+
   // densità generate: da 1 a `dpr`
   const dprList = Array.from({length: dpr}, (_, i) => i + 1);
 
@@ -121,17 +126,23 @@ export function buildPictureTag({
       .sort((a, b) => a[0] - b[0])
 
     // attributo `sizes`: ogni size è abbinata al breakpoint corrispondente (max-width),
-    // l'ultima (senza breakpoint) è il valore di default
+    // quella successiva all'ultimo breakpoint è il valore di default
+    // (le eventuali entry oltre `breakpoints.length + 1` vengono ignorate)
     ,sizesAttr = sizePairs
+      .slice(0, breakpoints.length + 1)
       .map(([w], i) => i < breakpoints.length? `(max-width: ${breakpoints[i]}px) ${w}px` : `${w}px`)
       .join(', ')
 
-    // dimensioni intrinseche dell'elemento img (la size più grande)
-    ,[imgWidth, imgHeight] = sizePairs[sizePairs.length - 1]
+    // dimensioni intrinseche dell'elemento img: la size più grande,
+    // indipendentemente dall'ordine delle entry
+    ,[imgWidth, imgHeight] = sizePairs.reduce((max, pair) => pair[0] > max[0]? pair : max)
 
-    // indice del candidato srcset usato come src di default dell'img:
-    // il candidato 1x della size mediana (mediana inferiore se le size sono pari)
-    ,defaultSrcIdx = srcsetSizes.findIndex(([w]) => w === sizePairs[Math.floor((sizePairs.length - 1) / 2)][0])
+    // larghezza 1x della size mediana (mediana inferiore se le size sono pari),
+    // indipendentemente dall'ordine delle entry
+    ,medianWidth = sizePairs.map(([w]) => w).sort((a, b) => a - b)[Math.floor((sizePairs.length - 1) / 2)]
+
+    // indice del candidato srcset usato come src di default dell'img
+    ,defaultSrcIdx = srcsetSizes.findIndex(([w]) => w === medianWidth)
   ;
 
   img_params.forEach(([name, value]) => searchParams.set(name, String(value)));
