@@ -31,3 +31,4 @@
 * 1.12.0 (13 lug 2026) - webpack starter in dev-tools
 * 1.13.0 (13 lug 2026) - create-favicons: bitmap sources
 * 1.14.0 (14 lug 2026) - buildPictureTag
+* 1.15.0 (15 lug 2026) - parse-file-size.js

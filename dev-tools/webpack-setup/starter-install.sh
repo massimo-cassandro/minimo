@@ -1,5 +1,11 @@
 #!/bin/zsh
 
+# Questo script richiede zsh: se lanciato con sh/bash blocca l'esecuzione
+if [ -z "$ZSH_VERSION" ]; then
+  echo "Errore: lanciare con 'zsh starter-install.sh', non con sh/bash." >&2
+  exit 1
+fi
+
 # Configurazione variabili
 # BASE_URL="https://raw.githubusercontent.com/massimo-cassandro/minimo/refs/heads/main"
 
@@ -24,33 +30,38 @@ NC='\033[0m' # No Color
 # protezione contro la sovrascrittura
 set -C
 
-# Array per tracciare le copie bloccati
+# Array per tracciare i file già esistenti
 BLOCKED_FILES=()
 
-# Wrapper: copia solo se il file non esiste, altrimenti registra il blocco
+# Wrapper: copia solo se il file non esiste, altrimenti registra il blocco.
+# Con terzo argomento "new", se la destinazione esiste già la copia viene
+# comunque creata con prefisso NEW- (da integrare manualmente o rimuovere)
 safe_cat() {
   local src="$1"
   local dest="$2"
+  local mode="$3"
+  if [ ! -f "$src" ]; then
+    echo -e "${RED}Sorgente mancante: $src${NC}"
+    return 1
+  fi
   if [ -e "$dest" ]; then
-    BLOCKED_FILES+=("$dest")
+    if [ "$mode" = "new" ]; then
+      local new_dest="$(dirname "$dest")/NEW-$(basename "$dest")"
+      cat "$src" >| "$new_dest"
+      BLOCKED_FILES+=("$dest → copiato come $new_dest")
+    else
+      BLOCKED_FILES+=("$dest")
+    fi
   else
     cat "$src" > "$dest"
   fi
 }
 
 echo -e "${GREEN}...package.json${NC}"
-if [ ! -f package.json ]; then
-  safe_cat "${TEMPLATES_DIR}/package-tpl.json" package.json
-else
-  echo -e "${GREEN}package.json already exists${NC}"
-fi
+safe_cat "${TEMPLATES_DIR}/package-tpl.json" package.json new
 
 echo -e "${GREEN}...gitignore${NC}"
-if [ ! -f .gitignore ]; then
-  safe_cat "${TEMPLATES_DIR}/_gitignore" .gitignore
-else
-  echo -e "${GREEN}.gitignore already exists${NC}"
-fi
+safe_cat "${TEMPLATES_DIR}/_gitignore" .gitignore new
 
 echo -e "\n${GREEN}Where do you want to install the frontend configuration?${NC}"
 echo "1) Root directory"
@@ -73,20 +84,20 @@ fi
 
 echo -e "\n${GREEN}...config files & utilities${NC}"
 
-safe_cat "${TEMPLATES_DIR}/_browserslistrc"            .browserslistrc
-safe_cat "${TEMPLATES_DIR}/_editorconfig"              .editorconfig
-safe_cat "${TEMPLATES_DIR}/_prettierrc"                .prettierrc
-safe_cat "${TEMPLATES_DIR}/jsconfig.json"              jsconfig.json
-safe_cat "${TEMPLATES_DIR}/__project__.code-workspace" __project__.code-workspace
+safe_cat "${TEMPLATES_DIR}/_browserslistrc"            .browserslistrc new
+safe_cat "${TEMPLATES_DIR}/_editorconfig"              .editorconfig new
+safe_cat "${TEMPLATES_DIR}/_prettierrc"                .prettierrc new
+safe_cat "${TEMPLATES_DIR}/jsconfig.json"              jsconfig.json new
+safe_cat "${TEMPLATES_DIR}/__project__.code-workspace" __project__.code-workspace new
 
 
 echo -e "\n${GREEN}...eslint${NC}"
 npm i -D @massimo-cassandro/eslint-config
-safe_cat "${TEMPLATES_DIR}/eslint.config.mjs" eslint.config.mjs
+safe_cat "${TEMPLATES_DIR}/eslint.config.mjs" eslint.config.mjs new
 
 echo -e "\n${GREEN}...stylelint${NC}"
 npm i -D @massimo-cassandro/stylelint-config
-safe_cat "${TEMPLATES_DIR}/stylelint.config.mjs" stylelint.config.mjs
+safe_cat "${TEMPLATES_DIR}/stylelint.config.mjs" stylelint.config.mjs new
 
 echo -e "\n${GREEN}...webpack${NC}"
 npm i -D webpack-cli webpack-dev-server webpack-manifest-plugin webpack
@@ -117,15 +128,19 @@ FILES=(
   'postcss.config.mjs'
 )
 
-if [ ! -d "$WEBPACK_LOCAL_DIR" ]; then
-  mkdir -p "$WEBPACK_LOCAL_DIR"
-
-  for FILE in "${FILES[@]}"; do
-    # echo "Scaricamento di $FILE..."
-    safe_cat "${WEBPACK_MODULES_REMOTE_URL}/${FILE}" "${WEBPACK_LOCAL_DIR}/${FILE}"
-  done
-
+# se la cartella esiste già, i moduli vengono copiati in NEW-webpack-modules
+# (da integrare manualmente o rimuovere)
+if [ -d "$WEBPACK_LOCAL_DIR" ]; then
+  NEW_WEBPACK_LOCAL_DIR="$(dirname "$WEBPACK_LOCAL_DIR")/NEW-$(basename "$WEBPACK_LOCAL_DIR")"
+  BLOCKED_FILES+=("$WEBPACK_LOCAL_DIR → copiata come $NEW_WEBPACK_LOCAL_DIR")
+  WEBPACK_LOCAL_DIR="$NEW_WEBPACK_LOCAL_DIR"
 fi
+
+mkdir -p "$WEBPACK_LOCAL_DIR"
+
+for FILE in "${FILES[@]}"; do
+  safe_cat "${WEBPACK_MODULES_REMOTE_URL}/${FILE}" "${WEBPACK_LOCAL_DIR}/${FILE}"
+done
 
 echo -e "\n${GREEN}Creating a template of your frontend application's folder structured${NC}"
 
@@ -136,9 +151,9 @@ mkdir -p error-pages imgs icons src src/css favicons design-tokens
 cd ..
 set +C
 
-# Riepilogo finale dei file bloccati
+# Riepilogo finale dei file già esistenti
 if [ ${#BLOCKED_FILES[@]} -gt 0 ]; then
-  echo -e "\n${YELLOW}*** File non copiati (già esistenti): ***${NC}"
+  echo -e "\n${YELLOW}*** File già esistenti (non copiati o copiati con prefisso NEW-): ***${NC}"
   for F in "${BLOCKED_FILES[@]}"; do
     echo -e "${YELLOW}  ✗ $F${NC}"
   done

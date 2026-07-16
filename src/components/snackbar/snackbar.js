@@ -15,6 +15,7 @@ References
 
 // TODO snackbar action
 // TODO handle multiple simultaneous snackbars (no stacking)
+// TODO test con prefers-reduced-motion
 
 /**
  * Displays a snackbar / toast notification using the Popover API.
@@ -53,12 +54,22 @@ export function snackbar(message, options = {}){
 
     if (_timeoutID) clearTimeout(_timeoutID);
 
-    _popover?.classList.add(styles.isHiding);
-
-    _popover?.addEventListener('animationend', () => {
+    const remove = () => {
       _popover?.hidePopover();
       _popover?.remove();
-    }, { once: true }); // 'once' prevents duplicate listeners; the flag guards against calls before animation ends
+    };
+
+    _popover?.classList.add(styles.isHiding);
+
+    // with `prefers-reduced-motion` (or any override disabling animations) no animation
+    // runs and `animationend` would never fire: in that case remove immediately
+    if (_popover?.getAnimations().length) {
+      // 'once' prevents duplicate listeners; the flag guards against calls before animation ends
+      _popover.addEventListener('animationend', remove, { once: true });
+    }
+    else {
+      remove();
+    }
   };
 
   _popover = domBuilder([

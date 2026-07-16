@@ -11,6 +11,7 @@ export { escapeHTML, unescapeHTML } from './src/utilities/escape-html.js';
 export { generatePwd } from './src/utilities/generate-pwd.js';
 export { getCookie, setCookie } from './src/utilities/cookies.js';
 export { linkedDates } from './src/utilities/linked-dates.js';
+export { parseFileSize } from './src/utilities/parse-file-size.js';
 export { randomId } from './src/utilities/random-id.js';
 export { relativeDate } from './src/utilities/relative-date.js';
 export { sentenceCase } from './src/utilities/sentence-case.js';
