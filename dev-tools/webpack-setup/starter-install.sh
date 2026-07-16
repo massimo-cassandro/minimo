@@ -1,8 +1,13 @@
 #!/bin/zsh
 
+RED='\033[0;31m'
+YELLOW='\033[0;33m'
+GREEN='\033[0;32m'
+NC='\033[0m' # No Color
+
 # Questo script richiede zsh: se lanciato con sh/bash blocca l'esecuzione
 if [ -z "$ZSH_VERSION" ]; then
-  echo "Errore: lanciare con 'zsh starter-install.sh', non con sh/bash." >&2
+  printf "${RED}Errore: lanciare con 'zsh starter-install.sh', non con sh/bash.${NC}\n" >&2
   exit 1
 fi
 
@@ -21,11 +26,6 @@ echo "BASE_URL: ${BASE_URL}"
 TEMPLATES_DIR="${BASE_URL}/templates"
 # WEBPACK_SOURCE_DIR="$BASE_URL/webpack-setup"
 WEBPACK_SOURCE_DIR="$BASE_URL"
-
-RED='\033[0;31m'
-YELLOW='\033[0;33m'
-GREEN='\033[0;32m'
-NC='\033[0m' # No Color
 
 # protezione contro la sovrascrittura
 set -C
@@ -58,7 +58,25 @@ safe_cat() {
 }
 
 echo -e "${GREEN}...package.json${NC}"
-safe_cat "${TEMPLATES_DIR}/package-tpl.json" package.json new
+if [ ! -f package.json ]; then
+  safe_cat "${TEMPLATES_DIR}/package-tpl.json" package.json
+elif [ ! -f "${TEMPLATES_DIR}/package-tpl.json" ]; then
+  echo -e "${RED}Sorgente mancante: ${TEMPLATES_DIR}/package-tpl.json${NC}"
+else
+  # package.json esistente: merge con il template, aggiungendo in fondo
+  # le chiavi del template prefissate con '_' (ordine originale preservato)
+  node -e '
+    const fs = require("fs");
+    const existing = JSON.parse(fs.readFileSync("package.json", "utf8"));
+    const tpl = JSON.parse(fs.readFileSync(process.argv[1], "utf8"));
+    for (const [key, value] of Object.entries(tpl)) {
+      existing["_" + key] = value;
+    }
+    fs.writeFileSync("package.json", JSON.stringify(existing, null, 2) + "\n");
+  ' "${TEMPLATES_DIR}/package-tpl.json"
+  echo -e "${YELLOW}package.json esistente: chiavi del template aggiunte in fondo con prefisso '_' (da integrare o rimuovere)${NC}"
+  BLOCKED_FILES+=("package.json → merge: chiavi template aggiunte con prefisso \`_\`")
+fi
 
 echo -e "${GREEN}...gitignore${NC}"
 safe_cat "${TEMPLATES_DIR}/_gitignore" .gitignore new
@@ -88,7 +106,26 @@ safe_cat "${TEMPLATES_DIR}/_browserslistrc"            .browserslistrc new
 safe_cat "${TEMPLATES_DIR}/_editorconfig"              .editorconfig new
 safe_cat "${TEMPLATES_DIR}/_prettierrc"                .prettierrc new
 safe_cat "${TEMPLATES_DIR}/jsconfig.json"              jsconfig.json new
-safe_cat "${TEMPLATES_DIR}/__project__.code-workspace" __project__.code-workspace new
+
+# code-workspace: se un file .code-workspace esiste già (qualunque sia il nome),
+# le chiavi del template vengono aggiunte in fondo con prefisso '_'
+WORKSPACE_TPL="${TEMPLATES_DIR}/__project__.code-workspace"
+WORKSPACE_FILES=( *.code-workspace(N) )
+if [ ${#WORKSPACE_FILES[@]} -gt 1 ]; then
+  echo -e "${RED}Trovati più file .code-workspace (${WORKSPACE_FILES[*]}): merge non eseguito${NC}"
+elif [ ${#WORKSPACE_FILES[@]} -eq 0 ]; then
+  safe_cat "$WORKSPACE_TPL" __project__.code-workspace
+elif [ ! -f "$WORKSPACE_TPL" ]; then
+  echo -e "${RED}Sorgente mancante: ${WORKSPACE_TPL}${NC}"
+else
+  WORKSPACE_FILE="${WORKSPACE_FILES[1]}"
+  if node "${BASE_URL}/merge-jsonc.cjs" "$WORKSPACE_TPL" "$WORKSPACE_FILE"; then
+    echo -e "${YELLOW}${WORKSPACE_FILE} esistente: chiavi del template aggiunte in fondo con prefisso '_' (da integrare o rimuovere)${NC}"
+    BLOCKED_FILES+=("${WORKSPACE_FILE} → merge: chiavi template aggiunte con prefisso \`_\`")
+  else
+    echo -e "${RED}Merge di ${WORKSPACE_FILE} non riuscito${NC}"
+  fi
+fi
 
 
 echo -e "\n${GREEN}...eslint${NC}"

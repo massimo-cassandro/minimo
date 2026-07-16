@@ -6,9 +6,31 @@ A collection of standalone Node.js CLI utilities to help manage a web project's 
 * [Svg Icons Tools](./svg-icons-tools/README.md) — optimizes SVG icons and combines/converts them into symbols, JSX, or SCSS variables
 * [Create favicons](./create-favicons/README.md) — generates the full favicon set (SVG, PNG, ICO, webmanifest, HTML snippet) from a source image
 * [upd@m](./upd@m/README.md) — updates all `@massimo-cassandro/*` packages installed in `node_modules`
-* **webpack-setup** — script for installing minimo environment
+* [webpack-setup](#webpack-setup) — script for installing minimo environment
 
-## Usage of SVG adn favicons tools
+## webpack-setup
+
+`webpack-setup/starter-install.sh` bootstraps a new frontend project: it copies the starter config files (`package.json`, `.gitignore`, `jsconfig.json`, eslint/stylelint configs, webpack config and modules, ...) and installs all the required dev dependencies.
+
+The script **requires zsh** (it exits with an error if launched with `sh` or `bash`). Existing files are never overwritten: root config files are copied with a `NEW-` prefix, while `package.json` and the `*.code-workspace` file are merged (template keys are appended at the end, prefixed with `_`).
+
+### If minimo is already installed
+
+```bash
+zsh node_modules/@massimo-cassandro/minimo/dev-tools/webpack-setup/starter-install.sh
+```
+
+### Without installing minimo
+
+To bootstrap a project **before** (or without) installing the whole package, download only the `webpack-setup` folder from the npm tarball and run the script from there:
+
+```bash
+curl -sL "$(npm view @massimo-cassandro/minimo dist.tarball)" | tar xz package/dev-tools/webpack-setup
+zsh package/dev-tools/webpack-setup/starter-install.sh
+rm -rf package
+```
+
+## SVG adn favicons tools
 
 ```bash
 ## SVG Icons Tools
