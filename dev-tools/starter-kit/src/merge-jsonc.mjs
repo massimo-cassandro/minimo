@@ -2,9 +2,9 @@
 // Merge JSONC: aggiunge in fondo al file di destinazione le chiavi di primo
 // livello del template, prefissate con '_', preservando commenti e
 // formattazione di entrambi i file.
-// Uso: node merge-jsonc.cjs <template> <destinazione>
+// Uso: node merge-jsonc.mjs <template> <destinazione>
 
-const fs = require('fs');
+import fs from 'fs';
 
 // Analizza un testo JSONC ignorando stringhe e commenti: individua
 // l'oggetto principale, le virgole a profondità 1 e la posizione

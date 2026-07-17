@@ -1,0 +1,24 @@
+/*
+  Template di entry css (globale o di pagina) — rinominare e adattare.
+
+  NB: OGNI entry css (globale, di pagina, `.critical`) deve importare
+  direttamente custom-properties.css: PurgeCSS elabora gli asset css
+  SINGOLARMENTE e mantiene in ciascuno solo le custom properties
+  effettivamente usate nell'asset stesso (`variables: true`, che
+  sostituisce postcss-jit-props). L'import diretto non produce quindi
+  duplicazioni nel css finale.
+*/
+
+@import '@css/custom-properties.css';
+/* @import '@css/fonts.css'; */
+
+/* @import '@css/custom-media.css'; */ /* NON necessario: iniettato da postcss-global-data */
+
+/* moduli minimo: importare solo quelli effettivamente usati */
+/* @import '@minimo/css/reset.css'; */
+/* @import '@minimo/css/layout-base.css'; */
+/* @import '@minimo/css/container.css'; */
+/* @import '@minimo/css/forms/forms.css'; */
+/* @import '@minimo/css/buttons/buttons.css'; */
+/* @import '@minimo/css/alerts.css'; */
+/* ... */

@@ -113,6 +113,7 @@ safe_cat "${TEMPLATES_DIR}/_browserslistrc"            .browserslistrc new
 safe_cat "${TEMPLATES_DIR}/_editorconfig"              .editorconfig new
 safe_cat "${TEMPLATES_DIR}/_prettierrc"                .prettierrc new
 safe_cat "${TEMPLATES_DIR}/jsconfig.json"              jsconfig.json new
+safe_cat "${TEMPLATES_DIR}/tokens-config.mjs"          tokens-config.mjs new
 safe_cat "${TEMPLATES_DIR}/_root_htaccess"             _root_htaccess
 safe_cat "${TEMPLATES_DIR}/_root_robots.txt"           _root_robots.txt
 
@@ -128,7 +129,7 @@ elif [ ! -f "$WORKSPACE_TPL" ]; then
   echo -e "${RED}Sorgente mancante: ${WORKSPACE_TPL}${NC}"
 else
   WORKSPACE_FILE="${WORKSPACE_FILES[1]}"
-  if node "${BASE_URL}/merge-jsonc.cjs" "$WORKSPACE_TPL" "$WORKSPACE_FILE"; then
+  if node "${BASE_URL}/src/merge-jsonc.mjs" "$WORKSPACE_TPL" "$WORKSPACE_FILE"; then
     echo -e "${YELLOW}${WORKSPACE_FILE} esistente: chiavi del template aggiunte in fondo con prefisso '_' (da integrare o rimuovere)${NC}"
     BLOCKED_FILES+=("${WORKSPACE_FILE} → merge: chiavi template aggiunte con prefisso \`_\`")
   else
@@ -150,7 +151,9 @@ npm i -D webpack-cli webpack-dev-server webpack-manifest-plugin webpack
 npm i -D @babel/core @babel/preset-env babel-loader terser-webpack-plugin
 npm i -D webpack-remove-empty-scripts copy-webpack-plugin html-loader html-webpack-plugin
 npm i -D postcss autoprefixer postcss-custom-media @csstools/postcss-global-data postcss-loader postcss-preset-env
-npm i -D cssnano mini-css-extract-plugin style-loader css-loader css-minimizer-webpack-plugin
+# NB: niente cssnano: la minificazione è di css-minimizer-webpack-plugin e cssnano
+# nel loader postcss eliminerebbe i commenti `purgecss ignore` prima di PurgeCSS
+npm i -D mini-css-extract-plugin style-loader css-loader css-minimizer-webpack-plugin
 npm i -D responsive-loader
 npm i -D process dotenv-webpack
 npm i -D svgo svg-url-loader svgo-loader svgo-add-viewbox mini-svg-data-uri
@@ -172,6 +175,7 @@ FILES=(
   'svg-rules.mjs'
   'svgo.config.mjs'
   'postcss.config.mjs'
+  'purgecss-variables-safelist.mjs'
 )
 
 # se la cartella esiste già, i moduli vengono copiati in NEW-webpack-modules
@@ -195,6 +199,12 @@ mkdir -p "$TEMPLATE_DIR_NAME"
 cd "$TEMPLATE_DIR_NAME"
 mkdir -p error-pages imgs icons src src/css favicons design-tokens
 cd ..
+
+# template delle entry css (globale/di pagina e critical): ogni entry deve
+# importare direttamente custom-properties.css (vedi commenti nei file stessi)
+safe_cat "${TEMPLATES_DIR}/entry-tpl.css"          "${TEMPLATE_DIR_NAME}/src/entry-tpl.css"
+safe_cat "${TEMPLATES_DIR}/entry-tpl.critical.css" "${TEMPLATE_DIR_NAME}/src/entry-tpl.critical.css"
+
 set +C
 
 # Riepilogo finale dei file già esistenti

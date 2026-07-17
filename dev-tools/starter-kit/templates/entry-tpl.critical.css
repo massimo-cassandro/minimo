@@ -1,0 +1,18 @@
+/*
+  Template di entry css critical — rinominare e adattare.
+
+  Le entry con suffisso `.critical` generano asset destinati a essere
+  INLINATI nei template html: devono restare AUTOSUFFICIENTI e minimi.
+  Il suffisso attiva l'istanza PurgeCSS dedicata con purge stretto, in dev
+  e in prod (vedi purgeCSSPluginCritical in webpack.config.mjs), e la regola
+  dedicata in css-rules.mjs.
+
+  Anche qui va importato direttamente custom-properties.css: PurgeCSS
+  elabora gli asset singolarmente e mantiene in questo asset solo le
+  custom properties usate in questo file, quindi l'asset resta minimo
+  senza dipendere dal css globale della pagina.
+*/
+
+@import '@css/custom-properties.css';
+
+/* stili above-the-fold della pagina (layout iniziale, spinner, ecc.) */

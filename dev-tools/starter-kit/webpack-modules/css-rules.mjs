@@ -146,7 +146,12 @@ function css_loaders({
         modules: css_modules
           ? {
             auto: true,
-            localIdentName: isDevelopment ? '[local]_[hash:base64:6]' : '[hash:base64:10]',
+            // il prefisso fisso `m_`, presente in ENTRAMBE le modalità, consente
+            // il safelist delle classi dei css modules in PurgeCSS (safelist.deep
+            // [/^m_/], vedi webpack.config.mjs): le classi hashate non possono
+            // comparire nei file di contenuto scansionati, e il purge è attivo
+            // anche in dev
+            localIdentName: isDevelopment ? 'm_[local]_[hash:base64:6]' : 'm_[hash:base64:8]',
             exportLocalsConvention: 'as-is',
 
             // namedExport: false,

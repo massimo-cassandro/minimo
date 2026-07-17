@@ -5,7 +5,7 @@ export default {
       $type: 'fontFamily'
     },
     'family-mono': {
-      $value: "'Monaspace Neon Var', 'Monaspace Neon', 'Aptos Mono', 'Roboto Mono', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'Liberation Mono', 'Andale Mono', 'Courier New', monospace",
+      $value: '\'Monaspace Neon Var\', \'Monaspace Neon\', \'Aptos Mono\', \'Roboto Mono\', \'SFMono-Regular\', \'Menlo\', \'Monaco\', \'Consolas\', \'Liberation Mono\', \'Andale Mono\', \'Courier New\', monospace',
       $type: 'fontFamily'
     },
 

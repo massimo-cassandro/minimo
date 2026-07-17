@@ -1,4 +1,4 @@
-// webpack.config.mjs
+// webpack.config.mjs __project_name__
 import path from 'path';
 import { fileURLToPath } from 'url';
 import webpack from 'webpack';
@@ -22,6 +22,7 @@ import { PurgeCSSPlugin } from 'purgecss-webpack-plugin';
 import { globSync } from 'glob';
 
 import { cssRules } from './webpack-modules/css-rules.mjs';
+import { purgecssVariablesSafelist } from './webpack-modules/purgecss-variables-safelist.mjs';
 import { getJsConfigAliases } from './webpack-modules/get-jsConfig-aliases.mjs';
 import { svgRules } from './webpack-modules/svg-rules.mjs';
 
@@ -41,6 +42,7 @@ const isDevelopment = process.env.NODE_ENV === 'development'
   ,favicons_path_regexp = new RegExp(favicons_path) // source pattern per le favicons (regexp o null)
   ,jsConfigAliases = getJsConfigAliases(path.resolve(__dirname, './jsconfig.json'))
   ,packageJson = JSON.parse(fs.readFileSync(path.resolve(__dirname, './package.json'), 'utf-8'))
+  ,purgeCSSDebug = false // true per loggare i selettori rimossi da PurgeCSS a fine build
   // ,manifest_shared_seed = {}
 ;
 
@@ -87,6 +89,111 @@ const CopyWebpackPluginPatterns = [
   // }
 ];
 
+// =>> PurgeCSS: opzioni e istanze (usate nei plugins e dal log di debug)
+//
+// Vengono create DUE istanze, attive in ENTRAMBE le modalità (dev e prod),
+// così i problemi di purge emergono subito durante lo sviluppo:
+// - `purgeCSSPluginCritical`: solo le entry `*.critical` (purge stretto, gli asset
+//   devono essere autosufficienti e minimi perché inlinati nei template html)
+// - `purgeCSSPlugin`: tutti gli asset (il doppio passaggio sui critical è idempotente)
+//
+// NB (watch mode): i template twig NON sono osservati da webpack: dopo aver
+// aggiunto una classe solo in un twig occorre rilanciare la build (o toccare
+// un file js/css) perché il purge venga ricalcolato.
+// NB (dev): il plugin agisce solo sugli asset css emessi; con
+// `inlineCssInDevMode: true` i css non-critical in dev sono iniettati da
+// style-loader e non vengono purgati (i critical passano comunque da
+// MiniCssExtract e sono sempre purgati)
+
+// `paths`: SOLO file che generano markup o classi (html/ejs, twig, php, js);
+// NIENTE file css tra i paths: verrebbero letti come "contenuto" e ogni selettore
+// risulterebbe usato, vanificando il purge
+const purgeCSSCommonOptions = {
+  paths: () => globSync(
+    [
+      path.resolve(__dirname, './src/**/*.{js,mjs,jsx}'),
+      path.resolve(__dirname, './*.ejs'), // template html di webpack
+      path.resolve(__dirname, './src/**/*.ejs'),
+      // progetti symfony: template twig e classi generate lato php
+      // path.resolve(__dirname, '../templates/**/*.twig'),
+      // path.resolve(__dirname, '../src/**/*.php'),
+      // il js di minimo genera markup con classi proprie (snackbar, unsplash-page, ecc.)
+      // NB: adattare il percorso di node_modules se questo config è in una
+      // sottodirectory del progetto (es. frontend/ → '../node_modules/...')
+      path.resolve(__dirname, './node_modules/@massimo-cassandro/minimo/src/**/*.{js,mjs}'),
+    ],
+    { nodir: true }
+  ),
+
+  // extractor di default (/[A-Za-z0-9_-]+/g): adeguato a classi/tag/id,
+  // NON definire extractors custom (il vecchio /[A-z0-9-:/]+/ era buggato:
+  // il range [A-z] include caratteri non voluti come `[`, `\`, `^`, ...)
+
+  variables: true, // rimuove le custom properties non usate (sostituisce postcss-jit-props)
+  keyframes: true, // rimuove i @keyframes non referenziati
+  // fontFace resta false (default): i font sono referenziati solo tramite
+  // var(--font-family) e purgecss non risolve le custom properties nei valori,
+  // quindi con `true` i @font-face verrebbero rimossi anche se usati
+
+  rejected: purgeCSSDebug // popola purgedStats per il log di debug
+};
+
+// safelist base minima, comune alle due istanze
+const purgeCSSSafelistBase = {
+  standard: [
+    // classi costruite dinamicamente nei template o lato server, invisibili
+    // all'analisi statica dei paths. Esempio (da adattare al progetto):
+    // flash messages twig con class="alert alert-{{ label }}"
+    /^alert-(success|notice|error|warning)$/
+  ],
+  deep: [
+    // css modules: prefisso `m_` presente in dev e prod (vedi css-rules.mjs),
+    // le classi hashate non possono comparire nei file scansionati
+    /^m_/
+  ],
+  greedy: [
+    // INDISPENSABILE: purgecss non riconosce il nesting selector nativo e senza
+    // questo pattern i selettori annidati composti solo da `&` + pseudo classi
+    // (&:hover, &:focus-visible, `&` semplice, ecc.) verrebbero SEMPRE rimossi
+    /^&$/
+  ]
+};
+
+// css della pagina critici (inlinati nei template): purge stretto,
+// devono essere autosufficienti e minimi
+const purgeCSSPluginCritical = new PurgeCSSPlugin({
+  ...purgeCSSCommonOptions,
+  only: ['.critical'],
+  safelist: purgeCSSSafelistBase
+});
+
+// tutti gli altri asset (il purge è idempotente: il secondo passaggio
+// sui critical non rimuove altro)
+const purgeCSSPlugin = new PurgeCSSPlugin({
+  ...purgeCSSCommonOptions,
+  safelist: {
+    ...purgeCSSSafelistBase,
+    // elenco generato: usi di var() nei blocchi `purgecss ignore` e nei css
+    // shadow-DOM/`?raw`, override cross-asset (seeds), con chiusura transitiva
+    // delle dipendenze (vedi webpack-modules/purgecss-variables-safelist.mjs)
+    variables: purgecssVariablesSafelist({
+      declarationGlobs: [
+        path.resolve(__dirname, './src/**/*.css'),
+        path.resolve(__dirname, './node_modules/@massimo-cassandro/minimo/src/**/*.css'),
+      ],
+      shadowGlobs: [
+        path.resolve(__dirname, './src/web-components/**/*.css'),
+        path.resolve(__dirname, './node_modules/@massimo-cassandro/minimo/src/web-components/**/*.css'),
+      ],
+      seeds: [
+        // props dichiarate in un asset ma consumate in un altro (es. override
+        // di tema definiti nel css di una pagina e consumati dal css globale):
+        // indicarle qui per nome ('--btn-primary-bg') o pattern (/^--btn-/)
+      ]
+    })
+  }
+});
+
 // recupero metadata immagini
 // const require = createRequire(import.meta.url);
 // responsive-loader adapter (CJS) — use createRequire
@@ -96,8 +203,14 @@ const CopyWebpackPluginPatterns = [
 /** CONFIG **/
 
 // =>> entries
+// NB: percorsi dalla root del progetto
 const entries = {
-  'xxxxxx': './src/index.js' // NB percorso dalla root
+  'xxxxxx': './src/index.js'
+
+  // css critici inlinati nei template html: il suffisso `.critical` nel nome
+  // della entry attiva l'istanza PurgeCSS dedicata con purge stretto
+  // (vedi purgeCSSPluginCritical) e la regola dedicata in css-rules.mjs
+  // ,'xxxxxx.critical': './src/xxxxxx.critical.css'
 };
 
 
@@ -106,7 +219,14 @@ const config = {
 
   // watch: isDevelopment, // necessario se non si usa devServer
   watchOptions: {
-    ignored: [ 'build', '**/node_modules', '.git', '_private' ],
+    ignored: [
+      '**/build/**',
+      '**/_dev/**',
+      '**/.git/**',
+      '**/_private/**',
+      '**/node_modules/**',
+      '!**/node_modules/@massimo-cassandro/**'
+    ],
     // poll: 1000, // se necessario, risolve il problema `Error: EMFILE: too many open files, watch`
   },
 
@@ -153,7 +273,7 @@ const config = {
         extractComments: false
       })
     ],
-    runtimeChunk: true,
+    runtimeChunk: 'single', // true
     splitChunks: {
       cacheGroups: {
 
@@ -172,7 +292,18 @@ const config = {
         },
 
         shared: {
-          test: shared_chunk_paths,
+          // solo moduli js (module.type !== 'css/mini-extract'): il css estratto
+          // resta nel chunk della entry che lo importa, così ogni asset css è
+          // autosufficiente. Necessario per PurgeCSS (`variables: true` funziona
+          // per singolo asset) e per i critical css inlinati nei template
+          //
+          // TODO: se in futuro la duplicazione di css tra le pagine dovesse crescere
+          // (componenti importati dal js di più entry), valutare un cacheGroup `styles`
+          // dedicato ai css condivisi: andranno escluse le entry `.critical` (devono
+          // restare autosufficienti) e gestite in safelist.variables le custom properties
+          // definite/consumate tra asset diversi (vedi purgecss-variables-safelist.mjs)
+          test: (module) => module.type !== 'css/mini-extract'
+            && shared_chunk_paths.test(module.nameForCondition?.() ?? ''),
           // test: /[\\/]node_modules[\\/]/,
 
           // alternativa: non include nel chunk shared i path che contengono la stringa `blurhash`
@@ -281,7 +412,7 @@ const config = {
     //   removeKeyHash: true, // /([a-f0-9]{32}\.?)/gi, // /(\?as_asset)$/,
     //   // rimuove i font dal manifest. Non necessari, rendono il file inutilmente grande
     //   filter: isDevelopment? undefined : (FileDescriptor) => {
-    //     return /_fonts/.test(FileDescriptor.path)? false : true;
+    //     return /fonts/.test(FileDescriptor.path)? false : true;
     //   },
     //   sort: isDevelopment? undefined : (a, b) => a.name.localeCompare(b.name)
     // }),
@@ -368,41 +499,42 @@ const config = {
         );
       },
       raw: true,
-      // exclude: /\.critical/ // chunk name
+      // niente banner nei critical css: vengono inlinati nei template html
+      exclude: /\.critical/ // chunk name
     }),
 
-    // =>> plugins: PurgeCSSPlugin (per ultimo)
+    // =>> plugins: PurgeCSSPlugin (per ultimo, attivo in dev e prod: i problemi
+    // di purge devono emergere subito durante lo sviluppo, non solo in build)
     // https://github.com/FullHuman/purgecss/tree/main/packages/purgecss-webpack-plugin
     // https://purgecss.com/configuration.html
-    // https://github.com/isaacs/node-glob#readme
-    new PurgeCSSPlugin({
+    //
+    // NB: il plugin elabora ogni asset css SINGOLARMENTE, quindi con `variables: true`
+    // una custom property viene mantenuta solo se definita e usata nello stesso asset.
+    // Per questo:
+    // - ogni entry css importa direttamente custom-properties.css (che sostituisce
+    //   postcss-jit-props: le props non usate vengono rimosse qui)
+    // - il chunk `shared` contiene solo js (vedi optimization.splitChunks)
+    // - le props dichiarate in un asset ma consumate altrove (override di tema,
+    //   shadow DOM dei web components) sono gestite dalla safelist generata
+    //   (vedi purgecss-variables-safelist.mjs)
+    purgeCSSPluginCritical,
+    purgeCSSPlugin,
 
-      // css da pulire
-      paths: globSync(
-
-        // path.resolve(__dirname, '@minimo/**/!(*.module).css'),
-        path.resolve(__dirname, '@src/**/*.{css,js,ejs}'),
-        //   path.resolve(__dirname, '@src/**/*.js'),
-        //   path.resolve(__dirname, '@app/**/*.ejs'),
-        //   path.join(__dirname, './templates/**/*.twig')
-
-        { nodir: true }
-      ), // .filter(filePath => !filePath.endsWith('.module.css'));
-
-
-
-      variables: false, // Analizza le variabili custom
-      safelist: {
-        standard: ['body', 'html', 'button', 'a'],
-        deep: [/^btn/],
-        greedy: []
-
-      },
-
-      // verbose: true,
-      // rejected: true,
-      // stdout: true
-    })
+    // log dei selettori rimossi (richiede `rejected: true` nei plugin, vedi purgeCSSDebug).
+    // NB: legge `purgedStats` dalle ISTANZE del plugin, non da compilation.purgedStats
+    // (proprietà inesistente: il vecchio log basato su di essa era codice morto)
+    ...(purgeCSSDebug ? [{
+      apply: (compiler) => {
+        compiler.hooks.afterEmit.tap('PurgeCSSLog', () => {
+          /* eslint-disable no-console */
+          console.log('\n--- [PurgeCSS] Selettori rimossi (critical) ---');
+          console.dir(purgeCSSPluginCritical.purgedStats, { depth: null, maxArrayLength: null });
+          console.log('\n--- [PurgeCSS] Selettori rimossi ---');
+          console.dir(purgeCSSPlugin.purgedStats, { depth: null, maxArrayLength: null });
+          /* eslint-enable no-console */
+        });
+      }
+    }] : [])
 
   ], // end plugins
 
