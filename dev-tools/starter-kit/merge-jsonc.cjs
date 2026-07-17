@@ -71,6 +71,34 @@ function firstQuotePos(text) {
   return -1;
 }
 
+// Voci di primo livello di un oggetto JSONC (spezzate sulle virgole a profondità 1)
+function topLevelEntries(text, s) {
+  const body = text.slice(s.open + 1, s.close);
+  const offset = s.open + 1;
+  const bounds = s.commas.map((p) => p - offset).concat(body.length);
+  const entries = [];
+  let prev = 0;
+  for (const b of bounds) {
+    entries.push(body.slice(prev, b));
+    prev = b + 1;
+  }
+  return entries;
+}
+
+// Nome della chiave di una voce (contenuto della prima stringa fuori dai commenti)
+function keyName(entry) {
+  const q = firstQuotePos(entry);
+  if (q < 0) return null;
+  let key = '';
+  let i = q + 1;
+  while (i < entry.length && entry[i] !== '"') {
+    if (entry[i] === '\\') i++;
+    key += entry[i];
+    i++;
+  }
+  return key;
+}
+
 const [tplPath, destPath] = process.argv.slice(2);
 
 try {
@@ -81,23 +109,20 @@ try {
   if (t.open < 0 || t.close < 0) throw new Error(tplPath + ': oggetto JSON non trovato');
   if (d.open < 0 || d.close < 0) throw new Error(destPath + ': oggetto JSON non trovato');
 
-  // voci di primo livello del template (spezzate sulle virgole a profondità 1)
-  const body = tpl.slice(t.open + 1, t.close);
-  const offset = t.open + 1;
-  const bounds = t.commas.map((p) => p - offset).concat(body.length);
-  const entries = [];
-  let prev = 0;
-  for (const b of bounds) {
-    entries.push(body.slice(prev, b));
-    prev = b + 1;
-  }
+  // chiavi di primo livello già presenti nella destinazione
+  const destKeys = new Set(
+    topLevelEntries(dest, d).map((entry) => keyName(entry)).filter((k) => k !== null)
+  );
 
-  // prefissa con '_' la chiave di ogni voce (voci di soli commenti/spazi escluse)
+  // prefissa con '_' la chiave di ogni voce del template, saltando le voci di
+  // soli commenti/spazi e le chiavi già presenti nella destinazione
+  // (così rilanciare lo script non produce duplicati)
   const renamed = [];
-  for (const entry of entries) {
+  for (const entry of topLevelEntries(tpl, t)) {
     const cleaned = entry.replace(/^\s+/, '').replace(/\s+$/, '');
+    const key = keyName(cleaned);
+    if (key === null || destKeys.has('_' + key)) continue;
     const q = firstQuotePos(cleaned);
-    if (q < 0) continue;
     renamed.push('\n  ' + cleaned.slice(0, q + 1) + '_' + cleaned.slice(q + 1));
   }
   if (renamed.length === 0) process.exit(0);

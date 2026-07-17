@@ -24,7 +24,8 @@
     "update-version": "./dev-tools/update-version/index.mjs",
     "upd@m": "./dev-tools/upd@m/index.mjs",
     "svgIconsTools": "./dev-tools/svg-icons-tools/index.mjs",
-    "create-favicons": "./dev-tools/create-favicons/index.mjs"
+    "create-favicons": "./dev-tools/create-favicons/index.mjs",
+    "starter-kit": "./dev-tools/starter-kit/starter-install.sh"
   },
   "repository": {
     "type": "git",

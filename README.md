@@ -12,13 +12,13 @@ npm i -D @massimo-cassandro/eslint-config
 npm i -D @massimo-cassandro/stylelint-config
 ```
 
-> Note: **minimo** is designed to be used with WebPack using the configuration you can find in the [webpack-setup folder](./webpack-setup/) of this repository. If changes are made (for example, to how SVG files are imported), things may not work as expected.
+> Note: **minimo** is designed to be used with WebPack using the configuration you can find in the [starter-kit folder](./dev-tools/starter-kit/) of this repository. If changes are made (for example, to how SVG files are imported), things may not work as expected.
 >
 
-For a complete install of all required webpack modules, use the install script at `./webpack-setup/starter-install.sh` launching:
+For a complete install of all required webpack modules, use the install script at `./dev-tools/starter-kit/starter-install.sh` launching:
 
 ```bash
-zsh ./node_modules/@massimo-cassandro/minimo/webpack-setup/starter-install.sh
+zsh ./node_modules/@massimo-cassandro/minimo/dev-tools/starter-kit/starter-install.sh
 ```
 ---
 

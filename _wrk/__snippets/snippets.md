@@ -5,7 +5,7 @@
 ## webpack
 
 ```bash
-zsh ~/Sites/minimo/webpack-setup/starter-install.sh
+zsh ~/Sites/minimo/dev-tools/starter-kit/starter-install.sh
 ```
 
 ## minimo alias

@@ -1,5 +1,12 @@
 #!/bin/zsh
 
+# IMPORTANTE: questo script è idempotente e deve restare tale.
+# Può essere rilanciato più volte sullo stesso progetto (anche via `npx starter-kit`
+# per aggiornare un setup esistente) senza sovrascrivere nulla né creare duplicati:
+# i file esistenti vengono saltati o copiati con prefisso NEW-, i merge di
+# package.json e *.code-workspace non duplicano le chiavi già presenti.
+# Ogni modifica futura deve conservare questa proprietà.
+
 RED='\033[0;31m'
 YELLOW='\033[0;33m'
 GREEN='\033[0;32m'
@@ -24,7 +31,7 @@ BASE_URL=${0:A:h}
 echo "BASE_URL: ${BASE_URL}"
 
 TEMPLATES_DIR="${BASE_URL}/templates"
-# WEBPACK_SOURCE_DIR="$BASE_URL/webpack-setup"
+# WEBPACK_SOURCE_DIR="$BASE_URL/starter-kit"
 WEBPACK_SOURCE_DIR="$BASE_URL"
 
 # protezione contro la sovrascrittura
@@ -106,6 +113,8 @@ safe_cat "${TEMPLATES_DIR}/_browserslistrc"            .browserslistrc new
 safe_cat "${TEMPLATES_DIR}/_editorconfig"              .editorconfig new
 safe_cat "${TEMPLATES_DIR}/_prettierrc"                .prettierrc new
 safe_cat "${TEMPLATES_DIR}/jsconfig.json"              jsconfig.json new
+safe_cat "${TEMPLATES_DIR}/_root_htaccess"             _root_htaccess
+safe_cat "${TEMPLATES_DIR}/_root_robots.txt"           _root_robots.txt
 
 # code-workspace: se un file .code-workspace esiste già (qualunque sia il nome),
 # le chiavi del template vengono aggiunte in fondo con prefisso '_'
