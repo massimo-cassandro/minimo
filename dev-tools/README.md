@@ -26,7 +26,7 @@ Since the installation is fully overwrite-safe, the script can also be **re-run 
 
 ### Without installing minimo
 
-To bootstrap a project **before** (or without) installing the whole package, download only the `starter-kit` folder from the npm tarball and run the script from there:
+To bootstrap a project **before** installing the whole package, download only the `starter-kit` folder from the npm tarball and run the script from there:
 
 ```bash
 curl -sL "$(npm view @massimo-cassandro/minimo dist.tarball)" | tar xz package/dev-tools/starter-kit

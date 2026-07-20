@@ -1,3 +1,15 @@
+/* TODO valutare rinomina dei breakpoint in nomi semantici (es. dsk/lap/tab/mob,
+   vedi scripts/build-margin-padding-css.mjs) per coerenza con la scala `sizes`,
+   che usa la stessa nomenclatura xs/sm/md/lg/xl e genera ambiguità nelle
+   utility responsive. Non banale: i tier attuali (xxlarge/xlarge/large/medium/
+   small, con varianti -only/-down) sono numerosi e in parte sovrapposti (es.
+   "large" = "small desktop") e non si riducono in modo pulito a poche
+   categorie semantiche; inoltre il nome è usato in molti file (grid.css,
+   display.css, visibility.css, text.css, sf-macro.css, json-table, oltre ai
+   file margin-padding-*-media.css) ed è parte di un template pensato per
+   essere personalizzato dall'utente: rinominarlo qui non aggiorna le copie
+   già in uso nei progetti che lo hanno importato. */
+
 /*
 90rem    : 1440px xxlarge (large desktop)
 80rem    : 1280px xlarge (desktop)

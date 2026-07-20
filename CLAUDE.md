@@ -99,6 +99,12 @@ minimo/
 
 ---
 
+## Convenzioni di codice
+
+**Lingua dei commenti**: i commenti `TODO`/`FIX` (e simili, es. `FIXME`) vanno scritti **in italiano**. Tutti gli altri commenti nel codice vanno scritti **in inglese**.
+
+---
+
 ## File pubblicati su npm
 
 Dal `files` di `package.json`:
@@ -255,13 +261,13 @@ Da affrontare con calma in futuro (eventualmente con una utility condivisa che r
 
 | File | Riga | Nota |
 |---|---|---|
+| [src/custom-media.css](src/custom-media.css#L1) | 1 | da rivedere: valutare rinomina breakpoint in nomi semantici per evitare collisioni con la scala `sizes`; impatto su molti file consumer e sul template personalizzabile dall'utente |
 | [src/css/visibility.css](src/css/visibility.css#L21) | 21 | da rivedere |
 | [src/css/alerts.css](src/css/alerts.css#L75) | 75 | alerts links da completare |
 | [src/css/grid.css](src/css/grid.css#L1) | 1 | unificare regole comuni con flex |
 | [src/css/anchors.css](src/css/anchors.css#L1) | 1, 4, 38 | rivedere e completare; sostituire colori con custom props specifiche |
 | [src/css/table.css](src/css/table.css#L10) | 10 | opzione per alternate row color |
 | [src/css/text.css](src/css/text.css#L7) | 7 | rivedere |
-| [src/css/margin-padding.css](src/css/margin-padding.css#L3) | 3–4 | generare utilities in automatico; versione con naming Bootstrap |
 | [src/css/forms/fieldset.css](src/css/forms/fieldset.css#L2) | 2 | da verificare |
 | [src/css/forms/forms.css](src/css/forms/forms.css#L1) | 1–6 | separare file; radio/checkbox groups; multiselect; `.form-grid`; customizable select; form-check come flex |
 | [src/css/buttons/status-buttons.css](src/css/buttons/status-buttons.css#L1) | 1 | rivedere tutto |

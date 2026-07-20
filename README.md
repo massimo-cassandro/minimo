@@ -20,6 +20,15 @@ For a complete install of all required webpack modules, use the install script a
 ```bash
 zsh ./node_modules/@massimo-cassandro/minimo/dev-tools/starter-kit/starter-install.sh
 ```
+
+To bootstrap a project **before** installing the whole package, download only the `starter-kit` folder from the npm tarball and run the script from there:
+
+```bash
+curl -sL "$(npm view @massimo-cassandro/minimo dist.tarball)" | tar xz package/dev-tools/starter-kit
+zsh package/dev-tools/starter-kit/starter-install.sh
+rm -rf package
+```
+
 ---
 
 ## Dev Tools

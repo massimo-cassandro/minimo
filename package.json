@@ -1,6 +1,6 @@
 {
   "name": "@massimo-cassandro/minimo",
-  "version": "1.16.1",
+  "version": "1.16.2",
   "description": "Light css framework & utilities",
   "type": "module",
   "main": "./index.js",
@@ -36,6 +36,7 @@
     "npm-publish": "npm publish",
     "upd@m": "npx upd@m",
     "build-tokens": "node ./design-tokens/utilities/build-tokens.mjs --config ./design-tokens/tokens-config.mjs",
+    "build-margin-padding-css": "node ./scripts/build-margin-padding-css.mjs",
     "check unresolved props": "node ./design-tokens/utilities/check-unresolved-custom-props.mjs --config ./design-tokens/tokens-config.mjs",
     "test": "node --test \"test/**/*.test.mjs\"",
     "checkJS": "npx tsc --noEmit -p jsconfig.json",

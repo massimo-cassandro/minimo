@@ -327,28 +327,6 @@ const config = {
           name: 'shared',
           chunks: 'all'
         }
-
-
-        // separazione @massimo-cassandro da node_modules:
-        // mc: {
-        //   test: /[\\/]node_modules\/@massimo-cassandro[\\/]/,
-        //   name: 'mc',
-        //   chunks: 'all'
-        // },
-        // shared: {
-        //   // test: /[\\/]node_modules[\\/]/,
-        //   test(module) {
-        //     // `module.resource` contains the absolute path of the file on disk.
-        //     // Note the usage of `path.sep` instead of / or \, for cross-platform compatibility.
-        //     return (
-        //       module.resource &&
-        //       module.resource.includes(`${path.sep}node_modules${path.sep}`) &&
-        //       !module.resource.includes(`${path.sep}@massimo-cassandro${path.sep}`)
-        //     );
-        //   },
-        //   name: 'shareds',
-        //   chunks: 'all'
-        // },
       }
     },
   },

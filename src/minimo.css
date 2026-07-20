@@ -37,6 +37,11 @@
 @import '@minimo/css/dimensions.css';
 @import '@minimo/css/display.css';
 @import '@minimo/css/margin-padding.css';
+/* @import '@minimo/css/margin-padding-media.css';  responsive verion */
+/* alternative boostrap naming
+@import '@minimo/css/margin-padding-bootstrap.css';
+@import '@minimo/css/margin-padding-bootsrap-media.css';
+*/
 @import '@minimo/css/overflow.css';
 @import '@minimo/css/position.css';
 @import '@minimo/css/visibility.css';
