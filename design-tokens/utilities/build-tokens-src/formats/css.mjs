@@ -150,7 +150,7 @@ StyleDictionary.registerFormat({
     const sequenceList = [
       'xxs', 'xs', 'sm', 'base', 'md', 'lg', 'xl', 'xxl', 'xxxl', '2xl', '3xl',
       'xlight', 'light', 'regular', 'medium', 'semibold', 'bold', 'xbold'
-    ]
+    ];
 
     const sortFunction = (a, b) => {
       const idxA = sequenceList.indexOf(a.name);

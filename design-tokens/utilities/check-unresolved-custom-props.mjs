@@ -16,7 +16,7 @@ import * as fs from 'node:fs';
 import { /* fileURLToPath,  */pathToFileURL } from 'url';
 // import { dirname } from 'path';
 import { glob } from 'node:fs/promises';
-import { styleText, parseArgs } from 'node:util';
+import { styleText } from 'node:util';
 
 // const __filename = fileURLToPath(import.meta.url);
 // const __dirname  = dirname(__filename);
@@ -24,22 +24,17 @@ import { styleText, parseArgs } from 'node:util';
 // ---------------------------------------------------------------------------
 // 1. Parse flags
 // ---------------------------------------------------------------------------
-const options = {
-  config: {
-    type: 'string',
-    short: 'c',
-  },
-};
+const args = process.argv.slice(2);
+const configFlagIndex = args.findIndex(arg => arg === '--config' || arg === '-c');
+const configArgPath = configFlagIndex !== -1 ? args[configFlagIndex + 1] : undefined;
 
-const { values } = parseArgs({ options });
-
-if (!values.config) {
+if (!configArgPath) {
   console.error(styleText(['red'], 'Error: you must provide the config path with --config or -c'));
   console.log('Example: node check-unresolved-custom-props.mjs --config ./config.mjs');
   process.exit(1);
 }
 
-const absoluteConfigPath = path.resolve(process.cwd(), values.config);
+const absoluteConfigPath = path.resolve(process.cwd(), configArgPath);
 const configDir = path.dirname(absoluteConfigPath);
 
 // ---------------------------------------------------------------------------
@@ -60,9 +55,13 @@ async function run() {
     const exclude = config.exclude_pattern ?? [];
 
     // Collect all .css files in the scan directory, excluding the token file itself
+    // and any file under a directory whose name starts with "TODO" (work-in-progress folders)
     const files = [];
     for await (const entry of glob(path.join(checkdir, '/**/*.css'))) {
-      if (!entry.endsWith(custom_prop_filename)) {
+      const relDirSegments = path.relative(checkdir, path.dirname(entry)).split(path.sep);
+      const isInTodoDir    = relDirSegments.some(segment => /^todo/i.test(segment));
+
+      if (!entry.endsWith(custom_prop_filename) && !isInTodoDir) {
         files.push(entry);
       }
     }

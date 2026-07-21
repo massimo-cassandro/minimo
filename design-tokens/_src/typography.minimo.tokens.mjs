@@ -1,8 +1,8 @@
 export default {
   font: {
     family: {
+      $type: 'fontFamily',
       $value: 'sans-serif',
-      $type: 'fontFamily'
     },
     'family-mono': {
       $value: '\'Monaspace Neon Var\', \'Monaspace Neon\', \'Aptos Mono\', \'Roboto Mono\', \'SFMono-Regular\', \'Menlo\', \'Monaco\', \'Consolas\', \'Liberation Mono\', \'Andale Mono\', \'Courier New\', monospace',

@@ -5,7 +5,7 @@
 // All paths are relative to this config file (not to the CWD).
 
 // import { homedir } from 'os';
-import path from 'path';
+// import path from 'path';
 
 // Path to the design token source files.
 // You can use an absolute path, a relative path, or build it programmatically.

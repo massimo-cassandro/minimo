@@ -33,3 +33,4 @@
 * 1.14.0 (14 lug 2026) - buildPictureTag
 * 1.15.0 (15 lug 2026) - parse-file-size.js
 * 1.16.0 (16 lug 2026) - Starter Kit Improvements
+* 1.17.0 (21 lug 2026) - modal-alert refactoring

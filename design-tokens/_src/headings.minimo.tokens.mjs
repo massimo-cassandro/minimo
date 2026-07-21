@@ -11,10 +11,18 @@ export default {
       $value: '{text.color}'
     },
     font: {
+      family: {
+        $type: 'fontFamily',
+        $value: '{font.family}'
+      },
       weight: {
         $type: 'string',
         $value: '{font.weight.semibold}'
       }
+    },
+    'line-height': {
+      $type: 'dimension',
+      $value: '{line-height.xs}'
     },
     h1: {
       font: {

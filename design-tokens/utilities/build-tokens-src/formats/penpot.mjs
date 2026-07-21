@@ -110,7 +110,6 @@ const resolveExpression = (orig, tokenMap) => {
   if (!/^[\d\s+\-*/.()]+$/.test(expr)) return null;
 
   try {
-    // eslint-disable-next-line no-new-func
     const result = Function(`"use strict"; return (${expr})`)();
     if (typeof result !== 'number' || !isFinite(result)) return null;
     // Round to a reasonable precision to avoid floating-point noise
@@ -161,6 +160,7 @@ StyleDictionary.registerFormat({
             value = resolved;
           } else {
             // Resolution failed — keep the original and emit a warning
+            // eslint-disable-next-line no-console
             console.warn(`[build-tokens] penpot: could not resolve expression "${orig}" for token "${token.path.join('.')}". Keeping original.`);
             value = orig;
           }

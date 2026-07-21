@@ -56,8 +56,8 @@
   height: auto;
   overflow: hidden;
   transition:
-    height var(--slide-duration, 500ms) ease,
-    display var(--slide-duration, 500ms) allow-discrete;
+    height var(--slide-duration) ease,
+    display var(--slide-duration) allow-discrete;
 }
 
 /* collapsed state: height animates to 0, then display snaps to none */
