@@ -1,8 +1,8 @@
 .inner-nav-main, .inner-nav {
   display: flex;
-  gap: var(--size-lg);
+  gap: var(--inner-nav-gap);
   justify-content: flex-end;
-  margin-block: var(--size-base);
+  margin-block: var(--inner-nav-margin-block);
   /* text-align: end; */
 
   @media print {

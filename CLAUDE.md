@@ -14,16 +14,9 @@ Progettato per essere usato con **webpack** (configurazione starter inclusa in `
 minimo/
 ├── index.js                        # entry point principale (export JS)
 ├── _wrk/                           # repo vecchi in lavorazione, da integrare in minimo (non pubblicato)
-│   ├── json-table/                 # ★ futuro sostituto di s-datatable-component (vedi sotto)
-│   ├── js-utilities/               # utilità JS varie
 │   ├── charts/                     # vecchia versione charts da rifattorizzare
 │   ├── spinner/                    # componente spinner
-│   ├── modal-popup/                # popup
 │   ├── popup-page/                 # pagina popup
-│   ├── vanilla-cookie-consent/     # cookie consent
-│   ├── recaptcha/                  # integrazione reCAPTCHA
-│   ├── unsplash-page-demo/         # demo unsplash page
-│   ├── modal-alert-demo/           # demo modal alert
 │   ├── auto-datatable-customization/
 │   ├── alert-autoclose.js          # single-file utilities
 │   ├── flash-alerts.js
@@ -61,9 +54,12 @@ minimo/
 │   │   ├── sf-macro/               # integrazione form Symfony
 │   │   ├── snackbar/               # usa Popover API
 │   │   ├── spinner/                # solo CSS
-│   │   └── unsplash-page/          # pagina foto Unsplash
+│   │   ├── unsplash-page/          # pagina foto Unsplash
+│   │   ├── TODO form-multiselect/       # spostato da _wrk, in attesa di integrazione
+│   │   └── TODO vanilla-cookie-consent/ # spostato da _wrk, in attesa di integrazione
 │   └── web-components/
-│       └── s-datatable-component/  # web component per simple-datatables ⚠️ da deprecare (verrà sostituito da json-table)
+│       ├── s-datatable-component/  # web component per simple-datatables ⚠️ da deprecare (verrà sostituito da json-table)
+│       └── TODO json-table/        # spostato da _wrk, ★ futuro sostituto di s-datatable-component (vedi sotto)
 ├── charts/                         # grafici SVG (usa @svgdotjs/svg.js come peer dep opzionale)
 │   ├── index.js                    # export: barsChart, goalChart, linesChart, MinimoCharts
 │   └── src/
@@ -81,8 +77,7 @@ minimo/
 ├── demo/                           # ambiente di test dei componenti (webpack, config interna alla dir)
 ├── demo-build/                     # (non ancora presente) build statica della demo per GitHub Pages
 ├── snippets-and-utilities/         # porzioni di codice slegate dal framework, utili per integrazioni rapide
-├── archived/                       # vecchi script inutilizzati, parcheggiati per usi futuri (potrebbero essere eliminati)
-└── _wrk/                           # work-in-progress, non pubblicato
+└── archived/                       # vecchi script inutilizzati, parcheggiati per usi futuri (potrebbero essere eliminati)
 ```
 
 ---
@@ -187,6 +182,16 @@ npm run upd@m                 # Aggiorna dipendenze
 
 ---
 
+## Indipendenza dei design token nei componenti
+
+Ogni componente/web-component con CSS (`src/components/*`, `src/web-components/*`) deve essere indipendente dal resto di minimo dal punto di vista dei design token: il CSS del componente fa riferimento **solo** alle proprie custom properties, namespaced sul componente (es. `--malert-*`, `--inner-nav-*`), mai a token generici di minimo referenziati direttamente (es. `--size-lg`, `--text-color`).
+
+A questo scopo ogni cartella componente/web-component ha un proprio file `<nome-componente>.minimo.tokens.mjs` colocato al suo interno (accanto al CSS/JS). Il file token del componente può referenziare token generici di minimo (es. `{status.success.background.color}`) — la risoluzione avviene in fase di build tramite `build-tokens` — ma il CSS del componente vede solo l'output namespaced, non la catena di riferimenti. Questo rende più semplice portare il componente in framework diversi da minimo (basta il proprio file token, non l'intero `custom-properties.css`).
+
+**Stato:** fatto per `modal-alert` e `inner-nav`. Per lo stato degli altri componenti vedi [TODO.md §6.2](TODO.md).
+
+---
+
 ## CSS ottimizzazione — valutazioni in corso
 
 ### postcss-jit-props
@@ -205,33 +210,35 @@ L'opzione preferibile sarebbe strutturare meglio l'integrazione con **PurgeCSS**
 
 ### json-table ★ (priorità alta)
 
-`_wrk/json-table/` è il sostituto designato di `s-datatable-component`. Il componente attuale (`src/web-components/s-datatable-component/`) è stato creato per ragioni di fretta ed **è destinato alla deprecazione** non appena `json-table` sarà pronto per la produzione.
+`src/web-components/TODO json-table/` (spostato da `_wrk/json-table/`, in attesa di integrazione) è il sostituto designato di `s-datatable-component`. Il componente attuale (`src/web-components/s-datatable-component/`) è stato creato per ragioni di fretta ed **è destinato alla deprecazione** non appena `json-table` sarà pronto per la produzione.
 
 **json-table** è un generatore di tabelle HTML da dati JSON (Ajax o statici), con search, sorting, paginazione, senza dipendenze esterne (no jQuery, no librerie terze come simple-datatables). Già pubblicato separatamente come `@massimo-cassandro/json-table`.
 
-Struttura attuale in `_wrk/json-table/src/`:
+Struttura attuale in `src/web-components/TODO json-table/src/`:
 - `js/` — moduli: `main-builder`, `table-builder`, `table-row/thead/tfoot`, `parse-data-row`, `parse-params`, `get-ajax-data`, `init-ajax-table`, `init-static-table`, `set-search-listener`, `set-sort-listeners`, `static-data-sorting`, `info-section`, `update-info`, `utilities`, `defaults`, `default-columns-data-types`
 - `css/` — CSS modules: `main-builder`, `table`, `info-section`, `icons`, `utility`
 - `__json-table-react/` — versione React (WIP separato)
 - `index.js` — entry point
 
-TODO aperti su json-table ([_wrk/json-table/TODO.md](_wrk/json-table/TODO.md)):
+TODO aperti su json-table ([src/web-components/TODO json-table/TODO.md](src/web-components/TODO%20json-table/TODO.md)):
 - Meccanismo di acquisizione JSON paginato per grandi quantità di record
 - Campi numerici: classi default `text-end`/`text-numeric` sovrascrivibili
 - `footerRender`: funzioni predefinite per calcoli base (somma, media, ecc.)
 - Documentazione incompleta nel README (sezioni TODO)
-- `_wrk/json-table/src/TODO.md`: verificare tutte le occorrenze di `this.params.ajax`
+- `src/web-components/TODO json-table/src/TODO.md`: verificare tutte le occorrenze di `this.params.ajax`
 
 ### Altri elementi in `_wrk/`
 
+`js-utilities/` e `recaptcha/` sono stati **cestinati** (rimossi senza migrazione). `modal-popup/` è stato integrato in produzione in `src/components/modal-popup/`. `vanilla-cookie-consent/` è stato spostato in `src/components/TODO vanilla-cookie-consent/` e `json-table/` in `src/web-components/TODO json-table/` (vedi sopra), entrambi in attesa di integrazione. `unsplash-page-demo/` e `modal-alert-demo/` sono stati rimossi da `_wrk/`; quest'ultimo è ora in `demo/demo-files/TODO modal-alert-demo/`.
+
+Elementi ancora presenti in `_wrk/`:
+
 | Cartella/File | Stato | Note |
 |---|---|---|
-| `js-utilities/` | da valutare | Utilità JS varie — da integrare o cestinare |
 | `charts/` | da rifattorizzare | Vecchia versione (1a vers) con chart `settimanale-mensile` e altre non ancora migrate |
 | `spinner/` | da valutare | Componente spinner (attualmente in minimo solo come CSS) |
 | `popup-page/` | da valutare | Componente popup page — da integrare o cestinare |
-| `vanilla-cookie-consent/` | da valutare | Integrazione cookie consent — da integrare o cestinare |
-| `recaptcha/` | da valutare | Integrazione reCAPTCHA — da integrare o cestinare |
+| `auto-datatable-customization/` | da valutare | Da integrare o cestinare |
 | `alert-autoclose.js` | da valutare | Da integrare o cestinare |
 | `flash-alerts.js` | da valutare | Da integrare o cestinare |
 | `img-viewer-dom-builder.js` | da valutare | Da integrare o cestinare |
@@ -288,7 +295,6 @@ Da affrontare con calma in futuro (eventualmente con una utility condivisa che r
 | [src/components/autocomplete/autocomplete-engine.js](src/components/autocomplete/autocomplete-engine.js#L283) | 283 | TODO[epic=autocomplete] (da definire) |
 | [src/components/autocomplete/check-autocomplete.js](src/components/autocomplete/check-autocomplete.js#L1) | 1 | TODO: trigger ac selection |
 | [src/components/snackbar/snackbar.js](src/components/snackbar/snackbar.js#L16) | 16–17 | TODO: snackbar action; gestione multiple senza stacking |
-| [src/components/modal-alert/modal-alert.js](src/components/modal-alert/modal-alert.js#L6) | 6 | TODO: riscrivere come async |
 
 ### JS — web components
 
@@ -317,7 +323,6 @@ Da affrontare con calma in futuro (eventualmente con una utility condivisa che r
 ### TODO dai file TODO.md dei componenti
 
 - **autocomplete** ([src/components/autocomplete/TODO.md](src/components/autocomplete/TODO.md)): da rivedere; definire uso CSS; unificare tokens
-- **modal-alert** ([src/components/modal-alert/TODO.md](src/components/modal-alert/TODO.md)): da rivedere; spostare custom props nel dictionary; eliminare `customization-templates/`
 - **unsplash-page** ([src/components/unsplash-page/TODO.md](src/components/unsplash-page/TODO.md)): riscrivere CSS con sizes; rivedere JS; importare CSS direttamente nel JS
 - **charts** ([charts/TODO.md](charts/TODO.md)): completare; aggiornare documentazione; aggiungere test nella demo; implementare tooltip nativo SVG (ora usa `data-title`)
 - **charts/node-helpers** ([charts/src/node-helpers/TODO.md](charts/src/node-helpers/TODO.md)): documentare modalità d'uso; richiede opentype

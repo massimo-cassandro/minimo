@@ -1,0 +1,20 @@
+// -----------------------------------------------------------------------
+// Generated file — do not edit manually.
+// This file is produced by the design-token build pipeline.
+// Source of truth: the token files in the project source directory.
+// Re-generate with: node build-tokens.mjs --config <path/to/config>
+// -----------------------------------------------------------------------
+{
+  "inner-nav": {
+    "gap": {
+      "$type": "dimension",
+      "$value": "{size.lg}"
+    },
+    "margin": {
+      "block": {
+        "$type": "dimension",
+        "$value": "{size.base}"
+      }
+    }
+  }
+}

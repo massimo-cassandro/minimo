@@ -6,7 +6,7 @@ const config = {
   destFile: 'custom-properties.css',
   source: [
     './_src/**/*.tokens.mjs',
-    '!./_src/_cfg/**',
+    '../src/**/*.tokens.mjs',
   ],
 
   penpotExpressions: 'resolve', // or 'calc' or 'keep'

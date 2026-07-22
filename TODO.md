@@ -9,7 +9,7 @@ Numerazione progressiva (`N`, `N.N`, `N.N.N`...) per riferimento rapido ai singo
 ## 0.
 ### css
 
-* custom preperties: aggiungere prefisso `minimo` (o abbreviazione)? in versione 2
+* **custom properties:** aggiungere prefisso (`mm-`) a tutte le custom properties **generiche/base** di minimo (`--size-*`, `--color-*`, `--radius-*`, `--text-color`, `--body-background-color`, `--z-index-*`, ...), per evitare collisioni con custom properties di progetti che integrano minimo. Non serve invece sui token già namespaced per componente (`--malert-*`, `--sf-macro-*`, `--up-*`, ...), poco a rischio di collisione — vedi anche [§6.2](#62-compatibilità-con-framework-diversi-da-minimo-css). Breaking change: in versione 2. Da accompagnare con uno script di migrazione (find/replace sui nomi noti delle custom properties) per i progetti esistenti.
 
 ## 1. da completare / rivedere
 
@@ -102,21 +102,17 @@ Analisi di `src/components` e `src/utilities` (esclusi i sotto-dir con prefisso 
 
 ### 6.2. Compatibilità con framework diversi da minimo (CSS)
 
-Verificato se il CSS dei componenti è utilizzabile senza il resto di minimo. Il discriminante è se le `var(--...)` hanno un **fallback**: se sì, il componente è davvero standalone; se no, richiede comunque che sia caricato `custom-properties.css` (i design token) di minimo, anche senza usarne il resto.
+**Decisione presa:** ogni componente/web-component con CSS deve essere indipendente dal resto di minimo dal punto di vista dei design token. Il CSS del componente fa riferimento **solo** alle proprie custom properties, namespaced sul componente (es. `--malert-*`, `--inner-nav-*`), mai a token generici di minimo referenziati direttamente (es. `--size-lg`, `--text-color`). A questo scopo ogni cartella componente/web-component ha un proprio file `<nome>.minimo.tokens.mjs` colocato: può referenziare token generici di minimo al proprio interno (in fase di build), ma il CSS del componente vede solo l'output namespaced. Questo rende più semplice l'uso del componente in framework diversi da minimo (basta portare il proprio file token).
 
-- [ ] **6.2.1.** **Standalone già oggi (var con fallback ovunque, buon riferimento per gli altri):** `modal-alert/modal-alert.css`, `slide-up-down-toggle/slide-up-down-toggle.module.css`, `unsplash-page/unsplash-page.module.css` (quasi completo — due colori hardcoded senza var: `.upContainer` `background-color: #333` e `.unsplashPhotoLink a` colori, righe ~67 e ~241-242: solo un limite di personalizzazione, non di portabilità).
-
-Valutare la possibiliuttà di inserire all'interno di ogni di ogni cartella componente che contiene un CSS, un estratto delle custom props necessarie al funzionamento del componente stesso e di quelli eventualmente collegati.
-
-- [ ] **6.2.2.** **Richiedono i design token di minimo (var senza fallback), da decidere se documentare come dipendenza minima o rendere standalone aggiungendo fallback:**
-  - **6.2.2.1.** `inner-nav/inner-nav.css` (`--size-lg`, `--size-base`)
-  - **6.2.2.2.** `overlay/overlay.css` (`--z-index-overlay`, `--text-color`, `--body-background-color` — senza token l'overlay diventa invisibile ma resta nel DOM, fallimento silenzioso)
-  - **6.2.2.3.** `sf-macro/sf-macro.css` (tutte le `--sf-macro-*`)
-  - **6.2.2.4.** `modal-popup/modal-popup.module.css` (`--body-background-color`, `--modal-popup-*`, `--size-*`)
-  - **6.2.2.5.** `snackbar/snackbar.module.css` (`--size-*`, `--snackbar-*`, `--z-index-snackbar`)
-  - **6.2.2.6.** `autocomplete/autocomplete.css` (`--secondary-100`, `--text-muted`, righe 16 e 83 — il resto del file usa colori hardcoded locali, quindi è parzialmente portabile)
-  - **6.2.2.7.** `spinner/spinner-circle-basic.css` (`--spinner-size`, `--spinner-color`, `--spinner-stroke-width`)
-- [ ] **6.2.3.** `components/autocomplete/autocomplete-engine.js:111` — il markup di default per i badge usa classi Bootstrap (`badge rounded-pill text-bg-secondary`) invece della classe `.badge` di minimo stesso (`src/css/badge.css`): incoerente sia se usato dentro minimo (badge non stilato secondo i suoi token) sia fuori (dipende comunque da Bootstrap non dichiarato). Da allineare a `.badge` di minimo o rendere il default neutro.
+- [ ] **6.2.3.** Da allineare allo stesso schema (CSS riferisce ancora token generici di minimo senza namespace/fallback):
+  - **6.2.3.1.** `overlay/overlay.css` (`--z-index-overlay`, `--text-color`, `--body-background-color` — senza token l'overlay diventa invisibile ma resta nel DOM, fallimento silenzioso)
+  - **6.2.3.2.** `sf-macro/sf-macro.css` (già namespaced su `--sf-macro-*` e con token colocati; verificare se serve un fallback esplicito per l'indipendenza CSS completa)
+  - **6.2.3.3.** `modal-popup/modal-popup.module.css` (`--body-background-color`, `--modal-popup-*`, `--size-*`)
+  - **6.2.3.4.** `snackbar/snackbar.module.css` (`--size-*`, `--snackbar-*`, `--z-index-snackbar`)
+  - **6.2.3.5.** `autocomplete/autocomplete.css` (`--secondary-100`, `--text-muted`, righe 16 e 83 — il resto del file usa colori hardcoded locali, quindi è parzialmente portabile)
+  - **6.2.3.6.** `spinner/spinner-circle-basic.css` (`--spinner-size`, `--spinner-color`, `--spinner-stroke-width`)
+- [ ] **6.2.4.** **Già conformi** (token colocati, CSS namespaced con fallback): `slide-up-down-toggle/slide-up-down-toggle.module.css`, `unsplash-page/unsplash-page.module.css` (quasi completo — due colori hardcoded senza var: `.upContainer` `background-color: #333` e `.unsplashPhotoLink a` colori, righe ~67 e ~241-242: solo un limite di personalizzazione, non di portabilità)
+- [ ] **6.2.5.** `components/autocomplete/autocomplete-engine.js:111` — il markup di default per i badge usa classi Bootstrap (`badge rounded-pill text-bg-secondary`) invece della classe `.badge` di minimo stesso (`src/css/badge.css`): incoerente sia se usato dentro minimo (badge non stilato secondo i suoi token) sia fuori (dipende comunque da Bootstrap non dichiarato). Da allineare a `.badge` di minimo o rendere il default neutro.
 
 ### 6.3. Extra — trovati incidentalmente durante l'analisi (non richiesti esplicitamente, ma da valutare)
 

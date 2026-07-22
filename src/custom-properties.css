@@ -182,6 +182,8 @@
   --headings-h4-font-size: var(--font-size-md);
   --headings-line-height: var(--line-height-xs);
   --headings-text-align: inherit;
+  --inner-nav-gap: var(--size-lg);
+  --inner-nav-margin-block: var(--size-base);
   --layout-container-max-width: 80rem;
   --line-height-base: 1.5;
   --line-height-sm: 1.4;
