@@ -1,9 +1,10 @@
 /*! minimo - unsplashPage */
 import { domBuilder } from '../../utilities/dom-builder/dom-builder.js';
 import { classnames } from '../../utilities/classnames.js';
-import imageIcon from '../../icons/image-duotone.svg';
-import arrowIcon from '../../icons/arrow-fat-lines-left-duotone.svg';
+
 import { fetchUnsplashData } from './fetch-unsplash-data.js';
+import imageIcon from '../../icons/image-duotone.svg?inline';
+import arrowIcon from '../../icons/arrow-fat-lines-left-duotone.svg?inline';
 import { decode } from 'blurhash';
 import * as styles from './unsplash-page.module.css';
 
