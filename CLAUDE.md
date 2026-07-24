@@ -188,7 +188,7 @@ Ogni componente/web-component con CSS (`src/components/*`, `src/web-components/*
 
 A questo scopo ogni cartella componente/web-component ha un proprio file `<nome-componente>.minimo.tokens.mjs` colocato al suo interno (accanto al CSS/JS). Il file token del componente può referenziare token generici di minimo (es. `{status.success.background.color}`) — la risoluzione avviene in fase di build tramite `build-tokens` — ma il CSS del componente vede solo l'output namespaced, non la catena di riferimenti. Questo rende più semplice portare il componente in framework diversi da minimo (basta il proprio file token, non l'intero `custom-properties.css`).
 
-**Stato:** fatto per `modal-alert` e `inner-nav`. Per lo stato degli altri componenti vedi [TODO.md §6.2](TODO.md).
+**Stato:** fatto per `modal-alert` e `inner-nav`. Per lo stato degli altri componenti vedi le rispettive sezioni in [TODO.md](TODO.md).
 
 ---
 
