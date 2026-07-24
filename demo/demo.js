@@ -9,7 +9,6 @@ const root = document.getElementById('root')
 
   ,titleCase = str => str.substring(0,1).toUpperCase() + str.substring(1)
 ;
-
 routes.push(
   {
     key: 'home',
@@ -27,16 +26,16 @@ routes.push(
   }
 );
 
-const routeObj = routes.filter(r => r.key === route)[0];
+let routeObj = routes.filter(r => r.key === route)[0];
 
 if(!routeObj) {
   throw new Error( 'Rotta non presente' );
 }
 
-
-
-h1.innerHTML =  routeObj.title?? titleCase(routeObj.key);
-document.title = h1.innerText + (route !== 'home'? ' | Minimo Demo' : '');
+routeObj = {
+  fullPage: false,
+  ...routeObj
+};
 
 if(routeObj.incl) {
   root.innerHTML = routeObj.incl;
@@ -46,9 +45,21 @@ if(routeObj.callback) {
   routeObj.callback();
 }
 
-if( route !== 'home') {
-  root.insertAdjacentHTML('afterend', '<p class="mbs-lg"><a href="/">Home</a></p>');
+if(!routeObj.fullPage) {
+
+  const title =  (routeObj.title?? titleCase(routeObj.key) )+ (route !== 'home'? ' | Minimo Demo' : '');
+  root.insertAdjacentHTML('afterbegin', `<h1 class="title">${title}</h1>`);
+
+
+  if( route !== 'home') {
+    root.insertAdjacentHTML('beforeend', '<p class="mbs-lg"><a href="/">Home</a></p>');
+  }
 }
+
+root.classList.toggle('container', !routeObj.fullPage);
+
+
+
 
 document.body.addEventListener('click', e => {
   if(e.target.closest('a') &&

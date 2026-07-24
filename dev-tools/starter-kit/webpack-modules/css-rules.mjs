@@ -31,6 +31,7 @@ export function cssRules({
     // CSS modules
     {
       test: /\.module\.(sass|scss|css)$/i,
+      sideEffects: true,
       oneOf: [
 
         // inserimento critical css con tag style al momento della build

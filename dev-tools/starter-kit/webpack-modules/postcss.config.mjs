@@ -4,6 +4,7 @@ import { fileURLToPath } from 'url';
 import globalData from '@csstools/postcss-global-data';
 import customMedia from 'postcss-custom-media';
 import autoprefixer from 'autoprefixer';
+// import jitProps from 'postcss-jit-props';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -31,6 +32,12 @@ export default (loaderContext) => {
         path.resolve(__dirname, '../src/css/custom-media.css'),
       ]
     }),
+
+    // jitProps({
+    //   files: [
+    //     path.resolve(__dirname, '../src/css/custom-properties.css'),
+    //   ]
+    // }),
 
     // per IOS < 17 (test)
     // https://github.com/csstools/postcss-plugins/tree/main/plugins/postcss-nesting

@@ -1,0 +1,37 @@
+:root {
+  /* commented use defaults */
+  /* --malert-backdrop: rgb(0 0 0 / .7); */
+  /* --malert-background-color: #fff; */
+  /* --malert-border-radius: var(--radius-xs); */
+  /* --malert-box-shadow: 0 .025rem .25rem 0 color-mix(in srgb, var(--malert-box-shadow-color) 15%, transparent), -.01875rem .1875rem .20625rem -.03125rem color-mix(in srgb, var(--malert-box-shadow-color) 15%, transparent), -.03125rem .38125rem .4125rem -.05625rem color-mix(in srgb, var(--malert-box-shadow-color) 14%, transparent), -.05625rem .7rem .75625rem -.0875rem color-mix(in srgb, var(--malert-box-shadow-color) 14%, transparent), -.1rem 1.21875rem 1.31875rem -.11875rem color-mix(in srgb, var(--malert-box-shadow-color) 13%, transparent), -.16875rem 2.04375rem 2.2125rem -.14375rem color-mix(in srgb, var(--malert-box-shadow-color) 13%, transparent), -.26875rem 3.25rem 3.525rem -.175rem color-mix(in srgb, var(--malert-box-shadow-color) 12%, transparent); */
+  /* --malert-box-shadow-color: #000; */
+  /* --malert-confirm-bg: hsl(277deg 72% 45%); */
+  /* --malert-confirm-fg: #fff; */
+  /* --malert-error-bg: var(--status-danger-background-color); */
+  /* --malert-error-fg: var(--status-danger-fg); */
+  /* --malert-heading-font-family: var(--headings-font-family); */
+  /* --malert-heading-font-size: var(--headings-h2-font-size); */
+  /* --malert-heading-font-weight: var(--headings-font-weight); */
+  /* --malert-heading-line-height: var(--headings-line-height); */
+  /* --malert-info-bg: var(--status-info-background-color); */
+  /* --malert-info-fg: var(--status-info-fg); */
+  /* --malert-success-bg: var(--status-success-background-color); */
+  /* --malert-success-fg: var(--status-success-fg); */
+  /* --malert-text-font-family: var(--font-family); */
+  /* --malert-text-font-size: var(--font-size-base); */
+  /* --malert-warning-bg: var(--status-warning-background-color); */
+  /* --malert-warning-fg: var(--status-warning-fg); */
+}
+
+.demoButtons {
+  display: flex;
+  flex-flow: row wrap;
+  gap: 2rem;
+  margin-block-end: 3rem;
+}
+
+form {
+  padding: .5rem;
+  margin-block: 2rem;
+  border: 1px dashed #666;
+}

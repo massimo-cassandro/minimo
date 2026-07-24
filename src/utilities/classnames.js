@@ -1,3 +1,4 @@
+/*! minimo - Classnames */
 /** @typedef {string | null | undefined | false | 0} ClassValue */
 
 /**

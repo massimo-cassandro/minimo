@@ -1,3 +1,4 @@
+/*! minimo - Form Reset Submit */
 // import './form.css'; // included in the main CSS entry point
 import { enableSubmitBtns } from '../utilities/enable-submit-btns.js';
 

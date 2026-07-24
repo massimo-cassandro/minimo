@@ -1,3 +1,4 @@
+/*! minimo - Modal Alert */
 import * as styles from './modal-alert.module.css';
 import { domBuilder } from '../../utilities/dom-builder/dom-builder.js';
 import { classnames } from '../../utilities/classnames.js';
@@ -53,7 +54,7 @@ const defaults = {
     type: 'success',
     title: 'Operazione completata',
     okBtnText: 'OK',
-    okBtnClass: 'btn',
+    okBtnClass: 'btn btn-success',
     timer: 4000, // ms
     icon: successIcon
   },
@@ -61,14 +62,14 @@ const defaults = {
     type: 'error',
     title: 'Si è verificato un errore',
     okBtnText: 'OK',
-    okBtnClass: 'btn',
+    okBtnClass: 'btn btn-danger',
     icon: errorIcon
   },
   warning: {
     type: 'warning',
     title: 'Attenzione!',
     okBtnText: 'OK',
-    okBtnClass: 'btn',
+    okBtnClass: 'btn btn-warning',
     icon: warningIcon,
     altIcon: dangerIcon,
     useAltIcon: false // when true, uses altIcon (danger) instead of the default warning icon
@@ -77,7 +78,7 @@ const defaults = {
     type: 'info',
     title: null,
     okBtnText: 'OK',
-    okBtnClass: 'btn',
+    okBtnClass: 'btn btn-info',
     icon: infoIcon
   },
   confirm: {
@@ -86,8 +87,8 @@ const defaults = {
     okBtnText: 'OK',
     cancelBtnText: 'Annulla',
     cancelBtnFocus: true, // false to give focus to the ok button
-    okBtnClass: 'btn btn-outline',
-    cancelBtnClass: 'btn',
+    okBtnClass: 'btn btn-primary',
+    cancelBtnClass: 'btn btn-primary btn-hollow',
     icon: confirmIcon,
     altIcon: warningIcon,
     useAltIcon: false // when true, uses altIcon (warning) instead of the default confirm icon
@@ -189,6 +190,8 @@ export function modalAlert(params = {}) {
           ? 'cancel'
           : 'ok';
 
+      console.log(params);
+
       const dialog = /** @type {HTMLDialogElement} */ (domBuilder([
         {
           tag: 'dialog',
@@ -227,7 +230,8 @@ export function modalAlert(params = {}) {
                       children: [
                         {
                           tag: 'button',
-                          className: params.okBtnClass? params.okBtnClass : 'btn btn-secondary',
+                          className: params.okBtnClass? params.okBtnClass : 'btn btn-primary',
+                          content: params.okBtnText,
                           attrs: {
                             type: 'button',
                             autofocus: focusTarget === 'ok'
@@ -238,6 +242,7 @@ export function modalAlert(params = {}) {
                           condition: params.type === 'confirm',
                           tag: 'button',
                           className: params.cancelBtnClass? params.cancelBtnClass : 'btn btn-secondary btn-hollow',
+                          content: params.cancelBtnText,
                           attrs: {
                             type: 'button',
                             autofocus: focusTarget === 'cancel'

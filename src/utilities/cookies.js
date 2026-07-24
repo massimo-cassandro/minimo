@@ -1,4 +1,5 @@
 // @ts-check
+/*! minimo - Cookies */
 
 /**
  * Returns the value of a cookie by name.

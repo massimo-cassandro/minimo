@@ -4,6 +4,8 @@ import { snackbarsDemo } from './demo-files/snackbars-demo.js';
 import { domBuilderDemo } from './demo-files/domBuilder-demo.js';
 import { modalPopupDemo } from './demo-files/modal-popup-demo.js';
 import { slideUpDownToggleDemo } from './demo-files/slide-up-down-toggle-demo/slide-up-down-toggle-demo.js';
+import { unsplashPageDemo } from './demo-files/unsplash-page-demo/unsplash-page-demo.js';
+import { modalAlertDemo } from './demo-files/modal-alert-demo/modal-alert-demo.js';
 
 import chartsHTML  from './demo-files/charts/charts.html';
 import { chartsDemo } from './demo-files/charts/charts-demo.js';
@@ -24,6 +26,15 @@ export const routes = [
   {
     key: 'slide-Up-Down-Toggle',
     callback: slideUpDownToggleDemo
+  },
+  {
+    key: 'unsplash-page',
+    callback: unsplashPageDemo,
+    fullPage: true
+  },
+  {
+    key: 'modal-alert',
+    callback: modalAlertDemo,
   },
   {
     key: 'buttons',

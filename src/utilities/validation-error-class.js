@@ -1,3 +1,4 @@
+/*! minimo - Validation Error */
 // usage:
 // throw new ValidationError('Duplicate values found', errorFields);
 

@@ -6,10 +6,51 @@ Numerazione progressiva (`N`, `N.N`, `N.N.N`...) per riferimento rapido ai singo
 
 ---
 
-## 0.
-### css
+## 0. priorità alta
 
-* **custom properties:** aggiungere prefisso (`mm-`) a tutte le custom properties **generiche/base** di minimo (`--size-*`, `--color-*`, `--radius-*`, `--text-color`, `--body-background-color`, `--z-index-*`, ...), per evitare collisioni con custom properties di progetti che integrano minimo. Non serve invece sui token già namespaced per componente (`--malert-*`, `--sf-macro-*`, `--up-*`, ...), poco a rischio di collisione — vedi anche [§6.2](#62-compatibilità-con-framework-diversi-da-minimo-css). Breaking change: in versione 2. Da accompagnare con uno script di migrazione (find/replace sui nomi noti delle custom properties) per i progetti esistenti.
+- **0.1.** **custom properties:** aggiungere prefisso (`mm-`) a tutte le custom properties **generiche/base** di minimo (`--size-*`, `--color-*`, `--radius-*`, `--text-color`, `--body-background-color`, `--z-index-*`, ...), per evitare collisioni con custom properties di progetti che integrano minimo. Non serve invece sui token già namespaced per componente (`--malert-*`, `--sf-macro-*`, `--up-*`, ...), poco a rischio di collisione — vedi anche [§6.2](#62-compatibilità-con-framework-diversi-da-minimo-css). Breaking change: in versione 2. Da accompagnare con uno script di migrazione (find/replace sui nomi noti delle custom properties) per i progetti esistenti.
+
+- **0.2.** **Webpack plugin per estrazione ottimizzata delle CSS Custom Properties**
+  - **Contesto:** minimo ha un file "master" con **tutte** le definizioni di custom properties disponibili (spacing, colori, tipografia, ecc.). Nei progetti che consumano il framework le definizioni vengono rimosse a monte e i CSS compilati da webpack contengono solo *usi* (`var(--nome)`), mai definizioni. Serve un plugin webpack che, dopo l'emit degli asset, scansioni i CSS compilati, determini quali custom properties sono effettivamente usate (incluse le dipendenze transitive) e inietti solo le definizioni necessarie in uno o più file target. La cosa viene fatta ora con postcss-jit-props, mentre l'uso di purgeCSS non ha dato mai risultati accettabili (ma viene cmq conservato per il purge delle classi)
+  - **Perché non jit-props:** [postcss-jit-props](https://github.com/GoogleChromeLabs/postcss-jit-props) risolve un problema simile ma a livello di singolo file, dentro la pipeline PostCSS pre-bundling: produce duplicazioni tra chunk e non permette di controllare il raggruppamento sources→target sul risultato finale del bundle. Il plugin va invece fatto operare sugli asset già finalizzati da webpack (hook `processAssets`, stage `PROCESS_ASSETS_STAGE_ADDITIONAL`).
+  - Legge un file di definizioni globale (master) con tutte le custom properties disponibili
+  - Per ogni "set" configurato (array di file CSS sorgente compilati → un file target), scansiona i sorgenti per trovare le custom properties effettivamente usate (`var(--nome)`)
+  - Risolve ricorsivamente le dipendenze transitive: se `--a` è usata ed è definita come `calc(var(--b) * 2)`, anche `--b` va inclusa, a cascata fino al fixed point — incluse le var() nei fallback (`var(--foo, var(--bar))`)
+  - Estrae le definizioni corrispondenti dal master, **preservando l'ordine originale di dichiarazione** (rilevante per il calcolo a cascata dei valori CSS)
+  - Inietta le definizioni risolte nel file target di quel set (nuovo asset o merge in un file esistente, configurabile), ripetendo il processo per ogni set in modo indipendente.
+  - Configurazione indicativa:
+    ```js
+    {
+      definitionsFile: 'src/tokens/all-custom-props.css',
+      sets: [
+        { sources: ['dist/main.css', 'dist/vendor.css'], target: 'dist/tokens.css' },
+        { sources: ['dist/admin.css'], target: 'dist/admin-tokens.css' }
+      ]
+    }
+    ```
+    - **NB:** valutare opzione (preferita) di utilizzare come file di target uno dei file source, iniettando le custom props all'inizio (se possibile, tenendo conto dell'eventuale presenza del banner prodotto da webpack)
+    - **opzione aggiuntiva** per la scelta del selettore da usare le props (`:root`, default, o `:where(html)`, o qualsiasi altro scelto dall'utente)
+  - Requisiti tecnici:
+    - Parsing delle *definizioni* nel master file con PostCSS (non regex), per gestire correttamente valori complessi, funzioni annidate, stringhe con virgole/parentesi
+    - Scansione degli *usi* nei CSS compilati può restare a regex (`/var\(\s*(--[\w-]+)/g`), essendo solo pattern-matching, non trasformazione
+    - Gestione esplicita di scope diversi da `:root` nel master (es. override in media query, classi di tema) — se una prop base è inclusa, va portato con sé anche l'eventuale blocco di override, non solo la definizione base
+    - Compatibilità con watch mode: il file master può essere cachato (cambia raramente), il set "usato" va ricalcolato ad ogni build incrementale
+    - Il plugin deve girare dopo eventuali step di minify/ottimizzazione CSS di webpack, così il match avviene sul CSS realmente servito
+  - Casi da non dimenticare:
+    - **Dark mode / temi:** il master può contenere override di custom properties dentro selettori come `[data-theme="dark"]`, `.dark-mode`, o dentro `@media (prefers-color-scheme: dark)`. Vanno inclusi nel target ogni volta che la prop base corrispondente risulta usata, anche se il blocco di override in sé non contiene un uso diretto rilevabile dalla scansione — altrimenti il tema alternativo si rompe silenziosamente
+    - **Custom properties "locali":** per convenzione le custom properties locali/interne a un componente hanno prefisso underscore (es. `--_spacing-internal`). Non fanno parte del pool globale del master e vanno escluse sia dalla scansione degli usi sia dalla risoluzione transitiva (pattern `--_`), per non cercarle inutilmente nel master né generare falsi "non trovati". In realtà questi casi dovrebbero essere gestiti dall'analisi dello scope (vedi sopra) e trattati come qualsiasi altra definizione gestita "internamente" in un selettore ad hoc. Es:
+
+    ```css
+    .mio-componente {
+      --my-prop: #fff;
+      --_my-prop2: #000;
+
+      p {
+        color: var(--my-prop);
+        background: var(--_my-prop2);
+      }
+    }
+    ```
 
 ## 1. da completare / rivedere
 
@@ -64,7 +105,7 @@ Numerazione progressiva (`N`, `N.N`, `N.N.N`...) per riferimento rapido ai singo
 - [ ] **3.16.** `dom-builder/dom-builder.js:169` — callback con azioni su children potrebbero non essere eseguiti in assenza di parent
 - [ ] **3.17.** design tokens: `btn-color-themes.minimo.tokens.mjs` — aggiungere temi `neutral` e `accent`
 - [ ] **3.18.** design tokens: `form.minimo.tokens.mjs:292` — importazione automatica SVG (problemi con svgo)
-- [ ] **3.19.** unsplash page: Aggiungere `blurhash` come `peerDependency` opzionale (cfr. `_wrk/TODO.md`)
+- [x] **3.19.** unsplash page: Aggiungere `blurhash` come `peerDependency` opzionale (cfr. `_wrk/TODO.md`)
 - [ ] **3.20.** capire come organizzare la dir snippet-and-utilities, recupero di quanto utile da `_wrk/__snippets`
 - [ ] **3.21.** completare readme
 - [ ] **3.22.** docs -> build with jsDoc

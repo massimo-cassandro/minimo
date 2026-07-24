@@ -1,3 +1,4 @@
+/*! minimo - Inner Nav */
 // tab / list navigation — copies the primary nav markup into all `.inner-nav` containers
 /*
 <p class="inner-nav-main">...</p>

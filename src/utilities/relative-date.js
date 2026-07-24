@@ -1,4 +1,5 @@
 // @ts-check
+/*! minimo - Relative Date */
 
 // Displays a date in relative form to the current date if within the set limits.
 // Relative dates are automatically updated every minute.

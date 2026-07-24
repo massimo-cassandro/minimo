@@ -1,3 +1,4 @@
+/*! minimo - Enable Submit Buttons */
 /**
  * Re-enables all submit and non-disabled button elements within the given context.
  * @param {Document | Element} [context=document]

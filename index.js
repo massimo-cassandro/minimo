@@ -1,4 +1,3 @@
-
 // utilities
 export { betterText } from './src/utilities/better-text.js';
 export { buildPictureTag } from './src/utilities/build-picture-tag.js';
@@ -30,4 +29,4 @@ export { overlay, removeOverlay } from './src/components/overlay/overlay.js';
 export { sf_macro } from './src/components/sf-macro/sf-macro.js';
 export { slideToggle, slideUp, slideDown } from './src/components/slide-up-down-toggle/slide-up-down-toggle.js';
 export { snackbar } from './src/components/snackbar/snackbar.js';
-export { unsplashPageJS } from './src/components/unsplash-page/unsplash-page.js';
+export { unsplashPage } from './src/components/unsplash-page/unsplash-page.js';

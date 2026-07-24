@@ -1,4 +1,5 @@
 // @ts-check
+/*! minimo - Random Id */
 
 /**
  * Generates a random ID string.

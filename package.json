@@ -1,6 +1,6 @@
 {
   "name": "@massimo-cassandro/minimo",
-  "version": "1.17.1",
+  "version": "1.18.0",
   "description": "Light css framework & utilities",
   "type": "module",
   "main": "./index.js",
@@ -39,6 +39,7 @@
     "build-margin-padding-css": "node ./scripts/build-margin-padding-css.mjs",
     "check unresolved props": "node ./design-tokens/utilities/check-unresolved-custom-props.mjs --config ./design-tokens/tokens-config.mjs",
     "test": "node --test \"test/**/*.test.mjs\"",
+    "test sideEffects tree-shaking": "node ./test/sideEffects-tree-shaking/run-test.mjs",
     "checkJS": "npx tsc --noEmit -p jsconfig.json",
     "checkJS ./src": "npx tsc --noEmit --allowJs --checkJs --target ES2023 --module ESNext --allowSyntheticDefaultImports --moduleResolution bundler declarations.d.ts src/**/*.js"
   },
@@ -61,8 +62,15 @@
     "dev-tools/**/*",
     "snippets/**/*"
   ],
+  "peerDependencies": {
+    "@svgdotjs/svg.js": "^3.2.7",
+    "blurhash": "^2.0.5"
+  },
   "peerDependenciesMeta": {
     "@svgdotjs/svg.js": {
+      "optional": true
+    },
+    "blurhash": {
       "optional": true
     },
     "style-dictionary": {

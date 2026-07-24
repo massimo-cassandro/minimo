@@ -1,8 +1,11 @@
+/*! minimo - unsplashPage */
+import { domBuilder } from '../../utilities/dom-builder/dom-builder.js';
+import { classnames } from '../../utilities/classnames.js';
 import imageIcon from '../../icons/image-duotone.svg';
 import arrowIcon from '../../icons/arrow-fat-lines-left-duotone.svg';
-import { breakpoints } from './img-breakpoints.js';
 import { fetchUnsplashData } from './fetch-unsplash-data.js';
 import { decode } from 'blurhash';
+import * as styles from './unsplash-page.module.css';
 
 /**
  * Initialises an Unsplash full-page photo with blurhash placeholder, responsive picture element,
@@ -16,10 +19,11 @@ import { decode } from 'blurhash';
  * @param {string | null} [settings.text=null] - Optional body text.
  * @param {string | null} [settings.backLink=null] - Optional back-link HTML.
  * @param {boolean} [settings.hidePhotoLink=true] - When true, the Unsplash link is shown only on hover.
- * @param {Record<string, string> | null} [settings.cssModulesObj=null] - CSS Modules class map; when null, class names are used as-is.
- * @returns {void}
+ * @returns {Promise<void>}
  */
-export function unsplashPageJS(settings) {
+
+
+export async function unsplashPage(settings) {
 
   const default_settings = {
       targetElement    : null,
@@ -49,122 +53,247 @@ export function unsplashPageJS(settings) {
 
     const targetElement = /** @type {HTMLElement} */ (settings.targetElement);
 
-    const cssClass = /** @param {string} classname */ classname =>
-      settings.cssModulesObj? settings.cssModulesObj[classname] : classname;
-
-    targetElement.innerHTML = `<div class="${cssClass('upContainer') + (settings.className? ` ${settings.className}` : '')}"></div>`;
-    const container = /** @type {HTMLElement} */ (targetElement.querySelector('.' + cssClass('upContainer')));
-    container.innerHTML = `<div class="${cssClass('upLoaderWrapper')}"><div class="${cssClass('upLoader')}"></div></div>`;
-
-    fetchUnsplashData({unsplash_data_url: settings.unsplashDataUrl})
-      .then(photo => {
-        if (!photo) return;
-
-        const pixels = decode(photo.blur_hash, container.offsetWidth, container.offsetHeight);
-
-        const canvas = document.createElement('canvas');
-        canvas.className = cssClass('upCanvas');
-        canvas.width = container.offsetWidth;
-        canvas.height = container.offsetHeight;
-        const ctx = canvas.getContext('2d');
-        if (ctx) {
-          const imageData = ctx.createImageData(container.offsetWidth, container.offsetHeight);
-          imageData.data.set(pixels);
-          ctx.putImageData(imageData, 0, 0);
-        }
+    const container = /** @type {HTMLElement} */ (domBuilder([
+      {
+        className: classnames( styles.container, settings.className ),
+        children: [
+          {
+            className: styles.loaderWrapper,
+            children: [
+              `div.${styles.loader}`
+            ]
+          }
+        ]
+      }
+    ], targetElement));
 
 
-        container.insertAdjacentElement('afterbegin', canvas);
+    const imgData = await fetchUnsplashData({unsplash_data_url: settings.unsplashDataUrl});
+    if (!imgData) return;
 
-        const formats = ['avif', 'webp', 'pjpg']; // `fm` parameter, in order of use
+    const pixels = decode(imgData.blur_hash, container.offsetWidth, container.offsetHeight);
 
-        container.insertAdjacentHTML('beforeend',
-          '<picture>' +
-            breakpoints.map((brk, idx) => {
+    const canvas = document.createElement('canvas');
+    canvas.className = styles.canvas;
+    canvas.width = container.offsetWidth;
+    canvas.height = container.offsetHeight;
+    const ctx = canvas.getContext('2d');
+    if (ctx) {
+      const imageData = ctx.createImageData(container.offsetWidth, container.offsetHeight);
+      imageData.data.set(pixels);
+      ctx.putImageData(imageData, 0, 0);
+    }
 
-              const is_last_brk = idx === breakpoints.length - 1;
-              return formats.map(fmt => {
-                const is_default_fmt = fmt === formats.at(-1);
+    container.insertAdjacentElement('afterbegin', canvas);
 
-                // https://unsplash.com/documentation#supported-parameters
-                // https://docs.imgix.com/apis/rendering/size/w
-                // https://docs.imgix.com/apis/rendering/size/h
-                // https://docs.imgix.com/apis/rendering/size/ar
-                // https://docs.imgix.com/apis/rendering/size/fit
-                // https://docs.imgix.com/apis/rendering/size/crop
-                // https://docs.imgix.com/apis/rendering/format/q
+    const formats = ['avif', 'webp', 'pjpg']; // `fm` parameter, in order of use
 
-                let url = photo.base_url + (/\?/.test(photo.base_url)? '&' : '?') +
-                  'fit=crop&crop=faces,entropy,edges' + // top, bottom, left, right, faces, focalpoint, edges, and entropy
-                  '&q=60' +
-                  `&w=${brk.w}&h=${brk.h}` +
-                  `&fm=${fmt}`;
+    /*
+      - image dimensions grouped by aspect ratio: each group becomes one <source> tag
+        per format (avif/webp/pjpg)
+      - each aspect ratio is expressed as [w, h] (e.g. [16, 9]); `widths` lists the target
+        render widths for that group, used both as the `w` imgix param and as the `Nw`
+        descriptor in `srcset`. Height is derived per width from the group's ratio and
+        passed to imgix as `h` (see buildImgixUrl), so groups can safely reuse the same
+        `widths` list (e.g. 9/16 and 9/20) while still requesting a different crop height
+      - orientation and the aspect-ratio media feature are derived from the ratio itself:
+        ratio >= 1 -> landscape + min-aspect-ratio, ratio < 1 -> portrait + max-aspect-ratio
+      - NB: order matters. <picture> uses "first matching <source> wins" (unlike the CSS
+        cascade, where the last matching rule wins), so groups must be ordered from most to
+        least restrictive: landscape groups from the widest ratio to the narrowest, portrait
+        groups from the narrowest ratio to the widest. Orientation makes the two families
+        mutually exclusive, so their relative order doesn't matter
+      */
+    const sizes = [
+      // landscape 16/9
+      {
+        ar: [16,9],
+        widths: [2560, 1920, 1440, 1200, 800, 570]
+      },
+      // landscape 4/3
+      {
+        ar: [4,3],
+        widths: [1536, 1440, 1280, 840, 570]
+      },
+      // portrait 9/20 (very tall phones)
+      {
+        ar: [9,20],
+        widths: [1080, 960, 768, 570, 400]
+      },
+      // portrait 9/16
+      {
+        ar: [9,16],
+        widths: [1080, 960, 768, 570, 400]
+      },
+      // portrait 3/4 (tablets)
+      {
+        ar: [3,4],
+        widths: [1200, 1024, 840]
+      }
+    ];
 
-                if(is_last_brk && is_default_fmt) {
+    // `url`/`searchParams` and the static imgix params (fit/crop/q) are set up once here
+    // and reused on every call: `fm`/`w`/`h` are the only parts that change per image, and
+    // the returned string is always consumed synchronously before the next call mutates them
+    /** @type {(w: number, h: number, fmt: string) => string} */
+    const buildImgixUrl = (() => {
+      const url = new URL(imgData.base_url),
+        searchParams = new URLSearchParams(url.search);
 
-                  return '<img ' +
-                    `class="${cssClass('unsplashPhoto')}" `+
-                    `src="${url}" `+
-                    `srcset="${url}${brk.dpr2? ` 1x, ${url}&dpr=2 2x` : ''}" `+
-                    `alt="${photo.alt_description?? `${photo.author} / Unsplash`}" `+
-                    `width="${brk.w}" height="${brk.h}">`;
+      searchParams.set('fit', 'crop');
+      searchParams.set('crop', 'faces,entropy,edges'); // top, bottom, left, right, faces, focalpoint, edges, and entropy
+      searchParams.set('q', '60');
 
-                } else {
-                  return '<source ' +
-                    `srcset="${url}${brk.dpr2? ` 1x, ${url}&dpr=2 2x` : ''}" `+
-                    (!is_default_fmt? `type="image/${fmt}" ` : '')+
-                    `media="${brk.mq}" `+
-                    `width="${brk.w}" height="${brk.h}">`;
+      return (w, h, fmt) => {
+        searchParams.set('fm', fmt);
+        searchParams.set('w', String(w));
+        searchParams.set('h', String(h));
+
+        url.search = searchParams.toString();
+        return url.toString();
+      };
+    })();
+
+    // smallest width of the widest (most common) group, used as the plain <img> fallback
+    // for browsers without <picture> support: the <source> tags above cover everything else
+    const default_group = sizes[0],
+      default_w = default_group.widths[default_group.widths.length - 1],
+      default_h = Math.round(default_w * default_group.ar[1] / default_group.ar[0]);
+
+    // https://unsplash.com/documentation#supported-parameters
+    // https://docs.imgix.com/apis/rendering/size/w
+    // https://docs.imgix.com/apis/rendering/size/h
+    // https://docs.imgix.com/apis/rendering/size/ar
+    // https://docs.imgix.com/apis/rendering/size/fit
+    // https://docs.imgix.com/apis/rendering/size/crop
+    // https://docs.imgix.com/apis/rendering/format/q
+    domBuilder([
+      {
+        tag: 'picture',
+        children: [
+          ...sizes.flatMap(({ar, widths}) => {
+            const ratio = ar[0] / ar[1],
+              orientation = ratio >= 1 ? 'landscape' : 'portrait',
+              aspectFeature = orientation === 'landscape' ? 'min-aspect-ratio' : 'max-aspect-ratio',
+              media = `(orientation: ${orientation}) and (${aspectFeature}: ${ar[0]}/${ar[1]})`;
+
+            return formats.map(fmt => {
+              const is_default_fmt = fmt === formats.at(-1),
+                srcset = widths
+                  .map(w => {
+                    const h = Math.round(w * ar[1] / ar[0]);
+                    return `${buildImgixUrl(w, h, fmt)} ${w}w`;
+                  })
+                  .join(', ');
+
+              return {
+                tag: 'source',
+                attrs: {
+                  type: is_default_fmt? null : `image/${fmt}`,
+                  media,
+                  sizes: '100vw',
+                  srcset
                 }
-              }).join('');
-            }).join('') +
-          '</picture>'
-        ); // end insert <picture>
+              };
+            });
+          }),
 
-        const img = /** @type {HTMLImageElement | null} */ (container.querySelector('.' + cssClass('unsplashPhoto')));
-        if (img) {
-          img.onload = () => {
-            container.querySelector('.' + cssClass('upLoaderWrapper'))?.remove();
-            container.classList.add(cssClass('show'));
+          // =>> img and its listener
+          {
+            tag: 'img',
+            className: styles.unsplashPhoto,
+            attrs: {
+              src: buildImgixUrl(default_w, default_h, formats[formats.length - 1]),
+              alt: imgData.alt_description ?? `${imgData.author} / Unsplash`
+            },
+            callback: el => {
+              el.onload = () => {
+                try {
+                  container.querySelector(`.${styles.loaderWrapper}`)?.remove();
+                  container.classList.add(styles.show);
 
-            container.insertAdjacentHTML('beforeend', `<div class="${cssClass('upMessageBox')}">
-              <div class="${cssClass('upMessage')}">
-                <h1>${settings.title}</h1>
-                ${settings.text? `<p>${settings.text}</p>` : ''}
-                ${settings.backLink ? `<p class="${cssClass('upBackLink')}">${settings.backLink}</p>` : ''}
+                  domBuilder([
+                    {
+                      className: styles.messageBox,
+                      children: [
+                        {
+                          className: styles.message,
+                          children: [
+                            { tag: 'h1', content: settings.title },
+                            {
+                              tag: 'p',
+                              content: settings.text,
+                              condition: !!settings.text
+                            },
+                            {
+                              tag: 'p',
+                              className: styles.backLink,
+                              content: settings.backLink,
+                              condition: !!settings.backLink
+                            },
+                            {
+                              className: styles.arrowWrapper,
+                              attrs: { role: 'button' },
+                              children: [
+                                { tag: 'img', attrs: { src: arrowIcon, alt: 'Icona freccia' } }
+                              ],
+                              callback: arrowEl => {
+                                arrowEl.addEventListener('click', e => {
+                                  const target = /** @type {HTMLElement} */ (e.target);
+                                  target.closest(`.${styles.message}`)?.classList.toggle(styles.hidden);
+                                }, false);
+                              }
+                            }
+                          ]
+                        },
+                        {
+                          className: styles.credits,
+                          children: [
+                            { tag: 'em', content: imgData.image_description },
+                            {
+                              tag: 'span',
+                              content: `Photo <a href="${imgData.author_profile}?utmSource=${settings.utmSource}&utm_medium=referral">${imgData.author} / Unsplash</a>`
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      className: classnames( styles.unsplashPhotoLink, settings.hidePhotoLink ? styles.showOnHover : null ),
+                      children: [
+                        {
+                          tag: 'a',
+                          attrs: {
+                            href: `${imgData.unsplash_url}?utm_source=${settings.utmSource}&utm_medium=referral`,
+                            target: '_blank',
+                            rel: 'noopener noreferrer'
+                          },
+                          children: [
+                            { tag: 'img', attrs: { src: imageIcon, alt: 'Icona immagine' } }
+                          ]
+                        }
+                      ]
+                    }
+                  ], container);
 
-                <div class="${cssClass('upArrowWrapper')}" role="button">
-                  <img src="${arrowIcon}" alt="Icona freccia">
-                </div>
-              </div>
+                } catch(e) {
+                  console.error( '[Unsplash Page] ' + e ); // eslint-disable-line
+                }
+              };
 
-              <div class="${cssClass('upCredits')}">
-                <em>${photo.image_description}</em>
-                <span>Photo
-                  <a href="${`${photo.author_profile}?utmSource=${settings.utmSource}&utm_medium=referral`}">
-                    ${photo.author} / Unsplash
-                  </a>
-                </span>
-              </div>
-            </div>
-            <div class="${cssClass('unsplashPhotoLink')}${settings.hidePhotoLink? ` ${cssClass('upShowOnHover')}` : ''}">
-              <a href="${`${photo.unsplash_url}?utm_source=${settings.utmSource}&utm_medium=referral`}" target="_blank" rel="noopener noreferrer">
-                <img src="${imageIcon}" alt="Icona immagine" />
-              </a>
-            </div>`);
+              el.onerror = () => {
+                console.error( '[Unsplash Page] Errore nel caricamento dell\'immagine' ); // eslint-disable-line
+                container.querySelector('.' + styles.loaderWrapper)?.remove();
+              };
+            }
+          }
+        ]
+      }
+    ], container);
 
-            container.querySelector('.' + cssClass('upArrowWrapper'))?.addEventListener('click', e => {
-              const target = /** @type {HTMLElement} */ (e.target);
-              target.closest(`.${cssClass('upMessage')}`)?.classList.toggle(cssClass('hidden'));
-            }, false);
-
-          }; // end img.onload
-        }
-
-      }); // end .then
 
   } catch(e) {
-    console.error( e ); // eslint-disable-line
+    console.error( '[Unsplash Page] ' + e ); // eslint-disable-line
   }
 
 }

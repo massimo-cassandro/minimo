@@ -153,8 +153,8 @@ Contiene vecchi script inutilizzati, parcheggiati temporaneamente per eventuali 
 **Minimo non include dipendenze esterne nell'installazione di default.** Le librerie di terze parti vengono dichiarate come `peerDependencies` opzionali (come già avviene per `@svgdotjs/svg.js`) e devono essere installate a cura dell'utente solo quando il componente che le richiede viene effettivamente utilizzato.
 
 Esempi attuali/previsti:
-- `@svgdotjs/svg.js` — richiesto da `charts/` (già in `peerDependenciesMeta` come opzionale)
-- `blurhash` — richiesto da `create-blurhash-canvas` (TODO: aggiungere a `peerDependenciesMeta`)
+- `@svgdotjs/svg.js` — richiesto da `charts/` (già in `peerDependencies`/`peerDependenciesMeta` come opzionale)
+- `blurhash` — richiesto da `unsplash-page` (già in `peerDependencies`/`peerDependenciesMeta` come opzionale)
 - `@tarekraafat/autocomplete.js` — richiesto da `src/components/autocomplete/` (TODO: aggiungere a `peerDependenciesMeta`)
 
 Ogni nuovo componente che introduce una dipendenza esterna deve seguire questa stessa logica: aggiungere la libreria a `peerDependencies` con `"optional": true` in `peerDependenciesMeta`, e documentare l'installazione richiesta.
@@ -242,7 +242,7 @@ Elementi ancora presenti in `_wrk/`:
 | `alert-autoclose.js` | da valutare | Da integrare o cestinare |
 | `flash-alerts.js` | da valutare | Da integrare o cestinare |
 | `img-viewer-dom-builder.js` | da valutare | Da integrare o cestinare |
-| `create-blurhash-canvas.js` | da valutare | Correlato a peer dep `blurhash` (vedi TODO package.json) — da integrare o cestinare |
+| `create-blurhash-canvas.js` | da valutare | Correlato a peer dep `blurhash` (già aggiunta in `package.json` per `unsplash-page`) — da integrare o cestinare |
 | `print-icon.js` | da valutare | Da integrare o cestinare |
 | `__snippets/` | archivio | Snippet da vari progetti, inclusi template Twig/Symfony, form theme, style-dictionary |
 
@@ -251,10 +251,6 @@ Elementi ancora presenti in `_wrk/`:
 ## TODO e FIX pendenti
 
 Traccia dei TODO/FIX sparsi nel codice, da risolvere alla prima occasione utile.
-
-### package.json / root
-
-- **TODO** — Aggiungere `blurhash` come peer dependency ([TODO.md](TODO.md)).
 
 ### Import CSS module (priorità bassa)
 

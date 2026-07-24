@@ -56,7 +56,7 @@ export function slideUpDownToggleDemo(){
       ]
     },
 
-    'h2 wrap: false (container musta not have padding)',
+    'h2 wrap: false (container must not have padding)',
     {
       // outer container without padding and with display: block
       callback: el => {

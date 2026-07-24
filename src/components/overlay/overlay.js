@@ -1,3 +1,4 @@
+/*! minimo - Overlay */
 import './overlay.css';
 
 /**

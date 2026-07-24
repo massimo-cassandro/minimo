@@ -1,4 +1,5 @@
 // @ts-check
+/*! minimo - Slide Up/Down Toggle */
 
 import * as styles from './slide-up-down-toggle.module.css';
 

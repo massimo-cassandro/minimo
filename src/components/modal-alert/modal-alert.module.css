@@ -1,7 +1,10 @@
+/*! minimo - Modal Alert */
+
 .malert {
   width: 600px;
   max-width: 90vw;
   padding: 0;
+  margin: auto;
   background-color: var(--malert-background-color);
   border: none;
   border-radius: var(--malert-border-radius);
@@ -19,23 +22,23 @@
 }
 
 .success {
-  --_malert-color: var(--malert-success-bg);
+  --_malert-color-bg: var(--malert-success-bg);
   --_malert-color-fg: var(--malert-success-fg);
 }
 .info {
-  --_malert-color: var(--malert-info-bg);
+  --_malert-color-bg: var(--malert-info-bg);
   --_malert-color-fg: var(--malert-info-fg);
 }
 .warning {
-  --_malert-color: var(--malert-warning-bg);
+  --_malert-color-bg: var(--malert-warning-bg);
   --_malert-color-fg: var(--malert-warning-fg);
 }
 .error {
-  --_malert-color: var(--malert-error-bg);
+  --_malert-color-bg: var(--malert-error-bg);
   --_malert-color-fg: var(--malert-error-fg);
 }
 .confirm {
-  --_malert-color: var(--malert-confirm-bg);
+  --_malert-color-bg: var(--malert-confirm-bg);
   --_malert-color-fg: var(--malert-confirm-fg);
 }
 
@@ -55,7 +58,6 @@
 
 .mMark {
   display: flex;
-  flex: 0;
   align-items: center;
   justify-content: center;
   width: 100%;
@@ -65,6 +67,7 @@
   svg {
     width: 100px;
     aspect-ratio: 1;
+    background-color: transparent;
     fill: var(--_malert-color-fg);
   }
 
@@ -112,13 +115,13 @@
   flex-flow: column nowrap;
   gap: 1rem;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: flex-end;
 
   padding-top: 1rem;
   margin-top: auto;
 
   @media screen and (min-width: 600px) {
-    flex-direction: row;
+    flex-direction: row-reverse;
     justify-content: space-between;
   }
 }

@@ -1,3 +1,4 @@
+/*! minimo - Dismiss Alerts */
 /**
  * Adds click listeners to all `[data-dismiss]` elements to remove their closest ancestor
  * that matches the class specified in the `data-dismiss` attribute.

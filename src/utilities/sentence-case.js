@@ -1,3 +1,4 @@
+/*! minimo - Sentence Case */
 /**
  * Converts a string to sentence case (first letter uppercase, rest lowercase).
  * @param {string | null | undefined} str

@@ -1,3 +1,4 @@
+/*! minimo - Generate Password */
 /**
  * Generates a random password using uppercase letters and digits,
  * excluding visually ambiguous characters (O, I, 0).

@@ -1,3 +1,5 @@
+/*! minimo - Inner Nav */
+
 .inner-nav-main, .inner-nav {
   display: flex;
   gap: var(--inner-nav-gap);

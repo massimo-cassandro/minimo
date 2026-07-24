@@ -1,6 +1,6 @@
 
 
-import { unsplashPageJS } from '@massimo-cassandro/minimo/index.js';
+import { unsplashPage } from '@massimo-cassandro/minimo/index.js';
 
 const errCode = document.documentElement.dataset.errCode || '500',
   errText = document.documentElement.dataset.errText,
@@ -23,7 +23,7 @@ const errCode = document.documentElement.dataset.errCode || '500',
 
 document.title = `Errore ${errCode}`;
 
-unsplashPageJS({
+unsplashPage({
   targetElement    : document.getElementById('root'),
   className        : 'error-page',
   unsplashDataUrl  : url,

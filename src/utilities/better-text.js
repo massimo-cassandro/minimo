@@ -1,4 +1,5 @@
 // @ts-check
+/*! minimo - Better Text */
 
 // Italian particles/articles (plus a few English and topographic terms) whose casing is
 // enforced and after which spaces are turned into non-breaking spaces. Hoisted to module

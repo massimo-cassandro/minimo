@@ -1,4 +1,5 @@
 // @ts-check
+/*! minimo - Parse File Size */
 
 /**
  * Converts a file size in bytes to a human readable string,

@@ -1,3 +1,4 @@
+/*! minimo - Disable Buttons On Submit */
 /**
  * Disables all `[type=submit]` and `[type=button]` buttons on form submit.
  *

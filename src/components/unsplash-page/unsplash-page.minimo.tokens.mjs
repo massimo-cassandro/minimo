@@ -1,5 +1,5 @@
 export default {
-  up: {
+  'uspg': {
     bg: {
       color: {
         $type: 'color',
@@ -59,7 +59,7 @@ export default {
     h1: {
       color: {
         $type: 'color',
-        $value: '{up.text.color}'
+        $value: '{uspg.text.color}'
       },
       font: {
         size: {
@@ -86,7 +86,7 @@ export default {
       box: {
         bg: {
           $type: 'color',
-          $value: '{up.link.color}'
+          $value: '{uspg.link.color}'
         }
       },
       fill: {

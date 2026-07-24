@@ -1,5 +1,6 @@
 
 // @ts-check
+/*! minimo - Truncate String */
 
 /**
  * Truncates a string to the desired length adding an option suffix

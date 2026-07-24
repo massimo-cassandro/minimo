@@ -1,3 +1,4 @@
+/*! minimo - Strip Tags */
 /**
  * Strips HTML tags from a string.
  * @param {string | null | undefined} str

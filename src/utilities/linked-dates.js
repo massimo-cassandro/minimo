@@ -1,4 +1,5 @@
 // @ts-check
+/*! minimo - Linked Dates */
 
 /**
  * Links date/datetime-local input fields so that one field constrains

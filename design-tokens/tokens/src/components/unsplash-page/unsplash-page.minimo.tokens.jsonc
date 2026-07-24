@@ -5,7 +5,7 @@
 // Re-generate with: node build-tokens.mjs --config <path/to/config>
 // -----------------------------------------------------------------------
 {
-  "up": {
+  "uspg": {
     "bg": {
       "color": {
         "$type": "color",
@@ -59,7 +59,7 @@
     "h1": {
       "color": {
         "$type": "color",
-        "$value": "{up.text.color}"
+        "$value": "{uspg.text.color}"
       },
       "font": {
         "size": {
@@ -84,7 +84,7 @@
       "box": {
         "bg": {
           "$type": "color",
-          "$value": "{up.link.color}"
+          "$value": "{uspg.link.color}"
         }
       },
       "fill": {

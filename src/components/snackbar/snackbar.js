@@ -1,3 +1,4 @@
+/*! minimo - Snackbar */
 import { domBuilder } from '../../utilities/dom-builder/dom-builder.js';
 import { classnames } from '../../utilities/classnames.js';
 import * as styles from './snackbar.module.css';

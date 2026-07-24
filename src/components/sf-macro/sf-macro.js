@@ -1,3 +1,4 @@
+/*! minimo - Symfony Macro */
 // import './sf-macro.css'; // import in the consuming project
 
 /**

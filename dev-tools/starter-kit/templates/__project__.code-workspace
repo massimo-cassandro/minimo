@@ -7,8 +7,8 @@
   "settings": {
 
     "cssvar.files": [
-      "frontend/css/custom-properties-list.css", // project props
-      
+      "frontend/css/custom-properties.css", // project props
+
       // OPEN PROPS
       // "./node_modules/open-props/open-props.min.css", // all open-props
 

@@ -1,3 +1,4 @@
+/*! minimo - Title Case */
 /**
  * Converts a string to title case (first letter of each word uppercase, rest lowercase).
  * @param {string | null | undefined} str

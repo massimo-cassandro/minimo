@@ -1,3 +1,4 @@
+/*! minimo - Create Id */
 import { stripTags } from './strip-tags.js';
 
 /**

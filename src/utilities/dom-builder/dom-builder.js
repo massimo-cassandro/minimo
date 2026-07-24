@@ -1,3 +1,4 @@
+/*! minimo - DOM Builder */
 import { domBuilderBasicSetup } from './domBuilderBasicSetup.js';
 import { parseDomString } from './parseDomString.js';
 
@@ -18,7 +19,7 @@ import { parseDomString } from './parseDomString.js';
  *   supported, falling back to raw `innerHTML` on browsers without it.
  * @property {boolean} [condition=true] - When false, the element is skipped.
  * @property {function(HTMLElement): void} [callback] - Callback invoked after the element is created.
- * @property {DomBuilderItem[]} [children] - Configuration array for child elements.
+ * @property {Array<DomBuilderItem|string>} [children] - Configuration array for child elements. Accepts strings (shorthand per `parseDomString`) and/or configuration objects.
  */
 
 /**
