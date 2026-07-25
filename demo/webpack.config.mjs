@@ -95,7 +95,7 @@ const config = {
   output: {
     path: output_dir,
     filename: '[name].[contenthash].js',
-    publicPath: './',
+    publicPath: isDevelopment? '/' : '/minimo',
     // publicPath: isDevelopment? '/' : './', // per devServer, nel caso in cui l'output di produzione non sia sulla root
     clean: !isDevelopment,
     // module: true,
@@ -199,8 +199,7 @@ const config = {
       template: path.resolve(__dirname, './demo.ejs'),
       inject: 'body',
       // title: 'Buttons Demo',
-      minify: !isDevelopment,
-      base: isDevelopment ? '/' : '/minimo/',
+      minify: !isDevelopment
     }),
 
     // =>> plugins: HtmlWebpackInjectAttributesPlugin
