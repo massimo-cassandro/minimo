@@ -1,10 +1,12 @@
+//@ts-nocheck
+
+/* globals process */
 import './demo.css';
 import './demo-files/charts/charts.css';
 
 import { routes } from 'routes.js';
 
 const root = document.getElementById('root')
-  ,h1 = document.getElementById('title')
   ,route = window.location.hash.replace('#/', '') || 'home'
 
   ,titleCase = str => str.substring(0,1).toUpperCase() + str.substring(1)
@@ -20,7 +22,7 @@ routes.push(
       // });
 
       root.innerHTML = '<ul>' +
-        routeList.map(r => `<li><a href="/#/${r.key}">${r.title?? titleCase(r.key)}</a></li>`).join('') +
+        routeList.map(r => `<li><a href="${process.env.NODE_ENV === 'development'? '' : '/minimo'}/#/${r.key}">${r.title?? titleCase(r.key)}</a></li>`).join('') +
         '</ul>';
     }
   }
