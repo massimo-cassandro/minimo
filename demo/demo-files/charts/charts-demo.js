@@ -4,7 +4,7 @@ import { barsTest } from './chart-demos/bars-demo.js';
 import { goalTest } from './chart-demos/goal-demo.js';
 import { linesTest } from './chart-demos/lines-demo.js';
 
-// import { ratingDisplayTest } from '../../../_wrk/charts/test/test-src/rating-display-test.js';
+// import { ratingDisplayTest } from '../../../charts/TODO charts/test/test-src/rating-display-test.js';
 // import { pieTest } from './src/pie-test.js';
 // import { hBarsTest } from './src/hbars-test.js';
 // import { signalBarsTest } from './src/signal-bars-test.js';

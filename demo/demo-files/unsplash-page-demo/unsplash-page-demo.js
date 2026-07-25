@@ -27,7 +27,7 @@ export async function unsplashPageDemo(){
     targetElement    : document.getElementById('root'),
     unsplashDataUrl,
     utmSource        : 'unsplashPageDemo test',
-    title            : 'Message title',
+    title            : 'Unsplash Page Demo',
     text             : 'This is the message <strong>text</strong>',
     backLink         : '<a href="/">Back to demo index</a>',
     hidePhotoLink    : true,

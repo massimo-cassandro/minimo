@@ -69,17 +69,14 @@ Riferimento centralizzato dei prossimi interventi. Le dir con prefisso `TODO ` i
     }
     ```
 
-## ICONE: centralizzare l'uso delle icone tramite un file `icons.js` come unica fonte di verità, per evitare potenziali duplicazioni dello stesso file
+## FORM-MULTISELECT
+  * `src/components/TODO form-multiselect/`
 
-## UNSPLASH PAGE 
-  * parametrizzare le icone nel box del messaggio ed altri eventuali parametri
+## JSON-TABLE
+  * `src/web-components/TODO json-table/`
 
-
-## `src/components/TODO form-multiselect/`
-
-## `src/web-components/TODO json-table/`
-
-## `src/components/TODO vanilla-cookie-consent/`
+## VANILLA-COOKIE-CONSENT
+  * `src/components/TODO vanilla-cookie-consent/`
 
 ## AUTOCOMPLETE
 
@@ -126,9 +123,6 @@ Riferimento centralizzato dei prossimi interventi. Le dir con prefisso `TODO ` i
   * rendere custom props e css indipendenti dal resto `modal-popup/modal-popup.module.css` (`--body-background-color`, `--modal-popup-*`, `--size-*`)
   * unificare con `_wrk/popup-page`?
 
-## FILE-UPLOADER
-  * includere e riscrivere `js-file-uploader` come web-component
-
 ## MINIMO
   * includere anche stylelint ed eslint config??
   * includere e successivamente archiviare `auto-datatables-bs5` e `ckeditor-utilities`
@@ -151,7 +145,7 @@ Riferimento centralizzato dei prossimi interventi. Le dir con prefisso `TODO ` i
    * rendere indipendebti css e custom props `sf-macro/sf-macro.css` (già namespaced su `--sf-macro-*` e con token collocati; verificare se serve un fallback esplicito per l'indipendenza CSS completa)
 
 ## CHARTS 
-  * (vedi anche `_wrk/charts`)
+  * vedi TODO nella dir
 
 ## CSS
   * `visibility.css:21` — da rivedere
@@ -160,7 +154,6 @@ Riferimento centralizzato dei prossimi interventi. Le dir con prefisso `TODO ` i
   * `anchors.css` — rivedere e completare; sostituire colori con custom props specifiche
   * `table.css:10` — aggiungere opzione alternate row color
   * `text.css:7` — rivedere
-  * `margin-padding.css` — generare utilities in automatico; anche versione con naming Bootstrap
   * `forms/fieldset.css:2` — da verificare
   * `forms/forms.css` — separare file; radio/checkbox groups; multiselect; `.form-grid`; customizable select; form-check come flex
   * `buttons/status-buttons.css` — rivedere tutto
@@ -184,7 +177,9 @@ Riferimento centralizzato dei prossimi interventi. Le dir con prefisso `TODO ` i
   * Rivedere meccanismo parametri cli (fare come svg-icons-tools)
   * Opzione calcolo percorso file nello snippet, in base alla sua posizione
 
-## JS-FILE-UPLOADER
+## FILE-UPLOADER
+  * includere e riscrivere `js-file-uploader` come web-component
+  * runominare in file-uploader senza js-
   * rifattorizzare (vedi todo nel repo)
   * prevedere possibilità di uso anche senza framework minimo
 

@@ -23,6 +23,7 @@ import * as styles from './unsplash-page.module.css';
  * @returns {Promise<void>}
  */
 
+// TODO add icon file customization and more custom props for message box
 
 export async function unsplashPage(settings) {
 
@@ -235,9 +236,7 @@ export async function unsplashPage(settings) {
                             {
                               className: styles.arrowWrapper,
                               attrs: { role: 'button' },
-                              children: [
-                                { tag: 'img', attrs: { src: arrowIcon, alt: 'Icona freccia' } }
-                              ],
+                              content: arrowIcon,
                               callback: arrowEl => {
                                 arrowEl.addEventListener('click', e => {
                                   const target = /** @type {HTMLElement} */ (e.target);
@@ -269,9 +268,7 @@ export async function unsplashPage(settings) {
                             target: '_blank',
                             rel: 'noopener noreferrer'
                           },
-                          children: [
-                            { tag: 'img', attrs: { src: imageIcon, alt: 'Icona immagine' } }
-                          ]
+                          content: imageIcon
                         }
                       ]
                     }

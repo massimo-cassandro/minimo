@@ -14,7 +14,6 @@ Progettato per essere usato con **webpack** (configurazione starter inclusa in `
 minimo/
 ├── index.js                        # entry point principale (export JS)
 ├── _wrk/                           # repo vecchi in lavorazione, da integrare in minimo (non pubblicato)
-│   ├── charts/                     # vecchia versione charts da rifattorizzare
 │   ├── spinner/                    # componente spinner
 │   ├── popup-page/                 # pagina popup
 │   ├── auto-datatable-customization/
@@ -23,7 +22,7 @@ minimo/
 │   ├── img-viewer-dom-builder.js
 │   ├── create-blurhash-canvas.js
 │   ├── print-icon.js
-│   └── __snippets/                 # snippet di codice da vari progetti
+│   └── __snippets/                 # snippet di codice da vari progetti (style-dictionary, utilities varie)
 ├── src/
 │   ├── minimo.css                  # entry point CSS principale
 │   ├── custom-properties.css       # CSS custom properties
@@ -62,11 +61,12 @@ minimo/
 │       └── TODO json-table/        # spostato da _wrk, ★ futuro sostituto di s-datatable-component (vedi sotto)
 ├── charts/                         # grafici SVG (usa @svgdotjs/svg.js come peer dep opzionale)
 │   ├── index.js                    # export: barsChart, goalChart, linesChart, MinimoCharts
-│   └── src/
-│       ├── bars.js, lines.js, goal.js
-│       ├── helpers/                # cartesian-axis, chart-utils, core, create-svg-canvas, legenda, ...
-│       ├── node-helpers/           # rendering SVG lato server (richiede opentype)
-│       └── rating-display/         # grafico gauge (commentato in index, WIP)
+│   ├── src/
+│   │   ├── bars.js, lines.js, goal.js
+│   │   ├── helpers/                # cartesian-axis, chart-utils, core, create-svg-canvas, legenda, ...
+│   │   ├── node-helpers/           # rendering SVG lato server (richiede opentype)
+│   │   └── rating-display/         # grafico gauge (commentato in index, WIP)
+│   └── TODO charts/                # vecchia versione (1a vers) da rifattorizzare, spostata da _wrk/charts
 ├── design-tokens/
 │   ├── _src/                       # sorgenti token (.mjs e .jsonc)
 │   └── tokens/                     # token compilati (JSONC, W3C DTCG format) — generati da build-tokens
@@ -76,7 +76,7 @@ minimo/
 ├── dev-tools/starter-kit/          # configurazione webpack starter + script d'installazione
 ├── demo/                           # ambiente di test dei componenti (webpack, config interna alla dir)
 ├── demo-build/                     # (non ancora presente) build statica della demo per GitHub Pages
-├── snippets-and-utilities/         # porzioni di codice slegate dal framework, utili per integrazioni rapide
+├── snippets/                       # porzioni di codice slegate dal framework, utili per integrazioni rapide
 └── archived/                       # vecchi script inutilizzati, parcheggiati per usi futuri (potrebbero essere eliminati)
 ```
 
@@ -130,13 +130,17 @@ La documentazione è **interamente da costruire**. Il contenuto attuale è minim
 
 ---
 
-## snippets-and-utilities/
+## snippets/
 
 Contiene porzioni di codice **slegate dal framework** ma utili per l'integrazione rapida di alcune funzionalità in progetti che usano minimo:
 - `UnsplashController.php` — controller PHP per Unsplash
 - `ImgViewerController.php` — controller PHP per image viewer
 - `minimo-form-layout.html.twig` — layout form Symfony/Twig
+- `flash-messages.html.twig` — template Twig per flash messages
 - `error-pages/` — template Twig per pagine di errore
+- `unsplash-browser-app/` — utility JS per il recupero immagini da Unsplash lato browser
+- `config-templates/` — template di configurazione (`.env`, `.htaccess`, robots.txt, babel, rollup, dependabot, ...)
+- altri script di utilità sparsi (validazioni IT — codice fiscale, partita IVA —, festività, anti-spam email, build custom device list)
 
 Non viene pubblicato su npm (non incluso nel campo `files` di `package.json`).
 
@@ -229,13 +233,12 @@ TODO aperti su json-table ([src/web-components/TODO json-table/TODO.md](src/web-
 
 ### Altri elementi in `_wrk/`
 
-`js-utilities/` e `recaptcha/` sono stati **cestinati** (rimossi senza migrazione). `modal-popup/` è stato integrato in produzione in `src/components/modal-popup/`. `vanilla-cookie-consent/` è stato spostato in `src/components/TODO vanilla-cookie-consent/` e `json-table/` in `src/web-components/TODO json-table/` (vedi sopra), entrambi in attesa di integrazione. `unsplash-page-demo/` e `modal-alert-demo/` sono stati rimossi da `_wrk/`; quest'ultimo è ora in `demo/demo-files/TODO modal-alert-demo/`.
+`js-utilities/` e `recaptcha/` sono stati **cestinati** (rimossi senza migrazione). `modal-popup/` è stato integrato in produzione in `src/components/modal-popup/`. `vanilla-cookie-consent/` è stato spostato in `src/components/TODO vanilla-cookie-consent/` e `json-table/` in `src/web-components/TODO json-table/` (vedi sopra), entrambi in attesa di integrazione. `unsplash-page-demo/` e `modal-alert-demo/` sono stati rimossi da `_wrk/`; quest'ultimo è ora in `demo/demo-files/TODO modal-alert-demo/`. `charts/` (vecchia versione 1a vers da rifattorizzare) è stato spostato in `charts/TODO charts/`, accanto alla nuova versione. `__snippets/twig/` (snippet Twig/Symfony: form theme, shared includes, select2, sf-macro, contenuti, error-pages, ...) è stato smistato: le parti ancora utili sono confluite in `archived/` e `snippets/`, il resto è stato **cestinato**; sono rimaste in `__snippets/` solo le sottocartelle `style-dictionary/` e `utilities/`.
 
 Elementi ancora presenti in `_wrk/`:
 
 | Cartella/File | Stato | Note |
 |---|---|---|
-| `charts/` | da rifattorizzare | Vecchia versione (1a vers) con chart `settimanale-mensile` e altre non ancora migrate |
 | `spinner/` | da valutare | Componente spinner (attualmente in minimo solo come CSS) |
 | `popup-page/` | da valutare | Componente popup page — da integrare o cestinare |
 | `auto-datatable-customization/` | da valutare | Da integrare o cestinare |
@@ -244,7 +247,7 @@ Elementi ancora presenti in `_wrk/`:
 | `img-viewer-dom-builder.js` | da valutare | Da integrare o cestinare |
 | `create-blurhash-canvas.js` | da valutare | Correlato a peer dep `blurhash` (già aggiunta in `package.json` per `unsplash-page`) — da integrare o cestinare |
 | `print-icon.js` | da valutare | Da integrare o cestinare |
-| `__snippets/` | archivio | Snippet da vari progetti, inclusi template Twig/Symfony, form theme, style-dictionary |
+| `__snippets/` | archivio | Snippet `style-dictionary/` e `utilities/` da vari progetti |
 
 ---
 

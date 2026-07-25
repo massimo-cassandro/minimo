@@ -14,5 +14,5 @@
     "charts/**/*.js",
     "design-tokens/utilities/**/*.mjs"
   ],
-  "exclude": ["node_modules", "demo", "demo-build", "_wrk", "archived", "snippets-and-utilities"]
+  "exclude": ["node_modules", "demo", "demo-build", "_wrk", "archived", "snippets", "charts/TODO charts"]
 }

@@ -181,10 +181,12 @@ html, body {
       }
     }
 
-    img {
+    svg {
       display: block;
       width: 100%;
-      height: 100%;
+      aspect-ratio: 1;
+      background-color: transparent;
+      fill: #000;
     }
   }
 
@@ -248,22 +250,25 @@ html, body {
       color: var(--uspg-icon-fill-color, #333);
       background-color: var(--uspg-icon-box-bg, var(--uspg-link-color, #fc0));
 
-      img {
+      svg {
         opacity: 1;
         filter: none;
       }
     }
   }
-  img {
+  svg {
     display: block;
+    width: 100%;
+    aspect-ratio: 1;
+    background-color: transparent;
     opacity: .6;
-    filter: brightness(0) invert(1);
+    fill: #fff;
   }
 
   @media (hover: hover) {
 
     .show &:hover {
-      img {
+      svg {
         opacity: 1;
       }
     }
