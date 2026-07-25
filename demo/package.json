@@ -5,7 +5,8 @@
     "webpack DEMO dev": "NODE_ENV=development webpack serve --config ./webpack.config.mjs",
     "php demo server": "php -S localhost:8100 # -t demo",
     "webpack DEMO prod": "NODE_ENV=production webpack --config ./webpack.config.mjs",
-    "create-favicons DEMO": "node ../dev-tools/create-favicons/index.mjs --dir=./dev-tools-demo/create-favicons-demo"
+    "create-favicons DEMO": "node ../dev-tools/create-favicons/index.mjs --dir=./dev-tools-demo/create-favicons-demo",
+    "npm upd DEMO": "npm update"
   },
   "private": true,
   "devDependencies": {

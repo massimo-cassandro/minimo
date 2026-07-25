@@ -1,10 +1,11 @@
 {
   "__help": "https://code.visualstudio.com/docs/languages/jsconfig",
   "compilerOptions": {
+    "checkJs": true,
     "target": "ES2023",
     "module": "ESNext",
-    "baseUrl": ".",
-    "allowSyntheticDefaultImports": false,
+    "allowSyntheticDefaultImports": true,
+    "moduleResolution": "bundler",
     "paths": {
       "@src/*": ["../src/*"],
       "@minimo/*": ["../src/*"],
