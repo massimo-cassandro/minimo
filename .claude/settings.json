@@ -6,8 +6,6 @@
       "Bash(python3 -c ' *)",
       "Bash(python3)",
       "Bash(git -C /Users/mazz/Sites/minimo status --short)",
-      "Bash(npm init *)",
-      "Bash(npm install *)",
       "Bash(node_modules/.bin/webpack --config webpack.config.js)",
       "Bash(npm ping *)",
       "Bash(npm run *)",
@@ -15,7 +13,6 @@
       "Bash(npm test *)",
       "Bash(node --test test/dom-builder.test.mjs)",
       "Bash(npx eslint *)",
-      "Bash(node ../dev-tools/create-favicons/index.mjs --config ./dev-tools-demo/create-favicons-demo/create-favicons-cfg.mjs)",
       "Bash(node --input-type=module -e ' *)"
     ]
   }

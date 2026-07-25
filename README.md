@@ -40,4 +40,5 @@ The [`dev-tools`](./dev-tools/README.md) directory contains a set of standalone 
 
 [Docs](docs)
 
-[Demo](demo-build)
+[Demo](https://massimo-cassandro.github.io/minimo/demo-build/) (in progress)
+

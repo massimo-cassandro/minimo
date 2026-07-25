@@ -455,14 +455,14 @@ const config = {
     new webpack.BannerPlugin({
       banner: () => {
 
-        const start_year = 2026,
-          current_year = new Date().toLocaleString('en-UK', { year: 'numeric' }),
-          year = [
+        const start_year = 2026
+          ,current_year = new Date().toLocaleString('en-UK', { year: 'numeric' })
+          ,year = [
             start_year,
             ...(current_year > start_year? [current_year] : [])
-          ].join('-'),
-
-          vers = packageJson.version.split('.').slice(0,-1).join('.');
+          ].join('-')
+          ,vers = packageJson.version.split('.').slice(0,-1).join('.')
+        ;
 
         return (
           '/*!\n' +

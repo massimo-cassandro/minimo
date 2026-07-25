@@ -1,18 +1,19 @@
+//@ts-nocheck
 // webpack.config.mjs
 import path from 'path';
 import { fileURLToPath } from 'url';
-// import webpack from 'webpack';
-// import fs from 'fs';
+import webpack from 'webpack';
+import fs from 'fs';
 import * as process from 'process'; // Rende 'process' disponibile nel contesto ESM
 // import { styleText } from 'node:util';
 // import { createRequire } from 'node:module';
 
 import HtmlWebpackPlugin from 'html-webpack-plugin';
-// import HtmlWebpackInjectPreload from '@principalstudio/html-webpack-inject-preload';
+import HtmlWebpackInjectPreload from '@principalstudio/html-webpack-inject-preload';
 import TerserPlugin from 'terser-webpack-plugin';
 import CssMinimizerPlugin from 'css-minimizer-webpack-plugin';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
-// import CopyWebpackPlugin from 'copy-webpack-plugin';
+import CopyWebpackPlugin from 'copy-webpack-plugin';
 // import Dotenv from 'dotenv-webpack';
 // import RemoveEmptyScriptsPlugin from 'webpack-remove-empty-scripts';
 // import { WebpackManifestPlugin } from 'webpack-manifest-plugin';
@@ -41,7 +42,7 @@ const isDevelopment = process.env.NODE_ENV === 'development'
   // ,favicons_path = null //'frontend/favicons/output'
   ,favicons_path_regexp = null //new RegExp(favicons_path) // source pattern per le favicons (regexp o null)
   ,jsConfigAliases = getJsConfigAliases(path.resolve(__dirname, './jsconfig.json'))
-  // ,packageJson = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../../package.json'), 'utf-8'))
+  ,packageJson = JSON.parse(fs.readFileSync(path.resolve(__dirname, './package.json'), 'utf-8'))
   // ,manifest_shared_seed = {}
 ;
 
@@ -50,7 +51,12 @@ const isDevelopment = process.env.NODE_ENV === 'development'
 // =>> CopyWebpackPlugin patterns
 // (null o array vuoto per disattivare)
 // https://github.com/webpack/copy-webpack-plugin/tree/main?tab=readme-ov-file#copy-webpack-plugin
-// const CopyWebpackPluginPatterns = [];
+const CopyWebpackPluginPatterns = [
+  {
+    from: './assets/README.md',
+    to: '[name][ext]'
+  },
+];
 
 // recupero metadata immagini
 // const require = createRequire(import.meta.url);
@@ -89,7 +95,7 @@ const config = {
   output: {
     path: output_dir,
     filename: '[name].[contenthash].js',
-    publicPath: '/',
+    publicPath: './',
     // publicPath: isDevelopment? '/' : './', // per devServer, nel caso in cui l'output di produzione non sia sulla root
     clean: !isDevelopment,
     // module: true,
@@ -158,15 +164,15 @@ const config = {
     // }),
 
     // =>> plugins: CopyWebpackPlugin
-    // ...(
-    //   CopyWebpackPluginPatterns != null && CopyWebpackPluginPatterns.length > 0
-    //     ? [
-    //       new CopyWebpackPlugin({
-    //         patterns: CopyWebpackPluginPatterns
-    //       })
-    //     ]
-    //     : []
-    // ),
+    ...(
+      CopyWebpackPluginPatterns != null && CopyWebpackPluginPatterns.length > 0
+        ? [
+          new CopyWebpackPlugin({
+            patterns: CopyWebpackPluginPatterns
+          })
+        ]
+        : []
+    ),
 
     // =>> plugins: WebpackManifestPlugin
     // new WebpackManifestPlugin({
@@ -193,7 +199,7 @@ const config = {
       template: path.resolve(__dirname, './demo.ejs'),
       inject: 'body',
       // title: 'Buttons Demo',
-      minify: false //!isDevelopment
+      minify: !isDevelopment
     }),
 
     // =>> plugins: HtmlWebpackInjectAttributesPlugin
@@ -209,40 +215,56 @@ const config = {
     //   }
     // }),
 
+    // =>> plugins: HtmlWebpackInjectPreload
+    // https://github.com/principalstudio/html-webpack-inject-preload
+    ...(isDevelopment
+      ? []
+      : [
+        new HtmlWebpackInjectPreload({
+          files: [
+            {
+              match: /.*-latin-(?!(ext-)).*\.woff2$/,
+              attributes: { as: 'font', type: 'font/woff2', crossorigin: true }
+            },
+            {
+              match: /.*\.css$/,
+              attributes: { as: 'style' }
+            },
+            {
+              match: /.*\.js$/,
+              attributes: { as: 'script' }
+            }
+          ]
+        })
+      ]
+    ),
 
 
-    // =>> plugins: PurgeCSSPlugin (per ultimo)
-    // https://github.com/FullHuman/purgecss/tree/main/packages/purgecss-webpack-plugin
-    // https://purgecss.com/configuration.html
-    // https://github.com/isaacs/node-glob#readme
-    // new PurgeCSSPlugin({
+    // =>> plugins: BannerPlugin
+    new webpack.BannerPlugin({
+      banner: () => {
 
-    //   // css da pulire
-    //   paths: globSync(
+        const start_year = 2026
+          ,current_year = new Date().toLocaleString('en-UK', { year: 'numeric' })
+          ,year = [
+            start_year,
+            ...(current_year > start_year? [current_year] : [])
+          ].join('-')
 
-    //     // path.resolve(__dirname, '@minimo/**/!(*.module).css'),
-    //     path.resolve(__dirname, '@src/**/*.{css,js,ejs}'),
-    //     //   path.resolve(__dirname, '@src/**/*.js'),
-    //     //   path.resolve(__dirname, '@app/**/*.ejs'),
-    //     //   path.join(__dirname, './templates/**/*.twig')
+        // ,vers = packageJson.version.split('.').slice(0,-1).join('.')
+        ;
 
-    //     { nodir: true }
-    //   ), // .filter(filePath => !filePath.endsWith('.module.css'));
-
-
-
-    //   variables: false, // Analizza le variabili custom
-    //   safelist: {
-    //     standard: ['body', 'html', 'button', 'a'],
-    //     deep: [/^btn/],
-    //     greedy: []
-
-    //   },
-
-    //   verbose: true,
-    //   rejected: true,
-    //   stdout: true
-    // })
+        return (
+          '/*!\n' +
+          // ` * ${packageJson.name} v.${vers} - Massimo Cassandro ${year}\n` +
+          ` * ${packageJson.name} - Massimo Cassandro ${year}\n` +
+          ' */\n'
+        );
+      },
+      raw: true,
+      // niente banner nei critical css: vengono inlinati nei template html
+      exclude: /\.critical/ // chunk name
+    }),
 
   ], // end plugins
 

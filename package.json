@@ -41,7 +41,8 @@
     "test": "node --test \"test/**/*.test.mjs\"",
     "test sideEffects tree-shaking": "node ./test/sideEffects-tree-shaking/run-test.mjs",
     "checkJS": "npx tsc --noEmit -p jsconfig.json",
-    "checkJS ./src": "npx tsc --noEmit --allowJs --checkJs --target ES2023 --module ESNext --allowSyntheticDefaultImports --moduleResolution bundler declarations.d.ts src/**/*.js"
+    "checkJS ./src": "npx tsc --noEmit --allowJs --checkJs --target ES2023 --module ESNext --allowSyntheticDefaultImports --moduleResolution bundler declarations.d.ts src/**/*.js",
+    "check outdated": "echo '*** ROOT ***' && npm outdated --omit=peer && echo '*** DEMO ***' && npm --prefix ./demo outdated && echo '*** END ***'"
   },
   "license": "MIT",
   "author": "Massimo Cassandro",
