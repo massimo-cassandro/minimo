@@ -54,7 +54,9 @@ function closeDialog(el) {
  * @returns {HTMLDialogElement} The dialog element.
  */
 
-// TODO attributi arua anche sul triggerm vedi ada-frontend/src/modal-dialog/modal-dialog.js
+// TODO attributi aria anche sul triggerm vedi ada-frontend/src/modal-dialog/modal-dialog.js
+// TODO possibilità di impostare la larghezza da parametro del componente
+// TODO rivedere anche custom props, eliminare le properties `_` e sostituirle con proprietà getsite nei tokens
 
 export function modalPopup({
 

@@ -1,5 +1,8 @@
+//@ts-nocheck
 import { domBuilder } from '@src/utilities/dom-builder/dom-builder.js';
 import { modalPopup } from '@src/components/modal-popup/modal-popup.js';
+
+import * as styles from './modal-popup-demo.module.css';
 
 export function modalPopupDemo(){
   const root = document.getElementById('root');
@@ -26,7 +29,7 @@ export function modalPopupDemo(){
                 content: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Beatae eum ducimus accusamus minima qui, aliquid quo voluptates soluta, molestias amet repudiandae mollitia! Corporis nulla quo voluptates aut ut fuga? Est laborum ipsa consectetur fuga laboriosam, pariatur perferendis. Nesciunt dolorem consectetur, tenetur animi facere, perferendis recusandae corrupti pariatur earum accusamus eveniet.'
               }
             ],
-            dialogExtraClassName: 'dialogExtraClassName',
+            dialogExtraClassName: styles.demoDialog,
             contentExtraClassName: 'contentExtraClassName',
             headerContent: 'Header text',
             footerContent: 'Footer text',

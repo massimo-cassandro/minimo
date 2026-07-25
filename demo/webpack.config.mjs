@@ -199,7 +199,8 @@ const config = {
       template: path.resolve(__dirname, './demo.ejs'),
       inject: 'body',
       // title: 'Buttons Demo',
-      minify: !isDevelopment
+      minify: !isDevelopment,
+      base: isDevelopment ? '/' : '/minimo/',
     }),
 
     // =>> plugins: HtmlWebpackInjectAttributesPlugin

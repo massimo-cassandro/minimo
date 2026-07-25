@@ -2,7 +2,7 @@ import buttons from './demo-files/buttons.html';
 import datetime_test from './demo-files/datetime-fields-test.html';
 import { snackbarsDemo } from './demo-files/snackbars-demo.js';
 import { domBuilderDemo } from './demo-files/domBuilder-demo.js';
-import { modalPopupDemo } from './demo-files/modal-popup-demo.js';
+import { modalPopupDemo } from './demo-files/modal-popup-demo/modal-popup-demo.js';
 import { slideUpDownToggleDemo } from './demo-files/slide-up-down-toggle-demo/slide-up-down-toggle-demo.js';
 import { unsplashPageDemo } from './demo-files/unsplash-page-demo/unsplash-page-demo.js';
 import { modalAlertDemo } from './demo-files/modal-alert-demo/modal-alert-demo.js';

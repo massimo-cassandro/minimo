@@ -1,6 +1,5 @@
 //@ts-nocheck
 
-/* globals process */
 import './demo.css';
 import './demo-files/charts/charts.css';
 
@@ -22,7 +21,7 @@ routes.push(
       // });
 
       root.innerHTML = '<ul>' +
-        routeList.map(r => `<li><a href="${process.env.NODE_ENV === 'development'? '' : '/minimo'}/#/${r.key}">${r.title?? titleCase(r.key)}</a></li>`).join('') +
+        routeList.map(r => `<li><a href="/#/${r.key}">${r.title?? titleCase(r.key)}</a></li>`).join('') +
         '</ul>';
     }
   }
