@@ -232,7 +232,7 @@
   --mpopup-header-padding: var(--size-xs);
   --mpopup-height: max-content;
   --mpopup-max-height: 5.625rem;
-  --mpopup-max-width: 6.125rem;
+  --mpopup-max-width: 4.375rem;
   --mpopup-min-height: 18.75rem;
   --mpopup-min-width: 25rem;
   --mpopup-width: max-content;

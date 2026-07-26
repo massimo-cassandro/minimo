@@ -11,7 +11,7 @@ export default {
     },
     'max-width': {
       $type: 'dimension',
-      $value: '98dvw',
+      $value: '70dvw',
     },
     height: {
       $type: 'dimension',
