@@ -199,7 +199,10 @@ const config = {
       template: path.resolve(__dirname, './demo.ejs'),
       inject: 'body',
       // title: 'Buttons Demo',
-      minify: !isDevelopment
+      minify: !isDevelopment,
+      // NB: The base tag doesn't seem to work well with hash routes on GitHub pages.
+      // base: isDevelopment ? '/' : '/minimo/',
+
     }),
 
     // =>> plugins: HtmlWebpackInjectAttributesPlugin

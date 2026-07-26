@@ -43,6 +43,12 @@ function closeDialog(el) {
  * @param {string | null} [params.contentExtraClassName=null] - Extra class added to the content wrapper.
  * @param {string | null} [params.headerExtraClassName=null] - Extra class added to the header wrapper.
  * @param {string | null} [params.footerExtraClassName=null] - Extra class added to the footer wrapper.
+ * @param {string | number | null} [params.dialogWidth=null] - optional dialog width value - if set, overrides main css custom prop
+ * @param {string | number | null} [params.dialogMinWidth=null] - optional dialog min-width value - if set, overrides main css custom prop
+ * @param {string | number | null} [params.dialogMaxWidth=null] - optional dialog max-width value - if set, overrides main css custom prop
+ * @param {string | number | null} [params.dialogHeight=null] - optional dialog height value - if set, overrides main css custom prop
+ * @param {string | number | null} [params.dialogMinHeight=null] - optional dialog min-height value - if set, overrides main css custom prop
+ * @param {string | number | null} [params.dialogMaxHeight=null] - optional dialog max-height value - if set, overrides main css custom prop
  * @param {string | null} [params.iframeUrl=null] - URL to load in an iframe.
  * @param {string | any[] | null} [params.content=null] - Plain text, HTML, or a domBuilder array.
  * @param {string | null} [params.ajaxUrl=null] - URL for Ajax content loading.
@@ -51,12 +57,9 @@ function closeDialog(el) {
  * @param {boolean} [params.addScrollbarPadding=false] - Adds right padding to compensate for the scrollbar.
  * @param {string | any[] | null} [params.headerContent=null] - Header content: plain text, HTML, or a domBuilder array.
  * @param {string | any[] | null} [params.footerContent=null] - Footer content: plain text, HTML, or a domBuilder array.
+ * @param {HTMLElement | null} [params.triggerElement=null] - Optional element that triggered the popup; when set, `aria-haspopup`, `aria-controls` and `aria-expanded` are managed on it.
  * @returns {HTMLDialogElement} The dialog element.
  */
-
-// TODO attributi aria anche sul triggerm vedi ada-frontend/src/modal-dialog/modal-dialog.js
-// TODO possibilità di impostare la larghezza da parametro del componente
-// TODO rivedere anche custom props, eliminare le properties `_` e sostituirle con proprietà getsite nei tokens
 
 export function modalPopup({
 
@@ -65,6 +68,14 @@ export function modalPopup({
 
   /** extra classname added to dialogInner */
   contentExtraClassName = null,
+
+  /** optional values for maon custom props overriding */
+  dialogWidth     = null,
+  dialogMinWidth  = null,
+  dialogMaxWidth  = null,
+  dialogHeight    = null,
+  dialogMinHeight = null,
+  dialogMaxHeight = null,
 
   /** iframe url */
   iframeUrl = null,
@@ -98,8 +109,10 @@ export function modalPopup({
   /** extra classname added to footer */
   footerExtraClassName = null,
 
-}) {
+  /** element that triggered the popup: if set, `aria-haspopup`, `aria-controls` and `aria-expanded` are managed on it */
+  triggerElement = null,
 
+}) {
 
 
   if(content == null && (ajaxUrl == null || ajaxCallback == null) && iframeUrl == null) {
@@ -120,15 +133,53 @@ export function modalPopup({
     mode = 'iframe';
   }
 
+
+
   // capture for use in the ajax callback closure (ajaxUrl is non-null when mode === 'ajax')
   const safeAjaxUrl = /** @type {string} */ (ajaxUrl);
+
+  // fine tuning custom props
+  /** @type {Record<string, string | number | null>} */
+  const cpropsValues = {
+    dialogWidth,
+    dialogMinWidth,
+    dialogMaxWidth,
+    dialogHeight,
+    dialogMinHeight,
+    dialogMaxHeight,
+  };
+  /** @type {Record<string, string>} */
+  const cpropsMap = {
+    dialogWidth     : '--mpopup-width',
+    dialogMinWidth  : '--mpopup-min-width',
+    dialogMaxWidth  : '--mpopup-max-width',
+    dialogHeight    : '--mpopup-height',
+    dialogMinHeight : '--mpopup-min-height',
+    dialogMaxHeight : '--mpopup-max-height'
+  };
+  /** @type {string[]} */
+  let dialogStyle = [];
+  Object.keys(cpropsMap).forEach(item => {
+    if(cpropsValues[item] != null) {
+      const value = typeof cpropsValues[item] === 'number' ? `${cpropsValues[item]}px` : cpropsValues[item];
+      dialogStyle.push(`${cpropsMap[item]}: ${value}`);
+    }
+  });
+
+  // ids for aria-controls (trigger → dialog) and aria-labelledby (dialog → header), generated only when needed
+  const dialogId = triggerElement != null ? `mpopup-${crypto.randomUUID()}` : null;
+  const headerId = headerContent != null ? `mpopup-header-${crypto.randomUUID()}` : null;
 
   domBuilder([
     {
       tag: 'dialog',
+      id: dialogId,
       className: classnames(styles.dialog, dialogExtraClassName, addScrollbarPadding && styles.scrollBarPadding),
       attrs: {
-        'closedby': 'any'
+        closedby: 'any',
+        'aria-modal': 'true',
+        'aria-labelledby': headerId,
+        style: dialogStyle.length? dialogStyle.join(';') : null
       },
       callback: el => { dialogEl = /** @type {HTMLDialogElement} */ (el); },
       children: [
@@ -144,6 +195,7 @@ export function modalPopup({
           className: styles.contentWrapper,
           children: [
             {
+              id: headerId,
               className: classnames(styles.header, headerExtraClassName),
               condition: headerContent != null,
               content: Array.isArray(headerContent) ? null : headerContent,
@@ -223,6 +275,10 @@ export function modalPopup({
 
     document.body.classList.remove('overflow-hidden');
 
+    if(triggerElement != null) {
+      triggerElement.setAttribute('aria-expanded', 'false');
+    }
+
     if(closeCallback) {
       closeCallback(thisDialog);
     }
@@ -230,6 +286,12 @@ export function modalPopup({
 
   }, false);
 
+
+  if(triggerElement != null) {
+    triggerElement.setAttribute('aria-haspopup', 'dialog');
+    triggerElement.setAttribute('aria-controls', /** @type {string} */ (dialogId));
+    triggerElement.setAttribute('aria-expanded', 'true');
+  }
 
   document.body.classList.add('overflow-hidden');
   thisDialog.showModal();

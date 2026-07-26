@@ -1,6 +1,6 @@
 {
   "name": "@massimo-cassandro/minimo",
-  "version": "1.18.2",
+  "version": "1.18.3",
   "description": "Light css framework & utilities",
   "type": "module",
   "main": "./index.js",
@@ -19,13 +19,13 @@
     "access": "public"
   },
   "bin": {
-    "buildTokens": "./design-tokens/utilities/build-tokens.mjs",
-    "checkUnresolvedProps": "./design-tokens/utilities/check-unresolved-custom-props.mjs",
-    "update-version": "./dev-tools/update-version/index.mjs",
-    "upd@m": "./dev-tools/upd@m/index.mjs",
-    "svgIconsTools": "./dev-tools/svg-icons-tools/index.mjs",
-    "create-favicons": "./dev-tools/create-favicons/index.mjs",
-    "starter-kit": "./dev-tools/starter-kit/starter-install.sh"
+    "buildTokens": "design-tokens/utilities/build-tokens.mjs",
+    "checkUnresolvedProps": "design-tokens/utilities/check-unresolved-custom-props.mjs",
+    "update-version": "dev-tools/update-version/index.mjs",
+    "upd@m": "dev-tools/upd@m/index.mjs",
+    "svgIconsTools": "dev-tools/svg-icons-tools/index.mjs",
+    "create-favicons": "dev-tools/create-favicons/index.mjs",
+    "starter-kit": "dev-tools/starter-kit/starter-install.sh"
   },
   "repository": {
     "type": "git",
@@ -81,6 +81,7 @@
   "devDependencies": {
     "@massimo-cassandro/eslint-config": "^3.0.11",
     "@massimo-cassandro/stylelint-config": "^2.3.11",
+    "@types/node": "^26.1.1",
     "jsdom": "^29.1.1",
     "style-dictionary": "^5.5.0"
   },
@@ -91,5 +92,10 @@
     "sharp": "^0.35.3",
     "sharp-ico": "^0.1.5",
     "svgo": "^4.0.2"
-  }
+  },
+  "directories": {
+    "doc": "docs",
+    "test": "test"
+  },
+  "keywords": []
 }

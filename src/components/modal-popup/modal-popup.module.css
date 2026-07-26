@@ -1,12 +1,4 @@
 /*! minimo - Modal Popup */
-/*
-NB:
-`--modal-popup-width` and `--modal-popup-height` are used with a fallback value,
-but can be set to the desired value on a case-by-case basis.
-
-Same for min/max-width and min/max-height
-
-*/
 
 .dialog {
 
@@ -15,25 +7,25 @@ Same for min/max-width and min/max-height
   display: flex;
   flex-direction: column;
 
-  width: var(--_modal-popup-width, max-content);
-  min-width: var(--_modal-popup-min-width, 400px);
-  max-width: var(--_modal-popup-max-width, 98dvw);
-  height: var(--_modal-popup-height, max-content);
-  min-height: var(--_modal-popup-min-height, 300px);
-  max-height: var(--_modal-popup-max-height, 90dvh);
+  width: var(--mpopup-width);
+  min-width: var(--mpopup-min-width);
+  max-width: var(--mpopup-max-width);
+  height: var(--mpopup-height);
+  min-height: var(--mpopup-min-height);
+  max-height: var(--mpopup-max-height);
   padding: 0;
   margin: auto;
   overflow: visible;
-  background-color: var(--body-background-color);
+  background-color: var(--mpopup-background-color);
   border: none;
-  border-radius: var(--modal-popup-border-radius);
-  box-shadow: var(--modal-popup-drop-shadow);
+  border-radius: var(--mpopup-border-radius);
+  box-shadow: var(--mpopup-drop-shadow);
   scale: 0;
   transition: scale .2s ease-out;
 
   &::backdrop {
     overscroll-behavior: contain;
-    background-color: var(--modal-popup-backdrop-color);
+    background-color: var(--mpopup-backdrop-color);
   }
 
   &.on {
@@ -45,8 +37,8 @@ Same for min/max-width and min/max-height
 .closeButton  {
 
   position: absolute;
-  top: calc(-1 * var(--modal-popup-btn-close-size) / 3);
-  right: calc(-1 * var(--modal-popup-btn-close-size) / 3);
+  top: calc(-1 * var(--mpopup-btn-close-size) / 3);
+  right: calc(-1 * var(--mpopup-btn-close-size) / 3);
 }
 
 .contentWrapper {
@@ -65,13 +57,13 @@ Same for min/max-width and min/max-height
   /* width: 100%;
   height: 100%; */
   min-height: 0;
-  padding: var(--size-base) var(--size-sm) var(--size-sm);
+  padding: var(--mpopup-content-padding);
   overflow-x: hidden;
   overflow-y: auto;
   scrollbar-gutter: stable;
 
   .scrollBarPadding & {
-    padding-inline-end: var(--size-md);
+    padding-inline-end: var(--mpopup-content-scrollbar-padding-i-end);
   }
 
 }
@@ -86,18 +78,18 @@ Same for min/max-width and min/max-height
 }
 
 .header {
-  padding: var(--modal-popup-header-padding);
-  font-size: var(--modal-popup-header-font-size);
-  color: var(--modal-popup-header-color);
-  background-color: var(--modal-popup-header-background-color);
-  border-radius: var(--modal-popup-border-radius) var(--modal-popup-border-radius) 0 0;
+  padding: var(--mpopup-header-padding);
+  font-size: var(--mpopup-header-font-size);
+  color: var(--mpopup-header-color);
+  background-color: var(--mpopup-header-background-color);
+  border-radius: var(--mpopup-border-radius) var(--mpopup-border-radius) 0 0;
 }
 .footer {
-  padding: var(--modal-popup-footer-padding);
-  font-size: var(--modal-popup-footer-font-size);
-  color: var(--modal-popup-footer-color);
-  background-color: var(--modal-popup-footer-background-color);
-  border-radius: 0 0 var(--modal-popup-border-radius) var(--modal-popup-border-radius);
+  padding: var(--mpopup-footer-padding);
+  font-size: var(--mpopup-footer-font-size);
+  color: var(--mpopup-footer-color);
+  background-color: var(--mpopup-footer-background-color);
+  border-radius: 0 0 var(--mpopup-border-radius) var(--mpopup-border-radius);
 }
 
 .header, .footer {

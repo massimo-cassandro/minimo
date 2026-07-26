@@ -1,3 +1,7 @@
+// @ts-nocheck
+
+import { homeLink } from '../../demo.js';
+
 import { unsplashPage } from '@src/components/unsplash-page/unsplash-page.js';
 
 export async function unsplashPageDemo(){
@@ -23,13 +27,15 @@ export async function unsplashPageDemo(){
     }
   }
 
+  console.log(homeLink);
+
   unsplashPage({
     targetElement    : document.getElementById('root'),
     unsplashDataUrl,
     utmSource        : 'unsplashPageDemo test',
     title            : 'Unsplash Page Demo',
     text             : 'This is the message <strong>text</strong>',
-    backLink         : '<a href="/">Back to demo index</a>',
+    backLink         : `<a href="${homeLink}">Back to demo index</a>`,
     hidePhotoLink    : true,
     cssModulesObj    : null
   });

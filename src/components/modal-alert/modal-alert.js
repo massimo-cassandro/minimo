@@ -120,7 +120,9 @@ const defaults = {
  * @property {string} [cancelBtnText] - text for 'cancel' button
  * @property {string} [cancelBtnClass] - alternative class for 'cancel' button. It replaces the default one
  * @property {boolean} [cancelBtnFocus] - true if the cancel button should be focused when the dialog box opens. It has no effect if an extraBtn is set
- *
+ */
+
+/**
  * Renders and opens a modal alert dialog.
  *
  * Backward compatibility: legacy snake_case parameter names (`extra_class`, `heading_class`,

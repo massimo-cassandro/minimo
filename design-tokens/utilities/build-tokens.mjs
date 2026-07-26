@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+/// <reference types="node" />
 /* eslint-disable no-console */
 
 // build-tokens.mjs
@@ -15,9 +16,9 @@
 import StyleDictionary from 'style-dictionary';
 import * as path from 'node:path';
 import { styleText } from 'node:util';
-import { homedir } from 'os';
+import { homedir } from 'node:os';
 import stylelint from 'stylelint';
-import { pathToFileURL } from 'url';
+import { pathToFileURL } from 'node:url';
 
 // ── 1. Configuration (args + resolved paths) ────────────────────────────────
 import {
@@ -88,7 +89,7 @@ const sd = new StyleDictionary({
 await sd.buildAllPlatforms();
 
 // ── 9. CSS lint ───────────────────────────────────────────────────────────────
-const stylelintConfig = await import(pathToFileURL(stylelintConfigPath)).then(m => m.default);
+const stylelintConfig = await import(pathToFileURL(stylelintConfigPath).href).then(m => m.default);
 
 
 await stylelint.lint({
@@ -98,6 +99,7 @@ await stylelint.lint({
 });
 
 // ── 10. Log ────────────────────────────────────────────────────────────────────
+/** @param {string} p */
 const short = (p) => p.replace(homedir(), '~');
 
 console.log(styleText(['yellow'], `[build-tokens] config file : ${short(configAbsPath)}`));

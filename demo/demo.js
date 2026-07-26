@@ -1,15 +1,26 @@
 //@ts-nocheck
 
+/* globals process */
+
+// NB: The base tag doesn't seem to work well with hash routes on GitHub pages.
+
 import './demo.css';
 import './demo-files/charts/charts.css';
 
 import { routes } from 'routes.js';
+
+
+const isDevelopment = process.env.NODE_ENV === 'development';
+
+export const homeLink = isDevelopment? '/' : '/minimo/';
 
 const root = document.getElementById('root')
   ,route = window.location.hash.replace('#/', '') || 'home'
 
   ,titleCase = str => str.substring(0,1).toUpperCase() + str.substring(1)
 ;
+
+
 routes.push(
   {
     key: 'home',
@@ -21,7 +32,7 @@ routes.push(
       // });
 
       root.innerHTML = '<ul>' +
-        routeList.map(r => `<li><a href="/#/${r.key}">${r.title?? titleCase(r.key)}</a></li>`).join('') +
+        routeList.map(r => `<li><a href="${isDevelopment? '' : '/minimo'}/#/${r.key}">${r.title?? titleCase(r.key)}</a></li>`).join('') +
         '</ul>';
     }
   }
@@ -46,6 +57,8 @@ if(routeObj.callback) {
   routeObj.callback();
 }
 
+
+
 if(!routeObj.fullPage) {
 
   const title =  (routeObj.title?? titleCase(routeObj.key) )+ (route !== 'home'? ' | Minimo Demo' : '');
@@ -53,7 +66,7 @@ if(!routeObj.fullPage) {
 
 
   if( route !== 'home') {
-    root.insertAdjacentHTML('beforeend', '<p class="mbs-lg"><a href="/">Home</a></p>');
+    root.insertAdjacentHTML('beforeend', `<p class="mbs-lg"><a href="${homeLink}">Home</a></p>`);
   }
 }
 

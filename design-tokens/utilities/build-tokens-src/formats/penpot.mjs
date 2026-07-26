@@ -32,7 +32,7 @@
 //                         original expression is kept with a warning.
 
 import StyleDictionary from 'style-dictionary';
-import path from 'path';
+import path from 'node:path';
 
 // Disclaimer prepended to every generated file when penpotFormat is 'jsonc'
 const DISCLAIMER = [

@@ -1,3 +1,4 @@
+/// <reference types="node" />
 // build-tokens-src/config.mjs
 // Reads the --config flag from argv, imports the project config file,
 // resolves all paths and exports them for build-tokens.mjs.
@@ -8,7 +9,7 @@
 /* globals process */
 
 import * as path from 'node:path';
-import { pathToFileURL } from 'url';
+import { pathToFileURL } from 'node:url';
 
 // ---------------------------------------------------------------------------
 // Read the --config flag
@@ -31,10 +32,11 @@ export const configDir     = path.dirname(configAbsPath);
 // ---------------------------------------------------------------------------
 // Import the project config
 // ---------------------------------------------------------------------------
-const buildConfig = (await import(pathToFileURL(configAbsPath))).default;
+const buildConfig = (await import(pathToFileURL(configAbsPath).href)).default;
 
 // Helper: resolves a path relative to the config directory.
 // Leaves already-absolute paths untouched.
+/** @param {string} p */
 const resolveFromConfig = (p) => path.resolve(configDir, p);
 
 // ---------------------------------------------------------------------------
@@ -91,6 +93,7 @@ export const penpotExpressions = VALID_EXPR_MODES.includes(buildConfig.penpotExp
 // ---------------------------------------------------------------------------
 const GLOB_CHARS = /[*?{[]/;
 
+/** @param {string} s */
 const resolveSource = (s) => {
   if (path.isAbsolute(s)) {
     // Already absolute: only normalise separators (needed on Windows)

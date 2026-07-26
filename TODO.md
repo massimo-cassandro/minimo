@@ -120,7 +120,6 @@ Riferimento centralizzato dei prossimi interventi. Le dir con prefisso `TODO ` i
   * rendere custom props e css indipendenti dal resto `snackbar/snackbar.module.css` (`--size-*`, `--snackbar-*`, `--z-index-snackbar`)
   
 ## MODAL POPUP
-  * rendere custom props e css indipendenti dal resto `modal-popup/modal-popup.module.css` (`--body-background-color`, `--modal-popup-*`, `--size-*`)
   * unificare con `_wrk/popup-page`?
 
 ## MINIMO

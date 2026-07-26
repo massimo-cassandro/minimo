@@ -6,6 +6,8 @@
 
 import { buildPenpotFiles } from './formats/penpot.mjs';
 
+/** @typedef {import('style-dictionary/types').PlatformConfig} PlatformConfig */
+
 // Transforms applied to the CSS platform
 const CSS_TRANSFORMS = [
   'attribute/cti',
@@ -40,7 +42,7 @@ const PENPOT_TRANSFORMS = [
  *                                                   Collected from sd.allTokens after SD initialisation.
  *                                                   Ignored when penpotDestFile is set.
  * @param {'keep'|'calc'|'resolve'} opts.penpotExpressions  How to handle math expressions in dimension tokens.
- * @returns {object} platforms object ready for Style Dictionary config
+ * @returns {Record<string, PlatformConfig>} platforms object ready for Style Dictionary config
  */
 export const buildPlatforms = ({
   buildPath,
@@ -51,6 +53,7 @@ export const buildPlatforms = ({
   penpotExpressions = 'keep',
   concreteFilePaths = [],
 }) => {
+  /** @type {Record<string, PlatformConfig>} */
   const platforms = {
     css: {
       buildPath: buildPath + '/',

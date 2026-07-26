@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+/// <reference types="node" />
 
 /* eslint-disable no-console */
 
@@ -13,7 +14,7 @@
 
 import * as path from 'node:path';
 import * as fs from 'node:fs';
-import { /* fileURLToPath,  */pathToFileURL } from 'url';
+import { /* fileURLToPath,  */pathToFileURL } from 'node:url';
 // import { dirname } from 'path';
 import { glob } from 'node:fs/promises';
 import { styleText } from 'node:util';
@@ -52,6 +53,7 @@ async function run() {
     const checkdir = path.resolve(configDir, config.dir_to_check);
 
     // Patterns for custom properties to exclude from the unresolved check
+    /** @type {RegExp[]} */
     const exclude = config.exclude_pattern ?? [];
 
     // Collect all .css files in the scan directory, excluding the token file itself
@@ -88,6 +90,7 @@ async function run() {
     // 4. Scan files for unresolved var() references
     // ---------------------------------------------------------------------------
     const usageRegex = /var\(\s*(--[a-z0-9-]+)\s*(,.*?)?\)/g;
+    /** @type {{file: string, line: number, prop: string}[]} */
     const unresolved_props = [];
 
     files.forEach(file => {
@@ -137,7 +140,7 @@ async function run() {
     console.log(styleText(['green'], '**** DONE ****'));
 
   } catch (err) {
-    console.log(styleText(['redBright'], err.stack));
+    console.log(styleText(['redBright'], err instanceof Error ? err.stack ?? err.message : String(err)));
     process.exit(1);
   }
 }

@@ -1,5 +1,38 @@
 export default {
-  'modal-popup': {
+  'mpopup': {
+
+    width: {
+      $type: 'dimension',
+      $value: 'max-content',
+    },
+    'min-width': {
+      $type: 'dimension',
+      $value: '400px',
+    },
+    'max-width': {
+      $type: 'dimension',
+      $value: '98dvw',
+    },
+    height: {
+      $type: 'dimension',
+      $value: 'max-content',
+    },
+    'min-height': {
+      $type: 'dimension',
+      $value: '300px',
+    },
+    'max-height': {
+      $type: 'dimension',
+      $value: '90dvh',
+    },
+
+    background: {
+      color: {
+        $type: 'color',
+        $value: '{body.background.color}',
+      }
+    },
+
     'drop-shadow': {
       $type: 'shadow',
       $value: [
@@ -8,7 +41,7 @@ export default {
           offsetY: '0',
           blur: '12px',
           spread: '2px',
-          color: 'rgba(0 0 0 / .25)'
+          color: 'rgb(0 0 0 / .25)'
         }
       ]
     },
@@ -29,6 +62,22 @@ export default {
         $value: '1.6rem'
       }
 
+    },
+    content: {
+      padding: {
+        $type: 'dimension',
+        $value: '{size.base} {size.sm} {size.sm}',
+      },
+      scrollbar: {
+        padding: {
+          i: {
+            end: {
+              $type: 'dimension',
+              $value: '{size.md}',
+            }
+          }
+        }
+      }
     },
     header: {
       padding: {
