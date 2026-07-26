@@ -31,6 +31,10 @@ rm -rf package
 
 ---
 
+## Design tokens
+
+Minimo comes with a set of design tokens and some utilities to manage them. See [Design Tokens readme](design-tokens/README.md).
+
 ## Dev Tools
 
 The [`dev-tools`](./dev-tools/README.md) directory contains a set of standalone Node.js CLI utilities for managing a web project — updating dependencies, bumping the version and changelog, and generating/optimizing SVG icons and favicons. They are published as part of the `minimo` package and exposed via the `bin` entries in `package.json` (`update-version`, `upd@m`, `svgIconsTools`, `create-favicons`); see the [Dev Tools README](./dev-tools/README.md) for the full list and usage.
@@ -38,7 +42,7 @@ The [`dev-tools`](./dev-tools/README.md) directory contains a set of standalone 
 
 ## Docs & Demo
 
-[Docs](docs)
+[Docs](docs/README.md)
 
 [Demo](https://massimo-cassandro.github.io/minimo/) (in progress)
 

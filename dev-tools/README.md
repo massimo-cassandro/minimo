@@ -34,6 +34,14 @@ zsh package/dev-tools/starter-kit/starter-install.sh
 rm -rf package
 ```
 
+To test the installation skipping all `npm install` commands, use the `--no-npm` parameter:
+
+```bash
+curl -sL "$(npm view @massimo-cassandro/minimo dist.tarball)" | tar xz package/dev-tools/starter-kit
+zsh package/dev-tools/starter-kit/starter-install.sh --no-npm
+rm -rf package
+```
+
 ## SVG adn favicons tools
 
 ```bash

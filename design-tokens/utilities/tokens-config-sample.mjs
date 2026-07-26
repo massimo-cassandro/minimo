@@ -75,6 +75,14 @@ const config = {
   //               e.g. {size.base} = 16px, "{size.base} * .25" -> "4px"
   penpotExpressions: 'resolve',
 
+  // If true, custom properties already present in the CSS destination file
+  // (destFile, from a previous build) take priority over the ones generated
+  // by this build. Properties found only in the pre-existing file (no longer
+  // generated) are kept too. Useful to preserve manual overrides/additions
+  // made directly in the compiled CSS across rebuilds. Ignored on the first
+  // build, when destFile does not exist yet. Default: false.
+  mergeCustomProps: false,
+
 
 
   // ---------------------------------------------------------------------------

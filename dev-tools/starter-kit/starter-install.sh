@@ -18,6 +18,23 @@ if [ -z "$ZSH_VERSION" ]; then
   exit 1
 fi
 
+# --no-npm: salta le installazioni npm (utile per testare rapidamente lo script)
+SKIP_NPM=0
+for ARG in "$@"; do
+  if [ "$ARG" = "--no-npm" ]; then
+    SKIP_NPM=1
+  fi
+done
+
+# Wrapper: esegue "npm i ..." a meno che SKIP_NPM sia attivo
+npm_i() {
+  if [ "$SKIP_NPM" = "1" ]; then
+    echo "(--no-npm) skip: npm i $*"
+  else
+    npm i "$@"
+  fi
+}
+
 # Configurazione variabili
 # BASE_URL="https://raw.githubusercontent.com/massimo-cassandro/minimo/refs/heads/main"
 
@@ -139,28 +156,28 @@ fi
 
 
 echo -e "\n${GREEN}...eslint${NC}"
-npm i -D @massimo-cassandro/eslint-config
+npm_i -D @massimo-cassandro/eslint-config
 safe_cat "${TEMPLATES_DIR}/eslint.config.mjs" eslint.config.mjs new
 
 echo -e "\n${GREEN}...stylelint${NC}"
-npm i -D @massimo-cassandro/stylelint-config
+npm_i -D @massimo-cassandro/stylelint-config
 safe_cat "${TEMPLATES_DIR}/stylelint.config.mjs" stylelint.config.mjs new
 
 echo -e "\n${GREEN}...webpack${NC}"
-npm i -D webpack-cli webpack-dev-server webpack-manifest-plugin webpack
-npm i -D @babel/core @babel/preset-env babel-loader terser-webpack-plugin
-npm i -D webpack-remove-empty-scripts copy-webpack-plugin html-loader html-webpack-plugin
-npm i -D postcss autoprefixer postcss-custom-media @csstools/postcss-global-data postcss-loader postcss-preset-env
+npm_i -D webpack-cli webpack-dev-server webpack-manifest-plugin webpack
+npm_i -D @babel/core @babel/preset-env babel-loader terser-webpack-plugin
+npm_i -D webpack-remove-empty-scripts copy-webpack-plugin html-loader html-webpack-plugin
+npm_i -D postcss autoprefixer postcss-custom-media @csstools/postcss-global-data postcss-loader postcss-preset-env
 # NB: niente cssnano: la minificazione è di css-minimizer-webpack-plugin e cssnano
 # nel loader postcss eliminerebbe i commenti `purgecss ignore` prima di PurgeCSS
-npm i -D mini-css-extract-plugin style-loader css-loader css-minimizer-webpack-plugin
-npm i -D responsive-loader
-npm i -D process dotenv-webpack
-npm i -D svgo svg-url-loader svgo-loader svgo-add-viewbox mini-svg-data-uri
-npm i -D ejs-loader
-npm i -D purgecss-webpack-plugin glob
+npm_i -D mini-css-extract-plugin style-loader css-loader css-minimizer-webpack-plugin
+npm_i -D responsive-loader
+npm_i -D process dotenv-webpack
+npm_i -D svgo svg-url-loader svgo-loader svgo-add-viewbox mini-svg-data-uri
+npm_i -D ejs-loader
+npm_i -D purgecss-webpack-plugin glob
 
-npm i -D style-dictionary
+npm_i -D style-dictionary
 
 safe_cat "${WEBPACK_SOURCE_DIR}/webpack.config.mjs"   "${FRONTEND_INSTALL_PATH}/webpack.config.mjs"
 safe_cat "${WEBPACK_SOURCE_DIR}/webpack-template.ejs" "${FRONTEND_INSTALL_PATH}/webpack-template.ejs"
@@ -168,15 +185,6 @@ safe_cat "${WEBPACK_SOURCE_DIR}/webpack-template.ejs" "${FRONTEND_INSTALL_PATH}/
 # cartella webpack
 WEBPACK_LOCAL_DIR="${FRONTEND_INSTALL_PATH}/webpack-modules"
 WEBPACK_MODULES_REMOTE_URL="${WEBPACK_SOURCE_DIR}/webpack-modules"
-FILES=(
-  'css-rules.mjs'
-  'get-jsConfig-aliases.mjs'
-  'mini-svg-data-uri-loader.cjs'
-  'svg-rules.mjs'
-  'svgo.config.mjs'
-  'postcss.config.mjs'
-  'purgecss-variables-safelist.mjs'
-)
 
 # se la cartella esiste già, i moduli vengono copiati in NEW-webpack-modules
 # (da integrare manualmente o rimuovere)
@@ -188,17 +196,29 @@ fi
 
 mkdir -p "$WEBPACK_LOCAL_DIR"
 
-for FILE in "${FILES[@]}"; do
-  safe_cat "${WEBPACK_MODULES_REMOTE_URL}/${FILE}" "${WEBPACK_LOCAL_DIR}/${FILE}"
+# copia tutti i file presenti in webpack-modules,
+for FILE in "${WEBPACK_MODULES_REMOTE_URL}"/*; do
+  [ -f "$FILE" ] || continue
+  safe_cat "$FILE" "${WEBPACK_LOCAL_DIR}/$(basename "$FILE")"
 done
 
 echo -e "\n${GREEN}Creating a template of your frontend application's folder structured${NC}"
 
-TEMPLATE_DIR_NAME="__frontend_app_dir_template__"
+TEMPLATE_DIR_NAME="__frontend_dir__"
 mkdir -p "$TEMPLATE_DIR_NAME"
 cd "$TEMPLATE_DIR_NAME"
-mkdir -p error-pages imgs icons src src/css favicons design-tokens
+mkdir -p error-pages imgs icons src css favicons design-tokens
 cd ..
+
+# copia dei file css presenti nella root di minimo/src
+# (custom-properties.css, custom-media.css, fonts.css, minimo.css, ...):
+MINIMO_ROOT_CSS_DIR="${BASE_URL}/../../src"
+for FILE in "${MINIMO_ROOT_CSS_DIR}"/*.css; do
+  safe_cat "$FILE" "${TEMPLATE_DIR_NAME}/css/$(basename "$FILE")"
+done
+
+# copia tokens.config.mjs
+safe_cat "${BASE_URL}/../../design-tokens/tokens-config.mjs" "${TEMPLATE_DIR_NAME}/css/tokens-config.mjs"
 
 # template delle entry css (globale/di pagina e critical): ogni entry deve
 # importare direttamente custom-properties.css (vedi commenti nei file stessi)

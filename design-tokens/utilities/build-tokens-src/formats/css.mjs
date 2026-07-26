@@ -6,6 +6,7 @@
 //   - individual properties for letterSpacing, textTransform, textDecoration
 
 import StyleDictionary from 'style-dictionary';
+import { mergeCustomProps, parseCustomProps } from '../merge-css.mjs';
 
 const BASE_FONT_SIZE = 16;
 
@@ -224,7 +225,22 @@ StyleDictionary.registerFormat({
         return [`  --${token.name}: ${value};`];
       });
 
-    customPropsCount = lines.length;
-    return `${selector} {\n${lines.join('\n')}\n}\n`;
+    // Build a name → declaration-tail map from the declarations generated
+    // above, then merge with any pre-existing custom properties loaded via
+    // loadExistingCustomProps() (see ../merge-css.mjs). Pre-existing values
+    // (including trailing comments) take priority when both exist;
+    // pre-existing-only properties are kept.
+    const generatedProps = parseCustomProps(lines.join('\n'));
+    const finalProps = mergeCustomProps(generatedProps);
+
+    // Final output is always sorted alphabetically ascending by property
+    // name, regardless of merge — this also keeps pre-existing-only
+    // properties from merge-css.mjs in order instead of trailing at the end.
+    const outLines = Object.entries(finalProps)
+      .sort(([a], [b]) => a.localeCompare(b, 'en', { numeric: true, sensitivity: 'base' }))
+      .map(([name, tail]) => `  --${name}: ${tail}`);
+
+    customPropsCount = outLines.length;
+    return `${selector} {\n${outLines.join('\n')}\n}\n`;
   },
 });

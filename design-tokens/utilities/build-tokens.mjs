@@ -31,6 +31,7 @@ import {
   penpotFormat,
   penpotExpressions,
   source,
+  mergeCustomProps,
 } from './build-tokens-src/config.mjs';
 
 // ── 2. Custom transforms ─────────────────────────────────────────────────────
@@ -38,13 +39,24 @@ import './build-tokens-src/transforms.mjs';
 
 // ── 3. CSS format ─────────────────────────────────────────────────────────────
 // customPropsCount is updated by the format at render time
+// loadExistingCustomProps supports the mergeCustomProps option (see below)
 import { customPropsCount } from './build-tokens-src/formats/css.mjs';
+import { loadExistingCustomProps } from './build-tokens-src/merge-css.mjs';
 
 // ── 4. Penpot format ──────────────────────────────────────────────────────────
 import { buildPenpotFiles, collectConcreteFilePaths } from './build-tokens-src/formats/penpot.mjs';
 
 // ── 5. Platforms builder ──────────────────────────────────────────────────────
 import { buildPlatforms } from './build-tokens-src/platforms.mjs';
+
+// ── 5b. Pre-existing custom properties (mergeCustomProps option) ────────────
+// Read before Style Dictionary runs, since it overwrites the destination
+// file. The css/variables-sorted format (formats/css.mjs) merges these
+// values in — pre-existing values take priority — right before serialising
+// the final CSS output. See merge-css.mjs.
+if (mergeCustomProps) {
+  loadExistingCustomProps(path.join(buildPath, destFile));
+}
 
 // ── 6. Collect concrete source file paths (multi-file Penpot mode only) ──────
 // Source entries may be glob patterns. SD expands them internally and stores
