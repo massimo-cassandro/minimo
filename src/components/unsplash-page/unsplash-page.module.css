@@ -68,15 +68,32 @@ html, body {
 
   background-color: #333;
 
-  a:is(:link, :visited) {
-    color: var(--uspg-link-color, #fc0);
-    text-decoration: var(--uspg-link-decoration, none);
-
+  a {
+    &:is(:link, :visited) {
+      text-decoration: var(--uspg-link-decoration);
+    }
+    &:link {
+      color: var(--uspg-link-color);
+    }
+    &:visited {
+      color: var(--uspg-link-visited-color);
+    }
+    &:focus {
+      outline: none;
+    }
+    &:focus-visible {
+      outline: var(--uspg-link-focus-outline-width) var(--uspg-link-focus-outline-style) var(--uspg-link-focus-outline-color);
+      outline-offset: var(--uspg-link-focus-outline-offset);
+    }
     @media (hover: hover) {
       &:hover {
-        color: var(--uspg-link-hover-color, #fc0);
-        text-decoration: var(--uspg-link-hover-decoration, underline);
+        color: var(--uspg-link-hover-color);
+        text-decoration: var(--uspg-link-hover-decoration);
+        background-color: var(--uspg-link-hover-background-color);
       }
+    }
+    &:active {
+      color: var(--uspg-link-active-color);
     }
   }
 }
@@ -122,6 +139,8 @@ html, body {
   justify-content: center;
   width: 100%;
   overflow: hidden;
+
+
 }
 
 .message, .credits {

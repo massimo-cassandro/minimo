@@ -37,24 +37,6 @@ export default {
       }
     }, // end base setup
 
-    // credit box
-    credits: {
-      font: {
-        size: {
-          $type: 'dimension',
-          $value: '{font.size.xs}'
-        },
-        weight: {
-          $type: 'fontWeight',
-          $value: '{font.weight.regular}'
-        },
-      },
-      'line-height': {
-        $type: 'number',
-        $value: '{line-height.xs}'
-      },
-    }, // end credits
-
     // title
     h1: {
       color: {
@@ -81,6 +63,87 @@ export default {
       },
     }, // end h1
 
+
+    // links
+    link: {
+      color: {
+        $type: 'color',
+        $value: '#fc0'
+      },
+      decoration: {
+        $type: 'string',
+        $value: 'none'
+      },
+      visited: {
+        color: {
+          $type: 'color',
+          $value: '#C711FF'
+        }
+      },
+      hover: {
+        color: {
+          $type: 'color',
+          $value: '{uspg.bg.color}'
+        },
+        background: {
+          color: {
+            $type: 'color',
+            $value: 'transparent'
+          }
+        },
+        decoration: {
+          $type: 'string',
+          $value: 'underline'
+        },
+      },
+      active: {
+        color: {
+          $type: 'color',
+          $value: '#F49C29'
+        }
+      },
+      focus: {
+        outline: {
+          width: {
+            $value: '2px',
+            $type: 'dimension'
+          },
+          style: {
+            $value: 'solid',
+            $type: 'string'
+          },
+          color: {
+            $value: '{uspg.link.color}',
+            $type: 'color'
+          },
+          offset: {
+            $value: '2px',
+            $type: 'dimension'
+          },
+        }
+      }
+
+    },
+
+    // credit box
+    credits: {
+      font: {
+        size: {
+          $type: 'dimension',
+          $value: '{font.size.xs}'
+        },
+        weight: {
+          $type: 'fontWeight',
+          $value: '{font.weight.regular}'
+        },
+      },
+      'line-height': {
+        $type: 'number',
+        $value: '{line-height.xs}'
+      },
+    }, // end credits
+
+
     // icons
     icon: {
       box: {
@@ -104,30 +167,6 @@ export default {
         },
       }
     }, // end icons
-
-    // links
-    link: {
-      color: {
-        $type: 'color',
-        $value: '#fc0'
-      },
-      decoration: {
-        $type: 'string',
-        $value: 'none'
-      },
-      hover: {
-        color: {
-          $type: 'color',
-          $value: '#fc0'
-        },
-        decoration: {
-          $type: 'string',
-          $value: 'underline'
-        },
-
-      }
-
-    }, // end link
 
     // loader
     loader: {

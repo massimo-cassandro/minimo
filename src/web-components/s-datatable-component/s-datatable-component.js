@@ -1,4 +1,7 @@
 // @ts-nocheck
+
+/* global process */
+
 import { DataTable } from 'simple-datatables';
 
 import { parseCols } from './src/parse-cols.js';
@@ -219,7 +222,7 @@ class SimpleDatatableAdapter extends HTMLElement {
     super();
     // this.attachShadow({ mode: 'open' }); // commentare per light dom
 
-    if (!_deprecationWarned) {
+    if (!_deprecationWarned && process.env.NODE_ENV === 'development') {
       _deprecationWarned = true;
       // eslint-disable-next-line no-console
       console.warn('[s-datatable] componente deprecato');

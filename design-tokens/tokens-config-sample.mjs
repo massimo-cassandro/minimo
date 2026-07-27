@@ -10,14 +10,10 @@
 // Path to the design token source files.
 // You can use an absolute path, a relative path, or build it programmatically.
 
-// Example using a local node_modules package (JS source files)
-const minimo_path = '../../node_modules/@massimo-cassandro/minimo/design-tokens-src';
 
-// Alternative: pre-built JSONC files from the same package
-// const minimo_path = '../../node_modules/@massimo-cassandro/minimo/design-tokens';
 
-// For local testing
-// const minimo_path = path.resolve(homedir(), 'Sites/minimo/src');
+// minimo package path in node_modules
+const minimo_path = '../../node_modules/@massimo-cassandro/minimo';
 
 const config = {
 
@@ -42,11 +38,15 @@ const config = {
   //   OK:  `${minimo_path}/**/*.{json,mjs}`
   //   NO:  path.join(minimo_path, '/**/*.{json,mjs}')
   source: [
-    `${minimo_path}/**/*.{jsonc,json,mjs}`,
-    './project-tokens/*.jsonc',
+    `${minimo_path}/design-tokens/_src/**/*.tokens.{mjs,jsonc}`, // main tokens
+    `${minimo_path}/src/**/*.tokens.{mjs,jsonc}`, // components tokens
 
     // optional extra token source (in this example, openProps, https://open-props.style/)
     // '../../node_modules/open-props/open-props.style-dictionary-tokens.json',
+
+    // your project tokens
+    './project-tokens/*.{js,mjs,jsonc,json}',
+
   ],
 
   // ---------------------------------------------------------------------------
@@ -61,12 +61,12 @@ const config = {
 
   // Output directory for the Penpot design token files.
   // Set to null (or omit) to disable json output entirely.
-  penpotBuildPath: './path/to/generated/design-tokens-dir',
+  penpotBuildPath: null || './path/to/generated/design-tokens-dir',
 
   // Base name (without extension) for the aggregated Penpot output file.
   // The extension is added automatically based on penpotFormat.
   // Set to null (or omit) to generate one file per .mjs source file instead.
-  penpotDestFile: 'tokens',
+  penpotDestFile: null || 'tokens',
 
   // How to handle math expressions in dimension token $values (e.g. "{size.base} * .25"):
   //   'keep'    write the expression unchanged

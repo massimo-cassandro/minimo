@@ -358,10 +358,17 @@
   --uspg-icon-fill-color: #333;
   --uspg-icon-hover-box-bg: #fff;
   --uspg-line-height: var(--line-height-sm);
+  --uspg-link-active-color: #f49c29;
   --uspg-link-color: #fc0;
   --uspg-link-decoration: none;
-  --uspg-link-hover-color: #fc0;
+  --uspg-link-focus-outline-color: var(--uspg-link-color);
+  --uspg-link-focus-outline-offset: .125rem;
+  --uspg-link-focus-outline-style: solid;
+  --uspg-link-focus-outline-width: .125rem;
+  --uspg-link-hover-background-color: transparent;
+  --uspg-link-hover-color: var(--uspg-bg-color);
   --uspg-link-hover-decoration: underline;
+  --uspg-link-visited-color: #c711ff;
   --uspg-loader-color: hsl(0deg 0% 100% / .6);
   --uspg-text-color: #fff;
   --z-index-overlay: 99;

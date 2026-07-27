@@ -40,22 +40,6 @@
         "$value": "unset"
       }
     },
-    "credits": {
-      "font": {
-        "size": {
-          "$type": "dimension",
-          "$value": "{font.size.xs}"
-        },
-        "weight": {
-          "$type": "fontWeight",
-          "$value": "{font.weight.regular}"
-        }
-      },
-      "line-height": {
-        "$type": "number",
-        "$value": "{line-height.xs}"
-      }
-    },
     "h1": {
       "color": {
         "$type": "color",
@@ -73,6 +57,80 @@
         "variation-settings": {
           "$type": "string",
           "$value": "unset"
+        }
+      },
+      "line-height": {
+        "$type": "number",
+        "$value": "{line-height.xs}"
+      }
+    },
+    "link": {
+      "color": {
+        "$type": "color",
+        "$value": "#fc0"
+      },
+      "decoration": {
+        "$type": "string",
+        "$value": "none"
+      },
+      "visited": {
+        "color": {
+          "$type": "color",
+          "$value": "#C711FF"
+        }
+      },
+      "hover": {
+        "color": {
+          "$type": "color",
+          "$value": "{uspg.bg.color}"
+        },
+        "background": {
+          "color": {
+            "$type": "color",
+            "$value": "transparent"
+          }
+        },
+        "decoration": {
+          "$type": "string",
+          "$value": "underline"
+        }
+      },
+      "active": {
+        "color": {
+          "$type": "color",
+          "$value": "#F49C29"
+        }
+      },
+      "focus": {
+        "outline": {
+          "width": {
+            "$type": "dimension",
+            "$value": "2px"
+          },
+          "style": {
+            "$type": "string",
+            "$value": "solid"
+          },
+          "color": {
+            "$type": "color",
+            "$value": "{uspg.link.color}"
+          },
+          "offset": {
+            "$type": "dimension",
+            "$value": "2px"
+          }
+        }
+      }
+    },
+    "credits": {
+      "font": {
+        "size": {
+          "$type": "dimension",
+          "$value": "{font.size.xs}"
+        },
+        "weight": {
+          "$type": "fontWeight",
+          "$value": "{font.weight.regular}"
         }
       },
       "line-height": {
@@ -99,26 +157,6 @@
             "$type": "color",
             "$value": "#fff"
           }
-        }
-      }
-    },
-    "link": {
-      "color": {
-        "$type": "color",
-        "$value": "#fc0"
-      },
-      "decoration": {
-        "$type": "string",
-        "$value": "none"
-      },
-      "hover": {
-        "color": {
-          "$type": "color",
-          "$value": "#fc0"
-        },
-        "decoration": {
-          "$type": "string",
-          "$value": "underline"
         }
       }
     },

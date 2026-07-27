@@ -1,6 +1,7 @@
 
 
-import { unsplashPage } from '@massimo-cassandro/minimo/index.js';
+import { unsplashPage } from '@massimo-cassandro/minimo';
+// import './error-pages.css';
 
 const errCode = document.documentElement.dataset.errCode || '500',
   errText = document.documentElement.dataset.errText,
@@ -27,7 +28,7 @@ unsplashPage({
   targetElement    : document.getElementById('root'),
   className        : 'error-page',
   unsplashDataUrl  : url,
-  utmSource        : 'ictgovernance.bluvacanze.it',
+  utmSource        : 'marketing.bluvacanze.it',
   title            : errors[errCode]?.title ?? errText,
   text             : `(${errCode} ${errText})`,
   backLink         : errCode !== '503'? 'Torna alla <a href="/">Home</a>' : '',

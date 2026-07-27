@@ -1,7 +1,7 @@
 
 /* @import '@src/fonts.css'; */
 /* @import '@src/css/custom-media.css'; */ /* managed by postcss */
-@import '@src/custom-properties.css';
+/* @import '@src/custom-properties.css'; */ /* managed by postcss-jit-props */
 
 @import '@minimo/css/reset.css';
 @import '@minimo/css/layout-base.css';

@@ -218,7 +218,7 @@ for FILE in "${MINIMO_ROOT_CSS_DIR}"/*.css; do
 done
 
 # copia tokens.config.mjs
-safe_cat "${BASE_URL}/../../design-tokens/tokens-config.mjs" "${TEMPLATE_DIR_NAME}/css/tokens-config.mjs"
+safe_cat "${BASE_URL}/../../design-tokens/tokens-config-sample.mjs" "${TEMPLATE_DIR_NAME}/css/tokens-config.mjs"
 
 # template delle entry css (globale/di pagina e critical): ogni entry deve
 # importare direttamente custom-properties.css (vedi commenti nei file stessi)

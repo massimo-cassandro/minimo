@@ -1,6 +1,6 @@
 {
   "name": "@massimo-cassandro/minimo",
-  "version": "1.19.0",
+  "version": "1.19.1",
   "description": "Light css framework & utilities",
   "type": "module",
   "main": "./index.js",
@@ -56,12 +56,16 @@
   "files": [
     "./index.js",
     "src/**/*.{js,mjs,css,svg,md}",
+    "design-tokens/README.md",
+    "design-tokens/tokens-config-sample.mjs",
     "design-tokens/tokens/**/*.{tokens.json,tokens.jsonc}",
     "design-tokens/_src/**/*.{tokens.json,tokens.jsonc,mjs,js,md}",
     "design-tokens/utilities/**/*.{mjs,md}",
     "charts/**/*.{js,mjs,md}",
     "dev-tools/**/*",
-    "snippets/**/*"
+    "snippets/**/*",
+    "!**/TODO*/**",
+    "!**/TODO*"
   ],
   "peerDependencies": {
     "@svgdotjs/svg.js": "^3.2.7",
