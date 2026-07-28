@@ -311,8 +311,8 @@
   --snackbar-btn-close-active-icon-color: var(--snackbar-text-color);
   --snackbar-btn-close-background-color: transparent;
   --snackbar-btn-close-border-color: transparent;
-  --snackbar-btn-close-border-radius: dimension;
-  --snackbar-btn-close-border-width: dimension;
+  --snackbar-btn-close-border-radius: 50%;
+  --snackbar-btn-close-border-width: var(--btn-close-border-width);
   --snackbar-btn-close-focus-outline-color: color-mix(in srgb, var(--snackbar-text-color) 50%, transparent);
   --snackbar-btn-close-focus-outline-offset: .125rem;
   --snackbar-btn-close-focus-outline-width: .125rem;

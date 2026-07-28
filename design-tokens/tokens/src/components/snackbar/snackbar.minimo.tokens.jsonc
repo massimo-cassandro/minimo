@@ -22,7 +22,7 @@
         "$value": "none"
       },
       "border-radius": {
-        "$type": "color",
+        "$type": "dimension",
         "$value": "{radius.xs}"
       },
       "padding": {
@@ -83,12 +83,12 @@
           "$value": "transparent"
         },
         "width": {
-          "$type": "2px",
-          "$value": "dimension"
+          "$type": "dimension",
+          "$value": "{btn.close.border.width}"
         },
         "radius": {
-          "$type": "50%",
-          "$value": "dimension"
+          "$type": "dimension",
+          "$value": "50%"
         }
       },
       "hover": {

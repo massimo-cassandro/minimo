@@ -18,7 +18,7 @@ export default{
       },
       'border-radius': {
         $value: '{radius.xs}',
-        $type: 'color'
+        $type: 'dimension'
       },
       padding: {
         block: {
@@ -81,12 +81,12 @@ export default{
           $type: 'color'
         },
         width: {
-          $value: 'dimension',
-          $type: '{btn.close.border.width}'
+          $type: 'dimension',
+          $value: '{btn.close.border.width}'
         },
         radius: {
-          $value: 'dimension',
-          $type: '50%'
+          $type: 'dimension',
+          $value: '50%'
         }
       },
 
