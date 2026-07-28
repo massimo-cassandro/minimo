@@ -1,7 +1,7 @@
 export default {
   accent: {
     color: {
-      $value: '{accent.100}',
+      $value: '{accent}',
       $type: 'color'
     }
   },

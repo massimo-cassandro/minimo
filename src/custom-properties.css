@@ -1,7 +1,6 @@
 :root {
-  --accent-100: #567d0d;
-  --accent-100-fg: #fff;
-  --accent-color: var(--accent-100);
+  --accent: #567d0d;
+  --accent-fg: #fff;
 
   --alert-border-radius: var(--radius-sm);
   --alert-box-shadow: 0 0 .5rem 0 oklch(0% 0 0 / .5);
@@ -275,7 +274,7 @@
   --sdt-pagination-border: var(--btn-border-width) var(--neutral-100);
   --sdt-pagination-padding-block: var(--size-xxs);
   --sdt-pagination-padding-inline: var(--size-xs);
-  --sdt-thead-hover-background-color: color-mix(in srgb, var(--table-thead-background-color) 90%, var(--accent-100));
+  --sdt-thead-hover-background-color: color-mix(in srgb, var(--table-thead-background-color) 90%, var(--accent));
 
   --secondary-100: #650853;
   --secondary-100-fg: #fff;

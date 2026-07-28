@@ -4,7 +4,7 @@ export default {
       hover: {
         background: {
           color: {
-            $value: 'color-mix(in srgb, {table.thead.background.color} 90%, {accent.100})',
+            $value: 'color-mix(in srgb, {table.thead.background.color} 90%, {accent})',
             $type: 'color'
           }
         }
