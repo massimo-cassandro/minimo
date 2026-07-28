@@ -22,6 +22,8 @@ const config = {
   // Comments at end of custom properties are preserved, while full line ones will be lost.
   mergeCustomProps: false,
 
+  checkUnused: true,
+
 
   // --------------------------------------
   // SETTINGS FOR PENPOT EXPORT
@@ -36,10 +38,10 @@ const config = {
   // SETTINGS FOR `CHECK-UNRESOLVED-PROPS`
   // --------------------------------------
   // dir to check to get the list of used custom properties
-  dir_to_check: '../src',
+  dirToCheck: '../src',
 
   // patterns of custom props to be exclued from check
-  exclude_pattern: [
+  excludePattern: [
     /^--_/,
   ]
 };

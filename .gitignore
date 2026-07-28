@@ -17,6 +17,6 @@ vendor
 node_modules
 _private
 public/_dev
-design-tokens/unresolved-props.md
+design-tokens/unresolved-unused-props.md
 
 

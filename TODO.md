@@ -159,6 +159,7 @@ Riferimento centralizzato dei prossimi interventi. Le dir con prefisso `TODO ` i
   * `buttons/buttons.css` — dividere per variante; button solo-icona da completare o eliminare
   * `buttons/btn-close.css:6` — controllare allineamento `×` interna
   * `overlay/overlay.css` (`--z-index-overlay`, `--text-color`, `--body-background-color` — senza token l'overlay diventa invisibile ma resta nel DOM, fallimento silenzioso)
+  * ricontrollare uso custime props in table, aumentare personalizzazione
 
 
 ## DESIGN TOKENS

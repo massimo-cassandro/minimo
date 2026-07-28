@@ -54,7 +54,9 @@
   --btn-close-background-color: var(--snackbar-btn-close-background-color);
   --btn-close-icon-color: var(--snackbar-btn-close-icon-color);
   --btn-close-icon-bar-size: 2px;
-
+  --btn-close-border-color: var(--snackbar-btn-close-border-color);
+  --btn-close-border-width: var(--snackbar-btn-close-border-width);
+  --btn-close-border-radius: var(--snackbar-btn-close-border-radius);
 
   --btn-close-hover-background-color: var(--snackbar-btn-close-hover-background-color);
   --btn-close-hover-border-color: var(--snackbar-btn-close-hover-border-color);

@@ -160,9 +160,12 @@ Alias references (`{color.brand.primary}`) are preserved in the output so Penpot
 
 ### `check-unresolved-custom-props.mjs`
 
-Scans all `.css` files in `dir_to_check` (recursively) and reports any `var(--...)` references that are not defined in the generated token CSS file or in any `extra_custom_props_files`.
+Scans all `.css` files in `dirToCheck` (recursively) and reports:
 
-Results are written to `unresolved-props.md` in the same directory as the config file.
+- **unresolved properties** — `var(--...)` references that are not defined in the generated token CSS file or in any `extraCustomPropsFiles`
+- **unused properties** — custom properties defined in the generated token CSS file (or an `extraCustomPropsFiles` entry) but never referenced via `var()` in any scanned CSS file. Only reported if `checkUnused: true` is set in the config, since it re-runs the Style Dictionary transform pipeline over the token sources to resolve, when possible, the `.mjs` source file for each unused property.
+
+Results are written to `unresolved-unused-props.md` in the same directory as the config file.
 
 #### Usage
 
@@ -172,11 +175,18 @@ npx checkUnresolvedProps --config ./path/to/tokens-config.mjs
 
 #### Output
 
-The script creates a `unresolved-props.md` file next to the config file. Each line links to the file and line number where the unresolved property is used:
+The script creates a `unresolved-unused-props.md` file next to the config file (only if there is at least one unresolved or unused property). Each unresolved entry links to the file and line number where the property is used; each unused entry links to its `.mjs` token source file when it can be resolved, otherwise just the property name is reported:
 
 ```markdown
-* [components.css :: 42](../src/components.css#L42) -> var(--color-action-hover)
-* [layout.css :: 17](../src/layout.css#L17) -> var(--spacing-missing)
+## Unresolved custom properties
+
+* [components.css](../src/components.css#L42) -> `--color-action-hover`
+* [layout.css](../src/layout.css#L17) -> `--spacing-missing`
+
+## Unused custom properties
+
+* [colors.minimo.tokens.mjs](../_src/colors.minimo.tokens.mjs) -> `--color-legacy-accent`
+* `--manually-added-prop`
 ```
 
 In VS Code, Option/Alt-clicking on the URL opens the file at the required line.
@@ -184,11 +194,11 @@ In VS Code, Option/Alt-clicking on the URL opens the file at the required line.
 
 #### Excluding properties
 
-Use `exclude_pattern` to suppress false positives — for example, internal/private custom properties that are defined dynamically or inline:
+Use `excludePattern` to suppress false positives — for example, internal/private custom properties that are defined dynamically or inline:
 
 ```js
 // skips all custom props starting with `--_` or `--js-`
-exclude_pattern: [
+excludePattern: [
   /^--_/,          
   /^--js-/,        
 ]

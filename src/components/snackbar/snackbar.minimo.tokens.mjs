@@ -79,6 +79,14 @@ export default{
         color: {
           $value: 'transparent',
           $type: 'color'
+        },
+        width: {
+          $value: 'dimension',
+          $type: '{btn.close.border.width}'
+        },
+        radius: {
+          $value: 'dimension',
+          $type: '50%'
         }
       },
 

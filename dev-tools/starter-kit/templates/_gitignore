@@ -19,3 +19,4 @@ vendor
 node_modules
 _private
 public/_dev
+unresolved-unused-props.md

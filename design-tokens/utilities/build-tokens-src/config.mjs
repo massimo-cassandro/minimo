@@ -10,6 +10,7 @@
 
 import * as path from 'node:path';
 import { pathToFileURL } from 'node:url';
+import { resolveSourcePaths } from './resolve-source-paths.mjs';
 
 // ---------------------------------------------------------------------------
 // Read the --config flag
@@ -83,34 +84,11 @@ export const mergeCustomProps = buildConfig.mergeCustomProps === true;
 // ---------------------------------------------------------------------------
 // Source: resolve patterns relative to the config directory and normalise to
 // forward-slash absolute paths (fast-glob, used internally by Style Dictionary,
-// requires forward slashes even on Windows).
-//
-// Glob patterns (containing *, ?, {, [) are NOT passed through path.join,
-// because path.join can normalise/collapse sequences that carry syntactic
-// meaning in a glob (e.g. "**"). They are only prefixed with configDir and
-// converted to forward slashes.
-// Concrete paths (no glob characters) are resolved canonically with path.resolve.
+// requires forward slashes even on Windows). See resolve-source-paths.mjs.
 //
 // WARNING: in the project config file, avoid building glob patterns with
 // path.join() — it may corrupt the pattern syntax. Use template literals:
 //   OK:  `${minimo_path}/**/*.{json,mjs}`
 //   NO:  path.join(minimo_path, '/**/*.{json,mjs}')
 // ---------------------------------------------------------------------------
-const GLOB_CHARS = /[*?{[]/;
-
-/** @param {string} s */
-const resolveSource = (s) => {
-  if (path.isAbsolute(s)) {
-    // Already absolute: only normalise separators (needed on Windows)
-    return s.split(path.sep).join('/');
-  }
-  if (GLOB_CHARS.test(s)) {
-    // Glob pattern: prefix with configDir without touching the pattern
-    const prefix = configDir.split(path.sep).join('/');
-    return `${prefix}/${s}`;
-  }
-  // Concrete relative path: canonical resolution
-  return path.resolve(configDir, s).split(path.sep).join('/');
-};
-
-export const source = buildConfig.source.map(resolveSource);
+export const source = resolveSourcePaths(buildConfig.source, configDir);

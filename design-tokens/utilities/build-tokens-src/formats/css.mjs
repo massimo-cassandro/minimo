@@ -236,11 +236,24 @@ StyleDictionary.registerFormat({
     // Final output is always sorted alphabetically ascending by property
     // name, regardless of merge — this also keeps pre-existing-only
     // properties from merge-css.mjs in order instead of trailing at the end.
-    const outLines = Object.entries(finalProps)
-      .sort(([a], [b]) => a.localeCompare(b, 'en', { numeric: true, sensitivity: 'base' }))
-      .map(([name, tail]) => `  --${name}: ${tail}`);
+    const sortedProps = Object.entries(finalProps)
+      .sort(([a], [b]) => a.localeCompare(b, 'en', { numeric: true, sensitivity: 'base' }));
 
-    customPropsCount = outLines.length;
+    // A blank line is inserted between blocks of properties sharing the same
+    // first hyphen-separated segment (e.g. all `btn-*` together), to visually
+    // group related custom properties in the generated file.
+    const outLines = [];
+    let prevPrefix = null;
+    for (const [name, tail] of sortedProps) {
+      const prefix = name.split('-')[0];
+      if (prevPrefix !== null && prefix !== prevPrefix) {
+        outLines.push('');
+      }
+      outLines.push(`  --${name}: ${tail}`);
+      prevPrefix = prefix;
+    }
+
+    customPropsCount = sortedProps.length;
     return `${selector} {\n${outLines.join('\n')}\n}\n`;
   },
 });

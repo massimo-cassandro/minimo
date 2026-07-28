@@ -300,20 +300,6 @@ const config = {
     splitChunks: {
       cacheGroups: {
 
-        icons: {
-          test(module) {
-            return (
-              module.resource &&
-              module.resource.includes(`${path.sep}src${path.sep}icons${path.sep}`) &&
-              !module.resource.includes(`${path.sep}node_modules${path.sep}`)
-            );
-          },
-          name: 'icons',
-          chunks: 'all',
-          priority: 20,
-          enforce: true
-        },
-
         shared: {
           // vedi shared_chunk_paths sopra per la logica completa del test
           // (path match + esclusione css quando PurgeCSS è attivo)
@@ -507,7 +493,16 @@ const config = {
           ],
           deep: [
             // css modules: prefisso `m_` della build di produzione (vedi css-rules.mjs),
-            // le classi hashate non possono comparire nei file scansionati
+            // le classi con hash non possono comparire nei file scansionati
+            /^m_/
+          ],
+          keyframes: [
+            // stesso motivo dei selettori sopra, più un bug di purgecss: dentro un
+            // blocco `purgecss start/end ignore` la regola è preservata ma le sue
+            // dichiarazioni non vengono scansionate per l'uso di animation-name
+            // (vedi @keyframes slide-in/slide-out di minimo snackbar.module.css),
+            // quindi l'@keyframes verrebbe rimosso come "non referenziato" anche
+            // se in realtà è usato dalla regola stessa
             /^m_/
           ],
           greedy: [

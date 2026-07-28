@@ -81,6 +81,14 @@
         "color": {
           "$type": "color",
           "$value": "transparent"
+        },
+        "width": {
+          "$type": "2px",
+          "$value": "dimension"
+        },
+        "radius": {
+          "$type": "50%",
+          "$value": "dimension"
         }
       },
       "hover": {

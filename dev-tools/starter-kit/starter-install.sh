@@ -130,7 +130,7 @@ safe_cat "${TEMPLATES_DIR}/_browserslistrc"            .browserslistrc new
 safe_cat "${TEMPLATES_DIR}/_editorconfig"              .editorconfig new
 safe_cat "${TEMPLATES_DIR}/_prettierrc"                .prettierrc new
 safe_cat "${TEMPLATES_DIR}/jsconfig.json"              jsconfig.json new
-safe_cat "${TEMPLATES_DIR}/tokens-config.mjs"          tokens-config.mjs new
+safe_cat "${BASE_URL}/../../design-tokens/tokens-config-sample.mjs" tokens-config.mjs new
 safe_cat "${TEMPLATES_DIR}/_root_htaccess"             _root_htaccess
 safe_cat "${TEMPLATES_DIR}/_root_robots.txt"           _root_robots.txt
 

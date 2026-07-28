@@ -8,8 +8,10 @@ import { buildPenpotFiles } from './formats/penpot.mjs';
 
 /** @typedef {import('style-dictionary/types').PlatformConfig} PlatformConfig */
 
-// Transforms applied to the CSS platform
-const CSS_TRANSFORMS = [
+// Transforms applied to the CSS platform.
+// Exported so other scripts (e.g. check-unresolved-custom-props.mjs) can
+// build a Style Dictionary instance with matching transformed token names.
+export const CSS_TRANSFORMS = [
   'attribute/cti',
   'name/kebab',
   'time/seconds',
