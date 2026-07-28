@@ -366,9 +366,9 @@
   --uspg-link-focus-outline-style: solid;
   --uspg-link-focus-outline-width: .125rem;
   --uspg-link-hover-background-color: transparent;
-  --uspg-link-hover-color: var(--uspg-bg-color);
+  --uspg-link-hover-color: var(--uspg-link-color);
   --uspg-link-hover-decoration: underline;
-  --uspg-link-visited-color: #c711ff;
+  --uspg-link-visited-color: #ff117b;
   --uspg-loader-color: hsl(0deg 0% 100% / .6);
   --uspg-text-color: #fff;
   --z-index-overlay: 99;

@@ -77,13 +77,13 @@ export default {
       visited: {
         color: {
           $type: 'color',
-          $value: '#C711FF'
+          $value: '#ff117b'
         }
       },
       hover: {
         color: {
           $type: 'color',
-          $value: '{uspg.bg.color}'
+          $value: '{uspg.link.color}'
         },
         background: {
           color: {
