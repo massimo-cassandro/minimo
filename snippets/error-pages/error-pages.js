@@ -33,6 +33,4 @@ unsplashPage({
   text             : `(${errCode} ${errText})`,
   backLink         : errCode !== '503'? 'Torna alla <a href="/">Home</a>' : '',
   // hidePhotoLink    : true,
-  // cssModules       : false,
-  // cssModulesObj    : null
 });

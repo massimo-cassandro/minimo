@@ -1,10 +1,10 @@
 {#-
 https://symfony.com/doc/current/controller/error_pages.html#testing-error-pages-during-development
 
-test errori: https://project.local:8890/_error/<error code>
+test: https://project.local:8890/_error/500 (or 403, 404... )
 -#}
 <!DOCTYPE html>
-<html lang="it" data-err-code="{{ status_code }}" data-err-text="{{ status_text}}">
+<html lang="it" data-err-code="{{ status_code }}" data-err-text="{{ status_text }}">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">

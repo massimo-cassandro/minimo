@@ -36,7 +36,6 @@ export async function unsplashPage(settings) {
       text             : null,
       backLink         : null,
       hidePhotoLink    : true,
-      cssModulesObj    : null
     },
     required_settings = ['targetElement', 'unsplashDataUrl', 'utmSource', 'title'];
 
