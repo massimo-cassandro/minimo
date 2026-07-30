@@ -1,25 +1,57 @@
+/**
+ * Multi-select web component.
+ *
+ * Arranges a series of radio buttons, checkboxes, or a `select[multiple]` element so that items
+ * appear within a popup window, similar to a `select` element.
+ * `select[multiple]` elements are rendered as a list of checkboxes.
+ *
+ * @example
+ * Checkboxes:
+ * ```html
+ * <multi-select [attributes]>
+ *   <input type="checkbox" [attributes]>
+ *   <input type="checkbox" [attributes]>
+ *   <input type="checkbox" [attributes]>
+ * </multi-select>
+ * ```
+ *
+ * @example
+ * Radio buttons:
+ * ```html
+ * <multi-select [attributes]>
+ *   <input type="radio" [attributes]>
+ *   <input type="radio" [attributes]>
+ *   <input type="radio" [attributes]>
+ * </multi-select>
+ * ```
+ *
+ * @example
+ * Select multiple:
+ * ```html
+ * <multi-select [attributes]>
+ *   <select multiple [attributes]>
+ *     <option value="...">...</option>
+ *     <option value="...">...</option>
+ *   </select>
+ * </multi-select>
+ * ```
+ */
+
+
+class MultiSelectComponent extends HTMLElement {
+  constructor() {
+    super();
+
+  }
+
+}
+
+if (!customElements.get('multi-select')) {
+  customElements.define('multi-select', MultiSelectComponent);
+}
+
+
 /*
-This file must be included in projects that implement the
-`bs*_form_layout.html.twig` template, if you are using the multiselect option
-
-https://github.com/massimo-cassandro/symfony-bootstrap-form-theme
-
-
-ES6:
--------------------------
-import { formMultiselect } from '@massimo-cassandro/js-utilities';
-
-formMultiselect();
-
-NB: this version dropped the dependance from bootstrap 5 Dropdown JS Element
-
-*/
-
-// multiselect widget
-// import { createPopper } from '@popperjs/core/dist/esm/popper-lite';
-// import flip from '@popperjs/core/dist/esm/modifiers/flip';
-// import preventOverflow from '@popperjs/core/dist/esm/modifiers/preventOverflow';
-
 export function formMultiselect(container=document) {
 
   const multiselects = container.querySelectorAll('.form-multiselect'),
@@ -81,3 +113,4 @@ export function formMultiselect(container=document) {
   });
 
 }
+*/
