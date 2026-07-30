@@ -163,7 +163,7 @@ Alias references (`{color.brand.primary}`) are preserved in the output so Penpot
 Scans all `.css` files in `dirToCheck` (recursively) and reports:
 
 - **unresolved properties** — `var(--...)` references that are not defined in the generated token CSS file or in any `extraCustomPropsFiles`
-- **unused properties** — custom properties defined in the generated token CSS file (or an `extraCustomPropsFiles` entry) but never referenced via `var()` in any scanned CSS file. Only reported if `checkUnused: true` is set in the config, since it re-runs the Style Dictionary transform pipeline over the token sources to resolve, when possible, the `.mjs` source file for each unused property.
+- **unused properties** — custom properties defined in the generated token CSS file (or an `extraCustomPropsFiles` entry) but never referenced via `var()` in any scanned CSS file. Only reported if `checkUnused: true` is set in the config, since it re-runs the Style Dictionary transform pipeline over the token sources to resolve, when possible, the `.mjs` source file for each unused property. When `ignoreUnusedInNodeModules` is true (default), properties sourced from a token file under `node_modules` (e.g. a third-party token package) are never reported as unused.
 
 Results are written to `unresolved-unused-props.md` in the same directory as the config file.
 

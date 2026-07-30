@@ -143,19 +143,13 @@ async function run() {
     // just to resolve source files, which adds a noticeable cost.
     const checkUnused = config.checkUnused === true;
 
-    // ---------------------------------------------------------------------------
-    // 5. Build the list of unused custom properties (defined but never
-    // referenced via var() in any scanned CSS file) — the opposite check
-    // of section 4.
-    // ---------------------------------------------------------------------------
-    const unused_props = checkUnused
-      ? defined_props
-        .filter(item => !used_props_set.has(item.prop))
-        .sort((a, b) => a.prop.localeCompare(b.prop))
-      : [];
+    // If true (default), properties sourced from a token file under
+    // node_modules (e.g. a third-party token package) are never reported as
+    // unused — the consuming project isn't expected to prune those.
+    const ignoreUnusedInNodeModules = config.ignoreUnusedInNodeModules !== false;
 
     // ---------------------------------------------------------------------------
-    // 6. Best-effort: resolve the .mjs token source file for each unused
+    // 5. Best-effort: resolve the .mjs token source file for each defined
     // property, by running the same transform pipeline used to generate the
     // CSS (see build-tokens-src/formats/css.mjs) over the token sources
     // declared in config.source. Properties that only exist in the generated
@@ -183,6 +177,24 @@ async function run() {
         // Non-fatal: unused properties will be reported by name only.
       }
     }
+
+    // ---------------------------------------------------------------------------
+    // 6. Build the list of unused custom properties (defined but never
+    // referenced via var() in any scanned CSS file) — the opposite check
+    // of section 4. Properties sourced from node_modules are skipped when
+    // ignoreUnusedInNodeModules is true (default).
+    // ---------------------------------------------------------------------------
+    const unused_props = checkUnused
+      ? defined_props
+        .filter(item => !used_props_set.has(item.prop))
+        .filter(item => {
+          if (!ignoreUnusedInNodeModules) return true;
+          const sourceFilePath = sourceFileByProp.get(item.prop);
+          if (!sourceFilePath) return true;
+          return !/(^|[\\/])node_modules([\\/]|$)/.test(sourceFilePath);
+        })
+        .sort((a, b) => a.prop.localeCompare(b.prop))
+      : [];
 
     // ---------------------------------------------------------------------------
     // 7. Write the report
