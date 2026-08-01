@@ -81,6 +81,13 @@ export const penpotExpressions = VALID_EXPR_MODES.includes(buildConfig.penpotExp
 // build-tokens-src/merge-css.mjs). Default: false.
 export const mergeCustomProps = buildConfig.mergeCustomProps === true;
 
+// colorPropertiesPrefixes: custom properties whose first hyphen-separated
+// name segment matches one of these prefixes are grouped together and moved
+// to the beginning of the generated CSS file (see formats/css.mjs). Default: [].
+export const colorPropertiesPrefixes = Array.isArray(buildConfig.colorPropertiesPrefixes)
+  ? buildConfig.colorPropertiesPrefixes
+  : [];
+
 // ---------------------------------------------------------------------------
 // Source: resolve patterns relative to the config directory and normalise to
 // forward-slash absolute paths (fast-glob, used internally by Style Dictionary,

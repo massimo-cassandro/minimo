@@ -239,19 +239,54 @@ StyleDictionary.registerFormat({
     const sortedProps = Object.entries(finalProps)
       .sort(([a], [b]) => a.localeCompare(b, 'en', { numeric: true, sensitivity: 'base' }));
 
+    // colorPropertiesPrefixes: properties whose first hyphen-separated name
+    // segment matches one of these prefixes are pulled out and placed, in
+    // prefix-list order, at the beginning of the output file.
+    const colorPropertiesPrefixes = options.colorPropertiesPrefixes ?? [];
+    const colorProps = [];
+    const restProps = [];
+    for (const entry of sortedProps) {
+      const prefix = entry[0].split('-')[0];
+      if (colorPropertiesPrefixes.includes(prefix)) {
+        colorProps.push(entry);
+      } else {
+        restProps.push(entry);
+      }
+    }
+    colorProps.sort(([a], [b]) => {
+      const prefixA = a.split('-')[0];
+      const prefixB = b.split('-')[0];
+      const idxA = colorPropertiesPrefixes.indexOf(prefixA);
+      const idxB = colorPropertiesPrefixes.indexOf(prefixB);
+      if (idxA !== idxB) return idxA - idxB;
+      return a.localeCompare(b, 'en', { numeric: true, sensitivity: 'base' });
+    });
+
     // A blank line is inserted between blocks of properties sharing the same
     // first hyphen-separated segment (e.g. all `btn-*` together), to visually
     // group related custom properties in the generated file.
     const outLines = [];
     let prevPrefix = null;
-    for (const [name, tail] of sortedProps) {
-      const prefix = name.split('-')[0];
-      if (prevPrefix !== null && prefix !== prevPrefix) {
-        outLines.push('');
+    const appendBlock = (props) => {
+      for (const [name, tail] of props) {
+        const prefix = name.split('-')[0];
+        if (prevPrefix !== null && prefix !== prevPrefix) {
+          outLines.push('');
+        }
+        outLines.push(`  --${name}: ${tail}`);
+        prevPrefix = prefix;
       }
-      outLines.push(`  --${name}: ${tail}`);
-      prevPrefix = prefix;
+    };
+
+    if (colorProps.length) {
+      outLines.push('  /** COLORS **/');
     }
+    appendBlock(colorProps);
+    if (colorProps.length && restProps.length) {
+      outLines.push('', '');
+      prevPrefix = null;
+    }
+    appendBlock(restProps);
 
     customPropsCount = sortedProps.length;
     return `${selector} {\n${outLines.join('\n')}\n}\n`;

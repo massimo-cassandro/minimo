@@ -1,6 +1,4 @@
-// alla paths relative to this file
-
-// TODO commenti e spiegaziono
+// all paths must be relative to this file
 
 const config = {
   stylelintConfigPath: '../stylelint.config.mjs',
@@ -21,6 +19,13 @@ const config = {
   // by this build (manual overrides/additions are preserved across rebuilds)
   // Comments at end of custom properties are preserved, while full line ones will be lost.
   mergeCustomProps: false,
+
+  // Properties whose names begin with one of the following strings are grouped
+  // and placed at the beginning of the output CSS file
+  colorPropertiesPrefixes: ['accent', 'primary', 'secondary', 'neutral'],
+
+
+  // TODO reaggruppamento per proprietà fw minimo (inizieranno con mm-) e proprietà dei componenti
 
   // --------------------------------------
   // SETTINGS FOR PENPOT EXPORT

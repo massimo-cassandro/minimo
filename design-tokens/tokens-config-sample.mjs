@@ -18,7 +18,7 @@ const minimo_path = '../../node_modules/@massimo-cassandro/minimo';
 const config = {
 
   // ---------------------------------------------------------------------------
-  // build-tokens.mjs settings
+  // BUILD-TOKENS & STYLE-DICTIONARY SETTINGS
   // ---------------------------------------------------------------------------
 
   // Path to the stylelint config used to lint the generated CSS file
@@ -49,11 +49,27 @@ const config = {
 
   ],
 
+  // If true, custom properties already present in the CSS destination file
+  // (destFile, from a previous build) take priority over the ones generated
+  // by this build. Properties found only in the pre-existing file (no longer
+  // generated) are kept too. Useful to preserve manual overrides/additions
+  // made directly in the compiled CSS across rebuilds. Ignored on the first
+  // build, when destFile does not exist yet. Default: false.
+  mergeCustomProps: false,
+
+  // Properties whose names begin with one of the following strings are grouped
+  // and placed at the beginning of the output CSS file
+  colorPropertiesPrefixes: ['accent', 'primary', 'secondary', 'neutral'],
+
+
+  // ---------------------------------------------------------------------------
+  // PENPOT / FIGMA
   // ---------------------------------------------------------------------------
   // Optional design tokens output
   // Generates one or more json(c) files in addition to the CSS output file, for use
   // in Penpot or Figma projects or as an alternative to the .mjs source files
   // ---------------------------------------------------------------------------
+
   // Output format for Penpot token files: 'jsonc' or 'json'
   //   'jsonc' -> adds a generated-file disclaimer header, uses .jsonc extension
   //   'json'  -> plain JSON, no disclaimer
@@ -75,18 +91,9 @@ const config = {
   //               e.g. {size.base} = 16px, "{size.base} * .25" -> "4px"
   penpotExpressions: 'resolve',
 
-  // If true, custom properties already present in the CSS destination file
-  // (destFile, from a previous build) take priority over the ones generated
-  // by this build. Properties found only in the pre-existing file (no longer
-  // generated) are kept too. Useful to preserve manual overrides/additions
-  // made directly in the compiled CSS across rebuilds. Ignored on the first
-  // build, when destFile does not exist yet. Default: false.
-  mergeCustomProps: false,
-
-
 
   // ---------------------------------------------------------------------------
-  // check-unresolved-custom-props.mjs settings
+  // CHECK-UNRESOLVED-CUSTOM-PROPS.MJS SETTINGS
   // ---------------------------------------------------------------------------
 
   // If true, also reports custom properties that are defined (in destFile or

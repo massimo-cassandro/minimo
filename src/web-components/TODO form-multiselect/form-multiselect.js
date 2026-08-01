@@ -9,9 +9,9 @@
  * Checkboxes:
  * ```html
  * <multi-select [attributes]>
- *   <input type="checkbox" [attributes]>
- *   <input type="checkbox" [attributes]>
- *   <input type="checkbox" [attributes]>
+ *   <input type="checkbox" [attributes]> <label for="...">Label</label>
+ *   <input type="checkbox" [attributes]> <label for="...">Label</label>
+ *   <input type="checkbox" [attributes]> <label for="...">Label</label>
  * </multi-select>
  * ```
  *
@@ -19,15 +19,16 @@
  * Radio buttons:
  * ```html
  * <multi-select [attributes]>
- *   <input type="radio" [attributes]>
- *   <input type="radio" [attributes]>
- *   <input type="radio" [attributes]>
+ *   <input type="radio" [attributes]> <label for="...">Label</label>
+ *   <input type="radio" [attributes]> <label for="...">Label</label>
+ *   <input type="radio" [attributes]> <label for="...">Label</label>
  * </multi-select>
  * ```
  *
  * @example
  * Select multiple:
  * ```html
+ * <label for="...">Label</label>
  * <multi-select [attributes]>
  *   <select multiple [attributes]>
  *     <option value="...">...</option>

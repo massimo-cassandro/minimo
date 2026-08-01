@@ -44,6 +44,7 @@ const PENPOT_TRANSFORMS = [
  *                                                   Collected from sd.allTokens after SD initialisation.
  *                                                   Ignored when penpotDestFile is set.
  * @param {'keep'|'calc'|'resolve'} opts.penpotExpressions  How to handle math expressions in dimension tokens.
+ * @param {string[]}        opts.colorPropertiesPrefixes  Name prefixes grouped at the top of the CSS output.
  * @returns {Record<string, PlatformConfig>} platforms object ready for Style Dictionary config
  */
 export const buildPlatforms = ({
@@ -54,6 +55,7 @@ export const buildPlatforms = ({
   penpotFormat,
   penpotExpressions = 'keep',
   concreteFilePaths = [],
+  colorPropertiesPrefixes = [],
 }) => {
   /** @type {Record<string, PlatformConfig>} */
   const platforms = {
@@ -67,6 +69,7 @@ export const buildPlatforms = ({
           options: {
             outputReferences: true,
             showFileHeader: true,
+            colorPropertiesPrefixes,
           },
         },
       ],

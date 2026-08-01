@@ -1,6 +1,17 @@
 :root {
+  /** COLORS **/
   --accent: #567d0d;
   --accent-fg: #fff;
+
+  --primary-100: #083865;
+  --primary-100-fg: #fff;
+
+  --secondary-100: #650853;
+  --secondary-100-fg: #fff;
+
+  --neutral-100: #666;
+  --neutral-100-fg: #fff;
+
 
   --alert-border-radius: var(--radius-sm);
   --alert-box-shadow: 0 0 .5rem 0 oklch(0% 0 0 / .5);
@@ -252,13 +263,7 @@
   --mpopup-min-width: 25rem;
   --mpopup-width: max-content;
 
-  --neutral-100: #666;
-  --neutral-100-fg: #fff;
-
   --overlay-color: rgb(0 0 0 / .6);
-
-  --primary-100: #083865;
-  --primary-100-fg: #fff;
 
   --radius-base: var(--size-base);
   --radius-lg: var(--size-lg);
@@ -275,9 +280,6 @@
   --sdt-pagination-padding-block: var(--size-xxs);
   --sdt-pagination-padding-inline: var(--size-xs);
   --sdt-thead-hover-background-color: color-mix(in srgb, var(--table-thead-background-color) 90%, var(--accent));
-
-  --secondary-100: #650853;
-  --secondary-100-fg: #fff;
 
   --sf-macro-btn-close-background-color: var(--btn-close-background-color);
   --sf-macro-btn-close-position-bottom: auto;

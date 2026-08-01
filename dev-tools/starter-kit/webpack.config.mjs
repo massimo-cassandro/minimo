@@ -397,6 +397,7 @@ const config = {
       inject: 'body',
       title: 'XXXXX',
       minify: !isDevelopment
+      // base: isDevelopment ? '/' : '/xxxxx/',
     }),
 
     // =>> plugins: HtmlWebpackInjectAttributesPlugin
