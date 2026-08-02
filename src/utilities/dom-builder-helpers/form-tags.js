@@ -44,7 +44,7 @@ export function buildInputTag({
  * @param {Object} args
  * @param {string} args.label - checkbox label.
  * @param {string | null} args.name - checkbox `name` attribute.
- * @param {string | number | null} args.value - checkbox `value` attribute.
+ * @param {string | number | null} [args.value=1] - checkbox `value` attribute.
  * @param {boolean} [args.checked=false] - checkbox `checked` attribute.
  * @param {string | null} [args.wrapperClass=null] - optional class to be added to the `.form-group` wrapper (used only when `addFormGroup` is true).
  * @param {boolean} [args.addFormGroup=true] - When true, wraps the checkbox in a `.form-group` element.
@@ -54,7 +54,7 @@ export function buildInputTag({
 export function buildCheckboxTag({
   label,
   name,
-  value,
+  value = 1,
   checked = false,
   wrapperClass = null,
   addFormGroup = true,
@@ -65,15 +65,22 @@ export function buildCheckboxTag({
     return null;
   }
 
+  /*
+  <div class="form-group">
+    <div class="form-check">
+      <input type="checkbox" id="..." name="..." class="form-check-input" value="1">
+      <label for="..." class="form-label">...</label>
+    </div>
+  </div>
+  */
   const id = randomId();
 
   const tag = {
     className: classnames('form-check', !addFormGroup && wrapperClass),
     children: [
-      `label.form-label[for:${id}] ${label}`,
       {
         tag: 'input',
-        className: 'form-control',
+        className: 'form-check-input',
         id: id,
         attrs: {
           type: 'checkbox',
@@ -81,7 +88,8 @@ export function buildCheckboxTag({
           name: name,
           checked: checked
         }
-      }
+      },
+      `label.form-label[for:${id}] ${label}`,
     ]
   };
 

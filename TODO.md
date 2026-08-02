@@ -132,6 +132,8 @@ Riferimento centralizzato dei prossimi interventi. Le dir con prefisso `TODO ` i
   * rimozione `_wrk`, spostare autodatatable (anche il repo, da deprecare) in `archived`
   * Miglioramenti perfomances e verifica componenti con css per far sì che possano essere usati anche frameowrk diversi da minimo.
   * Analisi di `src/components` e `src/utilities` (esclusi i sotto-dir con prefisso `TODO ` — `form-multiselect`, `vanilla-cookie-consent` — già tracciati sopra come da integrare, non ancora in uno stato stabile).
+  * inserire info per uso con html-css-class-completion: https://marketplace.visualstudio.com/items?itemName=Zignd.html-css-class-completion
+}
 
 ## FORM
   * nuovo componente che combini la parte di gestione del submit del form in un unico componente. Da valutare. In caso positivo valutare se marcare come @deprecated le vecchie funzioni, ma manternerle per compatubilità (in una nuova dir `deprecated`?) (vedi commento in validation-error-class). Considerare che `disableBtnsOnSubmit` ha senso in tutte le situazioni in cui non sia necessario un listener submit ad hoc
