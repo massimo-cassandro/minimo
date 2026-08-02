@@ -12,6 +12,7 @@
   --neutral-100: #666;
   --neutral-100-fg: #fff;
 
+  /* ---------------------- */
 
   --alert-border-radius: var(--radius-sm);
   --alert-box-shadow: 0 0 .5rem 0 oklch(0% 0 0 / .5);

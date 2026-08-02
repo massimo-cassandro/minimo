@@ -30,7 +30,7 @@ const config = {
   // Output filename for the generated CSS file
   destFile: 'custom-properties.css',
 
-  // Source token files — accepts paths, globs, or a mix of both.
+  // Source token files — accept paths, globs, or a mix of both.
   // Supported formats: .json, .jsonc, .mjs (must export a DTCG-compliant default object)
   //
   // WARNING: do not use path.join() to build glob patterns — it may corrupt
@@ -55,6 +55,7 @@ const config = {
   // generated) are kept too. Useful to preserve manual overrides/additions
   // made directly in the compiled CSS across rebuilds. Ignored on the first
   // build, when destFile does not exist yet. Default: false.
+  // Comments at the end of custom properties are preserved, while full-line ones will be lost.
   mergeCustomProps: false,
 
   // Properties whose names begin with one of the following strings are grouped
@@ -70,20 +71,6 @@ const config = {
   // in Penpot or Figma projects or as an alternative to the .mjs source files
   // ---------------------------------------------------------------------------
 
-  // Output format for Penpot token files: 'jsonc' or 'json'
-  //   'jsonc' -> adds a generated-file disclaimer header, uses .jsonc extension
-  //   'json'  -> plain JSON, no disclaimer
-  penpotFormat: 'jsonc',
-
-  // Output directory for the Penpot design token files.
-  // Set to null (or omit) to disable json output entirely.
-  penpotBuildPath: null || './path/to/generated/design-tokens-dir',
-
-  // Base name (without extension) for the aggregated Penpot output file.
-  // The extension is added automatically based on penpotFormat.
-  // Set to null (or omit) to generate one file per .mjs source file instead.
-  penpotDestFile: null || 'tokens',
-
   // How to handle math expressions in dimension token $values (e.g. "{size.base} * .25"):
   //   'keep'    write the expression unchanged
   //   'calc'    — wrap in CSS calc(): "calc({size.base} * .25)"
@@ -91,9 +78,23 @@ const config = {
   //               e.g. {size.base} = 16px, "{size.base} * .25" -> "4px"
   penpotExpressions: 'resolve',
 
+  // Output format for Penpot token files: 'jsonc' or 'json'
+  //   'jsonc' -> adds a generated-file disclaimer header, uses .jsonc extension
+  //   'json'  -> plain JSON, no disclaimer
+  penpotFormat: 'jsonc',
+
+  // Output directory for the Penpot design token files.
+  // Set to null (or omit) to disable json output entirely.
+  penpotBuildPath: null, // or './path/to/generated/design-tokens-dir',
+
+  // Base name (without extension) for the aggregated Penpot output file.
+  // The extension is added automatically based on penpotFormat.
+  // Set to null (or omit) to generate one file per .mjs source file instead.
+  penpotDestFile: null, // or 'tokens' (or else),
+
 
   // ---------------------------------------------------------------------------
-  // CHECK-UNRESOLVED-CUSTOM-PROPS.MJS SETTINGS
+  // CHECK-UNRESOLVED-CUSTOM-PROPS SETTINGS
   // ---------------------------------------------------------------------------
 
   // If true, also reports custom properties that are defined (in destFile or

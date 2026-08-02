@@ -139,6 +139,7 @@ Riferimento centralizzato dei prossimi interventi. Le dir con prefisso `TODO ` i
 ## DOM BUILDER
   * `dom-builder/dom-builder.js:4-5` — sintassi stringa multi-riga e nidificazione con indent
   * `dom-builder/dom-builder.js:169` — callback con azioni su children potrebbero non essere eseguiti in assenza di parent 
+  * helpers per la costruzione di alcuni elementi di uso comune (come picture): form, inputs ecc
 
 ## SF-MACRO
    * rendere indipendebti css e custom props `sf-macro/sf-macro.css` (già namespaced su `--sf-macro-*` e con token collocati; verificare se serve un fallback esplicito per l'indipendenza CSS completa)

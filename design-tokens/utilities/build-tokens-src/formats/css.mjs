@@ -283,7 +283,7 @@ StyleDictionary.registerFormat({
     }
     appendBlock(colorProps);
     if (colorProps.length && restProps.length) {
-      outLines.push('', '');
+      outLines.push('', '  /* ---------------------- */', '');
       prevPrefix = null;
     }
     appendBlock(restProps);

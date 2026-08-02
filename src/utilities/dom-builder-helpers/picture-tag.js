@@ -1,7 +1,5 @@
 /*! minimo - buildPictureTag */
-import { classnames } from './classnames.js';
-
-/** @typedef {import('./dom-builder/dom-builder.js').DomBuilderItem} DomBuilderItem */
+import { classnames } from '../classnames.js';
 
 /**
  * @typedef {Object} PictureSizeEntry

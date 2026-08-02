@@ -120,6 +120,8 @@ input[type='checkbox'] {
 /* da bs5 */
 /* versione con label a destra */
 /* TODO rivedere. sostituire float con flex? */
+/* TODO eliminare necessità di stare dentro un `.form-group` */
+/* TODO aggiungere esempi di uso */
 .form-check {
   display: block;
   padding-left: 1.5em;

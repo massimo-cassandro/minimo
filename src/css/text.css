@@ -3,42 +3,6 @@ p {
   margin: 0 0 var(--size-sm);
 }
 
-a:link, .btn-link {
-  /* TODO rivedere, forse più complicato del necessario */
-  &:not(.btn) {
-    font-weight: var(--font-weight-semibold);
-    color: var(--link-color);
-    text-decoration: none;
-  }
-}
-
-a {
-  &:visited {
-    color: var(--link-visited-color);
-  }
-}
-
-a, .btn-link {
-  &:focus {
-    outline: none;
-  }
-
-  &:focus-visible {
-    outline: 1px solid color-mix(in srgb, var(--link-color) 60%, transparent);
-    outline-offset: 2px;
-  }
-  &:hover {
-    text-decoration: underline;
-    text-underline-offset: 2px;
-  }
-  &:active {
-    color: var(--body-background-color);
-    outline: 2px solid var(--link-color);
-    background-color: var(--link-color);
-    offset: 0;
-  }
-}
-
 strong, b {
   font-weight: 700;
 }
