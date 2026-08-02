@@ -18,7 +18,7 @@ import { parseDomString } from './parseDomString.js';
  *   treated as markup: sanitized and inserted via the native Sanitizer API (`Element.setHTML`) where
  *   supported, falling back to raw `innerHTML` on browsers without it.
  * @property {boolean} [condition=true] - When false, the element is skipped.
- * @property {function(HTMLElement): void} [callback] - Callback invoked after the element is created.
+ * @property {(function(HTMLElement): void) | null} [callback] - Callback invoked after the element is created.
  * @property {Array<DomBuilderItem|string>} [children] - Configuration array for child elements. Accepts strings (shorthand per `parseDomString`) and/or configuration objects.
  */
 

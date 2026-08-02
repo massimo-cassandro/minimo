@@ -4,20 +4,20 @@
 /* TODO classe grid specifica per i form ?? (.form-grid?) */
 /* TODO customizable select */
 /* TODO form-check: rifare come flex, separare? */
+/* TODO abbreviare prefisso  */
 
 .form-group:has([required]):not(:has([disabled])) {
 
   /* `>` excludes labels within form-collections  */
   > .form-label {
     position: relative;
-    padding-inline-start: var(--size-base);
+    padding-inline-start: var(--form-control-required-label-padding-inline-start);
     &::before {
       position: absolute;
-      top: -.15em;
-      left: 0;
+      top: var(--form-control-required-flag-top);
+      left: var(--form-control-required-flag-left);
       display: inline-block;
-      padding-inline-end: var(--size-xxs);
-      font-size: 2em;
+      font-size: var(--form-control-required-flag-font-size);
       color: var(--form-control-required-flag-color);
       content: var(--form-control-required-flag-content);
     }

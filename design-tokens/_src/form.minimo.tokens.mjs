@@ -172,13 +172,39 @@ export default {
         }
       },
       required: {
-        'flag-color': {
-          $value: '#c00',
-          $type: 'color'
+        label: {
+          padding: {
+            inline: {
+              start: {
+                $type: 'dimension',
+                $value: '{size.xxs}',
+              }
+            }
+          },
         },
-        'flag-content': {
-          $value: '\'\\002A\'',
-          $type: 'string'
+        flag: {
+          color: {
+            $type: 'color',
+            $value: '#c00',
+          },
+          content: {
+            $type: 'string',
+            $value: '\'\\002A\'',
+          },
+          top: {
+            $type: 'dimension',
+            $value: '-.15em',
+          },
+          left: {
+            $type: 'dimension',
+            $value: '0em',
+          },
+          font: {
+            size: {
+              $type: 'dimension',
+              $value: '2em',
+            }
+          }
         }
       },
       focus: {
