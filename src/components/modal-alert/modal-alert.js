@@ -87,8 +87,8 @@ const defaults = {
     okBtnText: 'OK',
     cancelBtnText: 'Annulla',
     cancelBtnFocus: true, // false to give focus to the ok button
-    okBtnClass: 'btn btn-primary',
-    cancelBtnClass: 'btn btn-primary btn-hollow',
+    okBtnClass: classnames('btn', styles.btnConfirm),
+    cancelBtnClass: classnames('btn', styles.btnConfirm, styles.btnHollow),
     icon: confirmIcon,
     altIcon: warningIcon,
     useAltIcon: false // when true, uses altIcon (warning) instead of the default confirm icon

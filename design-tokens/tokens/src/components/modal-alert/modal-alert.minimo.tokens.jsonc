@@ -128,6 +128,86 @@
       "fg": {
         "$type": "color",
         "$value": "#fff"
+      },
+      "btn": {
+        "bg": {
+          "$type": "color",
+          "$value": "{malert.confirm.bg}"
+        },
+        "fg": {
+          "$type": "color",
+          "$value": "{malert.confirm.fg}"
+        },
+        "border": {
+          "color": {
+            "$type": "color",
+            "$value": "{malert.confirm.bg}"
+          }
+        },
+        "focus": {
+          "outline": {
+            "color": {
+              "$type": "color",
+              "$value": "color-mix(in srgb, {malert.confirm.bg} 60%, transparent)"
+            },
+            "width": {
+              "$type": "dimension",
+              "$value": "{btn.focus.outline.width}"
+            }
+          }
+        },
+        "hover": {
+          "bg": {
+            "$type": "color",
+            "$value": "{malert.confirm.fg}"
+          },
+          "fg": {
+            "$type": "color",
+            "$value": "{malert.confirm.bg}"
+          },
+          "border": {
+            "color": {
+              "$type": "color",
+              "$value": "{malert.confirm.btn.hover.fg}"
+            }
+          }
+        },
+        "active": {
+          "bg": {
+            "$type": "color",
+            "$value": "color-mix(in srgb, {malert.confirm.bg} 60%, #000)"
+          },
+          "fg": {
+            "$type": "color",
+            "$value": "{malert.confirm.fg}"
+          },
+          "border": {
+            "color": {
+              "$type": "color",
+              "$value": "{malert.confirm.btn.active.bg}"
+            }
+          }
+        },
+        "hollow": {
+          "bg": {
+            "$type": "color",
+            "$value": "{malert.confirm.fg}"
+          },
+          "fg": {
+            "$type": "color",
+            "$value": "{malert.confirm.bg}"
+          },
+          "hover": {
+            "bg": {
+              "$type": "color",
+              "$value": "{malert.confirm.bg}"
+            },
+            "fg": {
+              "$type": "color",
+              "$value": "{malert.confirm.fg}"
+            }
+          }
+        }
       }
     },
     "heading": {

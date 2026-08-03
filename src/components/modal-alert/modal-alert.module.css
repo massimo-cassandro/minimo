@@ -146,3 +146,54 @@
     transform: translateY(0);
   }
 }
+
+
+/* confirm button */
+
+
+.btnConfirm {
+  --_button-bg-color: var(--malert-confirm-btn-bg);
+  --_button-fg-color: var(--malert-confirm-btn-fg);
+  --_button-border-color: var(--malert-confirm-btn-border-color);
+
+  @media (hover: hover) {
+    &:hover {
+      --_button-bg-color: var(--malert-confirm-btn-hover-bg);
+      --_button-fg-color: var(--malert-confirm-btn-hover-fg);
+      --_button-border-color: var(--malert-confirm-btn-hover-border-color);
+    }
+  }
+  &:focus {
+    outline: none;
+  }
+
+  &:focus-visible, &:active {
+    outline: var(--malert-confirm-btn-focus-outline-width) solid var(--malert-confirm-btn-focus-outline-color);
+    /* outline-offset: 4px; */
+  }
+
+  &:active {
+    --_button-bg-color: var(--malert-confirm-btn-active-bg);
+    --_button-fg-color: var(--malert-confirm-btn-active-fg);
+    --_button-border-color: var(--malert-confirm-btn-active-border-color);
+  }
+
+
+  &.btnHollow {
+
+    --_button-bg-color: var(--malert-confirm-btn-hollow-bg);
+    --_button-fg-color: var(--malert-confirm-btn-hollow-fg);
+    /* --_button-border-color: var(--__btn-o-primary-border-color); */
+
+
+    @media (hover: hover) {
+      &:hover {
+        --_button-bg-color: var(--malert-confirm-btn-hollow-hover-bg);
+        --_button-fg-color: var(--malert-confirm-btn-hollow-hover-fg);
+        /* --_button-border-color: var(--__btn-o-primary-hover-border-color); */
+      }
+    }
+
+  }
+
+} /* end btnConfirm */

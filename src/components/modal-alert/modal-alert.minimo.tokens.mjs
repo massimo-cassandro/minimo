@@ -116,6 +116,7 @@ export default {
         $value: '{status.danger.fg}'
       }
     },
+
     confirm: {
       bg: {
         $type: 'color',
@@ -124,7 +125,99 @@ export default {
       fg: {
         $type: 'color',
         $value: '#fff'
-      }
+      },
+
+      // =>> settings for confirm button
+      btn: {
+        bg: {
+          $value: '{malert.confirm.bg}',
+          $type: 'color'
+        },
+        fg: {
+          $value: '{malert.confirm.fg}',
+          $type: 'color'
+        },
+
+        border: {
+          color: {
+            $value: '{malert.confirm.bg}',
+            $type: 'color'
+          }
+        },
+
+        focus: {
+          outline: {
+            color: {
+              $value: 'color-mix(in srgb, {malert.confirm.bg} 60%, transparent)',
+              $type: 'color'
+            },
+            width: {
+              $type: 'dimension',
+              $value: '{btn.focus.outline.width}'
+            }
+          }
+        },
+
+        hover: {
+          bg: {
+            $value: '{malert.confirm.fg}',
+            $type: 'color'
+          },
+          fg: {
+            $value: '{malert.confirm.bg}',
+            $type: 'color'
+          },
+
+          border: {
+            color: {
+              $value: '{malert.confirm.btn.hover.fg}',
+              $type: 'color'
+            }
+          }
+        },
+
+        active: {
+          bg: {
+            $value: 'color-mix(in srgb, {malert.confirm.bg} 60%, #000)',
+            $type: 'color'
+          },
+          fg: {
+            $value: '{malert.confirm.fg}',
+            $type: 'color'
+          },
+
+          border: {
+            color: {
+              $value: '{malert.confirm.btn.active.bg}',
+              $type: 'color'
+            }
+          },
+        },
+
+        hollow: {
+          bg: {
+            $value: '{malert.confirm.fg}',
+            $type: 'color'
+          },
+          fg: {
+            $value: '{malert.confirm.bg}',
+            $type: 'color'
+          },
+
+          hover: {
+            bg: {
+              $value: '{malert.confirm.bg}',
+              $type: 'color'
+            },
+            fg: {
+              $value: '{malert.confirm.fg}',
+              $type: 'color'
+            }
+
+          },
+        } // end hollow
+      } // end confirm button
+
     },
 
     heading: {
@@ -158,7 +251,7 @@ export default {
           $value: '{font.size.base}'
         },
       }
-    }
+    },
   }
 };
 

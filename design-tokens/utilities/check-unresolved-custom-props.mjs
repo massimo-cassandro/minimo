@@ -63,14 +63,19 @@ async function run() {
     /** @type {RegExp[]} */
     const exclude = config.excludePattern ?? [];
 
-    // Collect all .css files in the scan directory, excluding the token file itself
-    // and any file under a directory whose name starts with "TODO" (work-in-progress folders)
+    // Collect all .css files in the scan directory, excluding any file under a
+    // directory whose name starts with "TODO" (work-in-progress folders).
+    // The token file itself (custom_prop_filename) is intentionally included:
+    // custom properties are often composed from other custom properties
+    // (e.g. `--malert-box-shadow: ... var(--malert-box-shadow-color) ...`)
+    // and those internal var() references must count as usage, otherwise the
+    // referenced property is wrongly reported as unused.
     const files = [];
     for await (const entry of glob(path.join(checkdir, '/**/*.css'))) {
       const relDirSegments = path.relative(checkdir, path.dirname(entry)).split(path.sep);
       const isInTodoDir    = relDirSegments.some(segment => /^todo/i.test(segment));
 
-      if (!entry.endsWith(custom_prop_filename) && !isInTodoDir) {
+      if (!isInTodoDir) {
         files.push(entry);
       }
     }
