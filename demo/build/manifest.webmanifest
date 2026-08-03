@@ -1,0 +1,14 @@
+{
+ "icons": [
+  {
+   "src": "/minimo/icon-192.png?_=e062a4115d19935c50b2",
+   "type": "image/png",
+   "sizes": "192x192"
+  },
+  {
+   "src": "/minimo/icon-512.png?_=22a9866502e0829e0404",
+   "type": "image/png",
+   "sizes": "512x512"
+  }
+ ]
+}

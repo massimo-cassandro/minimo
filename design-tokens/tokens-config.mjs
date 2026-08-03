@@ -90,7 +90,7 @@ const config = {
 
 
   // ---------------------------------------------------------------------------
-  // CHECK-UNRESOLVED-CUSTOM-PROPS SETTINGS
+  // CHECK UNRESOLVED & UNUSED CUSTOM PROPS SETTINGS
   // ---------------------------------------------------------------------------
 
   // If true, also reports custom properties that are defined (in destFile or

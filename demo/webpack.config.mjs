@@ -39,8 +39,8 @@ const isDevelopment = process.env.NODE_ENV === 'development'
   ,postcssConfig_path = path.resolve(__dirname, './postcss.config.mjs')
   ,output_dir = path.resolve(__dirname, './build')
   // ,output_dir = isDevelopment? '_dev' : 'build' // symfony
-  // ,favicons_path = null //'frontend/favicons/output'
-  ,favicons_path_regexp = null //new RegExp(favicons_path) // source pattern per le favicons (regexp o null)
+  ,favicons_path = './favicons/output'
+  ,favicons_path_regexp = new RegExp(favicons_path) // source pattern per le favicons (regexp o null)
   ,jsConfigAliases = getJsConfigAliases(path.resolve(__dirname, './jsconfig.json'))
   ,packageJson = JSON.parse(fs.readFileSync(path.resolve(__dirname, './package.json'), 'utf-8'))
   // ,manifest_shared_seed = {}
@@ -193,6 +193,14 @@ const config = {
       chunkFilename: '[id].[contenthash].css'
     }),
 
+    // =>> plugins: HtmlWebpackPlugin (manifest)
+    new HtmlWebpackPlugin({
+      filename: 'manifest.webmanifest',
+      template: path.resolve(__dirname, './favicons/output/manifest.webmanifest.ejs'),
+      inject: false,
+      minify: false //!isDevelopment
+    }),
+
     // =>> plugins: HtmlWebpackPlugin
     new HtmlWebpackPlugin({
       filename: 'index.html',
@@ -328,14 +336,14 @@ const config = {
       },
 
       // =>> rules: favicons
-      // {
-      //   test: /\.(?:ico|png|svg|webmanifest)$/i,
-      //   type: 'asset/resource',
-      //   include: favicons_path_regexp?? undefined,
-      //   generator: {
-      //     filename: '[name][ext]?_=[contenthash]'
-      //   }
-      // },
+      {
+        test: /\.(?:ico|png|svg|webmanifest)$/i,
+        type: 'asset/resource',
+        include: favicons_path_regexp?? undefined,
+        generator: {
+          filename: '[name][ext]?_=[contenthash]'
+        }
+      },
 
       // =>> raw txt / md files
       {
