@@ -130,7 +130,32 @@ const defaults = {
  * `ok_btn_class`, `cancel_btn_text`, `cancel_btn_class`, `cancel_focus`, `use_warning_icon`)
  * are still accepted and internally mapped to their camelCase equivalent, see `legacyParamNames`.
  *
- * @param {ModalAlertParams} params - Dialog parameters (merged with defaults by type).
+ * The base param type below is intentionally `object` (not `ModalAlertParams`): TypeScript only
+ * expands dotted `@param` properties (needed for editor IntelliSense to list each property) when
+ * the base type is the literal `object`; a named typedef there would error (TS8032).
+ * @param {object} [params] - Dialog parameters (merged with defaults by type).
+ * @param {string} [params.type] - Dialog type: `success`, `error`, `warning`, `info`, or `confirm`.
+ * @param {string | null} [params.extraClass] - optional dialog extra class
+ * @param {(() => void) | null} [params.onOpen] - optional callback on dialog open
+ * @param {(() => void) | null} [params.onClose] - optional callback on dialog close
+ * @param {boolean} [params.animation] - if true, dialog will be animated
+ * @param {boolean} [params.showMarks] - if true, mark icons will be showed
+ * @param {((arg?: *) => void) | null} [params.callback] - optional callback dialog after user choice
+ * @param {number | null} [params.timer] - timer for autoclose (ms). `null` for disable
+ * @param {string | null} [params.title] - title text
+ * @param {string | null} [params.mes] - text message (plain or html)
+ * @param {string | null} [params.headingClass] - optional extra class for heading
+ * @param {string | null} [params.textClass] - optional extra class for text
+ * @param {string | null} [params.icon] - Icon markup used for the dialog; defaults to the type's icon.
+ * @param {string | null} [params.altIcon] - Alternate icon markup, used instead of `icon` when `useAltIcon` is `true`.
+ * @param {boolean} [params.useAltIcon] - When `true`, uses `altIcon` instead of `icon` (e.g. the `danger` icon on a `warning` dialog, or the `warning` icon on a `confirm` dialog).
+ * @param {DomBuilderItem | null} [params.extraBtn] - optional extra button (as domBuilder object)
+ * @param {boolean} [params.extraBtnFocus] - true if the extra button should be focused when the dialog box opens (overrides any focus assigned to the 'cancel' button)
+ * @param {string} [params.okBtnText] - text for 'ok' button
+ * @param {string} [params.okBtnClass] - alternative class for 'ok' button. It replaces the default one
+ * @param {string} [params.cancelBtnText] - text for 'cancel' button
+ * @param {string} [params.cancelBtnClass] - alternative class for 'cancel' button. It replaces the default one
+ * @param {boolean} [params.cancelBtnFocus] - true if the cancel button should be focused when the dialog box opens. It has no effect if an extraBtn is set
  * @returns {Promise<string | boolean | undefined>} Resolves when the dialog closes. If the
  *   dismissing button has a `data-malert-result` attribute, that string is used; otherwise, for
  *   `confirm` dialogs, resolves `true`/`false` for the OK/Cancel button; otherwise `undefined`.

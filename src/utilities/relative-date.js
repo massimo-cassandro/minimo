@@ -23,8 +23,22 @@
  * Returns an HTML `<time>` element string displaying the date in relative or absolute form.
  * Relative dates are auto-refreshed every minute via a shared `setInterval`.
  *
+ * The base param type below is intentionally `object` (not `RelativeDateOptions`): TypeScript only
+ * expands dotted `@param` properties (needed for editor IntelliSense to list each property) when
+ * the base type is the literal `object`; a named typedef there would error (TS8032).
  * @param {Date | string} date - Date to display (Date object or ISO string)
- * @param {RelativeDateOptions} [options={}]
+ * @param {object} [options={}]
+ * @param {boolean} [options.useRelativeTime=true] - Show times near the date as "in xx minutes" (before) or "now" (within `relativeTimeMinutesAfter`)
+ * @param {string} [options.nowString] - String to display when the date is right now
+ * @param {number} [options.relativeTimeMinutesBefore] - Minutes before the date within which to show "in xx minutes"
+ * @param {number} [options.relativeTimeMinutesAfter] - Minutes after the date within which to show the now string
+ * @param {boolean} [options.relativeTimeShowTime] - Show the actual time alongside relative date labels
+ * @param {string} [options.relativeTimeShowTimeMarkup] - HTML markup for the time portion; `@@time@@` is replaced with the localized time string
+ * @param {boolean} [options.firstLetterUpperCase] - Capitalize the first letter of the returned string
+ * @param {Intl.DateTimeFormatOptions} [options.dateFormat] - Format for non-relative dates (beyond day after tomorrow)
+ * @param {Intl.DateTimeFormatOptions} [options.timeFormat] - Format for time displayed in relative date labels
+ * @param {string[]} [options.relativeStrings] - Labels for yesterday / today / tomorrow / day after tomorrow (in chronological order)
+ * @param {string} [options.locale] - Locale string for date/time formatting
  * @returns {string} HTML `<time>` element as a string
  *
  * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/RelativeTimeFormat
