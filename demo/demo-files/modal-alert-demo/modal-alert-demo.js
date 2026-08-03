@@ -105,7 +105,11 @@ export function modalAlertDemo(){
               modalAlert({
                 type  : 'confirm',
                 title : 'Confirm',
-                callback: result => alert(`${result? 'OK button or ENTER key' : 'Cancel button or ESC key'} pressed`)
+                callback: result => {
+                  // eslint-disable-next-line no-console
+                  console.log('Result:', result);
+                  alert(`${result? 'OK button or ENTER key' : 'Cancel button or ESC key'} pressed`);
+                }
               });
             });
           }

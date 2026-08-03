@@ -192,7 +192,7 @@ export function modalAlert(params = {}) {
           ? 'cancel'
           : 'ok';
 
-      console.log(params);
+      // console.log(params);
 
       const dialog = /** @type {HTMLDialogElement} */ (domBuilder([
         {
@@ -305,7 +305,7 @@ export function modalAlert(params = {}) {
             arg = btn.dataset.malertResult;
 
           } else if(params.type === 'confirm') {
-            arg = btn.classList.contains('malert-ok');
+            arg = btn === okBtn;
           }
         }
 
