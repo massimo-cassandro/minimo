@@ -1,6 +1,6 @@
 {
   "name": "@massimo-cassandro/minimo",
-  "version": "1.19.12",
+  "version": "1.20.0",
   "description": "Light css framework & utilities",
   "type": "module",
   "main": "./index.js",
@@ -37,6 +37,8 @@
     "upd@m": "npx upd@m",
     "build-tokens": "node ./design-tokens/utilities/build-tokens.mjs --config ./design-tokens/tokens-config.mjs",
     "build-margin-padding-css": "node ./scripts/build-margin-padding-css.mjs",
+    "generate:types": "node ./scripts/generate-class-types.mjs",
+    "prepublishOnly": "npm run generate:types",
     "check unresolved props": "node ./design-tokens/utilities/check-unresolved-custom-props.mjs --config ./design-tokens/tokens-config.mjs",
     "test": "node --test \"test/**/*.test.mjs\"",
     "test sideEffects tree-shaking": "node ./test/sideEffects-tree-shaking/run-test.mjs",
@@ -56,6 +58,7 @@
   "files": [
     "./index.js",
     "src/**/*.{js,mjs,css,svg,md}",
+    "types/**/*.d.ts",
     "design-tokens/README.md",
     "design-tokens/tokens-config-sample.mjs",
     "design-tokens/tokens/**/*.{tokens.json,tokens.jsonc}",

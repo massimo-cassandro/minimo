@@ -55,7 +55,7 @@ StyleDictionary.registerTransform({
 });
 
 // ---------------------------------------------------------------------------
-// 2. px → rem (dimension tokens only, skips values already in rem)
+// 2. px → rem (dimension tokens only, skips values already in rem, %, em, ...)
 // ---------------------------------------------------------------------------
 StyleDictionary.registerTransform({
   name: 'size/pxToRem-smart',
@@ -64,8 +64,7 @@ StyleDictionary.registerTransform({
     const value = token.$value || token.value;
     return (token.$type === 'dimension' || token.type === 'dimension')
       && typeof value === 'string'
-      && !value.endsWith('rem')
-      && !value.endsWith('%');
+      && value.endsWith('px');
   },
   transform: (token) => {
     const value      = token.$value || token.value;

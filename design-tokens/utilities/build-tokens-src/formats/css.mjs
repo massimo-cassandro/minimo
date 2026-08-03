@@ -131,6 +131,14 @@ const buildTypography = (tokenName, original, resolveRefs) => {
   return lines.join('\n');
 };
 
+// Builds a customPropsGroups title comment, e.g.:
+//   /* ****** LAYOUT ****** */
+// Dashes fill out a fixed total width so titles line up regardless of name length.
+const DECORATOR_LENGHT = 6;
+const buildGroupTitle = (name) => {
+  return `  /** ${'*'.repeat(DECORATOR_LENGHT)} ${name} ${'*'.repeat(DECORATOR_LENGHT)} **/`;
+};
+
 // ── Format registration ──────────────────────────────────────────────────────
 
 // Exported counter — read by build-tokens.mjs for the final log line
@@ -239,27 +247,31 @@ StyleDictionary.registerFormat({
     const sortedProps = Object.entries(finalProps)
       .sort(([a], [b]) => a.localeCompare(b, 'en', { numeric: true, sensitivity: 'base' }));
 
-    // colorPropertiesPrefixes: properties whose first hyphen-separated name
-    // segment matches one of these prefixes are pulled out and placed, in
-    // prefix-list order, at the beginning of the output file.
-    const colorPropertiesPrefixes = options.colorPropertiesPrefixes ?? [];
-    const colorProps = [];
+    // customPropsGroups: properties whose first hyphen-separated name segment
+    // matches one of a group's prefixes are pulled out, labelled with that
+    // group's name and placed, in group-list order, at the beginning of the
+    // output file. A property matches the first group (in list order) whose
+    // prefixes include it.
+    const customPropsGroups = options.customPropsGroups ?? [];
+    const groupedProps = customPropsGroups.map(() => []);
     const restProps = [];
     for (const entry of sortedProps) {
       const prefix = entry[0].split('-')[0];
-      if (colorPropertiesPrefixes.includes(prefix)) {
-        colorProps.push(entry);
+      const groupIndex = customPropsGroups.findIndex((g) => g.prefixes?.includes(prefix));
+      if (groupIndex !== -1) {
+        groupedProps[groupIndex].push(entry);
       } else {
         restProps.push(entry);
       }
     }
-    colorProps.sort(([a], [b]) => {
-      const prefixA = a.split('-')[0];
-      const prefixB = b.split('-')[0];
-      const idxA = colorPropertiesPrefixes.indexOf(prefixA);
-      const idxB = colorPropertiesPrefixes.indexOf(prefixB);
-      if (idxA !== idxB) return idxA - idxB;
-      return a.localeCompare(b, 'en', { numeric: true, sensitivity: 'base' });
+    groupedProps.forEach((props, i) => {
+      const prefixes = customPropsGroups[i].prefixes;
+      props.sort(([a], [b]) => {
+        const idxA = prefixes.indexOf(a.split('-')[0]);
+        const idxB = prefixes.indexOf(b.split('-')[0]);
+        if (idxA !== idxB) return idxA - idxB;
+        return a.localeCompare(b, 'en', { numeric: true, sensitivity: 'base' });
+      });
     });
 
     // A blank line is inserted between blocks of properties sharing the same
@@ -278,11 +290,17 @@ StyleDictionary.registerFormat({
       }
     };
 
-    if (colorProps.length) {
-      outLines.push('  /** COLORS **/');
-    }
-    appendBlock(colorProps);
-    if (colorProps.length && restProps.length) {
+    const hasGroups = groupedProps.some((props) => props.length);
+    let isFirstBlock = true;
+    groupedProps.forEach((props, i) => {
+      if (!props.length) return;
+      if (!isFirstBlock) outLines.push('');
+      isFirstBlock = false;
+      outLines.push(buildGroupTitle(customPropsGroups[i].name));
+      appendBlock(props);
+      prevPrefix = null;
+    });
+    if (hasGroups && restProps.length) {
       outLines.push('', '  /* ---------------------- */', '');
       prevPrefix = null;
     }

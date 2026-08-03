@@ -177,7 +177,7 @@ export default {
             inline: {
               start: {
                 $type: 'dimension',
-                $value: '{size.xxs}',
+                $value: '{size.base}',
               }
             }
           },

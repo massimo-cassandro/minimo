@@ -1,5 +1,15 @@
 /*! minimo - Classnames */
-/** @typedef {string | null | undefined | false | 0} ClassValue */
+
+/**
+ * `MinimoClass | any other string`: keeps editor autocomplete for minimo's
+ * own class names (see ../../types/classes.d.ts, auto-generated) while still
+ * accepting arbitrary consumer-defined class names. The `string & {}` branding
+ * is a TS trick that prevents the union from collapsing to plain `string`,
+ * which would silently disable the autocomplete.
+ * @typedef {import('../../types/classes.js').MinimoClass | (string & {})} ClassName
+ */
+
+/** @typedef {ClassName | null | undefined | false | 0} ClassValue */
 
 /**
  * Joins CSS class names, filtering out falsy and non-string values.

@@ -44,7 +44,8 @@ const PENPOT_TRANSFORMS = [
  *                                                   Collected from sd.allTokens after SD initialisation.
  *                                                   Ignored when penpotDestFile is set.
  * @param {'keep'|'calc'|'resolve'} opts.penpotExpressions  How to handle math expressions in dimension tokens.
- * @param {string[]}        opts.colorPropertiesPrefixes  Name prefixes grouped at the top of the CSS output.
+ * @param {{name: string, prefixes: string[]}[]} opts.customPropsGroups  Named groups of name prefixes, moved to the top of the CSS output in list order.
+ * @param {boolean}         opts.pxToRem             If false, skips the px→rem transform on the CSS platform. Default: true.
  * @returns {Record<string, PlatformConfig>} platforms object ready for Style Dictionary config
  */
 export const buildPlatforms = ({
@@ -55,13 +56,18 @@ export const buildPlatforms = ({
   penpotFormat,
   penpotExpressions = 'keep',
   concreteFilePaths = [],
-  colorPropertiesPrefixes = [],
+  customPropsGroups = [],
+  pxToRem = true,
 }) => {
+  const cssTransforms = pxToRem
+    ? CSS_TRANSFORMS
+    : CSS_TRANSFORMS.filter((name) => name !== 'size/pxToRem-smart');
+
   /** @type {Record<string, PlatformConfig>} */
   const platforms = {
     css: {
       buildPath: buildPath + '/',
-      transforms: CSS_TRANSFORMS,
+      transforms: cssTransforms,
       files: [
         {
           destination: destFile,
@@ -69,7 +75,7 @@ export const buildPlatforms = ({
           options: {
             outputReferences: true,
             showFileHeader: true,
-            colorPropertiesPrefixes,
+            customPropsGroups,
           },
         },
       ],

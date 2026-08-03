@@ -49,6 +49,11 @@ const config = {
 
   ],
 
+  // If true (default), dimension token values expressed in px are converted
+  // to rem in the generated CSS. Values in other units (em, %, vh, dvw, ...)
+  // are never touched regardless of this option.
+  pxToRem: true,
+
   // If true, custom properties already present in the CSS destination file
   // (destFile, from a previous build) take priority over the ones generated
   // by this build. Properties found only in the pre-existing file (no longer
@@ -58,9 +63,20 @@ const config = {
   // Comments at the end of custom properties are preserved, while full-line ones will be lost.
   mergeCustomProps: false,
 
-  // Properties whose names begin with one of the following strings are grouped
-  // and placed at the beginning of the output CSS file
-  colorPropertiesPrefixes: ['accent', 'primary', 'secondary', 'neutral'],
+  // Named groups of custom properties. Properties whose first hyphen-separated
+  // name segment matches one of a group's `prefixes` are pulled out, labelled
+  // with the group's `name` and placed at the beginning of the output CSS
+  // file, in the order the groups are listed here.
+  customPropsGroups: [
+    {
+      name: 'COLORS',
+      prefixes: ['accent', 'primary', 'secondary', 'neutral'],
+    },
+    {
+      name: 'LAYOUT',
+      prefixes: ['body', 'layout'],
+    },
+  ],
 
 
   // ---------------------------------------------------------------------------

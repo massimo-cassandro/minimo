@@ -32,7 +32,8 @@ import {
   penpotExpressions,
   source,
   mergeCustomProps,
-  colorPropertiesPrefixes,
+  customPropsGroups,
+  pxToRem,
 } from './build-tokens-src/config.mjs';
 
 // ── 2. Custom transforms ─────────────────────────────────────────────────────
@@ -96,7 +97,8 @@ const sd = new StyleDictionary({
     penpotFormat,
     penpotExpressions,
     concreteFilePaths,
-    colorPropertiesPrefixes,
+    customPropsGroups,
+    pxToRem,
   }),
 });
 

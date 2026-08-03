@@ -1,5 +1,5 @@
 :root {
-  /** COLORS **/
+  /** ****** COLORS ****** **/
   --accent: #567d0d;
   --accent-fg: #fff;
 
@@ -12,6 +12,12 @@
   --neutral-100: #666;
   --neutral-100-fg: #fff;
 
+  /** ****** LAYOUT ****** **/
+  --body-background-color: #fff;
+  --body-text: var(--text-color);
+
+  --layout-container-max-width: 80rem;
+
   /* ---------------------- */
 
   --alert-border-radius: var(--radius-sm);
@@ -23,9 +29,6 @@
   --badge-font-weight: var(--font-weight-semibold);
   --badge-lg-font-size: var(--font-size-base);
   --badge-lg-font-weight: var(--badge-font-weight);
-
-  --body-background-color: #fff;
-  --body-text: var(--text-color);
 
   --box-shadow-base: 0 0 .75rem 0 rgb(0 0 0 / .25);
 
@@ -162,10 +165,10 @@
   --form-control-readonly-opacity: 1;
   --form-control-required-flag-color: #c00;
   --form-control-required-flag-content: '\002A';
-  --form-control-required-flag-font-size: .125rem;
-  --form-control-required-flag-left: 0rem;
-  --form-control-required-flag-top: -.009375rem;
-  --form-control-required-label-padding-inline-start: var(--size-xxs);
+  --form-control-required-flag-font-size: 2em;
+  --form-control-required-flag-left: 0em;
+  --form-control-required-flag-top: -.15em;
+  --form-control-required-label-padding-inline-start: var(--size-base);
   --form-control-select-trigger-icon: url('data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2016%2016%22%3E%3Cpath%20fill%3D%22none%22%20stroke%3D%22rgb(5%2C%2048%2C%2056)%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20stroke-width%3D%222%22%20d%3D%22m2%205%206%206%206-6%22%2F%3E%3C%2Fsvg%3E');
   --form-control-sm-font-size: var(--font-size-sm);
   --form-control-sm-padding-block: var(--size-xxs);
@@ -210,8 +213,6 @@
 
   --inner-nav-gap: var(--size-lg);
   --inner-nav-margin-block: var(--size-base);
-
-  --layout-container-max-width: 80rem;
 
   --line-height-base: 1.5;
   --line-height-sm: 1.4;
@@ -262,8 +263,8 @@
   --mpopup-header-font-size: var(--font-size-xl);
   --mpopup-header-padding: var(--size-xs);
   --mpopup-height: max-content;
-  --mpopup-max-height: 5.625rem;
-  --mpopup-max-width: 4.375rem;
+  --mpopup-max-height: 90dvh;
+  --mpopup-max-width: 70dvw;
   --mpopup-min-height: 18.75rem;
   --mpopup-min-width: 25rem;
   --mpopup-width: max-content;
