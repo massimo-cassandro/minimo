@@ -4,12 +4,19 @@
 /**
  * Returns the value of a cookie by name.
  * @param {string} name
- * @returns {string | undefined}
+ * @param {object} [options]
+ * @param {boolean} [options.parseJson=false] - If true, JSON-parses the value and returns an object instead of a string.
+ * @returns {string | object | null}
  */
-export function getCookie(name) {
+export function getCookie(name, {parseJson = false} = {}) {
   const value = `; ${document.cookie}`;
   const parts = value.split(`; ${name}=`);
-  if (parts.length === 2) return parts.pop()?.split(';').shift();
+  if (parts.length !== 2) return null;
+
+  const cookieValue = parts.pop()?.split(';').shift();
+  if (cookieValue === undefined) return null;
+
+  return parseJson ? JSON.parse(cookieValue) : cookieValue;
 }
 
 
