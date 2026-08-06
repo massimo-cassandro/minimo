@@ -89,7 +89,7 @@
     "@massimo-cassandro/eslint-config": "^3.0.13",
     "@massimo-cassandro/stylelint-config": "^2.3.13",
     "@types/node": "^26.1.2",
-    "jsdom": "^29.1.1",
+    "jsdom": "^30.0.1",
     "style-dictionary": "^5.5.0"
   },
   "dependencies": {
