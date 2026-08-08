@@ -11,6 +11,7 @@ import { parseDomString } from './parseDomString.js';
  * @property {string | string[]} [tagName='div'] - Alias for `tag`.
  * @property {string | string[]} [className] - CSS class(es): a single string or an array (falsy values filtered out).
  * @property {string | string[]} [class] - Alias for `className`.
+ * @property {string | string[]} [classname] - Alias for `className`.
  * @property {string | null} [id] - Unique element ID.
  * @property {[string, *] | [string, *][] | Object<string, *>} [attrs] - Attributes: a `[name, value]` pair, array of pairs, or `{name: value}` object.
  * @property {string | number | Function | Element | DomBuilderItem[] | null} [content] - Element content.
@@ -67,13 +68,25 @@ import { parseDomString } from './parseDomString.js';
  * object-level properties take precedence.
  *
  * @function domBuilder
- * @param {Array<DomBuilderItem|string>} [structureArray=[]] - Configuration array. Accepts strings (shorthand per `parseDomString`) and/or configuration objects.
+ * @param {Array<DomBuilderItem|string>} [structureArray=[]] - Configuration array. Accepts strings (shorthand per `parseDomString`) and/or configuration objects, each supporting:
+ * - `tag` / `tagName` {string | string[]} - HTML tag name, or array of nested tags (each is parent of the next). Default `'div'`.
+ * - `className` / `class` / `classname` {string | string[]} - CSS class(es): a single string or an array (falsy values filtered out).
+ * - `id` {string | null} - Unique element ID.
+ * - `attrs` {[string, *] | [string, *][] | Object<string, *>} - Attributes: a `[name, value]` pair, array of pairs, or `{name: value}` object.
+ * - `content` {string | number | Function | Element | DomBuilderItem[] | null} - Element content. A string/number is set as `textContent` unless it contains `<`, in which case it's sanitized and inserted as markup (`Element.setHTML`, falling back to `innerHTML`).
+ * - `condition` {boolean} - When false, the element is skipped. Default `true`.
+ * - `callback` {(function(HTMLElement): void) | null} - Invoked after the element is created.
+ * - `children` {Array<DomBuilderItem|string>} - Configuration array for child elements (same format, nested).
+ *
+ * IDs and classes can be specified either as top-level object keys or inside `attrs`; top-level properties take precedence.
  * @param {HTMLElement} [parent] - Parent element the structure is attached to (see `options.insertMode`).
  * @param {Object} [options={}] - Configuration options.
  * @param {boolean} [options.emptyParent=false] - When true, the parent element is emptied before building.
  * @param {'append'|'before'|'after'} [options.insertMode='append'] - How each root element of `structureArray` is attached to `parent`: `append` inserts it as a child (default), `before`/`after` insert it as a previous/next sibling of `parent`, preserving `structureArray` order. Only applies to the elements produced by this call — nested `domBuilder` calls (`content`, `children`) always append.
  * @returns {HTMLElement|null} The first created element, or null if nothing was created.
  */
+
+
 export function domBuilder(structureArray = [], parent, options = {}) {
 
   options = {

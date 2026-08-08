@@ -48,20 +48,28 @@ const isDevelopment = process.env.NODE_ENV === 'development'
   // ,manifest_shared_seed = {}
 ;
 
-// test del cacheGroup `shared` (splitChunks): con PurgeCSS attivo i css restano
-// FUORI dal chunk condiviso e nel chunk della entry che li importa, così ogni
-// asset css resta autosufficiente (`variables: true` funziona per singolo asset,
-// e i critical css inlinati nei template devono restare autosufficienti). Con
-// PurgeCSS disattivo questo vincolo non serve più: i css seguono lo stesso path
-// matching dei moduli js
+// test del cacheGroup `shared` (splitChunks): i css restano SEMPRE FUORI dal
+// chunk condiviso e nel chunk della entry che li importa, così ogni asset css
+// resta autosufficiente (`variables: true` funziona per singolo asset, e i
+// critical css inlinati nei template devono restare autosufficienti). I
+// template (twig/altro) linkano solo il css della propria entry (e gli
+// eventuali `.critical.css`), MAI uno shared.css: se i css finissero nel
+// chunk condiviso, quella parte di stili sparirebbe silenziosamente dalla
+// pagina.
+//
+// NB: non è la soluzione migliore, perché rinuncia alla deduplicazione dei
+// css tra entry — ma è la più pratica al momento vista la duplicazione ancora
+// limitata tra le pagine. Da rivedere in futuro se la duplicazione dovesse
+// crescere.
 //
 // TODO: se in futuro la duplicazione di css tra le pagine dovesse crescere
 // (componenti importati dal js di più entry), valutare un cacheGroup `styles`
 // dedicato ai css condivisi: andranno escluse le entry `.critical` (devono
-// restare autosufficienti) e gestite in safelist.variables le custom properties
-// definite/consumate tra asset diversi (vedi purgecss-variables-safelist.mjs)
+// restare autosufficienti), gestite in safelist.variables le custom properties
+// definite/consumate tra asset diversi (vedi purgecss-variables-safelist.mjs),
+// e i template dovranno linkare esplicitamente lo shared.css generato
 const shared_chunk_paths = (module) => {
-  if (usePurgeCss && module.type === 'css/mini-extract') return false;
+  if (module.type === 'css/mini-extract') return false;
 
   // path delle directory da utilizzare nel chunk `shared`
   const sep = '[\\\\/]'; // stringa che produce [\\/] nel pattern
@@ -302,7 +310,7 @@ const config = {
 
         shared: {
           // vedi shared_chunk_paths sopra per la logica completa del test
-          // (path match + esclusione css quando PurgeCSS è attivo)
+          // (path match + esclusione sempre dei css)
           test: shared_chunk_paths,
           name: 'shared',
           chunks: 'all'

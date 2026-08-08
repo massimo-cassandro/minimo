@@ -1,0 +1,19 @@
+*~
+.DS_Store
+
+
+vendor
+
+# local env
+# .env
+.env.dev
+.env.local
+.env.development
+.env.test
+.env.development.local
+.env.test.local
+.env.production.local
+
+# frontend
+node_modules
+_prev

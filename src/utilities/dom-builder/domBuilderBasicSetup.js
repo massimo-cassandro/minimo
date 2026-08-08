@@ -42,9 +42,12 @@ const boolAttrs = new Set([
  */
 export function domBuilderBasicSetup (element, domBuilderItem) {
 
-  // class aliases: accept both `class` and `className`; `className` takes precedence
+  // class aliases: accept `class` and `classname`; `className` takes precedence over both
   if (domBuilderItem.class && !domBuilderItem.className) {
     domBuilderItem.className = domBuilderItem.class;
+  }
+  if (domBuilderItem.classname && !domBuilderItem.className) {
+    domBuilderItem.className = domBuilderItem.classname;
   }
 
   // normalize attrs: a single flat array is treated as a single [name, value] pair

@@ -1,6 +1,6 @@
 {
   "name": "@massimo-cassandro/minimo",
-  "version": "1.20.5",
+  "version": "1.20.6",
   "description": "Light css framework & utilities",
   "type": "module",
   "main": "./index.js",
@@ -72,7 +72,8 @@
   ],
   "peerDependencies": {
     "@svgdotjs/svg.js": "^3.2.7",
-    "blurhash": "^2.0.5"
+    "blurhash": "^2.0.5",
+    "style-dictionary": "^5.0.0"
   },
   "peerDependenciesMeta": {
     "@svgdotjs/svg.js": {

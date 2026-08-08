@@ -1,0 +1,28 @@
+# https://github.com/browserslist/browserslist
+# https://browsersl.ist/
+
+last 2 major versions
+since 2023
+not dead
+
+not op_mini all
+not op_mob > 0
+not and_uc > 0
+not and_qq > 0
+not baidu > 0
+not kaios > 0
+not android > 0
+not ie > 0
+not ie_mob > 0
+not bb > 0
+
+safari >= 16
+ios_saf >= 16
+edge >= 109
+chrome >= 109
+firefox esr
+opera >= 95
+samsung >= 20
+
+> 3% in IT
+

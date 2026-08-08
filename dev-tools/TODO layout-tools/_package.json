@@ -1,0 +1,58 @@
+{
+  "name": "@massimo-cassandro/layout-tools-2",
+  "version": "5.0.0",
+  "description": "Layout utilities",
+  "type": "module",
+  "scripts": {
+    "webpack DEV": "NODE_ENV=development webpack serve --config ./webpack.config.cjs #--open-app-name 'Google Chrome'",
+    "webpack PROD": "NODE_ENV=production webpack --config ./webpack.config.cjs",
+    "update-version": "npx update-version",
+    "upd@m": "npx upd@m"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "keywords": [
+    "node",
+    "dev tools"
+  ],
+  "author": "Massimo Cassandro",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/massimo-cassandro/layout-tools-2.git#main"
+  },
+  "bugs": {
+    "url": "https://github.com/massimo-cassandro/layout-tools-2/issues"
+  },
+  "homepage": "https://github.com/massimo-cassandro/layout-tools-2/tree/main#readme",
+  "devDependencies": {
+    "@babel/core": "^7.28.4",
+    "@babel/preset-env": "^7.28.3",
+    "@eslint/js": "^9.36.0",
+    "@massimo-cassandro/dev-updater": "^2.1.0",
+    "@massimo-cassandro/eslint-config": "^2.0.6",
+    "@massimo-cassandro/stylelint-config": "^1.1.11",
+    "@stylistic/stylelint-plugin": "^4.0.0",
+    "autoprefixer": "^10.4.21",
+    "babel-loader": "^10.0.0",
+    "css-minimizer-webpack-plugin": "^7.0.2",
+    "eslint": "^9.36.0",
+    "globals": "^16.4.0",
+    "html-webpack-plugin": "^5.6.4",
+    "postcss": "^8.5.6",
+    "postcss-loader": "^8.2.0",
+    "postcss-preset-env": "^10.3.1",
+    "style-loader": "^4.0.0",
+    "stylelint": "^16.24.0",
+    "stylelint-config-css-modules": "^4.5.1",
+    "stylelint-config-twbs-bootstrap": "^16.1.0",
+    "terser-webpack-plugin": "^5.3.14",
+    "webpack": "^5.101.3",
+    "webpack-cli": "^6.0.1",
+    "webpack-dev-server": "^5.2.2"
+  },
+  "dependencies": {
+    "css-loader": "^7.1.2"
+  }
+}
