@@ -51,29 +51,29 @@ export const destFile  = buildConfig.destFile;
 // Stylelint
 export const stylelintConfigPath = resolveFromConfig(buildConfig.stylelintConfigPath);
 
-// Penpot — platform is active only if penpotBuildPath is set in the config
-const penpotBuildPathRaw = buildConfig.penpotBuildPath ?? null;
-export const penpotBuildPath = penpotBuildPathRaw ? resolveFromConfig(penpotBuildPathRaw) : null;
+// JSON — platform is active only if jsonBuildPath is set in the config
+const jsonBuildPathRaw = buildConfig.jsonBuildPath ?? null;
+export const jsonBuildPath = jsonBuildPathRaw ? resolveFromConfig(jsonBuildPathRaw) : null;
 
-// penpotDestFile: base name (no extension) for the aggregated output file.
+// jsonDestFile: base name (no extension) for the aggregated output file.
 // null  → one file per source (mirrors the source structure)
 // string → single aggregated file (e.g. 'tokens' → 'tokens.jsonc')
-// The extension is added automatically based on penpotFormat.
-export const penpotDestFile = buildConfig.penpotDestFile ?? null;
+// The extension is added automatically based on jsonFormat.
+export const jsonDestFile = buildConfig.jsonDestFile ?? null;
 
-// penpotFormat: controls output format for Penpot token files.
+// jsonFormat: controls output format for the generated JSON token files.
 // 'jsonc' → .jsonc extension + generated-file disclaimer header
 // 'json'  → plain .json, no disclaimer
 // Any value other than 'jsonc' is normalised to 'json'.
-export const penpotFormat = buildConfig.penpotFormat === 'jsonc' ? 'jsonc' : 'json';
+export const jsonFormat = buildConfig.jsonFormat === 'jsonc' ? 'jsonc' : 'json';
 
-// penpotExpressions: controls how math expressions in dimension token values are handled.
+// jsonExpression: controls how math expressions in dimension token values are handled.
 //   'keep'    (default) — write the expression as-is
 //   'calc'    — wrap in CSS calc()
 //   'resolve' — evaluate numerically; unit inherited from the first referenced token
 const VALID_EXPR_MODES = ['keep', 'calc', 'resolve'];
-export const penpotExpressions = VALID_EXPR_MODES.includes(buildConfig.penpotExpressions)
-  ? buildConfig.penpotExpressions
+export const jsonExpression = VALID_EXPR_MODES.includes(buildConfig.jsonExpression)
+  ? buildConfig.jsonExpression
   : 'resolve';
 
 // pxToRem: if true (default), dimension token values expressed in px are

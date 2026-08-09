@@ -131,6 +131,17 @@ const buildTypography = (tokenName, original, resolveRefs) => {
   return lines.join('\n');
 };
 
+// Builds a trailing ` /* ... */` comment from a token's $description, to be
+// appended at the end of its generated custom prop declaration (same line).
+// Newlines are collapsed (declarations are parsed one line at a time, see
+// parseCustomProps in ../merge-css.mjs) and `*/` is escaped so the comment
+// can't be closed early by its own content.
+const buildDescriptionComment = (description) => {
+  if (!description) return '';
+  const flat = String(description).replace(/\s*\n\s*/g, ' ').trim().replace(/\*\//g, '* /');
+  return flat ? ` /* ${flat} */` : '';
+};
+
 // Builds a customPropsGroups title comment, e.g.:
 //   /* ****** LAYOUT ****** */
 // Dashes fill out a fixed total width so titles line up regardless of name length.
@@ -185,9 +196,15 @@ StyleDictionary.registerFormat({
       .flatMap((token) => {
         const type = token.$type ?? token.type;
         const orig = token.original?.$value ?? token.original?.value;
+        const description = token.$description ?? token.description ?? token.comment;
+        const commentSuffix = buildDescriptionComment(description);
 
         if (type === 'typography') {
-          return [buildTypography(token.name, orig ?? {}, resolveRefs)];
+          const typographyLines = buildTypography(token.name, orig ?? {}, resolveRefs)
+            .split('\n')
+            .map((line) => `${line}${commentSuffix}`)
+            .join('\n');
+          return [typographyLines];
         }
 
         let value;
@@ -230,7 +247,7 @@ StyleDictionary.registerFormat({
           value = String(token.$value ?? token.value);
         }
 
-        return [`  --${token.name}: ${value};`];
+        return [`  --${token.name}: ${value};${commentSuffix}`];
       });
 
     // Build a name → declaration-tail map from the declarations generated

@@ -10,8 +10,8 @@
 //   build-tokens-src/config.mjs   <- reads --config flag and resolves all paths
 //   build-tokens-src/transforms.mjs  <- registers custom Style Dictionary transforms
 //   build-tokens-src/formats/css.mjs    <- registers the css/variables-sorted format
-//   build-tokens-src/formats/penpot.mjs <- registers the json/penpot format, exports helpers
-//   build-tokens-src/platforms.mjs      <- builds the platforms object (css + optional penpot)
+//   build-tokens-src/formats/json.mjs   <- registers the json/tokens format, exports helpers
+//   build-tokens-src/platforms.mjs      <- builds the platforms object (css + optional json)
 
 import StyleDictionary from 'style-dictionary';
 import * as path from 'node:path';
@@ -26,10 +26,10 @@ import {
   buildPath,
   destFile,
   stylelintConfigPath,
-  penpotBuildPath,
-  penpotDestFile,
-  penpotFormat,
-  penpotExpressions,
+  jsonBuildPath,
+  jsonDestFile,
+  jsonFormat,
+  jsonExpression,
   source,
   mergeCustomProps,
   customPropsGroups,
@@ -45,8 +45,8 @@ import './build-tokens-src/transforms.mjs';
 import { customPropsCount } from './build-tokens-src/formats/css.mjs';
 import { loadExistingCustomProps } from './build-tokens-src/merge-css.mjs';
 
-// ── 4. Penpot format ──────────────────────────────────────────────────────────
-import { buildPenpotFiles, collectConcreteFilePaths } from './build-tokens-src/formats/penpot.mjs';
+// ── 4. JSON format ────────────────────────────────────────────────────────────
+import { buildJsonFiles, collectConcreteFilePaths } from './build-tokens-src/formats/json.mjs';
 
 // ── 5. Platforms builder ──────────────────────────────────────────────────────
 import { buildPlatforms } from './build-tokens-src/platforms.mjs';
@@ -60,29 +60,37 @@ if (mergeCustomProps) {
   loadExistingCustomProps(path.join(buildPath, destFile));
 }
 
-// ── 6. Collect concrete source file paths (multi-file Penpot mode only) ──────
+// ── 6. Collect concrete source file paths (multi-file JSON mode only) ────────
 // Source entries may be glob patterns. SD expands them internally and stores
 // the concrete path in token.filePath. We need those concrete paths to build
-// the per-file descriptors for the penpot platform.
+// the per-file descriptors for the json platform.
 //
 // SD v5 lazy-loads sources: `await sd.hasInitialized` triggers loading;
 // after that sd.allTokens is a plain synchronous array with filePath populated.
 //
-// In single-file mode (penpotDestFile is set) we skip this step entirely.
+// In single-file mode (jsonDestFile is set) we skip this step entirely.
 let concreteFilePaths = [];
 
-if (penpotBuildPath && !penpotDestFile) {
+if (jsonBuildPath && !jsonDestFile) {
   const sdInit = new StyleDictionary({ source, log: { verbosity: 'silent' }, platforms: {} });
   concreteFilePaths = await collectConcreteFilePaths(sdInit);
 }
 
-// ── 7. Clean penpot output directory ─────────────────────────────────────────
-// Wipe the destination folder before writing new files so that tokens removed
-// from the source are not left behind as stale artefacts.
-if (penpotBuildPath) {
-  const { rm, mkdir } = await import('fs/promises');
-  await rm(penpotBuildPath, { recursive: true, force: true });
-  await mkdir(penpotBuildPath, { recursive: true });
+// ── 7. Clean json output directory ───────────────────────────────────────────
+// Remove only previously generated *.json/*.jsonc files, so that tokens
+// removed from the source are not left behind as stale artefacts, while any
+// other file placed in jsonBuildPath by the user (e.g. a README) is left
+// untouched. Files are written flat in jsonBuildPath (no subdirectories), so
+// only its top level is scanned.
+if (jsonBuildPath) {
+  const { readdir, rm, mkdir } = await import('fs/promises');
+  const existingEntries = await readdir(jsonBuildPath, { withFileTypes: true }).catch(() => []);
+  await Promise.all(
+    existingEntries
+      .filter((entry) => entry.isFile() && /\.jsonc?$/.test(entry.name))
+      .map((entry) => rm(path.join(jsonBuildPath, entry.name)))
+  );
+  await mkdir(jsonBuildPath, { recursive: true });
 }
 
 // ── 8. Build ──────────────────────────────────────────────────────────────────
@@ -92,10 +100,10 @@ const sd = new StyleDictionary({
   platforms: buildPlatforms({
     buildPath,
     destFile,
-    penpotBuildPath,
-    penpotDestFile,
-    penpotFormat,
-    penpotExpressions,
+    jsonBuildPath,
+    jsonDestFile,
+    jsonFormat,
+    jsonExpression,
     concreteFilePaths,
     customPropsGroups,
     pxToRem,
@@ -122,20 +130,20 @@ console.log(styleText(['yellow'], `[build-tokens] config file : ${short(configAb
 console.log(styleText(['yellow'], `[build-tokens] source      : ${source.map(short)}`));
 console.log(styleText(['yellow'], `[build-tokens] dest file   : ${short(path.join(buildPath, destFile))}`));
 
-if (penpotBuildPath) {
-  const penpotFiles = buildPenpotFiles(concreteFilePaths, penpotDestFile, penpotFormat, penpotExpressions);
-  if (penpotFiles.length === 1) {
+if (jsonBuildPath) {
+  const jsonFiles = buildJsonFiles(concreteFilePaths, jsonDestFile, jsonFormat, jsonExpression);
+  if (jsonFiles.length === 1) {
     console.log(styleText(['yellow'],
-      `[build-tokens] penpot json : ${short(path.join(penpotBuildPath, penpotFiles[0].destination))}`
+      `[build-tokens] json        : ${short(path.join(jsonBuildPath, jsonFiles[0].destination))}`
     ));
   } else {
     console.log(styleText(['yellow'],
-      `[build-tokens] penpot json : ${penpotFiles.length} files in ${short(penpotBuildPath)}`
+      `[build-tokens] json        : ${jsonFiles.length} files in ${short(jsonBuildPath)}`
     ));
   }
 } else {
   console.log(styleText(['yellow'],
-    '[build-tokens] penpot json : (disabled — penpotBuildPath not set)'
+    '[build-tokens] json        : (disabled — jsonBuildPath not set)'
   ));
 }
 

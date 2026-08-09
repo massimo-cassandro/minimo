@@ -56,7 +56,7 @@ Read comments inside the sample file for more info.
 
 Reads design token source files and generates:
 - A **CSS file** containing all tokens as custom properties inside `:root { ... }`
-- Optionally, one or more **W3C DTCG JSON/JSONC** files to import into Penpot/Figma (use in Figma requires a plugin).
+- Optionally, one or more **W3C DTCG JSON/JSONC** files, independent of any specific consuming tool (usable in Penpot, Figma via plugin, Token Studio, ...).
 
 #### Usage
 
@@ -129,32 +129,33 @@ Typography tokens are expanded into multiple properties:
 
 The generated file is linted and auto-fixed with stylelint using the config specified in `stylelintConfigPath`.
 
-#### Penpot output
+#### JSON output
 
-When `penpotBuildPath` is set, the script also generates W3C DTCG token files for import into Penpot via the [Design Tokens plugin](https://penpot.app/penpot-files/design-tokens).
+When `jsonBuildPath` is set, the script also generates W3C DTCG token files, independent of any specific consuming tool (e.g. importable into Penpot via the [Design Tokens plugin](https://penpot.app/penpot-files/design-tokens), into Figma via a compatible plugin, or into Token Studio).
 
-**Single file** (`penpotDestFile` is a string):
+**Single file** (`jsonDestFile` is a string):
 ```
-penpotBuildPath/tokens.jsonc   ← all tokens in one file
-```
-
-**One file per source** (`penpotDestFile` is `null` or omitted):
-```
-penpotBuildPath/colors.tokens.jsonc
-penpotBuildPath/spacing.tokens.jsonc
-penpotBuildPath/typography.tokens.jsonc
+jsonBuildPath/tokens.jsonc   ← all tokens in one file
 ```
 
-The `penpotFormat` option controls the output:
+**One file per source** (`jsonDestFile` is `null` or omitted):
+```
+jsonBuildPath/colors.tokens.jsonc
+jsonBuildPath/spacing.tokens.jsonc
+jsonBuildPath/typography.tokens.jsonc
+```
+All files are written flat in `jsonBuildPath`, regardless of the subdirectory structure of the source files — no subdirectories are created. If two source files with different paths would produce the same output filename, the build fails with an error listing the colliding files instead of silently overwriting one with the other.
+
+The `jsonFormat` option controls the output:
 
 | Value | Extension | Disclaimer header |
 |---|---|---|
 | `'jsonc'` | `.jsonc` | Yes |
 | `'json'` | `.json` | No |
 
-Alias references (`{color.brand.primary}`) are preserved in the output so Penpot maintains token links between primitive and semantic tokens.
+Alias references (`{color.brand.primary}`) are preserved in the output so consuming tools maintain token links between primitive and semantic tokens.
 
-> Penpot token files intentionally use a minimal set of transforms (no px→rem conversion, no shorthand expansion) because Penpot expects original values and structured objects, not resolved CSS strings.
+> JSON token files intentionally use a minimal set of transforms (no px→rem conversion, no shorthand expansion) because consuming tools generally expect original values and structured objects, not resolved CSS strings.
 
 ---
 

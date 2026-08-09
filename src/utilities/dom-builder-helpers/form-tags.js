@@ -11,7 +11,7 @@ import { randomId } from '../random-id.js';
  * @param {boolean} [args.condition=true] - When false, returns `null` without building anything.
  * @param {string | null} [args.wrapperClass=null] - optional class to be added to the `.form-group` wrapper.
  * @param {string | HTMLElement | null} [args.help=null] - Optional help text.
- * @param {Array} args.children - domBuilder children to render inside the `.form-group` (before the help text).
+ * @param {Array<Object>} args.children - domBuilder children to render inside the `.form-group` (before the help text).
  * @returns {DomBuilderItem|null} The `.form-group` domBuilder item, or `null` when `condition` is false.
  */
 function buildFormGroup({
@@ -208,8 +208,8 @@ export function buildTextareaTag({
         attrs: {
           ...(attrs??{}),
           name: name,
-          value: value
         },
+        content: value,
         callback: callback
       }
     ]

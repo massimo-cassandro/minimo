@@ -1,30 +1,33 @@
-// build-tokens-src/formats/penpot.mjs
-// Registers the 'json/penpot' format and exports buildPenpotFiles() and
+// build-tokens-src/formats/json.mjs
+// Registers the 'json/tokens' format and exports buildJsonFiles() and
 // collectConcreteFilePaths().
 //
-// The format produces a W3C DTCG nested file importable into Penpot via the
-// "Design Tokens" plugin (also compatible with Token Studio and Supernova).
+// The format produces a W3C DTCG nested JSON(C) file, independent of any
+// specific consuming tool (usable in Penpot, Figma via plugin, Token Studio,
+// Supernova, or any other DTCG-compatible tool).
 //
-// Output format is controlled by the penpotFormat option in the project config:
+// Output format is controlled by the jsonFormat option in the project config:
 //   'jsonc' -> .jsonc extension + generated-file disclaimer header
 //   'json'  -> plain .json, no disclaimer
 //
-// buildPenpotFiles() builds the `files` array for the penpot platform:
-//   penpotDestFile set  -> single aggregated file
-//   penpotDestFile null -> one file per concrete source file, mirroring the
-//                          subdirectory structure of the source tree
+// buildJsonFiles() builds the `files` array for the json platform:
+//   jsonDestFile set  -> single aggregated file
+//   jsonDestFile null -> one file per concrete source file, all placed flat
+//                        in jsonBuildPath (no subdirectories) — see the
+//                        collision check in buildJsonFiles()
 //
-// ── Expression handling (penpotExpressions option) ───────────────────────────
+// ── Expression handling (jsonExpression option) ─────────────────────────────
 //
 // Dimension tokens may carry math expressions in their $value, e.g.:
 //   { $type: "dimension", $value: "{size.base} * .25" }
 //
-// The penpotExpressions config option controls how these are handled:
+// The jsonExpression config option controls how these are handled:
 //
-//   'keep'    (default) — write the expression as-is; Penpot or the consuming
-//                         tool is expected to evaluate it.
+//   'keep'    (default) — write the expression as-is; the consuming tool is
+//                         expected to evaluate it.
 //   'calc'    — wrap in a CSS calc(): "calc({size.base} * .25)"
-//                         aliases are left as {references} for Penpot to resolve.
+//                         aliases are left as {references} for the consuming
+//                         tool to resolve.
 //   'resolve' — evaluate the expression numerically and write a concrete value.
 //                         The unit is inherited from the first dimension token
 //                         referenced in the expression (e.g. {size.base} = 16px
@@ -34,7 +37,7 @@
 import StyleDictionary from 'style-dictionary';
 import path from 'node:path';
 
-// Disclaimer prepended to every generated file when penpotFormat is 'jsonc'
+// Disclaimer prepended to every generated file when jsonFormat is 'jsonc'
 const DISCLAIMER = [
   '// -----------------------------------------------------------------------',
   '// Generated file — do not edit manually.',
@@ -126,10 +129,10 @@ const toCalc = (orig) => `calc(${orig})`;
 // ── Format ───────────────────────────────────────────────────────────────────
 
 StyleDictionary.registerFormat({
-  name: 'json/penpot',
+  name: 'json/tokens',
   format: ({ dictionary, options }) => {
     const root = {};
-    const expressionMode = options.penpotExpressions ?? 'keep'; // 'keep' | 'calc' | 'resolve'
+    const expressionMode = options.jsonExpression ?? 'keep'; // 'keep' | 'calc' | 'resolve'
     const tokenMap = (expressionMode === 'resolve') ? makeTokenMap(dictionary) : null;
 
     for (const token of dictionary.allTokens) {
@@ -161,7 +164,7 @@ StyleDictionary.registerFormat({
           } else {
             // Resolution failed — keep the original and emit a warning
             // eslint-disable-next-line no-console
-            console.warn(`[build-tokens] penpot: could not resolve expression "${orig}" for token "${token.path.join('.')}". Keeping original.`);
+            console.warn(`[build-tokens] json: could not resolve expression "${orig}" for token "${token.path.join('.')}". Keeping original.`);
             value = orig;
           }
         } else if (expressionMode === 'calc') {
@@ -173,7 +176,7 @@ StyleDictionary.registerFormat({
         }
       } else {
         // Non-expression value: preserve {references} wherever they appear.
-        //   - Pure alias:   "{some.token}"           → kept as-is for Penpot token links
+        //   - Pure alias:   "{some.token}"           → kept as-is to preserve token links
         //   - CSS function: "color-mix(in srgb, {some.token} 60%, #000)" → kept as-is
         //   - Plain value:  "#ff0000", "16px", …     → use the resolved $value
         const containsRef = typeof orig === 'string' && orig.includes('{');
@@ -193,23 +196,6 @@ StyleDictionary.registerFormat({
   },
 });
 
-// ── commonDir ────────────────────────────────────────────────────────────────
-// Returns the longest common directory prefix shared by all given file paths.
-// Used to compute relative paths that mirror the source subdirectory structure.
-
-const commonDir = (filePaths) => {
-  if (filePaths.length === 0) return '';
-  if (filePaths.length === 1) return path.dirname(filePaths[0]);
-
-  const dirs  = filePaths.map(fp => path.dirname(path.resolve(fp)));
-  const parts = dirs[0].split(path.sep);
-
-  let i = 0;
-  while (i < parts.length && dirs.every(d => d.split(path.sep)[i] === parts[i])) i++;
-
-  return parts.slice(0, i).join(path.sep);
-};
-
 // ── collectConcreteFilePaths ──────────────────────────────────────────────────
 //
 // Extracts the unique concrete file paths from a Style Dictionary instance.
@@ -224,42 +210,59 @@ export const collectConcreteFilePaths = async (sd) => {
   return [...paths].sort();
 };
 
-// ── buildPenpotFiles ──────────────────────────────────────────────────────────
+// ── buildJsonFiles ──────────────────────────────────────────────────────────
 //
 // @param {string[]}                       concreteFilePaths  From collectConcreteFilePaths()
-// @param {string|null}                    penpotDestFile     Aggregated file base name, or null
-// @param {'json'|'jsonc'}                 penpotFormat       Output format
-// @param {'keep'|'calc'|'resolve'}        penpotExpressions  Expression handling mode
+// @param {string|null}                    jsonDestFile       Aggregated file base name, or null
+// @param {'json'|'jsonc'}                 jsonFormat         Output format
+// @param {'keep'|'calc'|'resolve'}        jsonExpression     Expression handling mode
 // @returns {object[]}  File descriptors for the Style Dictionary platform
 
-export const buildPenpotFiles = (
+export const buildJsonFiles = (
   concreteFilePaths,
-  penpotDestFile,
-  penpotFormat = 'json',
-  penpotExpressions = 'keep'
+  jsonDestFile,
+  jsonFormat = 'json',
+  jsonExpression = 'keep'
 ) => {
-  const ext  = penpotFormat === 'jsonc' ? '.jsonc' : '.json';
-  const jsonc = penpotFormat === 'jsonc';
+  const ext  = jsonFormat === 'jsonc' ? '.jsonc' : '.json';
+  const jsonc = jsonFormat === 'jsonc';
 
-  if (penpotDestFile) {
+  if (jsonDestFile) {
     return [{
-      destination: penpotDestFile + ext,
-      format: 'json/penpot',
-      options: { jsonc, penpotExpressions },
+      destination: jsonDestFile + ext,
+      format: 'json/tokens',
+      options: { jsonc, jsonExpression },
     }];
   }
 
-  const sourceRoot = commonDir(concreteFilePaths);
+  // One file per source, all placed flat in jsonBuildPath — no subdirectories
+  // mirroring the source tree. Since source files can share a basename across
+  // different directories (e.g. two components each with their own
+  // <name>.minimo.tokens.mjs), fail loudly on collisions instead of letting
+  // one silently overwrite the other.
+  const pathsByDestName = new Map();
+  for (const filePath of concreteFilePaths) {
+    const destName = path.basename(filePath).replace(/\.[^.]+$/, '') + ext;
+    if (!pathsByDestName.has(destName)) pathsByDestName.set(destName, []);
+    pathsByDestName.get(destName).push(filePath);
+  }
+
+  const collisions = [...pathsByDestName.entries()].filter(([, paths]) => paths.length > 1);
+  if (collisions.length > 0) {
+    const details = collisions
+      .map(([destName, paths]) => `  "${destName}" <- ${paths.join(', ')}`)
+      .join('\n');
+    throw new Error(
+      `[build-tokens] json: output filename collision — these source files would overwrite each other (json output files are flattened into a single directory):\n${details}`
+    );
+  }
 
   return concreteFilePaths.map((filePath) => {
-    const absPath  = path.resolve(filePath);
-    const relPath  = path.relative(sourceRoot, absPath);
-    const destName = relPath.replace(/\.[^.]+$/, '') + ext;
-
+    const absPath = path.resolve(filePath);
     return {
-      destination: destName,
-      format: 'json/penpot',
-      options: { jsonc, penpotExpressions },
+      destination: path.basename(filePath).replace(/\.[^.]+$/, '') + ext,
+      format: 'json/tokens',
+      options: { jsonc, jsonExpression },
       filter: (token) => {
         const fp = token.filePath ? path.resolve(token.filePath) : '';
         return fp === absPath;

@@ -80,11 +80,12 @@ const config = {
 
 
   // ---------------------------------------------------------------------------
-  // PENPOT / FIGMA
+  // JSON TOKENS OUTPUT
   // ---------------------------------------------------------------------------
-  // Optional design tokens output
-  // Generates one or more json(c) files in addition to the CSS output file, for use
-  // in Penpot or Figma projects or as an alternative to the .mjs source files
+  // Optional design tokens output, independent of any specific consuming tool
+  // Generates one or more json(c) files in addition to the CSS output file —
+  // usable in Penpot, Figma (via plugin), Token Studio, or as an alternative
+  // to the .mjs source files
   // ---------------------------------------------------------------------------
 
   // How to handle math expressions in dimension token $values (e.g. "{size.base} * .25"):
@@ -92,21 +93,25 @@ const config = {
   //   'calc'    — wrap in CSS calc(): "calc({size.base} * .25)"
   //   'resolve' — (default) evaluate numerically, inheriting the unit from the first referenced token
   //               e.g. {size.base} = 16px, "{size.base} * .25" -> "4px"
-  penpotExpressions: 'resolve',
+  jsonExpression: 'resolve',
 
-  // Output format for Penpot token files: 'jsonc' or 'json'
+  // Output format for the JSON token files: 'jsonc' or 'json'
   //   'jsonc' -> adds a generated-file disclaimer header, uses .jsonc extension
   //   'json'  -> plain JSON, no disclaimer
-  penpotFormat: 'jsonc',
+  jsonFormat: 'jsonc',
 
-  // Output directory for the Penpot design token files.
+  // Output directory for the JSON design token files.
   // Set to null (or omit) to disable json output entirely.
-  penpotBuildPath: null, // or './path/to/generated/design-tokens-dir',
+  // In multi-file mode (jsonDestFile: null), all files are written flat in
+  // this directory (no subdirectories mirroring the source tree); the build
+  // fails with an error if two source files would produce the same filename.
+  jsonBuildPath: null, // or './path/to/generated/design-tokens-dir',
 
-  // Base name (without extension) for the aggregated Penpot output file.
-  // The extension is added automatically based on penpotFormat.
-  // Set to null (or omit) to generate one file per .mjs source file instead.
-  penpotDestFile: null, // or 'tokens' (or else),
+  // Base name (without extension) for the aggregated JSON output file.
+  // The extension is added automatically based on jsonFormat.
+  // Set to null (or omit) to generate one file per .mjs source file instead
+  // (all placed flat in jsonBuildPath — see jsonBuildPath above).
+  jsonDestFile: null, // or 'tokens' (or else),
 
 
   // ---------------------------------------------------------------------------

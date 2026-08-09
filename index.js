@@ -1,7 +1,5 @@
 // utilities
 export { betterText } from './src/utilities/better-text.js';
-export { buildPictureTag } from './src/utilities/dom-builder-helpers/picture-tag.js';
-export { buildInputTag, buildCheckboxTag, buildTextareaTag } from './src/utilities/dom-builder-helpers/form-tags.js';
 export { classnames, classnamesNull } from './src/utilities/classnames.js';
 export { createId } from './src/utilities/create-id.js';
 export { disableBtnsOnSubmit } from './src/utilities/disable-btns-on-submit.js';
@@ -20,6 +18,10 @@ export { titleCase } from './src/utilities/title-case.js';
 export { truncateString } from './src/utilities/truncate-string.js';
 export { ValidationError } from './src/utilities/validation-error-class.js';
 
+// domBuilder helpers
+export { buildPictureTag } from './src/utilities/dom-builder-helpers/picture-tag.js';
+export { buildInputTag, buildCheckboxTag, buildTextareaTag } from './src/utilities/dom-builder-helpers/form-tags.js';
+
 // components
 export { dismissAlerts } from './src/components/dismiss-alerts.js';
 export { formResetSubmit } from './src/components/form-reset-submit.js';
@@ -31,3 +33,5 @@ export { sf_macro } from './src/components/sf-macro/sf-macro.js';
 export { slideToggle, slideUp, slideDown } from './src/components/slide-up-down-toggle/slide-up-down-toggle.js';
 export { snackbar } from './src/components/snackbar/snackbar.js';
 export { unsplashPage } from './src/components/unsplash-page/unsplash-page.js';
+
+// web components

@@ -1,10 +1,10 @@
 // build-tokens-src/platforms.mjs
 // Builds and returns the `platforms` object for the Style Dictionary config.
 //
-// The `penpot` platform is included only if penpotBuildPath is set.
-// Output format (json/jsonc) and file splitting are delegated to buildPenpotFiles().
+// The `json` platform is included only if jsonBuildPath is set.
+// Output format (json/jsonc) and file splitting are delegated to buildJsonFiles().
 
-import { buildPenpotFiles } from './formats/penpot.mjs';
+import { buildJsonFiles } from './formats/json.mjs';
 
 /** @typedef {import('style-dictionary/types').PlatformConfig} PlatformConfig */
 
@@ -24,10 +24,11 @@ export const CSS_TRANSFORMS = [
   'typography/css',
 ];
 
-// Transforms applied to the Penpot platform.
-// Kept minimal on purpose: Penpot expects original values (e.g. "16px" not "1rem")
-// and alias references ({...}) must be preserved to maintain token links.
-const PENPOT_TRANSFORMS = [
+// Transforms applied to the JSON platform.
+// Kept minimal on purpose: consuming tools expect original values (e.g. "16px"
+// not "1rem") and alias references ({...}) must be preserved to maintain
+// token links.
+const JSON_TRANSFORMS = [
   'attribute/cti',
   'name/kebab',
   'color/css-modern',
@@ -37,13 +38,13 @@ const PENPOT_TRANSFORMS = [
  * @param {object}          opts
  * @param {string}          opts.buildPath           Absolute path for CSS output directory
  * @param {string}          opts.destFile            CSS output filename (e.g. "tokens.css")
- * @param {string|null}     opts.penpotBuildPath     Absolute path for Penpot output (null = disabled)
- * @param {string|null}     opts.penpotDestFile      Base name for aggregated file; null = one file per source
- * @param {'json'|'jsonc'}  opts.penpotFormat        Output format for Penpot files
+ * @param {string|null}     opts.jsonBuildPath       Absolute path for JSON output (null = disabled)
+ * @param {string|null}     opts.jsonDestFile        Base name for aggregated file; null = one file per source
+ * @param {'json'|'jsonc'}  opts.jsonFormat          Output format for JSON files
  * @param {string[]}        opts.concreteFilePaths   Concrete (expanded) source file paths for multi-file mode.
  *                                                   Collected from sd.allTokens after SD initialisation.
- *                                                   Ignored when penpotDestFile is set.
- * @param {'keep'|'calc'|'resolve'} opts.penpotExpressions  How to handle math expressions in dimension tokens.
+ *                                                   Ignored when jsonDestFile is set.
+ * @param {'keep'|'calc'|'resolve'} opts.jsonExpression  How to handle math expressions in dimension tokens.
  * @param {{name: string, prefixes: string[]}[]} opts.customPropsGroups  Named groups of name prefixes, moved to the top of the CSS output in list order.
  * @param {boolean}         opts.pxToRem             If false, skips the px→rem transform on the CSS platform. Default: true.
  * @returns {Record<string, PlatformConfig>} platforms object ready for Style Dictionary config
@@ -51,10 +52,10 @@ const PENPOT_TRANSFORMS = [
 export const buildPlatforms = ({
   buildPath,
   destFile,
-  penpotBuildPath,
-  penpotDestFile,
-  penpotFormat,
-  penpotExpressions = 'keep',
+  jsonBuildPath,
+  jsonDestFile,
+  jsonFormat,
+  jsonExpression = 'keep',
   concreteFilePaths = [],
   customPropsGroups = [],
   pxToRem = true,
@@ -82,11 +83,11 @@ export const buildPlatforms = ({
     },
   };
 
-  if (penpotBuildPath) {
-    platforms.penpot = {
-      buildPath: penpotBuildPath + '/',
-      transforms: PENPOT_TRANSFORMS,
-      files: buildPenpotFiles(concreteFilePaths, penpotDestFile, penpotFormat, penpotExpressions),
+  if (jsonBuildPath) {
+    platforms.json = {
+      buildPath: jsonBuildPath + '/',
+      transforms: JSON_TRANSFORMS,
+      files: buildJsonFiles(concreteFilePaths, jsonDestFile, jsonFormat, jsonExpression),
     };
   }
 
