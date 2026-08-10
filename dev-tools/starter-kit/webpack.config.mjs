@@ -445,7 +445,7 @@ const config = {
       ]
     ),
 
-
+    // TODO author dinamico https://docs.npmjs.com/cli/v11/configuring-npm/package-json#people-fields-author-contributors
     // =>> plugins: BannerPlugin
     new webpack.BannerPlugin({
       banner: () => {
@@ -459,11 +459,8 @@ const config = {
           ,vers = packageJson.version.split('.').slice(0,-1).join('.')
         ;
 
-        return (
-          '/*!\n' +
-          ` * ${packageJson.name} v.${vers} - Massimo Cassandro ${year}\n` +
-          ' */\n'
-        );
+        return `/*! ${packageJson.name} v.${vers} - Massimo Cassandro ${year} */`;
+
       },
       raw: true,
       // niente banner nei critical css: vengono inlinati nei template html

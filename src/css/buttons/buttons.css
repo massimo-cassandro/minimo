@@ -1,6 +1,6 @@
 /* TODO dividere in più file secondo la variante? */
 
-button, [role='button'], .btn, .btn-reset {
+button, [role='button'], .btn, .btn-reset, .btn-link {
   &:not([disabled]) {
     cursor: pointer;
   }

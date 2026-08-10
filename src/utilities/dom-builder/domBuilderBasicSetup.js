@@ -1,6 +1,4 @@
 
-/** @typedef {import('./dom-builder.js').DomBuilderItem} DomBuilderItem */
-
 // boolean attributes are omitted when their value is explicitly false;
 // declared once at module level (Set for O(1) lookup) since the list never changes between calls
 const boolAttrs = new Set([

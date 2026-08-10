@@ -174,6 +174,11 @@ function css_loaders({
           sassOptions: {
             quietDeps: true,
             silenceDeprecations: [ 'legacy-js-api', 'mixed-decls', 'color-functions', 'global-builtin', 'import' ],
+            // charset:false evita che sass anteponga @charset/BOM all'output di ogni
+            // singolo modulo quando la sorgente contiene caratteri non-ASCII (anche solo
+            // in un commento): con più moduli concatenati da MiniCssExtractPlugin, quel
+            // BOM finirebbe a metà del bundle finale invece che in testa al file.
+            charset: false,
           }
         }
       } ]

@@ -1,6 +1,6 @@
 {
   "name": "@massimo-cassandro/minimo",
-  "version": "1.20.8",
+  "version": "1.20.11",
   "description": "Light css framework & utilities",
   "type": "module",
   "main": "./index.js",
@@ -43,13 +43,14 @@
     "test": "node --test \"test/**/*.test.mjs\"",
     "test sideEffects tree-shaking": "node ./test/sideEffects-tree-shaking/run-test.mjs",
     "checkJS": "npx tsc --noEmit -p jsconfig.json",
-    "checkJS ./src": "npx tsc --noEmit --allowJs --checkJs --target ES2023 --module ESNext --allowSyntheticDefaultImports --moduleResolution bundler declarations.d.ts src/**/*.js",
+    "checkJS ./src": "npx tsc --noEmit --allowJs --checkJs --target ES2023 --module ESNext --allowSyntheticDefaultImports --moduleResolution bundler declarations.d.ts types/global.d.ts src/**/*.js",
     "check outdated": "echo '*** ROOT ***' && npm outdated --omit=peer && echo '*** DEMO ***' && npm --prefix ./demo outdated && echo '*** END ***'"
   },
   "license": "MIT",
   "author": "Massimo Cassandro",
   "sideEffects": [
-    "**/s-datatable-component/**/*"
+    "**/s-datatable-component/**/*",
+    "**/*.css"
   ],
   "engines": {
     "node": ">= 18.0.0",
