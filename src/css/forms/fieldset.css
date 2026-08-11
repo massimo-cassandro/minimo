@@ -72,4 +72,8 @@ fieldset.form-group, fieldset.form-collection-fset {
     font-style: italic;
     opacity: .6;
   }
+
+  &:has(.table-responsive) {
+    min-width: 0;
+  }
 }

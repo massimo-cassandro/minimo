@@ -764,6 +764,7 @@ export type MinimoClass =
   | 'my-xxs-lap'
   | 'my-xxs-mob'
   | 'my-xxs-tab'
+  | 'no-border'
   | 'no-result'
   | 'overflow-hidden'
   | 'overlay'

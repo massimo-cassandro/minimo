@@ -17,7 +17,7 @@ sf_macro({
 ## Twig macro
 
 ```twig
-<fieldset class="sf-macro-wrapper">
+<fieldset class="fset sf-macro-wrapper">
   <legend>XXXXX</legend>
 
   {%- macro makeRow(row) -%}

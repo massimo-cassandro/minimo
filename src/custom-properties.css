@@ -39,16 +39,16 @@
   --btn-close-background-color: var(--body-background-color);
   --btn-close-border-color: var(--btn-close-icon-color);
   --btn-close-border-radius: 50%;
-  --btn-close-border-width: .125rem;
+  --btn-close-border-width: 2px;
   --btn-close-focus-outline-color: var(--link-focus-outline-color);
-  --btn-close-focus-outline-offset: .125rem;
-  --btn-close-focus-outline-width: .125rem;
+  --btn-close-focus-outline-offset: 2px;
+  --btn-close-focus-outline-width: 2px;
   --btn-close-hover-background-color: var(--btn-close-icon-color);
   --btn-close-hover-border-color: var(--btn-close-icon-color);
   --btn-close-hover-icon-color: var(--btn-close-background-color);
-  --btn-close-icon-bar-size: .125rem;
+  --btn-close-icon-bar-size: 2px;
   --btn-close-icon-color: var(--text-color);
-  --btn-close-padding: .1875rem;
+  --btn-close-padding: 3px;
   --btn-close-size: 1.5rem;
   --btn-disabled-opacity: var(--form-control-disabled-opacity);
   --btn-focus-outline-width: var(--form-control-focus-outline-width);
@@ -56,13 +56,13 @@
   --btn-font-style: var(--form-control-font-style);
   --btn-font-weight: var(--font-weight-semibold);
   --btn-hollow-border-width: calc(var(--btn-border-width) * 2);
-  --btn-lg-focus-outline-width: .25rem;
+  --btn-lg-focus-outline-width: 4px;
   --btn-lg-font-size: var(--font-size-lg);
   --btn-lg-padding-block: var(--size-base);
   --btn-lg-padding-inline: var(--size-md);
   --btn-link-disabled-color: var(--text-muted);
   --btn-link-disabled-font-style: italic;
-  --btn-md-focus-outline-width: .1875rem;
+  --btn-md-focus-outline-width: 3px;
   --btn-md-font-size: var(--font-size-md);
   --btn-md-padding-block: var(--size-xs);
   --btn-md-padding-inline: var(--size-sm);
@@ -96,15 +96,15 @@
   --btn-secondary-hover-background-color: var(--btn-secondary-color);
   --btn-secondary-hover-border-color: var(--btn-secondary-hover-color);
   --btn-secondary-hover-color: var(--btn-secondary-background-color);
-  --btn-sm-focus-outline-width: .125rem;
+  --btn-sm-focus-outline-width: 2px;
   --btn-sm-font-size: var(--font-size-sm);
   --btn-sm-padding-block: var(--size-xxs);
   --btn-sm-padding-inline: var(--size-xs);
-  --btn-xl-focus-outline-width: .375rem;
+  --btn-xl-focus-outline-width: 6px;
   --btn-xl-font-size: var(--font-size-xl);
   --btn-xl-padding-block: var(--size-md);
   --btn-xl-padding-inline: var(--size-xl);
-  --btn-xs-focus-outline-width: .0625rem;
+  --btn-xs-focus-outline-width: 1px;
   --btn-xs-font-size: var(--font-size-xs);
   --btn-xs-padding-block: var(--size-xxs);
   --btn-xs-padding-inline: var(--size-xxs);
@@ -135,14 +135,15 @@
   --form-control-background-color: var(--body-background-color);
   --form-control-border-color: #666;
   --form-control-border-radius: var(--radius-xxs);
-  --form-control-border-width: .0625rem;
+  --form-control-border-style: solid;
+  --form-control-border-width: 1px;
   --form-control-disabled-background-color: #ddd;
   --form-control-disabled-color: #999;
   --form-control-disabled-font-style: italic;
   --form-control-disabled-opacity: .7;
   --form-control-focus-color: hsl(205 69% 45% / .508);
-  --form-control-focus-outline-offset: -.125rem;
-  --form-control-focus-outline-width: .25rem;
+  --form-control-focus-outline-offset: -2px;
+  --form-control-focus-outline-width: 4px;
   --form-control-font-size: var(--font-size-base);
   --form-control-font-style: normal;
   --form-control-font-weight: var(--font-weight-regular);
@@ -184,7 +185,7 @@
   --form-control-xs-padding-inline: var(--size-xxs);
   --form-end-margin-block-end: var(--size-base);
   --form-end-margin-block-start: var(--size-base);
-  --form-fieldset-border-width: .0625rem;
+  --form-fieldset-border-width: 1px;
   --form-group-padding-block: 0 var(--size-base);
   --form-input-group-background-color: transparent;
   --form-label-color: var(--text-color);
@@ -194,8 +195,8 @@
   --form-legend-color: var(--text-color);
   --form-user-info-color: var(--text-muted);
   --form-user-info-font-size: var(--font-size-xs);
-  --form-validation-outline-offset: -.1875rem;
-  --form-validation-outline-width: .1875rem;
+  --form-validation-outline-offset: -3px;
+  --form-validation-outline-width: 3px;
 
   --grid-cols: 3;
   --grid-min-col-width: 6rem;
@@ -222,7 +223,7 @@
   --link-active-color: #51054c;
   --link-color: #0d12ae;
   --link-focus-outline-color: var(--link-color);
-  --link-focus-outline-width: .125rem;
+  --link-focus-outline-width: 2px;
   --link-visited-color: #ae0da3;
 
   --malert-backdrop: rgb(0 0 0 / .7);
@@ -280,8 +281,8 @@
   --mpopup-height: max-content;
   --mpopup-max-height: 90dvh;
   --mpopup-max-width: 70dvw;
-  --mpopup-min-height: 18.75rem;
-  --mpopup-min-width: 25rem;
+  --mpopup-min-height: 300px;
+  --mpopup-min-width: 400px;
   --mpopup-width: max-content;
 
   --overlay-color: rgb(0 0 0 / .6);
@@ -336,8 +337,8 @@
   --snackbar-btn-close-border-radius: 50%;
   --snackbar-btn-close-border-width: var(--btn-close-border-width);
   --snackbar-btn-close-focus-outline-color: color-mix(in srgb, var(--snackbar-text-color) 50%, transparent);
-  --snackbar-btn-close-focus-outline-offset: .125rem;
-  --snackbar-btn-close-focus-outline-width: .125rem;
+  --snackbar-btn-close-focus-outline-offset: 2px;
+  --snackbar-btn-close-focus-outline-width: 2px;
   --snackbar-btn-close-hover-background-color: color-mix(in srgb, var(--snackbar-text-color) 40%, transparent);
   --snackbar-btn-close-hover-border-color: transparent;
   --snackbar-btn-close-hover-icon-color: var(--snackbar-background-color);
@@ -354,7 +355,7 @@
 
   --spinner-color: var(--primary-100);
   --spinner-size: var(--size-lg);
-  --spinner-stroke-width: .125rem;
+  --spinner-stroke-width: 2px;
 
   --status-danger-background-color: var(--status-danger-color);
   --status-danger-border-color: var(--status-danger-color);
@@ -377,7 +378,7 @@
   --switch-checked-background-color: var(--primary-100);
   --switch-cursor-background-color: var(--body-background-color);
 
-  --table-body-border-width: .0625rem;
+  --table-body-border-width: 1px;
   --table-body-tr-alt-bg-color: #efefef;
   --table-body-tr-hover-bg-color: #cbcbcb;
   --table-border-color: #333;
@@ -388,7 +389,7 @@
   --table-tfoot-border-width: var(--table-thead-border-width);
   --table-tfoot-font-weight: var(--font-weight-semibold);
   --table-thead-background-color: #ddd;
-  --table-thead-border-width: .1875rem;
+  --table-thead-border-width: 3px;
 
   --text-color: #000;
   --text-dim: var(--text-muted);
@@ -418,9 +419,9 @@
   --uspg-link-color: #fc0;
   --uspg-link-decoration: none;
   --uspg-link-focus-outline-color: var(--uspg-link-color);
-  --uspg-link-focus-outline-offset: .125rem;
+  --uspg-link-focus-outline-offset: 2px;
   --uspg-link-focus-outline-style: solid;
-  --uspg-link-focus-outline-width: .125rem;
+  --uspg-link-focus-outline-width: 2px;
   --uspg-link-hover-background-color: transparent;
   --uspg-link-hover-color: var(--uspg-link-color);
   --uspg-link-hover-decoration: underline;

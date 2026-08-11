@@ -50,7 +50,7 @@
   line-height: var(--form-control-line-height);
   color: var(--form-control-text-color);
   background-color: var(--form-control-background-color);
-  border: 1px solid var(--form-control-border-color);
+  border: var(--form-control-border-width) var(--form-control-border-style) var(--form-control-border-color);
   border-radius: var(--form-control-border-radius);
 
   &:focus {
@@ -83,6 +83,11 @@
   white-space: nowrap;
   cursor: not-allowed;
   background-color: var(--form-control-static-background-color);
+
+  &.no-border {
+    padding: calc(var(--form-control-padding-block) + var(--form-control-border-width)) 0;
+    border: none;
+  }
 }
 
 /* da bootstrap */

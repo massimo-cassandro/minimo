@@ -7,6 +7,7 @@ Riferimento centralizzato dei prossimi interventi. Le dir con prefisso `TODO ` i
 
 ## CUSTOM PROPERTIES:
   * aggiungere prefisso (`mm-`) a tutte le custom properties **generiche/base** di minimo (`--size-*`, `--color-*`, `--radius-*`, `--text-color`, `--body-background-color`, `--z-index-*`, ...), per evitare collisioni con custom properties di progetti che integrano minimo. Non serve invece sui token già namespaced per componente (`--malert-*`, `--sf-macro-*`, `--up-*`, ...), poco a rischio di collisione — vedi anche la sezione [Compatibilità con framework diversi da minimo (CSS)](#compatibilità-con-framework-diversi-da-minimo-css). Breaking change: in versione 2. Da accompagnare con uno script di migrazione (find/replace sui nomi noti delle custom properties) per i progetti esistenti.
+  * fare in modo di aggiungere all'inzio di ogni gruppo di proprietà di un componente, un commento con il nome del componente stesso
 
 ## WEBPACK PLUGIN PER ESTRAZIONE OTTIMIZZATA DELLE CSS CUSTOM PROPERTIES
 

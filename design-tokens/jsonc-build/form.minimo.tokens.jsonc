@@ -98,6 +98,10 @@
           "$type": "dimension",
           "$value": "1px"
         },
+        "style": {
+          "$type": "string",
+          "$value": "solid"
+        },
         "radius": {
           "$type": "dimension",
           "$value": "{radius.xxs}"

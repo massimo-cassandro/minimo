@@ -52,7 +52,7 @@ const config = {
   // If true (default), dimension token values expressed in px are converted
   // to rem in the generated CSS. Values in other units (em, %, vh, dvw, ...)
   // are never touched regardless of this option.
-  pxToRem: true,
+  pxToRem: false,
 
   // If true, custom properties already present in the CSS destination file
   // (destFile, from a previous build) take priority over the ones generated

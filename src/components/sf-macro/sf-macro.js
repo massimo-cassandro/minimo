@@ -1,5 +1,5 @@
-/*! minimo - Symfony Macro */
-// import './sf-macro.css'; // import in the consuming project
+/*! minimo - Symfony Macro Manager */
+import './sf-macro.css';
 
 /**
  * Initialises Symfony macro collection fields (repeatable fieldsets).

@@ -53,7 +53,6 @@ export default {
           $type: 'color'
         }
       },
-
       font: {
         style: {
           $value: 'normal',
@@ -100,11 +99,16 @@ export default {
           $value: '1px',
           $type: 'dimension'
         },
+        style: {
+          $value: 'solid',
+          $type: 'string'
+        },
         radius: {
           $value: '{radius.xxs}',
           $type: 'dimension'
         }
       },
+
 
       placeholder: {
         color: {

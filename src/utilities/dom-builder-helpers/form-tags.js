@@ -48,18 +48,20 @@ function buildFormGroup({
  * @param {string | number | null} args.value - input `value` attribute.
  * @param {string | null} [args.type='text'] - input `type` attribute.
  * @param {string | null} [args.wrapperClass=null] - optional class to be added to the `.form-group` wrapper.
+ * @param {string | null} [args.className=null] - optional class to be added to the `input`.
  * @param {boolean} [args.condition=true] - When false, the function returns `null` without building anything.
  * @param {string | HTMLElement | null} args.help - Optional help text.
  * @param {(function(HTMLElement): void) | null} args.callback - Optional callback function.
- * @param {object | null}  [args.attrs={}] - Optional attributes object.
+ * @param {Record<string, any> | null}  [args.attrs={}] - Optional attributes object.
  * @returns {DomBuilderItem|null} The `input` domBuilder item, or `null` when `condition` is false.
  */
-export function buildInputTag({
+export function buildInput({
   label,
   name,
   value = null,
   type = 'text',
   wrapperClass = null,
+  className = null,
   condition = true,
   help = null,
   attrs = {},
@@ -76,7 +78,7 @@ export function buildInputTag({
       `label.form-label[for:${id}] ${label}`,
       {
         tag: 'input',
-        className: 'form-control',
+        className: classnames('form-control', className, attrs?.class),
         id: id,
         attrs: {
           ...(attrs??{}),
@@ -104,10 +106,10 @@ export function buildInputTag({
  * @param {boolean} [args.condition=true] - When false, the function returns `null` without building anything.
  * @param {string | HTMLElement | null} args.help - Optional help text.
  * @param {(function(HTMLElement): void) | null} args.callback - Optional callback function.
- * @param {object | null}  [args.attrs={}] - Optional attributes object.
+ * @param {Record<string, any> | null}  [args.attrs={}] - Optional attributes object.
  * @returns {DomBuilderItem|null} The `.form-check` (or `.form-group`-wrapped) domBuilder item, or `null` when `condition` is false.
  */
-export function buildCheckboxTag({
+export function buildCheckbox({
   label,
   name,
   value = 1,
@@ -175,22 +177,26 @@ export function buildCheckboxTag({
  * @param {string} args.label - textarea label.
  * @param {string | null} args.name - textarea `name` attribute.
  * @param {string | number | null} args.value - textarea content.
+ * @param {boolean} [args.autosize=true] - adds `autosize` class
  * @param {string | null} [args.wrapperClass=null] - optional class to be added to the `.form-group` wrapper.
+ * @param {string | null} [args.className=null] - optional class to be added to the textarea element.
  * @param {boolean} [args.condition=true] - When false, the function returns `null` without building anything.
  * @param {string | HTMLElement | null} args.help - Optional help text.
  * @param {(function(HTMLElement): void) | null} args.callback - Optional callback function.
- * @param {object | null}  [args.attrs={}] - Optional attributes object.
+ * @param {Record<string, any> | null}  [args.attrs={}] - Optional attributes object.
  * @returns {DomBuilderItem|null} The `textarea` domBuilder item, or `null` when `condition` is false.
  */
-export function buildTextareaTag({
+export function buildTextarea({
   label,
   name,
   value = null,
   wrapperClass = null,
+  className = null,
   condition = true,
   help = null,
   callback = null,
-  attrs = {}
+  attrs = {},
+  autosize = true
 }) {
 
   const id = randomId();
@@ -203,8 +209,55 @@ export function buildTextareaTag({
       `label.form-label[for:${id}] ${label}`,
       {
         tag: 'textarea',
-        className: 'form-control',
+        className: classnames('form-control', className, attrs?.class, autosize && 'autosize'),
         id: id,
+        attrs: {
+          ...(attrs??{}),
+          name: name,
+        },
+        content: value,
+        callback: callback
+      }
+    ]
+  });
+}
+
+/**
+ * Fake field (plain text showed as an input field)
+ *
+ * @param {Object} args
+ * @param {string} args.label - label.
+ * @param {string | number | null} args.value - text content.
+ * @param {string | null} [args.wrapperClass=null] - optional class to be added to the `.form-group` wrapper.
+ * @param {boolean} [args.noBorder=true] - adds `no-border` class.
+ * @param {string | null} [args.className=null] - optional class to be added to the fake field.
+ * @param {boolean} [args.condition=true] - When false, the function returns `null` without building anything.
+ * @param {string | HTMLElement | null} args.help - Optional help text.
+ * @param {(function(HTMLElement): void) | null} args.callback - Optional callback function.
+ * @param {Record<string, any> | null}  [args.attrs={}] - Optional attributes object.
+ * @returns {DomBuilderItem|null} The fake field domBuilder item, or `null` when `condition` is false.
+ */
+export function buildFakeField({
+  label,
+  value = null,
+  wrapperClass = null,
+  className = null,
+  condition = true,
+  help = null,
+  callback = null,
+  attrs = {},
+  noBorder = true
+}) {
+
+
+  return buildFormGroup({
+    condition,
+    wrapperClass,
+    help,
+    children: [
+      `span.form-label ${label}`,
+      {
+        className: classnames('form-control-static', className, attrs?.class, noBorder && 'no-border'),
         attrs: {
           ...(attrs??{}),
           name: name,
