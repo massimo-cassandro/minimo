@@ -63,6 +63,11 @@ const config = {
   // Comments at the end of custom properties are preserved, while full-line ones will be lost.
   mergeCustomProps: false,
 
+  // Wraps the generated custom properties inside a CSS `@layer` at-rule,
+  // e.g. addLayer: 'project' -> `@layer project { :root { ... } }`.
+  // Set to null, undefined or false (default) to emit no layer.
+  addLayer: 'project',
+
   // Named groups of custom properties. Properties whose first hyphen-separated
   // name segment matches one of a group's `prefixes` are pulled out, labelled
   // with the group's `name` and placed at the beginning of the output CSS

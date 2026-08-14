@@ -34,6 +34,7 @@ import {
   mergeCustomProps,
   customPropsGroups,
   pxToRem,
+  addLayer,
 } from './build-tokens-src/config.mjs';
 
 // ── 2. Custom transforms ─────────────────────────────────────────────────────
@@ -107,6 +108,7 @@ const sd = new StyleDictionary({
     concreteFilePaths,
     customPropsGroups,
     pxToRem,
+    addLayer,
   }),
 });
 

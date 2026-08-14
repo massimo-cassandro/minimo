@@ -324,6 +324,12 @@ StyleDictionary.registerFormat({
     appendBlock(restProps);
 
     customPropsCount = sortedProps.length;
-    return `${selector} {\n${outLines.join('\n')}\n}\n`;
+    const block = `${selector} {\n${outLines.join('\n')}\n}\n`;
+
+    // addLayer: wraps the whole block inside `@layer <name> { ... }`.
+    // Indentation is left to stylelint's fix step (run right after the build).
+    return options.addLayer
+      ? `@layer ${options.addLayer} {\n\n${block}}\n`
+      : block;
   },
 });

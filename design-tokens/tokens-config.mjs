@@ -43,6 +43,11 @@ const config = {
   mergeCustomProps: false,
 
 
+  // wraps generated custom properties inside a css `@layer` at-rule
+  // Set the property to null, undefined, or false to set no layer
+  addLayer: 'project',
+
+
   // Named groups of custom properties. Properties whose first hyphen-separated
   // name segment matches one of a group's `prefixes` are pulled out, labelled
   // with the group's `name` and placed at the beginning of the output CSS

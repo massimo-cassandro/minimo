@@ -87,6 +87,11 @@ export const pxToRem = buildConfig.pxToRem !== false;
 // build-tokens-src/merge-css.mjs). Default: false.
 export const mergeCustomProps = buildConfig.mergeCustomProps === true;
 
+// addLayer: wraps the generated custom properties inside a CSS `@layer`
+// at-rule (see formats/css.mjs), e.g. `@layer project { :root { ... } }`.
+// Set to null, undefined or false (default) to emit no layer.
+export const addLayer = buildConfig.addLayer ? String(buildConfig.addLayer).trim() : null;
+
 // customPropsGroups: custom properties whose first hyphen-separated name
 // segment matches one of a group's prefixes are pulled out, labelled with
 // that group's name and moved to the beginning of the generated CSS file, in

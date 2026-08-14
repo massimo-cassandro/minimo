@@ -1,4 +1,4 @@
-/* project e overrides sono destinati all'uso nel progetto che implementa minimo */
+/* see https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/At-rules/@layer */
 @layer reset, base, components, utilities, project, overrides;
 
 /* @import '@src/fonts.css'; */

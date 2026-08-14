@@ -47,6 +47,7 @@ const JSON_TRANSFORMS = [
  * @param {'keep'|'calc'|'resolve'} opts.jsonExpression  How to handle math expressions in dimension tokens.
  * @param {{name: string, prefixes: string[]}[]} opts.customPropsGroups  Named groups of name prefixes, moved to the top of the CSS output in list order.
  * @param {boolean}         opts.pxToRem             If false, skips the px→rem transform on the CSS platform. Default: true.
+ * @param {string|null}     opts.addLayer            Wraps the generated custom properties inside `@layer <addLayer> { ... }`. null = no layer.
  * @returns {Record<string, PlatformConfig>} platforms object ready for Style Dictionary config
  */
 export const buildPlatforms = ({
@@ -59,6 +60,7 @@ export const buildPlatforms = ({
   concreteFilePaths = [],
   customPropsGroups = [],
   pxToRem = true,
+  addLayer = null,
 }) => {
   const cssTransforms = pxToRem
     ? CSS_TRANSFORMS
@@ -77,6 +79,7 @@ export const buildPlatforms = ({
             outputReferences: true,
             showFileHeader: true,
             customPropsGroups,
+            addLayer,
           },
         },
       ],
