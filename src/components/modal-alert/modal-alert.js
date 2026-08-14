@@ -99,27 +99,27 @@ const defaults = {
 /**
  * @typedef {Object} ModalAlertParams
  * @property {string} [type] - Dialog type: `success`, `error`, `warning`, `info`, or `confirm`.
- * @property {string | null} [extraClass] - optional dialog extra class
- * @property {(() => void) | null} [onOpen] - optional callback on dialog open
- * @property {(() => void) | null} [onClose] - optional callback on dialog close
- * @property {boolean} [animation] - if true, dialog will be animated
- * @property {boolean} [showMarks] - if true, mark iconswill be showed
- * @property {((arg?: *) => void) | null} [callback] - optional callback dialog after user choice
- * @property {number | null} [timer] - timer for autoclose (ms). `null` for disable
  * @property {string | null} [title] - title text
  * @property {string | null} [mes] - text message (plain or html)
- * @property {string | null} [headingClass] - optional extra class for heading
- * @property {string | null} [textClass] - optional extra class for text
- * @property {string | null} [icon] - Icon markup used for the dialog; defaults to the type's icon.
- * @property {string | null} [altIcon] - Alternate icon markup, used instead of `icon` when `useAltIcon` is `true`.
- * @property {boolean} [useAltIcon] - When `true`, uses `altIcon` instead of `icon` (e.g. the `danger` icon on a `warning` dialog, or the `warning` icon on a `confirm` dialog).
- * @property {DomBuilderItem | null} [extraBtn] - optional extra button (as domBuilder object)
- * @property {boolean} [extraBtnFocus] - true if the extra button should be focused when the dialog box opens (overrides any focus assigned to the 'cancel' button)
+ * @property {((arg?: *) => void) | null} [callback] - optional callback dialog after user choice
+ * @property {number | null} [timer] - timer for autoclose (ms). `null` for disable
+ * @property {(() => void) | null} [onOpen] - optional callback on dialog open
+ * @property {(() => void) | null} [onClose] - optional callback on dialog close
+ * @property {string | null} [extraClass] - optional dialog extra class
  * @property {string} [okBtnText] - text for 'ok' button
  * @property {string} [okBtnClass] - alternative class for 'ok' button. It replaces the default one
  * @property {string} [cancelBtnText] - text for 'cancel' button
  * @property {string} [cancelBtnClass] - alternative class for 'cancel' button. It replaces the default one
  * @property {boolean} [cancelBtnFocus] - true if the cancel button should be focused when the dialog box opens. It has no effect if an extraBtn is set
+ * @property {string | null} [headingClass] - optional extra class for heading
+ * @property {DomBuilderItem | null} [extraBtn] - optional extra button (as domBuilder object)
+ * @property {boolean} [extraBtnFocus] - true if the extra button should be focused when the dialog box opens (overrides any focus assigned to the 'cancel' button)
+ * @property {boolean} [animation] - if true, dialog will be animated
+ * @property {boolean} [showMarks] - if true, mark iconswill be showed
+ * @property {string | null} [textClass] - optional extra class for text
+ * @property {string | null} [icon] - Icon markup used for the dialog; defaults to the type's icon.
+ * @property {string | null} [altIcon] - Alternate icon markup, used instead of `icon` when `useAltIcon` is `true`.
+ * @property {boolean} [useAltIcon] - When `true`, uses `altIcon` instead of `icon` (e.g. the `danger` icon on a `warning` dialog, or the `warning` icon on a `confirm` dialog).
  */
 
 /**

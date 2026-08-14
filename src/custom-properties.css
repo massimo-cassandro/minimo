@@ -219,11 +219,17 @@
   --line-height-sm: 1.4;
   --line-height-xs: 1.25;
 
-  --link-active-background-color: transparent;
-  --link-active-color: #51054c;
+  --link-active-background-color: var(--primary-100);
+  --link-active-color: var(--body-background-color);
   --link-color: #0d12ae;
-  --link-focus-outline-color: var(--link-color);
+  --link-focus-outline-color: color-mix(in srgb, var(--link-color) 60%, transparent);
+  --link-focus-outline-offset: 2px;
   --link-focus-outline-width: 2px;
+  --link-font-weight: var(--font-weight-semibold);
+  --link-hover-color: var(--link-color);
+  --link-hover-text-decoration: underline;
+  --link-hover-text-underline-offset: 2px;
+  --link-text-decoration: none;
   --link-visited-color: #ae0da3;
 
   --malert-backdrop: rgb(0 0 0 / .7);

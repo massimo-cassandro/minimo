@@ -1,13 +1,17 @@
-/*! minimo - Inner Nav */
+@layer components {
 
-.inner-nav-main, .inner-nav {
-  display: flex;
-  gap: var(--inner-nav-gap);
-  justify-content: flex-end;
-  margin-block: var(--inner-nav-margin-block);
-  /* text-align: end; */
+  /*! minimo - Inner Nav */
 
-  @media print {
-    display: none;
+  .inner-nav-main, .inner-nav {
+    display: flex;
+    gap: var(--inner-nav-gap);
+    justify-content: flex-end;
+    margin-block: var(--inner-nav-margin-block);
+    /* text-align: end; */
+
+    @media print {
+      display: none;
+    }
   }
+
 }

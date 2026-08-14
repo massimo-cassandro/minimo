@@ -1,4 +1,6 @@
-/* TODO completare, aggiungere focus, vedere soluzione bootstrap
+@layer base {
+
+  /* TODO completare, aggiungere focus, vedere soluzione bootstrap
 
 
 .form-switch {
@@ -43,7 +45,7 @@
 
 */
 
-/*
+  /*
 <div class="switch">
   <input type="checkbox">
   <span class="switch-track"></span>
@@ -51,55 +53,57 @@
 </div>
 */
 
-.switch {
-  display: inline-flex;
-  align-items: center;
-  cursor: pointer;
-}
+  .switch {
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+  }
 
-.switch input {
-  position: absolute;
-  opacity: 0;
-  width: 0;
-  height: 0;
-}
+  .switch input {
+    position: absolute;
+    width: 0;
+    height: 0;
+    opacity: 0;
+  }
 
-.switch-track {
-  position: relative;
-  width: 2.5em;
-  height: 1.5em;
-  background-color: var(--switch-background-color);
-  border-radius: 1.5em;
-  transition: background-color 0.2s;
-}
+  .switch-track {
+    position: relative;
+    width: 2.5em;
+    height: 1.5em;
+    background-color: var(--switch-background-color);
+    border-radius: 1.5em;
+    transition: background-color .2s;
+  }
 
-.switch label {
-  margin-left: .5em;
-  user-select: none;
-}
+  .switch label {
+    margin-left: .5em;
+    user-select: none;
+  }
 
-.switch-track::after {
-  content: '';
-  position: absolute;
-  top: 2px;
-  left: 2px;
-  width: 2em;
-  height: 2em;
-  background: var(--switch-cursor-background-color);
-  border-radius: 50%;
-  transition: translate 0.2s;
-}
+  .switch-track::after {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 2em;
+    height: 2em;
+    content: '';
+    background: var(--switch-cursor-background-color);
+    border-radius: 50%;
+    transition: translate .2s;
+  }
 
-.switch input:checked + .switch-track {
-  background-color: var(--switch-checked-background-color);
-}
+  .switch input:checked + .switch-track {
+    background-color: var(--switch-checked-background-color);
+  }
 
-.switch input:checked + .switch-track::after {
-  translate: 20px 0;
-}
+  .switch input:checked + .switch-track::after {
+    translate: 20px 0;
+  }
 
-/* accessibilità */
-.switch input:focus-visible + .switch-track {
-  outline: 2px solid var(--switch-checked-background-color);
-  outline-offset: 2px;
+  /* accessibilità */
+  .switch input:focus-visible + .switch-track {
+    outline: 2px solid var(--switch-checked-background-color);
+    outline-offset: 2px;
+  }
+
 }

@@ -1,6 +1,6 @@
 {
   "name": "@massimo-cassandro/minimo",
-  "version": "1.20.15",
+  "version": "1.21.0",
   "description": "Light css framework & utilities",
   "type": "module",
   "main": "./index.js",
@@ -90,9 +90,9 @@
   "devDependencies": {
     "@massimo-cassandro/eslint-config": "^3.0.13",
     "@massimo-cassandro/stylelint-config": "^2.3.13",
-    "@types/node": "^26.1.2",
+    "@types/node": "^26.2.0",
     "jsdom": "^29.1.1",
-    "style-dictionary": "^5.5.0"
+    "style-dictionary": "^5.5.1"
   },
   "dependencies": {
     "@inquirer/input": "^5.1.2",

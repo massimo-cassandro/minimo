@@ -1,3 +1,5 @@
+@layer components {
+
 /* TODO dark mode */
 
 .infoOuterContainer {
@@ -75,4 +77,6 @@
       outline-color: var(--green-2);
     }
   } */
+}
+
 }

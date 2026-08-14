@@ -1,82 +1,84 @@
-/* wrapper per le tabelle per evitare che superino la larghezza dello spazio disponibile */
+@layer base {
 
-/* purgecss start ignore */
+  /* wrapper per le tabelle per evitare che superino la larghezza dello spazio disponibile */
 
-.table-responsive {
-  max-width: 100%;
-  overflow-x: auto;
-}
+  /* purgecss start ignore */
 
-/* TODO opzione per attivare/disattuvare alternate color */
-.table {
-
-  --_alternate-row-bg: var(--table-body-tr-alt-bg-color);
-  --_hover-row-bg: var(--table-body-tr-hover-bg-color);
-  --_border-color: var(--table-border-color);
-  --_border: 1px solid var(--_border-color);
-
-  width: 100%;
-  margin: 1rem 0;
-  border-collapse: collapse;
-
-  tr {
-    border-bottom: var(--_border);
+  .table-responsive {
+    max-width: 100%;
+    overflow-x: auto;
   }
 
-  thead {
-    background-color: var(--table-thead-background-color);
-    tr:last-child {
-      border-width: var(--table-thead-border-width);
-    }
-  }
+  /* TODO opzione per attivare/disattuvare alternate color */
+  .table {
 
-  tfoot {
-    background-color: var(--table-tfoot-background-color);
-    tr:first-child {
-      border-block-start: var(--table-tfoot-border-width) solid var(--_border-color);
-    }
-    th, td {
-      font-weight: var(--table-tfoot-font-weight);
-    }
-  }
+    --_alternate-row-bg: var(--table-body-tr-alt-bg-color);
+    --_hover-row-bg: var(--table-body-tr-hover-bg-color);
+    --_border-color: var(--table-border-color);
+    --_border: 1px solid var(--_border-color);
 
-  tbody {
-    tr:nth-child(even) {
-      background-color: var(--_alternate-row-bg);
+    width: 100%;
+    margin: 1rem 0;
+    border-collapse: collapse;
+
+    tr {
+      border-bottom: var(--_border);
     }
 
-    @media (hover: hover) {
-      tr:hover {
-        background-color: var(--_hover-row-bg);
+    thead {
+      background-color: var(--table-thead-background-color);
+      tr:last-child {
+        border-width: var(--table-thead-border-width);
       }
     }
-  }
 
-
-  th, td {
-    padding: var(--table-cell-padding-block) var(--table-cell-padding-inline);
-    line-height: var(--table-cell-line-height);
-    vertical-align: top;
-    text-align: start;
-
-    .valign-middle &, &.valign-middle {
-      vertical-align: middle;
-    }
-  }
-
-  &.table-bordered {
-    border: var(--_border);
-
-    th, td {
-      &:not(:first-child) {
-        border-inline-start: var(--_border);
+    tfoot {
+      background-color: var(--table-tfoot-background-color);
+      tr:first-child {
+        border-block-start: var(--table-tfoot-border-width) solid var(--_border-color);
+      }
+      th, td {
+        font-weight: var(--table-tfoot-font-weight);
       }
     }
+
+    tbody {
+      tr:nth-child(even) {
+        background-color: var(--_alternate-row-bg);
+      }
+
+      @media (hover: hover) {
+        tr:hover {
+          background-color: var(--_hover-row-bg);
+        }
+      }
+    }
+
+
+    th, td {
+      padding: var(--table-cell-padding-block) var(--table-cell-padding-inline);
+      line-height: var(--table-cell-line-height);
+      vertical-align: top;
+      text-align: start;
+
+      .valign-middle &, &.valign-middle {
+        vertical-align: middle;
+      }
+    }
+
+    &.table-bordered {
+      border: var(--_border);
+
+      th, td {
+        &:not(:first-child) {
+          border-inline-start: var(--_border);
+        }
+      }
+    }
+
   }
 
-}
-
-/*
+  /*
 @media (prefers-color-scheme: dark) {
   .table {
     --_border-color: var(--_stone-8);
@@ -86,4 +88,6 @@
 }
 */
 
-/* purgecss end ignore */
+  /* purgecss end ignore */
+
+}

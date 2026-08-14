@@ -1,3 +1,5 @@
+@layer components {
+
 .centerAlign {
   text-align: center;
 }
@@ -6,4 +8,6 @@
 }
 .nowrap {
   white-space: nowrap;
+}
+
 }

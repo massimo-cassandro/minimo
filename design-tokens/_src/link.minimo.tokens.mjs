@@ -1,5 +1,17 @@
 export default {
   link: {
+    font: {
+      weight: {
+        $type: 'string',
+        $value: '{font.weight.semibold}',
+      }
+    },
+    text: {
+      decoration: {
+        $type: 'string',
+        $value: 'none',
+      },
+    },
     color: {
       $type: 'color',
       $value: '#0d12ae'
@@ -11,15 +23,34 @@ export default {
       },
     },
     hover: {
-      color: null
+      color: {
+        $type: 'color',
+        $value: '{link.color}'
+      },
+      text: {
+        decoration: {
+          $type: 'string',
+          $value: 'underline',
+        },
+        underline: {
+          offset: {
+            $type: 'dimension',
+            $value: '2px',
+          }
+        }
+      }
     },
     focus: {
       outline: {
         color: {
           $type: 'color',
-          $value: '{link.color}'
+          $value: 'color-mix(in srgb, {link.color} 60%, transparent)'
         },
         width: {
+          $type: 'dimension',
+          $value: '2px'
+        },
+        offset: {
           $type: 'dimension',
           $value: '2px'
         },
@@ -28,12 +59,12 @@ export default {
     active: {
       color: {
         $type: 'color',
-        $value: '#51054C'
+        $value: '{body.background.color}'
       },
       background: {
         color: {
           $type: 'color',
-          $value: 'transparent'
+          $value: '{primary.100}'
         }
       }
     }

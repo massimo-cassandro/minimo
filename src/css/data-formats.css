@@ -1,30 +1,34 @@
+@layer base {
 
-.data-lining-nums {
-  font-feature-settings: 'lnum', 'pnum';
-  font-variant-numeric: lining-nums proportional-nums;
-}
 
-.data-tabular-nums {
-  font-feature-settings: 'lnum', 'pnum';
-  font-variant-numeric: lining-nums tabular-nums;
-}
-
-.data-euro {
-  &::before {
-    margin-right: .2rem;
-    font-size: 70%;
-    color: currentColor;
-    content: '\20AC';
+  .data-lining-nums {
+    font-feature-settings: 'lnum', 'pnum';
+    font-variant-numeric: lining-nums proportional-nums;
   }
-}
-.data-perc {
-  &::after {
-    margin-left: .1rem;
-    font-size: 70%;
-    color: currentColor;
-    content: '%';
+
+  .data-tabular-nums {
+    font-feature-settings: 'lnum', 'pnum';
+    font-variant-numeric: lining-nums tabular-nums;
   }
-}
-.data-dec {
-  font-size: 85%;
+
+  .data-euro {
+    &::before {
+      margin-right: .2rem;
+      font-size: 70%;
+      color: currentColor;
+      content: '\20AC';
+    }
+  }
+  .data-perc {
+    &::after {
+      margin-left: .1rem;
+      font-size: 70%;
+      color: currentColor;
+      content: '%';
+    }
+  }
+  .data-dec {
+    font-size: 85%;
+  }
+
 }

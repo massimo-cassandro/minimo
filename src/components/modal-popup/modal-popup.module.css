@@ -1,99 +1,103 @@
-/*! minimo - Modal Popup */
+@layer components {
 
-.dialog {
+  /*! minimo - Modal Popup */
 
-  position: fixed;
+  .dialog {
 
-  display: flex;
-  flex-direction: column;
+    position: fixed;
 
-  width: var(--mpopup-width);
-  min-width: var(--mpopup-min-width);
-  max-width: var(--mpopup-max-width);
-  height: var(--mpopup-height);
-  min-height: var(--mpopup-min-height);
-  max-height: var(--mpopup-max-height);
-  padding: 0;
-  margin: auto;
-  overflow: visible;
-  background-color: var(--mpopup-background-color);
-  border: none;
-  border-radius: var(--mpopup-border-radius);
-  box-shadow: var(--mpopup-drop-shadow);
-  scale: 0;
-  transition: scale .2s ease-out;
+    display: flex;
+    flex-direction: column;
 
-  &::backdrop {
-    overscroll-behavior: contain;
-    background-color: var(--mpopup-backdrop-color);
+    width: var(--mpopup-width);
+    min-width: var(--mpopup-min-width);
+    max-width: var(--mpopup-max-width);
+    height: var(--mpopup-height);
+    min-height: var(--mpopup-min-height);
+    max-height: var(--mpopup-max-height);
+    padding: 0;
+    margin: auto;
+    overflow: visible;
+    background-color: var(--mpopup-background-color);
+    border: none;
+    border-radius: var(--mpopup-border-radius);
+    box-shadow: var(--mpopup-drop-shadow);
+    scale: 0;
+    transition: scale .2s ease-out;
+
+    &::backdrop {
+      overscroll-behavior: contain;
+      background-color: var(--mpopup-backdrop-color);
+    }
+
+    &.on {
+      scale: 1;
+    }
+
   }
 
-  &.on {
-    scale: 1;
+  .closeButton  {
+
+    position: absolute;
+    top: calc(-1 * var(--mpopup-btn-close-size) / 3);
+    right: calc(-1 * var(--mpopup-btn-close-size) / 3);
   }
 
-}
-
-.closeButton  {
-
-  position: absolute;
-  top: calc(-1 * var(--mpopup-btn-close-size) / 3);
-  right: calc(-1 * var(--mpopup-btn-close-size) / 3);
-}
-
-.contentWrapper {
-  display: flex;
-  flex: 1;
-  flex-flow: column nowrap;
-  gap: 0;
-  align-items: stretch;
-  justify-content: flex-start;
-  min-height: 0;
-}
+  .contentWrapper {
+    display: flex;
+    flex: 1;
+    flex-flow: column nowrap;
+    gap: 0;
+    align-items: stretch;
+    justify-content: flex-start;
+    min-height: 0;
+  }
 
 
-.content {
-  flex: 1;
-  /* width: 100%;
+  .content {
+    flex: 1;
+    /* width: 100%;
   height: 100%; */
-  min-height: 0;
-  padding: var(--mpopup-content-padding);
-  overflow-x: hidden;
-  overflow-y: auto;
-  scrollbar-gutter: stable;
+    min-height: 0;
+    padding: var(--mpopup-content-padding);
+    overflow-x: hidden;
+    overflow-y: auto;
+    scrollbar-gutter: stable;
 
-  .scrollBarPadding & {
-    padding-inline-end: var(--mpopup-content-scrollbar-padding-i-end);
+    .scrollBarPadding & {
+      padding-inline-end: var(--mpopup-content-scrollbar-padding-i-end);
+    }
+
   }
 
-}
-
-.iframe {
-  width: 100%;
-  height: 100%;
-  padding: 0;
-  margin: 0;
-  overscroll-behavior: contain;
-  border: none;
-}
-
-.header {
-  padding: var(--mpopup-header-padding);
-  font-size: var(--mpopup-header-font-size);
-  color: var(--mpopup-header-color);
-  background-color: var(--mpopup-header-background-color);
-  border-radius: var(--mpopup-border-radius) var(--mpopup-border-radius) 0 0;
-}
-.footer {
-  padding: var(--mpopup-footer-padding);
-  font-size: var(--mpopup-footer-font-size);
-  color: var(--mpopup-footer-color);
-  background-color: var(--mpopup-footer-background-color);
-  border-radius: 0 0 var(--mpopup-border-radius) var(--mpopup-border-radius);
-}
-
-.header, .footer {
-  * {
-    color: inherit;
+  .iframe {
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    margin: 0;
+    overscroll-behavior: contain;
+    border: none;
   }
+
+  .header {
+    padding: var(--mpopup-header-padding);
+    font-size: var(--mpopup-header-font-size);
+    color: var(--mpopup-header-color);
+    background-color: var(--mpopup-header-background-color);
+    border-radius: var(--mpopup-border-radius) var(--mpopup-border-radius) 0 0;
+  }
+  .footer {
+    padding: var(--mpopup-footer-padding);
+    font-size: var(--mpopup-footer-font-size);
+    color: var(--mpopup-footer-color);
+    background-color: var(--mpopup-footer-background-color);
+    border-radius: 0 0 var(--mpopup-border-radius) var(--mpopup-border-radius);
+  }
+
+  .header, .footer {
+    * {
+      color: inherit;
+    }
+  }
+
 }

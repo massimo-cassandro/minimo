@@ -1,0 +1,49 @@
+@layer base {
+
+  /* TODO rivedere e completare */
+
+  a:link, .btn-link {
+    /* TODO rivedere, forse più complicato del necessario */
+    &:not(.btn) {
+      font-weight: var(--link-font-weight);
+      color: var(--link-color);
+      text-decoration: var(--link-text-decoration);
+    }
+  }
+
+  a:not(.btn) {
+    text-decoration: none;
+    &:link {
+      color: var(--link-color);
+    }
+    &:visited {
+      color: var(--link-visited-color);
+    }
+  }
+
+  a:not(.btn), .btn-link {
+    &:focus {
+      outline: none;
+    }
+
+    &:focus-visible {
+      outline: var(--link-focus-outline-width) solid color-mix(in srgb, var(--link-focus-outline-color) 60%, transparent);
+      outline-offset: var(--link-focus-outline-offset);
+    }
+    @media (hover: hover) {
+      &:hover {
+        color: var(--link-hover-color);
+        text-decoration: var(--link-hover-text-decoration);
+        text-underline-offset: var(--link-hover-text-underline-offset);
+      }
+    }
+    &:active {
+      /* TODO rivedere, sostituire con colori specifici da custom props */
+      /* stylelint-disable-next-line declaration-no-important */
+      color: var(--link-active-color) !important;
+      background-color: var(--link-active-background-color);
+      offset: 0;
+    }
+  }
+
+}

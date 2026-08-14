@@ -1,5 +1,7 @@
-/*! minimo - Slide Up/Down Toggle */
-/*
+@layer components {
+
+  /*! minimo - Slide Up/Down Toggle */
+  /*
  * CSS Module for slide-up-down-toggle.js
  *
  * Three modern CSS features work together to animate height without JS measurement:
@@ -44,37 +46,37 @@
  *     style="--slide-duration: 300ms"
  */
 
-/* applied to the animation wrapper (generated or the target itself) */
-.slide {
-  interpolate-size: allow-keywords;
-  /*
+  /* applied to the animation wrapper (generated or the target itself) */
+  .slide {
+    interpolate-size: allow-keywords;
+    /*
    * !important overrides any external display: none (inline or CSS rule without !important).
    * .slide[data-slide='closed'] below has higher specificity (0,2,0 vs 0,1,0) so its
    * display: none !important still wins when the element is collapsed.
    */
-  /* stylelint-disable-next-line declaration-no-important */
-  display: block !important;
-  height: auto;
-  overflow: hidden;
-  transition:
-    height var(--slide-duration) ease,
-    display var(--slide-duration) allow-discrete;
-}
+    /* stylelint-disable-next-line declaration-no-important */
+    display: block !important;
+    height: auto;
+    overflow: hidden;
+    transition:
+      height var(--slide-duration) ease,
+      display var(--slide-duration) allow-discrete;
+  }
 
-/* collapsed state: height animates to 0, then display snaps to none */
-.slide[data-slide='closed'] {
-  /* stylelint-disable-next-line declaration-no-important */
-  display: none !important;
-  height: 0;
-}
+  /* collapsed state: height animates to 0, then display snaps to none */
+  .slide[data-slide='closed'] {
+    /* stylelint-disable-next-line declaration-no-important */
+    display: none !important;
+    height: 0;
+  }
 
-/*
+  /*
  * Entry state for the expand transition.
  * When .slide transitions from display:none → display:block, the browser needs
  * a starting value for height. @starting-style provides height:0 so the
  * animation plays from zero to auto instead of snapping instantly.
  */
-/*
+  /*
  * @starting-style targets only [data-slide='open'] — not :not([data-slide='closed']).
  * The broader selector would also match newly inserted wrappers (which have no
  * data-slide attribute), causing an unwanted entry animation from height:0 that
@@ -82,17 +84,19 @@
  * Using [data-slide='open'] restricts this to the expand animation triggered by
  * slideDown(), which always sets data-slide="open" on a previously hidden element.
  */
-@starting-style {
-  .slide[data-slide='open'] {
-    height: 0;
+  @starting-style {
+    .slide[data-slide='open'] {
+      height: 0;
+    }
   }
-}
 
-/*
+  /*
  * FOUC prevention — global, no class required.
  * Hides elements with data-slide="closed" before JS has run and added .slide.
  * Uses :global so CSS Modules does not hash this selector.
  */
-:global([data-slide='closed']) {
-  display: none;
+  :global([data-slide='closed']) {
+    display: none;
+  }
+
 }

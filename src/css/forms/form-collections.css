@@ -1,17 +1,21 @@
-.form-collection-fset { /* fieldset */
-  padding: 0;
-  border: none;
+@layer base {
 
-  .form-collection {
-    display: flex;
-    flex-flow: column nowrap;
-    gap: var(--size-xs);
-    align-items: flex-start;
-    justify-content: flex-start;
+  .form-collection-fset { /* fieldset */
+    padding: 0;
+    border: none;
 
-    &.form-collection-inline {
-      flex-flow: row wrap;
-      gap: var(--size-md);
+    .form-collection {
+      display: flex;
+      flex-flow: column nowrap;
+      gap: var(--size-xs);
+      align-items: flex-start;
+      justify-content: flex-start;
+
+      &.form-collection-inline {
+        flex-flow: row wrap;
+        gap: var(--size-md);
+      }
     }
   }
+
 }

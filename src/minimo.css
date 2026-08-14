@@ -1,3 +1,5 @@
+/* project e overrides sono destinati all'uso nel progetto che implementa minimo */
+@layer reset, base, components, utilities, project, overrides;
 
 /* @import '@src/fonts.css'; */
 /* @import '@src/css/custom-media.css'; */ /* managed by postcss */
@@ -24,7 +26,7 @@
 
 @import '@minimo/css/badge.css';
 @import '@minimo/css/text.css';
-@import '@minimo/css/anchors.css';
+@import '@minimo/css/links.css';
 @import '@minimo/css/headings.css';
 @import '@minimo/css/alerts.css';
 @import '@minimo/css/icons.css';

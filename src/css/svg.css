@@ -1,3 +1,7 @@
-svg {
-  fill: currentColor;
+@layer base {
+
+  svg {
+    fill: currentColor;
+  }
+
 }
