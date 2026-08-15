@@ -1,22 +1,17 @@
-@layer base {
+.form-group {
+  display: flex;
+  flex-flow: column nowrap;
+  gap: var(--size-xxs);
+  align-content: flex-start; /* multiline container */
+  align-items: flex-start;
+  justify-content: stretch;
+  padding-block: var(--form-group-padding-block);
 
+  /* &:has(textarea) {
+  height: 100%;
+} */
 
-  .form-group {
-    display: flex;
-    flex-flow: column nowrap;
-    gap: var(--size-xxs);
-    align-content: flex-start; /* multiline container */
-    align-items: flex-start;
-    justify-content: stretch;
-    padding-block: var(--form-group-padding-block);
-
-    /* &:has(textarea) {
-    height: 100%;
-  } */
-
-    .grid & {
-      padding-block-end: 0;
-    }
+  .grid & {
+    padding-block-end: 0;
   }
-
 }

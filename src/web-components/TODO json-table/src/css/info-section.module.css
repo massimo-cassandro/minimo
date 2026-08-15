@@ -1,4 +1,3 @@
-@layer components {
 
 /* TODO dark mode */
 
@@ -77,6 +76,4 @@
       outline-color: var(--green-2);
     }
   } */
-}
-
 }

@@ -1,20 +1,18 @@
-@layer base {
 
-  .badge {
-    display: inline-block;
-    padding: var(--size-xxs) var(--size-sm);
-    font-size: var(--badge-font-size);
-    font-weight: var(--badge-font-weight);
-    vertical-align: middle;
-    color: var(--badge-color);
-    background-color: var(--badge-background-color);
-    border-radius: var(--radius-pill);
+.badge {
+  display: inline-block;
+  padding: var(--size-xxs) var(--size-sm);
+  font-size: var(--badge-font-size);
+  font-weight: var(--badge-font-weight);
+  vertical-align: middle;
+  color: var(--badge-color);
+  background-color: var(--badge-background-color);
+  border-radius: var(--radius-pill);
 
-    &.badge-lg {
-      font-size: var(--badge-lg-font-size);
-      font-weight: var(--badge-lg-font-weight);
+  &.badge-lg {
+    font-size: var(--badge-lg-font-size);
+    font-weight: var(--badge-lg-font-weight);
 
-    }
   }
-
 }
+

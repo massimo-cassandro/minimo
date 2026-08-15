@@ -1,9 +1,10 @@
+/* decomment layers if you want to use them */
 /* see https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/At-rules/@layer */
-@layer reset, base, components, utilities, project, overrides;
+/* @layer reset, base, components, utilities, project, overrides; */
 
 /* @import '@src/fonts.css'; */
 /* @import '@src/css/custom-media.css'; */ /* managed by postcss */
-/* @import '@src/custom-properties.css'; */ /* managed by postcss-jit-props */
+/* @import '@src/custom-properties.css' layer('base'); */ /* managed by postcss-jit-props */
 
 @import '@minimo/css/reset.css';
 @import '@minimo/css/layout-base.css';

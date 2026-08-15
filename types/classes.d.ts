@@ -1169,6 +1169,7 @@ export type MinimoClass =
   | 'pis-xxs-lap'
   | 'pis-xxs-mob'
   | 'pis-xxs-tab'
+  | 'position-relative'
   | 'ps'
   | 'ps-0'
   | 'ps-0-dsk'

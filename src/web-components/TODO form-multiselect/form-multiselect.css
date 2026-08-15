@@ -1,7 +1,6 @@
-@layer components {
 
-// multiselect, requires BS 5 (or 4)
-// TODO remove bs dependencies, switch to custom props
+/* multiselect, requires BS 5 (or 4) */
+/* TODO remove bs dependencies, switch to custom props */
 
 .form-multiselect {
   &, button {
@@ -39,6 +38,4 @@
   padding-right: $input-btn-padding-y * 3;
   @extend .text-truncate;
   text-align: left;
-}
-
 }

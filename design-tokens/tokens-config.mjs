@@ -45,7 +45,7 @@ const config = {
 
   // wraps generated custom properties inside a css `@layer` at-rule
   // Set the property to null, undefined, or false to set no layer
-  addLayer: 'project',
+  addLayer: false,
 
 
   // Named groups of custom properties. Properties whose first hyphen-separated

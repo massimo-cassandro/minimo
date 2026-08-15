@@ -1,4 +1,3 @@
-@layer components {
 
 /* stylelint-disable max-nesting-depth */
 
@@ -171,6 +170,4 @@
     /* top: var(--jt-sort-desc-arrow-svg-vertical-adjust, -3px); */
     rotate: var(--jt-sort-desc-arrow-rotate, 0);
   }
-}
-
 }

@@ -66,7 +66,7 @@ const config = {
   // Wraps the generated custom properties inside a CSS `@layer` at-rule,
   // e.g. addLayer: 'project' -> `@layer project { :root { ... } }`.
   // Set to null, undefined or false (default) to emit no layer.
-  addLayer: 'project',
+  addLayer: false,
 
   // Named groups of custom properties. Properties whose first hyphen-separated
   // name segment matches one of a group's `prefixes` are pulled out, labelled

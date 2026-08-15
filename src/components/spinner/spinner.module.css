@@ -1,9 +1,5 @@
-@layer components {
-
-  .spinnerWrapper {
-    display: grid;
-    place-content: center;
-    padding: 2rem;
-  }
-
+.spinnerWrapper {
+  display: grid;
+  place-content: center;
+  padding: 2rem;
 }

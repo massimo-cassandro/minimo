@@ -26,6 +26,8 @@ import stylelint from 'stylelint';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
+const addLayer = false; // true to add `@layer` rule
+
 const target_file            = '../src/css/margin-padding.css',
   target_file_media           = '../src/css/margin-padding-media.css',
   target_bs_file              = '../src/css/margin-padding-bootstrap.css',
@@ -187,7 +189,10 @@ function buildPlainCss(entries, header) {
     out += '\n';
   }
 
-  return header + `@layer utilities {\n\n${out.trimEnd()}\n\n}\n`;
+  return addLayer
+    ? header + `@layer utilities {\n\n${out.trimEnd()}\n\n}\n`
+    : header + '\n' + out.trimEnd() + '\n'
+  ;
 }
 
 function buildMediaCss(entries, header) {
@@ -204,7 +209,10 @@ function buildMediaCss(entries, header) {
     out += '}\n\n';
   }
 
-  return header + `@layer utilities {\n\n${out.trimEnd()}\n\n}\n`;
+  return addLayer
+    ? header + `@layer utilities {\n\n${out.trimEnd()}\n\n}\n`
+    : header + '\n' + out.trimEnd() + '\n'
+  ;
 }
 
 // ── build ─────────────────────────────────────────────────────────────────

@@ -1,6 +1,7 @@
 import { classnames } from '../classnames.js';
 import { randomId } from '../random-id.js';
 
+
 /**
  * Shared `.form-group` wrapper for the tag builders below: handles the
  * `condition` guard, `wrapperClass`, optional help text and `callback` in
@@ -45,6 +46,7 @@ function buildFormGroup({
  * @param {Object} args
  * @param {string} args.label - input label.
  * @param {string | null} args.name - input `name` attribute.
+ * @param {string | null} args.id - `id` attribute.
  * @param {string | number | null} args.value - input `value` attribute.
  * @param {string | null} [args.type='text'] - input `type` attribute.
  * @param {string | null} [args.wrapperClass=null] - optional class to be added to the `.form-group` wrapper.
@@ -58,6 +60,7 @@ function buildFormGroup({
 export function buildInput({
   label,
   name,
+  id = null,
   value = null,
   type = 'text',
   wrapperClass = null,
@@ -68,7 +71,7 @@ export function buildInput({
   callback = null
 }){
 
-  const id = randomId();
+  id = id || randomId();
 
   return buildFormGroup({
     condition,
@@ -92,6 +95,86 @@ export function buildInput({
   });
 }
 
+/**
+ * select tag builder
+ *
+ * @param {Object} args
+ * @param {string} args.label - select label.
+ * @param {string | null} args.name - select `name` attribute.
+ * @param {string | null} args.id - `id` attribute.
+ * @param {string | number | null} args.selectedValue - selected value
+ * @param {Array<[string|number, string]> | Array<Record<string, string>> | Record<string, string> | null} args.options -
+ *    options value/text pairs, as an array of two-element `[[value, text], ...]` arrays,
+ *    as an array of objects `[{somekey: value, somekey2: text},...]` objects, or as a single `{value: text, ...}` object
+ * @param {boolean} [args.addEmptyOption=true] - When true, and empty option tag is added at top
+ * @param {string | null} [args.wrapperClass=null] - optional class to be added to the `.form-group` wrapper.
+ * @param {string | null} [args.className=null] - optional class to be added to the `input`.
+ * @param {boolean} [args.condition=true] - When false, the function returns `null` without building anything.
+ * @param {string | HTMLElement | null} args.help - Optional help text.
+ * @param {(function(HTMLElement): void) | null} args.callback - Optional callback function.
+ * @param {Record<string, any> | null}  [args.attrs={}] - Optional attributes object.
+ * @returns {DomBuilderItem|null} The `input` domBuilder item, or `null` when `condition` is false.
+ */
+export function buildSelect({
+  label,
+  name,
+  id = null,
+  selectedValue = null,
+  options = null,
+  addEmptyOption = true,
+  wrapperClass = null,
+  className = null,
+  condition = true,
+  help = null,
+  attrs = {},
+  callback = null
+}){
+
+  id = id || randomId();
+
+  // normalizing option as an array
+  if(options && !Array.isArray(options)) {
+    options = Object.entries(options);
+
+  } else if(options && !Array.isArray(options[0])) {
+    options =  options.map(o => Object.values(o));
+  }
+
+
+  return buildFormGroup({
+    condition,
+    wrapperClass,
+    help,
+    children: [
+      `label.form-label[for:${id}] ${label}`,
+      {
+        tag: 'select',
+        className: classnames('form-control', className, attrs?.class),
+        id: id,
+        attrs: {
+          ...(attrs??{}),
+          name: name,
+        },
+        children: [
+          ...(addEmptyOption? ['option[value:]'] : []),
+          ...(options
+            ? options.map(([value, text]) => ({
+              tag: 'option',
+              attrs: {
+                value: value,
+                selected: value === selectedValue
+              },
+              content: text
+            }))
+            : []
+          )
+        ],
+        callback: callback
+      }
+    ]
+  });
+}
+
 
 /**
  * Checkbox tag builder
@@ -99,6 +182,7 @@ export function buildInput({
  * @param {Object} args
  * @param {string} args.label - checkbox label.
  * @param {string | null} args.name - checkbox `name` attribute.
+ * @param {string | null} args.id - `id` attribute.
  * @param {string | number | null} [args.value=1] - checkbox `value` attribute.
  * @param {boolean} [args.checked=false] - checkbox `checked` attribute.
  * @param {string | null} [args.wrapperClass=null] - optional class to be added to the `.form-group` wrapper (used only when `addFormGroup` is true).
@@ -112,6 +196,7 @@ export function buildInput({
 export function buildCheckbox({
   label,
   name,
+  id = null,
   value = 1,
   checked = false,
   wrapperClass = null,
@@ -134,7 +219,7 @@ export function buildCheckbox({
     </div>
   </div>
   */
-  const id = randomId();
+  id = id || randomId();
 
   const tag = {
     className: classnames('form-check', !addFormGroup && !help && wrapperClass),
@@ -176,6 +261,7 @@ export function buildCheckbox({
  * @param {Object} args
  * @param {string} args.label - textarea label.
  * @param {string | null} args.name - textarea `name` attribute.
+ * @param {string | null} args.id - `id` attribute.
  * @param {string | number | null} args.value - textarea content.
  * @param {boolean} [args.autosize=true] - adds `autosize` class
  * @param {string | null} [args.wrapperClass=null] - optional class to be added to the `.form-group` wrapper.
@@ -189,6 +275,7 @@ export function buildCheckbox({
 export function buildTextarea({
   label,
   name,
+  id = null,
   value = null,
   wrapperClass = null,
   className = null,
@@ -199,7 +286,7 @@ export function buildTextarea({
   autosize = true
 }) {
 
-  const id = randomId();
+  id = id || randomId();
 
   return buildFormGroup({
     condition,

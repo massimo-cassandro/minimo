@@ -20,7 +20,7 @@ export { ValidationError } from './src/utilities/validation-error-class.js';
 
 // domBuilder helpers
 export { buildPictureTag } from './src/utilities/dom-builder-helpers/picture-tag.js';
-export { buildInput, buildCheckbox, buildTextarea, buildFakeField } from './src/utilities/dom-builder-helpers/form-tags.js';
+export { buildInput, buildCheckbox, buildTextarea, buildFakeField, buildSelect } from './src/utilities/dom-builder-helpers/form-tags.js';
 
 // components
 export { dismissAlerts } from './src/components/dismiss-alerts.js';

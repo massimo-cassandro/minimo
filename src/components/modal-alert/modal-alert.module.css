@@ -1,203 +1,200 @@
-@layer components {
+/*! minimo - Modal Alert */
 
-  /*! minimo - Modal Alert */
+.malert {
+  width: 600px;
+  max-width: 90vw;
+  padding: 0;
+  margin: auto;
+  background-color: var(--malert-background-color);
+  border: none;
+  border-radius: var(--malert-border-radius);
+  box-shadow: var(--malert-box-shadow, var(--default-box-shadow));
+  /* box-shadow: 2px 2px 12px #000; */
 
-  .malert {
-    width: 600px;
-    max-width: 90vw;
-    padding: 0;
-    margin: auto;
-    background-color: var(--malert-background-color);
-    border: none;
-    border-radius: var(--malert-border-radius);
-    box-shadow: var(--malert-box-shadow, var(--default-box-shadow));
-    /* box-shadow: 2px 2px 12px #000; */
+  &::backdrop {
+    overscroll-behavior: contain;
+    background-color: var(--malert-backdrop);
+  }
 
-    &::backdrop {
-      overscroll-behavior: contain;
-      background-color: var(--malert-backdrop);
+  &, * {
+    box-sizing: border-box;
+  }
+}
+
+.success {
+  --_malert-color-bg: var(--malert-success-bg);
+  --_malert-color-fg: var(--malert-success-fg);
+}
+.info {
+  --_malert-color-bg: var(--malert-info-bg);
+  --_malert-color-fg: var(--malert-info-fg);
+}
+.warning {
+  --_malert-color-bg: var(--malert-warning-bg);
+  --_malert-color-fg: var(--malert-warning-fg);
+}
+.error {
+  --_malert-color-bg: var(--malert-error-bg);
+  --_malert-color-fg: var(--malert-error-fg);
+}
+.confirm {
+  --_malert-color-bg: var(--malert-confirm-bg);
+  --_malert-color-fg: var(--malert-confirm-fg);
+}
+
+
+.innerWrapper{
+  display: flex;
+  flex-flow: column nowrap;
+  /* gap: .7rem; */
+  align-items: stretch;
+  justify-content: flex-start;
+
+  @media screen and (min-width: 600px) {
+    flex-direction: row;
+  }
+}
+
+
+.mMark {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: .4rem;
+  background-color: var(--_malert-color-bg);
+
+  svg {
+    width: 100px;
+    aspect-ratio: 1;
+    background-color: transparent;
+    fill: var(--_malert-color-fg);
+  }
+
+  @media screen and (min-width: 600px) {
+    flex-direction: row;
+    align-items: flex-start;
+    width: auto;
+    padding: 1rem;
+    /* svg {
+    width: 100px;
+  } */
+  }
+}
+
+.mBody {
+  display: flex;
+  flex: 1;
+  flex-flow: column nowrap;
+  gap: .5rem;
+  align-items: stretch;
+  justify-content: flex-start;
+  padding: .5rem;
+
+  text-align: center;
+
+  @media screen and (min-width: 600px) {
+    padding: 1rem;
+    text-align: left;
+  }
+}
+
+.mHeading {
+  font-family: var(--malert-heading-font-family);
+  font-size: var(--malert-heading-font-size);
+  font-weight: var(--malert-heading-font-weight);
+  line-height: var(--malert-heading-line-height);
+}
+.mText {
+  font-family: var(--malert-text-font-family);
+  font-size: var(--malert-text-font-size);
+}
+
+.mBtns {
+  display: flex;
+  flex-flow: column nowrap;
+  gap: 1rem;
+  align-items: center;
+  justify-content: flex-end;
+
+  padding-top: 1rem;
+  margin-top: auto;
+
+  @media screen and (min-width: 600px) {
+    flex-direction: row-reverse;
+    justify-content: space-between;
+  }
+}
+
+
+.mAnimated {
+  transform: translateY(-500%);
+  animation: dialog-in .3s ease-out;
+
+  &[open] {
+    transform: none;
+  }
+}
+
+@keyframes dialog-in {
+  from {
+    opacity: 0;
+    transform: translateY(-50%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+
+/* confirm button */
+
+
+.btnConfirm {
+  --_button-bg-color: var(--malert-confirm-btn-bg);
+  --_button-fg-color: var(--malert-confirm-btn-fg);
+  --_button-border-color: var(--malert-confirm-btn-border-color);
+
+  @media (hover: hover) {
+    &:hover {
+      --_button-bg-color: var(--malert-confirm-btn-hover-bg);
+      --_button-fg-color: var(--malert-confirm-btn-hover-fg);
+      --_button-border-color: var(--malert-confirm-btn-hover-border-color);
     }
-
-    &, * {
-      box-sizing: border-box;
-    }
+  }
+  &:focus {
+    outline: none;
   }
 
-  .success {
-    --_malert-color-bg: var(--malert-success-bg);
-    --_malert-color-fg: var(--malert-success-fg);
+  &:focus-visible, &:active {
+    outline: var(--malert-confirm-btn-focus-outline-width) solid var(--malert-confirm-btn-focus-outline-color);
+    /* outline-offset: 4px; */
   }
-  .info {
-    --_malert-color-bg: var(--malert-info-bg);
-    --_malert-color-fg: var(--malert-info-fg);
-  }
-  .warning {
-    --_malert-color-bg: var(--malert-warning-bg);
-    --_malert-color-fg: var(--malert-warning-fg);
-  }
-  .error {
-    --_malert-color-bg: var(--malert-error-bg);
-    --_malert-color-fg: var(--malert-error-fg);
-  }
-  .confirm {
-    --_malert-color-bg: var(--malert-confirm-bg);
-    --_malert-color-fg: var(--malert-confirm-fg);
+
+  &:active {
+    --_button-bg-color: var(--malert-confirm-btn-active-bg);
+    --_button-fg-color: var(--malert-confirm-btn-active-fg);
+    --_button-border-color: var(--malert-confirm-btn-active-border-color);
   }
 
 
-  .innerWrapper{
-    display: flex;
-    flex-flow: column nowrap;
-    /* gap: .7rem; */
-    align-items: stretch;
-    justify-content: flex-start;
+  &.btnHollow {
 
-    @media screen and (min-width: 600px) {
-      flex-direction: row;
-    }
-  }
+    --_button-bg-color: var(--malert-confirm-btn-hollow-bg);
+    --_button-fg-color: var(--malert-confirm-btn-hollow-fg);
+    /* --_button-border-color: var(--__btn-o-primary-border-color); */
 
-
-  .mMark {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    padding: .4rem;
-    background-color: var(--_malert-color-bg);
-
-    svg {
-      width: 100px;
-      aspect-ratio: 1;
-      background-color: transparent;
-      fill: var(--_malert-color-fg);
-    }
-
-    @media screen and (min-width: 600px) {
-      flex-direction: row;
-      align-items: flex-start;
-      width: auto;
-      padding: 1rem;
-      /* svg {
-      width: 100px;
-    } */
-    }
-  }
-
-  .mBody {
-    display: flex;
-    flex: 1;
-    flex-flow: column nowrap;
-    gap: .5rem;
-    align-items: stretch;
-    justify-content: flex-start;
-    padding: .5rem;
-
-    text-align: center;
-
-    @media screen and (min-width: 600px) {
-      padding: 1rem;
-      text-align: left;
-    }
-  }
-
-  .mHeading {
-    font-family: var(--malert-heading-font-family);
-    font-size: var(--malert-heading-font-size);
-    font-weight: var(--malert-heading-font-weight);
-    line-height: var(--malert-heading-line-height);
-  }
-  .mText {
-    font-family: var(--malert-text-font-family);
-    font-size: var(--malert-text-font-size);
-  }
-
-  .mBtns {
-    display: flex;
-    flex-flow: column nowrap;
-    gap: 1rem;
-    align-items: center;
-    justify-content: flex-end;
-
-    padding-top: 1rem;
-    margin-top: auto;
-
-    @media screen and (min-width: 600px) {
-      flex-direction: row-reverse;
-      justify-content: space-between;
-    }
-  }
-
-
-  .mAnimated {
-    transform: translateY(-500%);
-    animation: dialog-in .3s ease-out;
-
-    &[open] {
-      transform: none;
-    }
-  }
-
-  @keyframes dialog-in {
-    from {
-      opacity: 0;
-      transform: translateY(-50%);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-
-  /* confirm button */
-
-
-  .btnConfirm {
-    --_button-bg-color: var(--malert-confirm-btn-bg);
-    --_button-fg-color: var(--malert-confirm-btn-fg);
-    --_button-border-color: var(--malert-confirm-btn-border-color);
 
     @media (hover: hover) {
       &:hover {
-        --_button-bg-color: var(--malert-confirm-btn-hover-bg);
-        --_button-fg-color: var(--malert-confirm-btn-hover-fg);
-        --_button-border-color: var(--malert-confirm-btn-hover-border-color);
+        --_button-bg-color: var(--malert-confirm-btn-hollow-hover-bg);
+        --_button-fg-color: var(--malert-confirm-btn-hollow-hover-fg);
+        /* --_button-border-color: var(--__btn-o-primary-hover-border-color); */
       }
     }
-    &:focus {
-      outline: none;
-    }
 
-    &:focus-visible, &:active {
-      outline: var(--malert-confirm-btn-focus-outline-width) solid var(--malert-confirm-btn-focus-outline-color);
-      /* outline-offset: 4px; */
-    }
+  }
 
-    &:active {
-      --_button-bg-color: var(--malert-confirm-btn-active-bg);
-      --_button-fg-color: var(--malert-confirm-btn-active-fg);
-      --_button-border-color: var(--malert-confirm-btn-active-border-color);
-    }
+} /* end btnConfirm */
 
-
-    &.btnHollow {
-
-      --_button-bg-color: var(--malert-confirm-btn-hollow-bg);
-      --_button-fg-color: var(--malert-confirm-btn-hollow-fg);
-      /* --_button-border-color: var(--__btn-o-primary-border-color); */
-
-
-      @media (hover: hover) {
-        &:hover {
-          --_button-bg-color: var(--malert-confirm-btn-hollow-hover-bg);
-          --_button-fg-color: var(--malert-confirm-btn-hollow-hover-fg);
-          /* --_button-border-color: var(--__btn-o-primary-hover-border-color); */
-        }
-      }
-
-    }
-
-  } /* end btnConfirm */
-
-}
