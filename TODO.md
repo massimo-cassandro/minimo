@@ -9,6 +9,97 @@ Riferimento centralizzato dei prossimi interventi. Le dir con prefisso `TODO ` i
   * aggiungere prefisso (`mm-`) a tutte le custom properties **generiche/base** di minimo (`--size-*`, `--color-*`, `--radius-*`, `--text-color`, `--body-background-color`, `--z-index-*`, ...), per evitare collisioni con custom properties di progetti che integrano minimo. Non serve invece sui token già namespaced per componente (`--malert-*`, `--sf-macro-*`, `--up-*`, ...), poco a rischio di collisione — vedi anche la sezione [Compatibilità con framework diversi da minimo (CSS)](#compatibilità-con-framework-diversi-da-minimo-css). Breaking change: in versione 2. Da accompagnare con uno script di migrazione (find/replace sui nomi noti delle custom properties) per i progetti esistenti.
   * fare in modo di aggiungere all'inzio di ogni gruppo di proprietà di un componente, un commento con il nome del componente stesso
 
+## PLUGIN PER AGGIUNTA DINAMICA LAYERS CSS
+in webpack.config, opzione per l'aggiunta dei layers, da passare a css_rules:
+  
+```javascript
+addCssLayers = false // (o null ecc)
+// oppure
+addCssLayers = [
+  {
+    layerName: 'base',
+    include: [
+      path.resolve(__dirname, 'node_modules/@massimo-cassandro/minimo/src/css'),
+    ],
+  },
+  {
+    layerName: 'components',
+    include: [
+      path.resolve(__dirname, 'node_modules/@massimo-cassandro/minimo/src/components'),
+      path.resolve(__dirname, 'node_modules/@massimo-cassandro/minimo/src/web-components'),
+    ],
+  },
+]
+```
+
+Creare plugin postcss:
+
+```javascript
+// postcss-wrap-in-layer.js
+const wrapInLayer = (layerName = 'vendor') => ({
+  postcssPlugin: 'wrap-in-layer',
+  Once(root, { AtRule }) {
+    const layer = new AtRule({ name: 'layer', params: layerName });
+    layer.append(root.nodes);
+    root.removeAll();
+    root.append(layer);
+  }
+});
+wrapInLayer.postcss = true;
+
+module.exports = wrapInLayer;
+```
+
+Configurazione da aggiungere a css_rules (esempio) (NB: se possibile NON usare common-js):
+
+```javascript
+{
+  test: /\.css$/,
+  oneOf: [
+    {
+      // solo i file che vuoi avvolgere in un layer
+      include: [
+        path.resolve(__dirname, 'node_modules/qualche-libreria'),
+        path.resolve(__dirname, 'src/vendor'),
+      ],
+      use: [
+        MiniCssExtractPlugin.loader,
+        'css-loader',
+        {
+          loader: 'postcss-loader',
+          options: {
+            postcssOptions: {
+              plugins: [require('./postcss-wrap-in-layer')('vendor')],
+            },
+          },
+        },
+      ],
+    },
+    {
+      // tutti gli altri CSS, pipeline normale
+      use: [MiniCssExtractPlugin.loader, 'css-loader', 'postcss-loader'],
+    },
+  ],
+}
+```
+
+rendere l'utilizzo condizionale (esempio):
+
+```javascript
+//...
+{
+  loader: 'postcss-loader',
+  options: {
+    postcssOptions: {
+      plugins: useLayer
+        ? [require('./postcss-wrap-in-layer')('vendor')]
+        : [],
+    },
+  },
+}
+//...
+```
+
 ## WEBPACK PLUGIN PER ESTRAZIONE OTTIMIZZATA DELLE CSS CUSTOM PROPERTIES
 
   * **Contesto:** minimo ha un file "master" con **tutte** le definizioni di custom properties disponibili (spacing, colori, tipografia, ecc.). Nei progetti che consumano il framework le definizioni vengono rimosse a monte e i CSS compilati da webpack contengono solo *usi* (`var(--nome)`), mai definizioni. Serve un plugin webpack che, dopo l'emit degli asset, scansioni i CSS compilati, determini quali custom properties sono effettivamente usate (incluse le dipendenze transitive) e inietti solo le definizioni necessarie in uno o più file target. La cosa viene fatta ora con postcss-jit-props, mentre l'uso di purgeCSS non ha dato mai risultati accettabili (ma viene cmq conservato per il purge delle classi)

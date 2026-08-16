@@ -102,7 +102,7 @@ export function buildInput({
  * @param {string} args.label - select label.
  * @param {string | null} args.name - select `name` attribute.
  * @param {string | null} args.id - `id` attribute.
- * @param {string | number | null} args.selectedValue - selected value
+ * @param {string | number | null} args.selectedValue - selected value (note: checked against 'options' values using loose equality '=='):
  * @param {Array<[string|number, string]> | Array<Record<string, string>> | Record<string, string> | null} args.options -
  *    options value/text pairs, as an array of two-element `[[value, text], ...]` arrays,
  *    as an array of objects `[{somekey: value, somekey2: text},...]` objects, or as a single `{value: text, ...}` object
@@ -162,7 +162,8 @@ export function buildSelect({
               tag: 'option',
               attrs: {
                 value: value,
-                selected: value === selectedValue
+                // eslint-disable-next-line eqeqeq
+                selected: value == selectedValue
               },
               content: text
             }))

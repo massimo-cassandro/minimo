@@ -36,7 +36,8 @@
 
 .closeButton  {
 
-  position: absolute;
+  /* stylelint-disable-next-line declaration-no-important */
+  position: absolute !important;
   top: calc(-1 * var(--mpopup-btn-close-size) / 3);
   right: calc(-1 * var(--mpopup-btn-close-size) / 3);
 }
