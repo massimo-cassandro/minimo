@@ -457,9 +457,12 @@ const config = {
             ...(current_year > start_year? [current_year] : [])
           ].join('-')
           ,vers = packageJson.version.split('.').slice(0,-1).join('.')
+          // ,vers = packageJson.version
         ;
 
-        return `/*! ${packageJson.name} v.${vers} - Massimo Cassandro ${year} */`;
+        const author = packageJson.author?.name ?? (packageJson.author ?? '');
+
+        return `/*! ${packageJson.name} v.${vers} - ${author} ${year} */`;
 
       },
       raw: true,

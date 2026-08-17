@@ -15,11 +15,11 @@ export default {
     },
     height: {
       $type: 'dimension',
-      $value: 'max-content',
+      $value: 'fit-content',
     },
     'min-height': {
       $type: 'dimension',
-      $value: '300px',
+      $value: '40dvw',
     },
     'max-height': {
       $type: 'dimension',

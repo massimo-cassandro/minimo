@@ -19,7 +19,8 @@
   "scripts": {
     "progetto JS webpack DEV": "npm 'launchChrome' && NODE_ENV=development webpack serve --config ./webpack.config.mjs #--open-app-name 'Google Chrome'",
     "progetto sf webpack DEV": "rm -rf ./public/_dev && NODE_ENV=development webpack --config ./frontend/webpack.config.mjs",
-    "webpack PROD": "NODE_ENV=production webpack --config ./webpack.config.mjs --stats minimal",
+    "webpack PROD": "npm run 'UPD-version' && NODE_ENV=production webpack --config ./webpack.config.mjs --stats minimal",
+    "eslint-check": "npx eslint app/ # or src/, frontend/src/ ...",
     "create-favicons INIT": "npx create-favicons init",
     "create-favicons": "npx create-favicons --dir=./src/favicons",
     "UPD-version": "npx update-version  # --log-file=./frontend/changelog.md --log-patch --pkg=alt/path/to/package.json",
@@ -30,7 +31,9 @@
     "symfony server": "symfony serve --port=8100 --listen-ip=0.0.0.0 # symfony server:stop # http://192.168.1.135:8100 # -d (deamon): rimane aperto anche dopo la chiusra del terminale",
     "node server": "node serve # richiede ‘npm i serve’",
     "build tokens": "npx buildTokens --config ./path/to/tokens-config.mjs",
-    "check unresolved props": "npx checkUnresolvedProps --config ./path/to/tokens-config.mjs"
+    "check unresolved props": "npx checkUnresolvedProps --config ./path/to/tokens-config.mjs",
+    "npm-outdated": "npm outdated",
+    "npm-upd": "npm update --save"
   },
   "devDependencies": {},
   "dependencies": {}

@@ -40,7 +40,10 @@ function closeDialog(el) {
  *
  * @param {Object} params
  * @param {string | null} [params.dialogExtraClassName=null] - Extra class added to the dialog element.
+ * @param {string | DomBuilderItem[] | null} [params.content=null] - Plain text, HTML, or a domBuilder array.
  * @param {string | null} [params.contentExtraClassName=null] - Extra class added to the content wrapper.
+ * @param {HTMLElement | null} [params.triggerElement=null] - Optional element that triggered the popup; when set, `aria-haspopup`, `aria-controls` and `aria-expanded` are managed on it.
+ * @param {boolean} [params.addFocus=true] - if true, dialog receives focus after opening
  * @param {string | null} [params.headerExtraClassName=null] - Extra class added to the header wrapper.
  * @param {string | null} [params.footerExtraClassName=null] - Extra class added to the footer wrapper.
  * @param {string | number | null} [params.dialogWidth=null] - optional dialog width value - if set, overrides main css custom prop
@@ -50,14 +53,12 @@ function closeDialog(el) {
  * @param {string | number | null} [params.dialogMinHeight=null] - optional dialog min-height value - if set, overrides main css custom prop
  * @param {string | number | null} [params.dialogMaxHeight=null] - optional dialog max-height value - if set, overrides main css custom prop
  * @param {string | null} [params.iframeUrl=null] - URL to load in an iframe.
- * @param {string | DomBuilderItem[] | null} [params.content=null] - Plain text, HTML, or a domBuilder array.
  * @param {string | null} [params.ajaxUrl=null] - URL for Ajax content loading.
  * @param {((data: *, el: Element) => void) | null} [params.ajaxCallback=null] - Called with the Ajax response and the content element.
  * @param {((el: HTMLDialogElement) => void) | null} [params.closeCallback=null] - Called with the dialog element just before it is removed.
  * @param {boolean} [params.addScrollbarPadding=false] - Adds right padding to compensate for the scrollbar.
  * @param {string | DomBuilderItem[] | null} [params.headerContent=null] - Header content: plain text, HTML, or a domBuilder array.
  * @param {string | DomBuilderItem[] | null} [params.footerContent=null] - Footer content: plain text, HTML, or a domBuilder array.
- * @param {HTMLElement | null} [params.triggerElement=null] - Optional element that triggered the popup; when set, `aria-haspopup`, `aria-controls` and `aria-expanded` are managed on it.
  * @returns {HTMLDialogElement} The dialog element.
  */
 
@@ -76,6 +77,8 @@ export function modalPopup({
   dialogHeight    = null,
   dialogMinHeight = null,
   dialogMaxHeight = null,
+
+  addFocus = true,
 
   /** iframe url */
   iframeUrl = null,
@@ -295,7 +298,10 @@ export function modalPopup({
 
   document.body.classList.add('overflow-hidden');
   thisDialog.showModal();
-  thisDialog.focus();
+
+  if(addFocus) {
+    thisDialog.focus();
+  }
 
   thisDialog.classList.add(styles.on);
 
