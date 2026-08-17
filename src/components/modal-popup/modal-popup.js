@@ -54,8 +54,9 @@ function closeDialog(el) {
  * @param {string | number | null} [params.dialogMaxHeight=null] - optional dialog max-height value - if set, overrides main css custom prop
  * @param {string | null} [params.iframeUrl=null] - URL to load in an iframe.
  * @param {string | null} [params.ajaxUrl=null] - URL for Ajax content loading.
+ * @param {((el: HTMLDialogElement) => void) | null} [params.openCallback=null] - Called with the dialog element after opening, receives the dialog element (`openCallback(dialogEl)`).
+ * @param {((el: HTMLDialogElement) => void) | null} [params.closeCallback=null] - Called with the dialog element just before it is removed, receives the dialog element (`closeCallback(dialogEl)`). NB: `dialogEl` is removed immediately after closing.
  * @param {((data: *, el: Element) => void) | null} [params.ajaxCallback=null] - Called with the Ajax response and the content element.
- * @param {((el: HTMLDialogElement) => void) | null} [params.closeCallback=null] - Called with the dialog element just before it is removed.
  * @param {boolean} [params.addScrollbarPadding=false] - Adds right padding to compensate for the scrollbar.
  * @param {string | DomBuilderItem[] | null} [params.headerContent=null] - Header content: plain text, HTML, or a domBuilder array.
  * @param {string | DomBuilderItem[] | null} [params.footerContent=null] - Footer content: plain text, HTML, or a domBuilder array.
@@ -93,10 +94,7 @@ export function modalPopup({
   ajaxUrl = null,
   ajaxCallback = null,
 
-  /** optional callback invoked when the dialog closes;
-   * receives the dialog element (`closeCallback(dialogEl)`)
-   * NB: `dialogEl` is removed immediately after
-   */
+  openCallback = null,
   closeCallback = null,
   addScrollbarPadding = false, // adds extra right padding to compensate for the scrollbar
 
@@ -260,6 +258,10 @@ export function modalPopup({
 
   // snapshot: dialogEl could be overwritten by a subsequent modalPopup call
   const thisDialog = /** @type {HTMLDialogElement} */ (dialogEl);
+
+  if(openCallback) {
+    openCallback(thisDialog);
+  }
 
   // close button listener
   thisDialog.querySelector(`.${styles.closeButton}`)?.addEventListener('click', () => {
