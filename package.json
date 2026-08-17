@@ -88,8 +88,8 @@
     }
   },
   "devDependencies": {
-    "@massimo-cassandro/eslint-config": "^3.0.13",
-    "@massimo-cassandro/stylelint-config": "^2.3.13",
+    "@massimo-cassandro/eslint-config": "^3.0.14",
+    "@massimo-cassandro/stylelint-config": "^2.3.14",
     "@types/node": "^26.2.0",
     "jsdom": "^29.1.1",
     "style-dictionary": "^5.5.1"
