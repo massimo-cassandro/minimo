@@ -1,106 +1,110 @@
+/* TODO aggiungere esempi di uso */
+/* TODO valutare versione con label a sinistra (form-check-reverse) */
 
-/* TODO completare, aggiungere focus, vedere soluzione bootstrap
+/*
+Markup (come bootstrap 5, con l'aggiunta dell'attributo nativo `switch`):
 
+<div class="form-check form-switch">
+  <input class="form-check-input" type="checkbox" role="switch" switch id="my-switch">
+  <label class="form-check-label" for="my-switch">Abilita notifiche</label>
+</div>
+
+L'attributo `switch` (per ora solo WebKit) fa sì che il browser generi un vero
+controllo switch nativo, modellabile con gli pseudo-elementi `::track` e `::thumb`.
+Dove non è supportato (o dove l'attributo è assente) si applica il fallback
+`appearance: none` con la pallina disegnata come background-image.
+*/
 
 .form-switch {
-padding-left: $form-switch-padding-start;
 
-.form-check-input {
-  --#{$prefix}form-switch-bg: #{escape-svg($form-switch-bg-image)};
+  --_switch-thumb-size: calc(var(--switch-height) - var(--switch-thumb-inset) * 2);
 
-  width: $form-switch-width;
-  margin-left: $form-switch-padding-start * -1;
-  background-image: var(--#{$prefix}form-switch-bg);
-  background-position: left center;
-  @include border-radius($form-switch-border-radius, 0);
-  @include transition($form-switch-transition);
+  /* annulla il layout con float di `.form-check` */
+  display: flex;
+  column-gap: var(--size-sm);
+  align-items: center;
+  padding-left: 0;
 
-  &:focus {
-    --#{$prefix}form-switch-bg: #{escape-svg($form-switch-focus-bg-image)};
+  .form-check-input {
+    float: none;
+    flex: none;
+    width: var(--switch-width);
+    height: var(--switch-height);
+    margin: 0;
+    appearance: none;
+    cursor: pointer;
+    background-color: var(--switch-background-color);
+    background-image: radial-gradient(
+      circle closest-side,
+      var(--switch-cursor-background-color) 98%,
+      transparent
+    );
+    background-repeat: no-repeat;
+    background-position: var(--switch-thumb-inset) center;
+    background-size: var(--_switch-thumb-size) var(--_switch-thumb-size);
+    border: none;
+    border-radius: var(--switch-height);
+
+    /* annulla lo `scale` applicato a tutti i checkbox */
+    scale: none;
+
+    &:checked {
+      background-color: var(--switch-checked-background-color);
+      background-position: calc(100% - var(--switch-thumb-inset)) center;
+    }
+
+    &:focus {
+      outline: none;
+    }
+
+    &:focus-visible {
+      outline: var(--form-control-focus-outline-width) solid var(--form-control-focus-color);
+      outline-offset: var(--form-control-focus-outline-offset);
+    }
   }
 
-  &:checked {
-    background-position: $form-switch-checked-bg-position;
+  .form-check-label {
+    cursor: pointer;
+    user-select: none;
+  }
 
-    @if $enable-gradients {
-      --#{$prefix}form-switch-bg: #{escape-svg($form-switch-checked-bg-image)}, var(--#{$prefix}gradient);
-    } @else {
-      --#{$prefix}form-switch-bg: #{escape-svg($form-switch-checked-bg-image)};
+  &:has(.form-check-input:disabled) {
+    opacity: var(--form-control-disabled-opacity);
+
+    .form-check-input, .form-check-label {
+      cursor: not-allowed;
     }
   }
 }
 
-&.form-check-reverse {
-  padding-right: $form-switch-padding-start;
-  padding-left: 0;
-
-  .form-check-input {
-    margin-right: $form-switch-padding-start * -1;
-    margin-left: 0;
+@media (prefers-reduced-motion: no-preference) {
+  .form-switch .form-check-input {
+    transition:
+      background-color var(--switch-transition-duration) linear,
+      background-position var(--switch-transition-duration) ease-in-out;
   }
 }
+
+/* switch nativo: si lascia il rendering al browser e si interviene sui suoi pseudo-elementi */
+/* stylelint-disable selector-pseudo-element-no-unknown */
+@supports selector(input[switch]::thumb) {
+
+  .form-switch .form-check-input[switch] {
+    appearance: auto;
+    background: none;
+    border-radius: 0; /* gestito da ::track */
+
+    &::track {
+      background-color: var(--switch-background-color);
+    }
+
+    &::thumb {
+      background-color: var(--switch-cursor-background-color);
+    }
+
+    &:checked::track {
+      background-color: var(--switch-checked-background-color);
+    }
+  }
 }
-
-
-*/
-
-/*
-<div class="switch">
-<input type="checkbox">
-<span class="switch-track"></span>
-<label>Abilita notifiche</label>
-</div>
-*/
-
-.switch {
-  display: inline-flex;
-  align-items: center;
-  cursor: pointer;
-}
-
-.switch input {
-  position: absolute;
-  width: 0;
-  height: 0;
-  opacity: 0;
-}
-
-.switch-track {
-  position: relative;
-  width: 2.5em;
-  height: 1.5em;
-  background-color: var(--switch-background-color);
-  border-radius: 1.5em;
-  transition: background-color .2s;
-}
-
-.switch label {
-  margin-left: .5em;
-  user-select: none;
-}
-
-.switch-track::after {
-  position: absolute;
-  top: 2px;
-  left: 2px;
-  width: 2em;
-  height: 2em;
-  content: '';
-  background: var(--switch-cursor-background-color);
-  border-radius: 50%;
-  transition: translate .2s;
-}
-
-.switch input:checked + .switch-track {
-  background-color: var(--switch-checked-background-color);
-}
-
-.switch input:checked + .switch-track::after {
-  translate: 20px 0;
-}
-
-/* accessibilità */
-.switch input:focus-visible + .switch-track {
-  outline: 2px solid var(--switch-checked-background-color);
-  outline-offset: 2px;
-}
+/* stylelint-enable selector-pseudo-element-no-unknown */

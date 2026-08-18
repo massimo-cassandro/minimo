@@ -284,10 +284,10 @@
   --mpopup-header-color: var(--text-color);
   --mpopup-header-font-size: var(--font-size-xl);
   --mpopup-header-padding: var(--size-xs);
-  --mpopup-height: max-content;
+  --mpopup-height: fit-content;
   --mpopup-max-height: 90dvh;
   --mpopup-max-width: 70dvw;
-  --mpopup-min-height: 300px;
+  --mpopup-min-height: 40dvw;
   --mpopup-min-width: 400px;
   --mpopup-width: max-content;
 
@@ -383,6 +383,10 @@
   --switch-background-color: var(--neutral-100);
   --switch-checked-background-color: var(--primary-100);
   --switch-cursor-background-color: var(--body-background-color);
+  --switch-height: 1.25em;
+  --switch-thumb-inset: .125em;
+  --switch-transition-duration: .2s;
+  --switch-width: 2.25em;
 
   --table-body-border-width: 1px;
   --table-body-tr-alt-bg-color: #efefef;

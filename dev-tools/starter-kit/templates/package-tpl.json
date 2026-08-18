@@ -28,7 +28,7 @@
     "launchChrome": "open -n -a 'Google Chrome' --args --profile-directory='Profile 3'",
     "python server": "python3 -m http.server 8000 # --directory __dirname__ # 8000 = default port",
     "php server": "php -S localhost:8000 # -t root_dir/",
-    "symfony server": "symfony serve --port=8100 --listen-ip=0.0.0.0 # symfony server:stop # http://192.168.1.135:8100 # -d (deamon): rimane aperto anche dopo la chiusra del terminale",
+    "symfony server": "symfony serve --port=810X --listen-ip=0.0.0.0 # http://192.168.1.135:810X # -d (deamon): rimane aperto anche dopo la chiusura del terminale, terminare con `symfony server:stop`",
     "node server": "node serve # richiede ‘npm i serve’",
     "build tokens": "npx buildTokens --config ./src/css/tokens-config.mjs # o ./frontend/src/css/tokens-config.mjs",
     "check unresolved props": "npx checkUnresolvedProps --config ./src/css/tokens-config.mjs # o ./frontend/src/css/tokens-config.mjs",

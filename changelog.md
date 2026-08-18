@@ -38,3 +38,4 @@
 * 1.19.0 (26 lug 2026) - Design Tokens Utilities: merge CSS
 * 1.20.0 (03 ago 2026) - css classes types & build-tokens improvements
 * 1.21.0 (14 ago 2026) - css layers
+* 1.22.0 (18 ago 2026) - switch

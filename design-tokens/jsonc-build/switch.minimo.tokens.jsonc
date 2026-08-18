@@ -6,6 +6,26 @@
 // -----------------------------------------------------------------------
 {
   "switch": {
+    "width": {
+      "$type": "dimension",
+      "$value": "2.25em"
+    },
+    "height": {
+      "$type": "dimension",
+      "$value": "1.25em"
+    },
+    "thumb": {
+      "inset": {
+        "$type": "dimension",
+        "$value": ".125em"
+      }
+    },
+    "transition": {
+      "duration": {
+        "$type": "duration",
+        "$value": ".2s"
+      }
+    },
     "background": {
       "color": {
         "$type": "color",
