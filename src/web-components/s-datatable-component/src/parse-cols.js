@@ -121,13 +121,15 @@ export function parseCols(col_obj){
 
     } else if(col_obj._renderMode === 'numeric') {
       return {
-// TODO implementare merge con classi presenti nei parametri definiti dall'utente
-        cellClass: 'text-end text-numeric',
-        headerClass: 'text-end text-numeric', // NB: usata anche per il footer
+        ...col_obj,
+        // le classi definite dall'utente vengono unite, non sostituite
+        cellClass: classnames('text-end text-numeric', col_obj.cellClass),
+        headerClass: classnames('text-end text-numeric', col_obj.headerClass), // NB: usata anche per il footer
       };
 
     } else if(col_obj._renderMode === 'euro_no_dec') {
       return {
+        ...col_obj,
         render: (value, cell) => {
           // console.log(value);
           if(value == null || isNaN(value)) {
@@ -143,8 +145,9 @@ export function parseCols(col_obj){
             });
           }
         },
-        cellClass: 'text-nowrap text-end text-numeric',
-        headerClass: 'text-nowrap text-end text-numeric', // NB: usata anche per il footer
+        // le classi definite dall'utente vengono unite, non sostituite
+        cellClass: classnames('text-nowrap text-end text-numeric', col_obj.cellClass),
+        headerClass: classnames('text-nowrap text-end text-numeric', col_obj.headerClass), // NB: usata anche per il footer
         type: 'number'
       };
 

@@ -2,6 +2,14 @@
 
 <https://fiduswriter.github.io/simple-datatables/documentation/>
 
+## Installazione
+
+`simple-datatables` è una **peer dependency opzionale** di minimo: va installata
+solo nei progetti che usano questo componente.
+
+```bash
+npm i simple-datatables
+```
 
 ## Utilizzo da markup
 
@@ -211,12 +219,28 @@ cols: [
                    //   _sortValue: 'owner.cognome'  → ordina per cognome
 
     _searchValue,  // Percorso/i del campo da usare per la RICERCA al posto del contenuto
-                   // visualizzato. Accetta uno o più percorsi separati da spazio.
+                   // visualizzato. Accetta uno o più percorsi separati da spazio,
+                   // oppure una funzione (row) => string|number|boolean.
                    // Supporta notazione punto.
-                   // Implementato tramite searchMethod di colonna (API simple-datatables)
-                   // e attributo data-search sulla cella.
+                   // Implementato tramite searchMethod di colonna (API simple-datatables):
+                   // il valore viene scritto in attributes['data-search'] della cella e
+                   // la searchMethod lo legge dall'OGGETTO DATI INTERNO di
+                   // simple-datatables (cellType: { data, text?, order?, attributes? }),
+                   // NON dal nodo DOM <td> (la libreria passa alla callback
+                   // `searchRow[index]`, non l'elemento renderizzato).
+                   // Ordine di lettura: attributes['data-search'] → text → data.
+                   // Il valore viene convertito con String(), quindi sono ammessi
+                   // numeri e booleani (es. `_searchValue: row => row.id`).
                    // La ricerca è di tipo AND: tutti i termini digitati devono essere
                    // presenti nel valore del campo (o dei campi) indicati.
+                   //
+                   // Normalizzazione: simple-datatables normalizza solo i termini
+                   // digitati (default `sensitivity: 'base'`, `ignorePunctuation: true`).
+                   // La searchMethod applica la stessa catena anche al contenuto della
+                   // cella (minuscole + NFD senza diacritici + rimozione punteggiatura),
+                   // così "citta" trova "Città" e "spa" trova "S.p.A.".
+                   // Se sulla colonna sono impostate `sensitivity` / `ignorePunctuation`,
+                   // vengono rispettate.
                    //
                    // Esempio: _searchValue: 'owner.cognome owner.nome'
                    //   cerca su entrambi i campi concatenati; "rossi mario" trova solo

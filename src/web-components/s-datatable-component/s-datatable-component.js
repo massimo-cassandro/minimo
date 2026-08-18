@@ -5,6 +5,7 @@
 import { DataTable } from 'simple-datatables';
 
 import { parseCols } from './src/parse-cols.js';
+import { makeSearchMethod } from './src/search-method.js';
 
 import * as styles from './s-datatable-component.module.css';
 
@@ -640,10 +641,13 @@ class SimpleDatatableAdapter extends HTMLElement {
             value = nullAs;
           }
 
-          // _searchValue: valore alternativo per la ricerca
-          // Viene scritto come testo nascosto nella cella così la funzione
-          // search personalizzata della colonna può leggerlo direttamente
-          // dal contenuto, senza dipendere da attributi non supportati.
+          // _searchValue: valore alternativo per la ricerca.
+          // Viene scritto in `attributes['data-search']` della cella: la
+          // searchMethod di colonna lo legge dall'oggetto dati interno di
+          // simple-datatables (cellType), non dal DOM.
+          // Accetta un percorso (o più percorsi separati da spazio) oppure una
+          // funzione (row) => string|number: il valore viene normalizzato con
+          // String() al momento del confronto.
           const searchValue = col_item._searchValue
             ? typeof col_item._searchValue === 'function'
               ? (col_item._searchValue(row) ?? '')
@@ -702,20 +706,14 @@ class SimpleDatatableAdapter extends HTMLElement {
         // data-search invece che sul testo visualizzato.
         // L'API simple-datatables prevede: (terms, cell, row, colIdx, source)
         // - terms: array di stringhe (uno per parola cercata)
-        // - cell:  nodo DOM <td> della riga renderizzata
+        // - cell:  oggetto dati interno `cellType` ({ data, text?, order?, attributes? }),
+        //          NON il nodo DOM <td>: la libreria passa `searchRow[index]`
+        //          (vedi `multiSearch` in src/datatable.ts).
         // La funzione deve restituire true se la riga è da includere.
-        // NOTA: `cell` è un nodo DOM, quindi va usato cell.getAttribute()
-        // e NON cell.attributes?.['data-search'] (che leggerebbe la NamedNodeMap
-        // come plain object, restituendo sempre undefined).
-        // Comportamento AND: tutti i termini devono essere presenti (come
-        // nella demo https://fiduswriter.github.io/simple-datatables/demos/22-and-search/).
+        // Vedi ./src/search-method.js per la lettura del valore e la
+        // normalizzazione (allineata a quella che la libreria applica ai termini).
         if (col_settings._searchValue) {
-          colObj.searchMethod = (terms, cell) => {
-            const haystack = (
-              cell.getAttribute?.('data-search') ?? cell.textContent ?? ''
-            ).toLowerCase();
-            return terms.every(term => haystack.includes(term.toLowerCase()));
-          };
+          colObj.searchMethod = makeSearchMethod(col_settings);
         }
 
         return colObj;
