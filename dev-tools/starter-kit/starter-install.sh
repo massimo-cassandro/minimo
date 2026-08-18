@@ -141,21 +141,22 @@ safe_cat "${TEMPLATES_DIR}/_prettierrc"                .prettierrc new
 safe_cat "${TEMPLATES_DIR}/_root_htaccess"             _root_htaccess
 safe_cat "${TEMPLATES_DIR}/_root_robots.txt"           _root_robots.txt
 
-# jsconfig.json: va installato ACCANTO a webpack.config.mjs (che legge gli alias
-# con `path.resolve(__dirname, './jsconfig.json')`), non necessariamente in root.
-# Il placeholder __NODE_MODULES__ viene risolto in base alla posizione scelta.
+# jsconfig.json: sta SEMPRE nella root del progetto (è anche il file di
+# riferimento di vscode). I suoi path sono quindi relativi alla root: il
+# placeholder __FRONTEND__ viene risolto in base alla posizione scelta.
+# NB: webpack.config.mjs lo cerca in root anche quando è in una sottodirectory
 if [ "$FRONTEND_INSTALL_PATH" = "." ]; then
-  NODE_MODULES_REL="./node_modules"
+  FRONTEND_REL="./"
 else
-  NODE_MODULES_REL="../node_modules"
+  FRONTEND_REL="./frontend/"
 fi
 JSCONFIG_TPL="${TEMPLATES_DIR}/jsconfig.json"
 if [ ! -f "$JSCONFIG_TPL" ]; then
   echo -e "${RED}Sorgente mancante: ${JSCONFIG_TPL}${NC}"
 else
   JSCONFIG_TMP="$(mktemp)"
-  sed "s|__NODE_MODULES__|${NODE_MODULES_REL}|g" "$JSCONFIG_TPL" >| "$JSCONFIG_TMP"
-  safe_cat "$JSCONFIG_TMP" "${FRONTEND_INSTALL_PATH}/jsconfig.json" new
+  sed "s|__FRONTEND__|${FRONTEND_REL}|g" "$JSCONFIG_TPL" >| "$JSCONFIG_TMP"
+  safe_cat "$JSCONFIG_TMP" jsconfig.json new
   rm -f "$JSCONFIG_TMP"
 fi
 
@@ -247,17 +248,34 @@ mkdir -p \
 # template html di webpack (HtmlWebpackPlugin: `./src/tpl/index.ejs`)
 safe_cat "${WEBPACK_SOURCE_DIR}/webpack-template.ejs" "${FRONTEND_INSTALL_PATH}/src/tpl/index.ejs"
 
-# css di partenza del progetto: solo i file destinati a essere personalizzati.
-# minimo.css NON viene copiato: i moduli css del framework vanno importati dal
-# pacchetto (`@import '@minimo/css/...'`, vedi entry-tpl.css)
-MINIMO_ROOT_CSS_DIR="${BASE_URL}/../../src"
-for FILE in custom-properties.css custom-media.css fonts.css; do
-  safe_cat "${MINIMO_ROOT_CSS_DIR}/${FILE}" "${FRONTEND_INSTALL_PATH}/src/css/${FILE}"
+# Sorgenti di minimo da copiare nel progetto: si usa il pacchetto appena
+# installato in node_modules (stessa versione che userà il progetto) e, in
+# fallback, la dir da cui è lanciato questo script (repo o pacchetto estratto)
+MINIMO_PKG_DIR=""
+for CANDIDATE in "./node_modules/@massimo-cassandro/minimo" "${BASE_URL}/../.."; do
+  if [ -f "${CANDIDATE}/src/custom-properties.css" ]; then
+    MINIMO_PKG_DIR="$CANDIDATE"
+    break
+  fi
 done
 
-# config di build-tokens: collocato accanto al css generato (custom-properties.css).
-# NB: i percorsi relativi nel file vanno adattati alla sua posizione effettiva
-safe_cat "${BASE_URL}/../../design-tokens/tokens-config-sample.mjs" "${FRONTEND_INSTALL_PATH}/src/css/tokens-config.mjs"
+if [ -z "$MINIMO_PKG_DIR" ]; then
+  echo -e "${RED}Sorgenti di minimo non trovati (né in ./node_modules/@massimo-cassandro/minimo né in ${BASE_URL}/../..): css di base e tokens-config non copiati${NC}"
+  BLOCKED_FILES+=("css di base + tokens-config.mjs → sorgenti minimo non trovati")
+else
+  echo "sorgenti minimo: ${MINIMO_PKG_DIR}"
+
+  # css di partenza del progetto: solo i file destinati a essere personalizzati.
+  # minimo.css NON viene copiato: i moduli css del framework vanno importati dal
+  # pacchetto (`@import '@minimo/css/...'`, vedi entry-tpl.css)
+  for FILE in custom-properties.css custom-media.css fonts.css; do
+    safe_cat "${MINIMO_PKG_DIR}/src/${FILE}" "${FRONTEND_INSTALL_PATH}/src/css/${FILE}"
+  done
+
+  # config di build-tokens: collocato accanto al css generato (custom-properties.css).
+  # NB: i percorsi relativi nel file vanno adattati alla sua posizione effettiva
+  safe_cat "${MINIMO_PKG_DIR}/design-tokens/tokens-config-sample.mjs" "${FRONTEND_INSTALL_PATH}/src/css/tokens-config.mjs"
+fi
 
 # template delle entry css (globale/di pagina e critical): ogni entry deve
 # importare direttamente custom-properties.css (vedi commenti nei file stessi)
