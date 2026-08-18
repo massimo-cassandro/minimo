@@ -19,11 +19,16 @@ if [ -z "$ZSH_VERSION" ]; then
 fi
 
 # --no-npm: salta le installazioni npm (utile per testare rapidamente lo script)
+# --root / --frontend: posizione della configurazione frontend (salta il prompt,
+#   utile per esecuzioni non interattive)
 SKIP_NPM=0
+FRONTEND_CHOICE=""
 for ARG in "$@"; do
-  if [ "$ARG" = "--no-npm" ]; then
-    SKIP_NPM=1
-  fi
+  case "$ARG" in
+    --no-npm) SKIP_NPM=1 ;;
+    --root) FRONTEND_CHOICE=1 ;;
+    --frontend) FRONTEND_CHOICE=2 ;;
+  esac
 done
 
 # Wrapper: esegue "npm i ..." a meno che SKIP_NPM sia attivo
@@ -105,11 +110,15 @@ fi
 echo -e "${GREEN}...gitignore${NC}"
 safe_cat "${TEMPLATES_DIR}/_gitignore" .gitignore new
 
-echo -e "\n${GREEN}Where do you want to install the frontend configuration?${NC}"
-echo "1) Root directory"
-echo "2) 'frontend' Directory"
-read "?Choose (1 or 2) [default: 1]: " choice < /dev/tty
-choice=${choice:-1}
+if [ -n "$FRONTEND_CHOICE" ]; then
+  choice="$FRONTEND_CHOICE"
+else
+  echo -e "\n${GREEN}Where do you want to install the frontend configuration?${NC}"
+  echo "1) Root directory"
+  echo "2) 'frontend' Directory"
+  read "?Choose (1 or 2) [default: 1]: " choice < /dev/tty
+  choice=${choice:-1}
+fi
 
 if [ "$choice" = "2" ]; then
   FRONTEND_INSTALL_PATH="./frontend"
@@ -129,10 +138,26 @@ echo -e "\n${GREEN}...config files & utilities${NC}"
 safe_cat "${TEMPLATES_DIR}/_browserslistrc"            .browserslistrc new
 safe_cat "${TEMPLATES_DIR}/_editorconfig"              .editorconfig new
 safe_cat "${TEMPLATES_DIR}/_prettierrc"                .prettierrc new
-safe_cat "${TEMPLATES_DIR}/jsconfig.json"              jsconfig.json new
-safe_cat "${BASE_URL}/../../design-tokens/tokens-config-sample.mjs" tokens-config.mjs new
 safe_cat "${TEMPLATES_DIR}/_root_htaccess"             _root_htaccess
 safe_cat "${TEMPLATES_DIR}/_root_robots.txt"           _root_robots.txt
+
+# jsconfig.json: va installato ACCANTO a webpack.config.mjs (che legge gli alias
+# con `path.resolve(__dirname, './jsconfig.json')`), non necessariamente in root.
+# Il placeholder __NODE_MODULES__ viene risolto in base alla posizione scelta.
+if [ "$FRONTEND_INSTALL_PATH" = "." ]; then
+  NODE_MODULES_REL="./node_modules"
+else
+  NODE_MODULES_REL="../node_modules"
+fi
+JSCONFIG_TPL="${TEMPLATES_DIR}/jsconfig.json"
+if [ ! -f "$JSCONFIG_TPL" ]; then
+  echo -e "${RED}Sorgente mancante: ${JSCONFIG_TPL}${NC}"
+else
+  JSCONFIG_TMP="$(mktemp)"
+  sed "s|__NODE_MODULES__|${NODE_MODULES_REL}|g" "$JSCONFIG_TPL" >| "$JSCONFIG_TMP"
+  safe_cat "$JSCONFIG_TMP" "${FRONTEND_INSTALL_PATH}/jsconfig.json" new
+  rm -f "$JSCONFIG_TMP"
+fi
 
 # code-workspace: se un file .code-workspace esiste già (qualunque sia il nome),
 # le chiavi del template vengono aggiunte in fondo con prefisso '_'
@@ -155,6 +180,9 @@ else
 fi
 
 
+echo -e "\n${GREEN}...minimo${NC}"
+npm_i -S @massimo-cassandro/minimo
+
 echo -e "\n${GREEN}...eslint${NC}"
 npm_i -D @massimo-cassandro/eslint-config
 safe_cat "${TEMPLATES_DIR}/eslint.config.mjs" eslint.config.mjs new
@@ -167,6 +195,7 @@ echo -e "\n${GREEN}...webpack${NC}"
 npm_i -D webpack-cli webpack-dev-server webpack-manifest-plugin webpack
 npm_i -D @babel/core @babel/preset-env babel-loader terser-webpack-plugin
 npm_i -D webpack-remove-empty-scripts copy-webpack-plugin html-loader html-webpack-plugin
+# npm_i -D @principalstudio/html-webpack-inject-preload file-loader # da installare solo se necessario
 npm_i -D postcss autoprefixer postcss-custom-media @csstools/postcss-global-data postcss-loader postcss-preset-env
 # NB: niente cssnano: la minificazione è di css-minimizer-webpack-plugin e cssnano
 # nel loader postcss eliminerebbe i commenti `purgecss ignore` prima di PurgeCSS
@@ -180,7 +209,6 @@ npm_i -D purgecss-webpack-plugin glob
 npm_i -D style-dictionary
 
 safe_cat "${WEBPACK_SOURCE_DIR}/webpack.config.mjs"   "${FRONTEND_INSTALL_PATH}/webpack.config.mjs"
-safe_cat "${WEBPACK_SOURCE_DIR}/webpack-template.ejs" "${FRONTEND_INSTALL_PATH}/webpack-template.ejs"
 
 # cartella webpack
 WEBPACK_LOCAL_DIR="${FRONTEND_INSTALL_PATH}/webpack-modules"
@@ -202,28 +230,39 @@ for FILE in "${WEBPACK_MODULES_REMOTE_URL}"/*; do
   safe_cat "$FILE" "${WEBPACK_LOCAL_DIR}/$(basename "$FILE")"
 done
 
-echo -e "\n${GREEN}Creating a template of your frontend application's folder structured${NC}"
+echo -e "\n${GREEN}Creating your frontend application's folder structure${NC}"
 
-TEMPLATE_DIR_NAME="__frontend_dir__"
-mkdir -p "$TEMPLATE_DIR_NAME"
-cd "$TEMPLATE_DIR_NAME"
-mkdir -p error-pages imgs icons src css favicons design-tokens
-cd ..
+# La struttura viene creata nella posizione scelta a inizio script, coerente con
+# i percorsi attesi da webpack.config.mjs (`./src/...`, `./favicons/output`,
+# `./error-pages/...`), da jsconfig.json (@css, @src, @icons, @imgs) e da
+# postcss.config.mjs (`../src/css/custom-media.css`)
+mkdir -p \
+  "${FRONTEND_INSTALL_PATH}/src/css" \
+  "${FRONTEND_INSTALL_PATH}/src/tpl" \
+  "${FRONTEND_INSTALL_PATH}/icons" \
+  "${FRONTEND_INSTALL_PATH}/imgs" \
+  "${FRONTEND_INSTALL_PATH}/favicons" \
+  "${FRONTEND_INSTALL_PATH}/error-pages"
 
-# copia dei file css presenti nella root di minimo/src
-# (custom-properties.css, custom-media.css, fonts.css, minimo.css, ...):
+# template html di webpack (HtmlWebpackPlugin: `./src/tpl/index.ejs`)
+safe_cat "${WEBPACK_SOURCE_DIR}/webpack-template.ejs" "${FRONTEND_INSTALL_PATH}/src/tpl/index.ejs"
+
+# css di partenza del progetto: solo i file destinati a essere personalizzati.
+# minimo.css NON viene copiato: i moduli css del framework vanno importati dal
+# pacchetto (`@import '@minimo/css/...'`, vedi entry-tpl.css)
 MINIMO_ROOT_CSS_DIR="${BASE_URL}/../../src"
-for FILE in "${MINIMO_ROOT_CSS_DIR}"/*.css; do
-  safe_cat "$FILE" "${TEMPLATE_DIR_NAME}/css/$(basename "$FILE")"
+for FILE in custom-properties.css custom-media.css fonts.css; do
+  safe_cat "${MINIMO_ROOT_CSS_DIR}/${FILE}" "${FRONTEND_INSTALL_PATH}/src/css/${FILE}"
 done
 
-# copia tokens.config.mjs
-safe_cat "${BASE_URL}/../../design-tokens/tokens-config-sample.mjs" "${TEMPLATE_DIR_NAME}/css/tokens-config.mjs"
+# config di build-tokens: collocato accanto al css generato (custom-properties.css).
+# NB: i percorsi relativi nel file vanno adattati alla sua posizione effettiva
+safe_cat "${BASE_URL}/../../design-tokens/tokens-config-sample.mjs" "${FRONTEND_INSTALL_PATH}/src/css/tokens-config.mjs"
 
 # template delle entry css (globale/di pagina e critical): ogni entry deve
 # importare direttamente custom-properties.css (vedi commenti nei file stessi)
-safe_cat "${TEMPLATES_DIR}/entry-tpl.css"          "${TEMPLATE_DIR_NAME}/src/entry-tpl.css"
-safe_cat "${TEMPLATES_DIR}/entry-tpl.critical.css" "${TEMPLATE_DIR_NAME}/src/entry-tpl.critical.css"
+safe_cat "${TEMPLATES_DIR}/entry-tpl.css"          "${FRONTEND_INSTALL_PATH}/src/entry-tpl.css"
+safe_cat "${TEMPLATES_DIR}/entry-tpl.critical.css" "${FRONTEND_INSTALL_PATH}/src/entry-tpl.critical.css"
 
 set +C
 

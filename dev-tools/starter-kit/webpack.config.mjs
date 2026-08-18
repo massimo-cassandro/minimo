@@ -24,21 +24,41 @@ import { getJsConfigAliases } from './webpack-modules/get-jsConfig-aliases.mjs';
 import { svgRules } from './webpack-modules/svg-rules.mjs';
 
 // --- config ---
+const __filename = fileURLToPath(import.meta.url)
+  ,__dirname = path.dirname(__filename);
+
+// Risolve un percorso a partire dalla root del progetto, che coincide con la dir
+// di questo file solo se il frontend NON è in una sottodirectory (es. ./frontend):
+// vengono provate entrambe le posizioni, in fallback la prima
+const fromProjectRoot = (relPath) => {
+  const candidates = ['./', '../'].map(p => path.resolve(__dirname, p, relPath));
+  return candidates.find(p => fs.existsSync(p)) ?? candidates[0];
+};
+
 const isDevelopment = process.env.NODE_ENV === 'development'
-  ,__filename = fileURLToPath(import.meta.url)
-  ,__dirname = path.dirname(__filename)
   ,useSass = false
   ,inlineCssInDevMode = true
   ,useSvgo = true
   ,useSvgr = false // svg per react
   ,svgoConfig = useSvgo? (await import('./webpack-modules/svgo.config.mjs')).default : null
   ,postcssConfig_path = path.resolve(__dirname, './webpack-modules/postcss.config.mjs')
+  // dir di output: relativa a QUESTO file ('../build' se il frontend è in una
+  // sottodirectory, './build' se webpack.config.mjs è nella root del progetto)
   ,output_dir = path.resolve(__dirname, '../build')
   // ,output_dir = isDevelopment? '_dev' : 'build' // symfony
-  ,favicons_path = 'frontend/favicons/output'
-  ,favicons_path_regexp = new RegExp(favicons_path) // source pattern per le favicons (regexp o null)
+  // dir delle favicons generate da `npx create-favicons` (vedi package.json):
+  // il path assoluto serve a CopyWebpackPlugin/HtmlWebpackPlugin (i path
+  // relativi sarebbero risolti dal cwd, non da questo file), mentre la regexp
+  // resta relativa perché viene confrontata con i path dei moduli
+  ,favicons_path = path.resolve(__dirname, './favicons/output')
+  ,favicons_path_regexp = /favicons\/output/ // source pattern per le favicons (regexp o null)
+  // NB: jsconfig.json va tenuto in questa stessa dir (gli alias sono risolti
+  // a partire dalla sua posizione)
   ,jsConfigAliases = getJsConfigAliases(path.resolve(__dirname, './jsconfig.json'))
-  ,packageJson = JSON.parse(fs.readFileSync(path.resolve(__dirname, './package.json'), 'utf-8')),usePurgeCss = true // false per disattivare PurgeCSS (debug rapido di problemi legati al purge)
+  ,packageJson = JSON.parse(fs.readFileSync(fromProjectRoot('package.json'), 'utf-8'))
+  // path del pacchetto minimo (il suo js genera markup con classi proprie e il
+  // suo css dichiara custom properties: entrambi vanno visti da PurgeCSS)
+  ,minimo_path = fromProjectRoot('node_modules/@massimo-cassandro/minimo')
   ,usePurgeCss = true // false per disattivare PurgeCSS (debug rapido di problemi legati al purge)
   ,purgeCSSOptions = {
     variables: false, // rimuove le custom properties non usate (sostituisce jit-props)
@@ -91,7 +111,7 @@ const shared_chunk_paths = (module) => {
 // https://github.com/webpack/copy-webpack-plugin/tree/main?tab=readme-ov-file#copy-webpack-plugin
 const CopyWebpackPluginPatterns = [
   {
-    from: 'src/favicons/output/icon-*.png',
+    from: `${favicons_path}/icon-*.png`,
     to: '[name][ext]'
   },
   // {
@@ -115,110 +135,9 @@ const CopyWebpackPluginPatterns = [
   // }
 ];
 
-// =>> PurgeCSS: opzioni e istanze (usate nei plugins e dal log di debug)
-//
-// Vengono create DUE istanze, attive in ENTRAMBE le modalità (dev e prod),
-// così i problemi di purge emergono subito durante lo sviluppo:
-// - `purgeCSSPluginCritical`: solo le entry `*.critical` (purge stretto, gli asset
-//   devono essere autosufficienti e minimi perché inlinati nei template html)
-// - `purgeCSSPlugin`: tutti gli asset (il doppio passaggio sui critical è idempotente)
-//
-// NB (watch mode): i template twig NON sono osservati da webpack: dopo aver
-// aggiunto una classe solo in un twig occorre rilanciare la build (o toccare
-// un file js/css) perché il purge venga ricalcolato.
-// NB (dev): il plugin agisce solo sugli asset css emessi; con
-// `inlineCssInDevMode: true` i css non-critical in dev sono iniettati da
-// style-loader e non vengono purgati (i critical passano comunque da
-// MiniCssExtract e sono sempre purgati)
-
-// `paths`: SOLO file che generano markup o classi (html/ejs, twig, php, js);
-// NIENTE file css tra i paths: verrebbero letti come "contenuto" e ogni selettore
-// risulterebbe usato, vanificando il purge
-const purgeCSSCommonOptions = {
-  paths: () => globSync(
-    [
-      path.resolve(__dirname, './src/**/*.{js,mjs,jsx}'),
-      path.resolve(__dirname, './*.ejs'), // template html di webpack
-      path.resolve(__dirname, './src/**/*.ejs'),
-      // progetti symfony: template twig e classi generate lato php
-      // path.resolve(__dirname, '../templates/**/*.twig'),
-      // path.resolve(__dirname, '../src/**/*.php'),
-      // il js di minimo genera markup con classi proprie (snackbar, unsplash-page, ecc.)
-      // NB: adattare il percorso di node_modules se questo config è in una
-      // sottodirectory del progetto (es. frontend/ → '../node_modules/...')
-      path.resolve(__dirname, './node_modules/@massimo-cassandro/minimo/src/**/*.{js,mjs}'),
-    ],
-    { nodir: true }
-  ),
-
-  // extractor di default (/[A-Za-z0-9_-]+/g): adeguato a classi/tag/id,
-  // NON definire extractors custom (il vecchio /[A-z0-9-:/]+/ era buggato:
-  // il range [A-z] include caratteri non voluti come `[`, `\`, `^`, ...)
-
-  variables: true, // rimuove le custom properties non usate (sostituisce postcss-jit-props)
-  keyframes: true, // rimuove i @keyframes non referenziati
-  // fontFace resta false (default): i font sono referenziati solo tramite
-  // var(--font-family) e purgecss non risolve le custom properties nei valori,
-  // quindi con `true` i @font-face verrebbero rimossi anche se usati
-
-  rejected: purgeCSSDebug // popola purgedStats per il log di debug
-};
-
-// safelist base minima, comune alle due istanze
-const purgeCSSSafelistBase = {
-  standard: [
-    // classi costruite dinamicamente nei template o lato server, invisibili
-    // all'analisi statica dei paths. Esempio (da adattare al progetto):
-    // flash messages twig con class="alert alert-{{ label }}"
-    /^alert-(success|notice|error|warning)$/
-  ],
-  deep: [
-    // css modules: prefisso `m_` presente in dev e prod (vedi css-rules.mjs),
-    // le classi hashate non possono comparire nei file scansionati
-    /^m_/
-  ],
-  greedy: [
-    // INDISPENSABILE: purgecss non riconosce il nesting selector nativo e senza
-    // questo pattern i selettori annidati composti solo da `&` + pseudo classi
-    // (&:hover, &:focus-visible, `&` semplice, ecc.) verrebbero SEMPRE rimossi
-    /^&$/
-  ]
-};
-
-// css della pagina critici (inlinati nei template): purge stretto,
-// devono essere autosufficienti e minimi
-const purgeCSSPluginCritical = new PurgeCSSPlugin({
-  ...purgeCSSCommonOptions,
-  only: ['.critical'],
-  safelist: purgeCSSSafelistBase
-});
-
-// tutti gli altri asset (il purge è idempotente: il secondo passaggio
-// sui critical non rimuove altro)
-const purgeCSSPlugin = new PurgeCSSPlugin({
-  ...purgeCSSCommonOptions,
-  safelist: {
-    ...purgeCSSSafelistBase,
-    // elenco generato: usi di var() nei blocchi `purgecss ignore` e nei css
-    // shadow-DOM/`?raw`, override cross-asset (seeds), con chiusura transitiva
-    // delle dipendenze (vedi webpack-modules/purgecss-variables-safelist.mjs)
-    variables: purgecssVariablesSafelist({
-      declarationGlobs: [
-        path.resolve(__dirname, './src/**/*.css'),
-        path.resolve(__dirname, './node_modules/@massimo-cassandro/minimo/src/**/*.css'),
-      ],
-      shadowGlobs: [
-        path.resolve(__dirname, './src/web-components/**/*.css'),
-        path.resolve(__dirname, './node_modules/@massimo-cassandro/minimo/src/web-components/**/*.css'),
-      ],
-      seeds: [
-        // props dichiarate in un asset ma consumate in un altro (es. override
-        // di tema definiti nel css di una pagina e consumati dal css globale):
-        // indicarle qui per nome ('--btn-primary-bg') o pattern (/^--btn-/)
-      ]
-    })
-  }
-});
+// =>> PurgeCSS
+// Istanze e opzioni sono in webpack-modules/purgecss-setup.mjs: qui restano
+// solo i flag e i dati di progetto (vedi createPurgeCSSPlugins nei `plugins`).
 
 // recupero metadata immagini
 // const require = createRequire(import.meta.url);
@@ -235,7 +154,7 @@ const entries = {
 
   // css critici inlinati nei template html: il suffisso `.critical` nel nome
   // della entry attiva l'istanza PurgeCSS dedicata con purge stretto
-  // (vedi purgeCSSPluginCritical) e la regola dedicata in css-rules.mjs
+  // (vedi purgecss-setup.mjs) e la regola dedicata in css-rules.mjs
   // ,'xxxxxx.critical': './src/xxxxxx.critical.css'
 };
 
@@ -393,7 +312,7 @@ const config = {
     // =>> plugins: HtmlWebpackPlugin (manifest)
     new HtmlWebpackPlugin({
       filename: 'manifest.webmanifest',
-      template: path.resolve(__dirname, './src/favicons/output/manifest.webmanifest.ejs'),
+      template: path.resolve(favicons_path, './manifest.webmanifest.ejs'),
       inject: false,
       minify: false //!isDevelopment
     }),
@@ -487,12 +406,16 @@ const config = {
         // SOLO file che generano markup o classi (twig, php, js);
         // i file di stile vengono comunque scartati dal plugin
         contentGlobs: [
-          path.resolve(__dirname, '../templates/**/*.twig'),
-          path.resolve(__dirname, '../src/**/*.php'),
+          // progetti symfony: template twig e classi generate lato php
+          // (percorsi relativi alla root del progetto: adattare il `../` se
+          // webpack.config.mjs NON è in una sottodirectory)
+          // path.resolve(__dirname, '../templates/**/*.twig'),
+          // path.resolve(__dirname, '../src/**/*.php'),
           path.resolve(__dirname, './src/**/*.{js,mjs,jsx}'),
+          path.resolve(__dirname, './src/**/*.ejs'), // template html di webpack
           path.resolve(__dirname, './error-pages/**/*.js'),
           // il js di minimo genera markup con classi proprie (snackbar, unsplash-page, ecc.)
-          path.resolve(__dirname, '../node_modules/@massimo-cassandro/minimo/src/**/*.{js,mjs}'),
+          `${minimo_path}/src/**/*.{js,mjs}`,
         ],
 
         safelist: {
@@ -529,11 +452,11 @@ const config = {
           declarationGlobs: [
             path.resolve(__dirname, './src/**/*.css'),
             path.resolve(__dirname, './error-pages/**/*.css'),
-            path.resolve(__dirname, '../node_modules/@massimo-cassandro/minimo/src/**/*.css'),
+            `${minimo_path}/src/**/*.css`,
           ],
           shadowGlobs: [
             path.resolve(__dirname, './src/web-components/**/*.css'),
-            path.resolve(__dirname, '../node_modules/@massimo-cassandro/minimo/src/web-components/**/*.css'),
+            `${minimo_path}/src/web-components/**/*.css`,
           ],
           seeds: [
             // override di .login-group (login.css) consumati dai buttons minimo (css globale)

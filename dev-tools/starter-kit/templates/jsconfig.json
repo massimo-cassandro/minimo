@@ -1,5 +1,6 @@
 {
   "__help": "https://code.visualstudio.com/docs/languages/jsconfig",
+  "__note": "Tenere questo file ACCANTO a webpack.config.mjs: gli alias webpack sono ricavati da qui (get-jsConfig-aliases.mjs) e risolti a partire dalla posizione di questo file",
   "compilerOptions": {
     "ignoreDeprecations": "6.0",
     "baseUrl": ".",
@@ -8,14 +9,14 @@
     "target": "es2023",
     "module": "ES6",
     "paths": {
-      "@css/*": ["./frontend/src/css/*"],
-      "@src/*": ["./frontend/src/*"],
-      "@icons/*": ["./frontend/icons/*"],
-      "@imgs/*": ["./frontend/imgs/*"],
-      "@frontend/*": ["./frontend/*"],
-      "@minimo/*": ["./node_modules/@massimo-cassandro/minimo/src/*"],
-      "@minimoCharts/*": ["./node_modules/@massimo-cassandro/minimo/charts/*"]
+      "@css/*": ["./src/css/*"],
+      "@src/*": ["./src/*"],
+      "@icons/*": ["./icons/*"],
+      "@imgs/*": ["./imgs/*"],
+      "@frontend/*": ["./*"],
+      "@minimo/*": ["__NODE_MODULES__/@massimo-cassandro/minimo/src/*"],
+      "@minimoCharts/*": ["__NODE_MODULES__/@massimo-cassandro/minimo/charts/*"]
     }
   },
-  "exclude": ["node_modules", "dist", "docs", "build", "public"]
+  "exclude": ["__NODE_MODULES__", "dist", "docs", "build", "public"]
 }

@@ -1,14 +1,15 @@
 <!DOCTYPE html>
+<!-- template html di webpack: installato in <frontend>/src/tpl/index.ejs
+     (vedi HtmlWebpackPlugin in webpack.config.mjs).
+     I require sono relativi a QUESTO file. -->
 <html lang="it">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 
-    <!-- favicons -->
-    <%= require('./favicons/output/favicons.incl.ejs')({}) %>
-    <!-- <%= require('./app/favicons/output/favicons.incl.ejs')({}) %> -->
-    <!-- <%= require('./frontend/favicons/output/favicons.incl.ejs')({}) %> -->
+    <!-- favicons (generate da `npx create-favicons`, vedi package.json) -->
+    <%= require('../../favicons/output/favicons.incl.ejs')({}) %>
 
     <title><%= htmlWebpackPlugin.options.title %></title>
     <!-- <base href="<%= htmlWebpackPlugin.options.base %>"> -->
