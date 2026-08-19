@@ -25,10 +25,10 @@ export function getCliParams() {
     }
 
     // Disabilita il log per major version 0
-    if (arg === '--noLogv0') {
-      params.noLogv0 = true;
-    } else if (arg.startsWith('--noLogv0=')) {
-      params.noLogv0 = arg.split('=')[1].trim() !== 'false';
+    if (arg === '--no-log-v0') {
+      params.noLogV0 = true;
+    } else if (arg.startsWith('--no-log-v0=')) {
+      params.noLogV0 = arg.split('=')[1].trim() !== 'false';
     }
 
   });

@@ -27,6 +27,12 @@ export async function chooser() {
 
   params.addLog = params.toLog.indexOf(answer) !== -1 || answer === 'init';
 
+  // Se noLogV0 è true e la major version (prospettica) è 0, il log non viene registrato (eccetto per l'inizializzazione)
+  if (params.addLog && params.noLogV0 && answer !== 'init') {
+    const newMajor = answer === 'major' ? params.semverArray[0] + 1 : params.semverArray[0];
+    if (newMajor === 0) params.addLog = false;
+  }
+
   if (answer && params.addLog) {
     const descr = await input({
       message: 'Description (optional): ',

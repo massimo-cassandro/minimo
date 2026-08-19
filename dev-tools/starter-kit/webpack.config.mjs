@@ -375,8 +375,8 @@ const config = {
             start_year,
             ...(current_year > start_year? [current_year] : [])
           ].join('-')
-          ,vers = packageJson.version.split('.').slice(0,-1).join('.')
-          // ,vers = packageJson.version
+          // ,vers = packageJson.version.split('.').slice(0,-1).join('.')
+          ,vers = packageJson.version
         ;
 
         const author = packageJson.author?.name ?? (packageJson.author ?? '');
