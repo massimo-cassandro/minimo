@@ -17,3 +17,4 @@ Options:
 * `--pkg`: Path to the `package.json` file relative to the current directory (default: `./package.json`)
 * `--log-file`: Path to the log file relative to the current directory (default: `./changelog.md`). If the file name ends with `.txt`, the log type is assumed to be the previous version of `update-version`, where each line is in the form `timestamp | version | description`
 * `--log-patch`: If present, patch changes are also recorded in the log.
+* `--noLogv0`: If `true` (default), the log is not written when the major version is `0`, except for the initial log entry created when the changelog file is first initialized. Pass `--noLogv0` to enable it explicitly, or `--noLogv0=false` to disable it from the command line.

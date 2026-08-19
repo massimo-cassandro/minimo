@@ -23,7 +23,7 @@
     "eslint-check": "npx eslint app/ # or src/, frontend/src/ ...",
     "create-favicons INIT": "npx create-favicons init",
     "create-favicons": "npx create-favicons --dir=./favicons # o ./frontend/favicons",
-    "UPD-version": "npx update-version  # --log-file=./frontend/changelog.md --log-patch --pkg=alt/path/to/package.json",
+    "UPD-version": "npx update-version --noLogv0 # --log-file=./frontend/changelog.md --log-patch --pkg=alt/path/to/package.json",
     "upd@m": "npx upd@m",
     "launchChrome": "open -n -a 'Google Chrome' --args --profile-directory='Profile 3'",
     "python server": "python3 -m http.server 8000 # --directory __dirname__ # 8000 = default port",

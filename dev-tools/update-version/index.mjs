@@ -29,7 +29,7 @@ async function run() {
 
   // check package.json
   if (!fs.existsSync(params.packageJsonFile)) {
-    console.error( styleText(['red'], `Errore: ${params.packageJsonFile} non trovato.` ));
+    console.error( styleText(['red'], `Error: ${params.packageJsonFile} not found.` ));
     process.exit(1);
 
   }
@@ -38,10 +38,10 @@ async function run() {
   params.oldSemver = params.packageJsonObj.version;
 
   if(!params.oldSemver) {
-    console.error( styleText(['red'], `Proprietà 'version' di '${params.cfg.packageJsonFile}' non presente` ));
+    console.error( styleText(['red'], `Property 'version' of '${params.cfg.packageJsonFile}' not found` ));
 
   } else {
-    console.log( styleText(['white', 'dim'], `Versione package.json attuale: ${params.oldSemver}` ) );
+    console.log( styleText(['white', 'dim'], `Current package.json version: ${params.oldSemver}` ) );
     params.semverArray = params.oldSemver.split('.').map(i => isNaN(i) ? i : +i);
   }
 
@@ -95,7 +95,7 @@ async function run() {
         ' '.repeat(rowLength - text.length - 1) +
         styleText(['yellow'], '│'),
 
-      outputString1 = `👍 Versione aggiornata: ${params.oldSemver} → ${params.newSemver}`,
+      outputString1 = `👍 Version updated: ${params.oldSemver} → ${params.newSemver}`,
       outputString2 = params.logRow.fullText? `Log: ${params.logRow.fullText}` : '',
       outputLenght = Math.max(outputString1.length, outputString2.length ) + 2, // 2 = spazi esterni
       frameLine = '─'.repeat(outputLenght);

@@ -61,7 +61,7 @@ if (fs.existsSync(changelogPath)) {
   ;
 
 } else {
-  console.log('File changelog.txt non trovato nella directory attuale');
+  console.log('File changelog.txt not found in the current directory');
   process.exit(1);
 }
 

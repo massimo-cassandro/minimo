@@ -5,23 +5,23 @@ import { params } from './params.mjs';
 
 export async function chooser() {
   const choices = [
-    { name: 'Aggiorna Patch version', value: 'patch' },
-    { name: 'Aggiorna Minor version', value: 'minor' },
-    { name: 'Aggiorna Major version', value: 'major' }
+    { name: 'Update Patch version', value: 'patch' },
+    { name: 'Update Minor version', value: 'minor' },
+    { name: 'Update Major version', value: 'major' }
   ];
 
   // Se il file di log non esiste, proponi l'inizializzazione
   if (!fs.existsSync(params.logFile)) {
     choices.unshift({
-      name: `Inizializza Changelog (v${params.oldSemver})`,
+      name: `Initialize Changelog (v${params.oldSemver})`,
       value: 'init'
     });
   }
 
-  choices.push({ name: 'Annulla', value: null });
+  choices.push({ name: 'Cancel', value: null });
 
   const answer = await select({
-    message: 'Cosa vuoi aggiornare?',
+    message: `What do you want to update?${params.oldSemver ? ` (current version ${params.oldSemver})` : ''}`,
     choices: choices
   });
 
@@ -29,7 +29,7 @@ export async function chooser() {
 
   if (answer && params.addLog) {
     const descr = await input({
-      message: 'Descrizione (opzionale): ',
+      message: 'Description (optional): ',
       default: answer === 'init'
         ? 'Setup'
         : answer === 'patch'
