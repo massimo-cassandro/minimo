@@ -2,22 +2,23 @@
 /* TODO valutare versione con label a sinistra (form-check-reverse) */
 
 /*
-Markup (come bootstrap 5, con l'aggiunta dell'attributo nativo `switch`):
+Markup (same as bootstrap 5, plus the native `switch` attribute):
 
 <div class="form-check form-switch">
   <input class="form-check-input" type="checkbox" role="switch" switch id="my-switch">
-  <label class="form-check-label" for="my-switch">Abilita notifiche</label>
+  <label class="form-label" for="my-switch">Enable notifications</label>
 </div>
 
-L'attributo `switch` (per ora solo WebKit) fa sì che il browser generi un vero
-controllo switch nativo, modellabile con gli pseudo-elementi `::track` e `::thumb`.
-Dove non è supportato (o dove l'attributo è assente) si applica il fallback
-`appearance: none` con la pallina disegnata come background-image.
+The `switch` attribute (WebKit only for now) makes the browser render a real
+native switch control, which can be styled through the `::track` and `::thumb`
+pseudo-elements. Where it is not supported (or where the attribute is missing),
+the `appearance: none` fallback is applied, with the thumb drawn as a
+background-image.
 */
 
 .form-switch {
 
-  --_switch-thumb-size: calc(var(--switch-height) - var(--switch-thumb-inset) * 2);
+  --_switch-thumb-size: calc(var(--form-switch-height) - var(--form-switch-thumb-inset) * 2);
 
   /* annulla il layout con float di `.form-check` */
   display: flex;
@@ -28,29 +29,30 @@ Dove non è supportato (o dove l'attributo è assente) si applica il fallback
   .form-check-input {
     float: none;
     flex: none;
-    width: var(--switch-width);
-    height: var(--switch-height);
+    width: var(--form-switch-width);
+    height: var(--form-switch-height);
     margin: 0;
     appearance: none;
     cursor: pointer;
-    background-color: var(--switch-background-color);
-    background-image: radial-gradient(
-      circle closest-side,
-      var(--switch-cursor-background-color) 98%,
-      transparent
-    );
+    background-color: var(--form-switch-background-color);
+    background-image:
+      radial-gradient(
+        circle closest-side,
+        var(--form-switch-cursor-background-color) 98%,
+        transparent
+      );
     background-repeat: no-repeat;
-    background-position: var(--switch-thumb-inset) center;
+    background-position: var(--form-switch-thumb-inset) center;
     background-size: var(--_switch-thumb-size) var(--_switch-thumb-size);
     border: none;
-    border-radius: var(--switch-height);
+    border-radius: var(--form-switch-height);
 
     /* annulla lo `scale` applicato a tutti i checkbox */
     scale: none;
 
     &:checked {
-      background-color: var(--switch-checked-background-color);
-      background-position: calc(100% - var(--switch-thumb-inset)) center;
+      background-color: var(--form-switch-checked-background-color);
+      background-position: calc(100% - var(--form-switch-thumb-inset)) center;
     }
 
     &:focus {
@@ -63,7 +65,8 @@ Dove non è supportato (o dove l'attributo è assente) si applica il fallback
     }
   }
 
-  .form-check-label {
+  .form-label {
+    padding-inline-start: 0 !important;
     cursor: pointer;
     user-select: none;
   }
@@ -71,7 +74,7 @@ Dove non è supportato (o dove l'attributo è assente) si applica il fallback
   &:has(.form-check-input:disabled) {
     opacity: var(--form-control-disabled-opacity);
 
-    .form-check-input, .form-check-label {
+    .form-check-input, .form-label {
       cursor: not-allowed;
     }
   }
@@ -80,8 +83,8 @@ Dove non è supportato (o dove l'attributo è assente) si applica il fallback
 @media (prefers-reduced-motion: no-preference) {
   .form-switch .form-check-input {
     transition:
-      background-color var(--switch-transition-duration) linear,
-      background-position var(--switch-transition-duration) ease-in-out;
+      background-color var(--form-switch-transition-duration) linear,
+      background-position var(--form-switch-transition-duration) ease-in-out;
   }
 }
 
@@ -95,15 +98,15 @@ Dove non è supportato (o dove l'attributo è assente) si applica il fallback
     border-radius: 0; /* gestito da ::track */
 
     &::track {
-      background-color: var(--switch-background-color);
+      background-color: var(--form-switch-background-color);
     }
 
     &::thumb {
-      background-color: var(--switch-cursor-background-color);
+      background-color: var(--form-switch-cursor-background-color);
     }
 
     &:checked::track {
-      background-color: var(--switch-checked-background-color);
+      background-color: var(--form-switch-checked-background-color);
     }
   }
 }

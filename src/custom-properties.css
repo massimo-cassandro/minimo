@@ -193,6 +193,13 @@
   --form-label-font-weight: var(--font-weight-semibold);
   --form-legend-background-color: transparent;
   --form-legend-color: var(--text-color);
+  --form-switch-background-color: var(--neutral-100);
+  --form-switch-checked-background-color: var(--primary-100);
+  --form-switch-cursor-background-color: var(--body-background-color);
+  --form-switch-height: 1.25em;
+  --form-switch-thumb-inset: .125em;
+  --form-switch-transition-duration: .2s;
+  --form-switch-width: 2.25em;
   --form-user-info-color: var(--text-muted);
   --form-user-info-font-size: var(--font-size-xs);
   --form-validation-outline-offset: -3px;
@@ -379,14 +386,6 @@
   --status-warning-border-color: var(--status-warning-color);
   --status-warning-color: #fc0;
   --status-warning-fg: #4f2900;
-
-  --switch-background-color: var(--neutral-100);
-  --switch-checked-background-color: var(--primary-100);
-  --switch-cursor-background-color: var(--body-background-color);
-  --switch-height: 1.25em;
-  --switch-thumb-inset: .125em;
-  --switch-transition-duration: .2s;
-  --switch-width: 2.25em;
 
   --table-body-border-width: 1px;
   --table-body-tr-alt-bg-color: #efefef;

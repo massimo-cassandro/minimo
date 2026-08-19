@@ -52,6 +52,11 @@ async function run() {
     params.updateMode = choice; // modalità scelta (init, major, minor o patch)
     updateSemver();
 
+    // Se noLogv0 è true e la major version è 0, il log non viene registrato (eccetto per l'inizializzazione)
+    if (params.noLogv0 && params.updateMode !== 'init' && params.semverArray[0] === 0) {
+      params.addLog = false;
+    }
+
     params.logRow.vers = params.newSemver;
 
     // Scrive il log, se richiesto

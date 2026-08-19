@@ -226,3 +226,69 @@ test('domBuilder: with no parent, elements are built but not attached to the doc
   assert.equal(main.tagName, 'DIV');
   assert.equal(main.parentNode, null);
 });
+
+test('domBuilder: `text` shorthand inserts a literal Text node as a sibling of tags', () => {
+  const container = document.createElement('div');
+  domBuilder([{
+    tag: 'p',
+    children: [
+      { text: 'Lorem ' },
+      { tag: 'strong', content: 'ipsum' },
+      { text: ' dolor' }
+    ]
+  }], container);
+
+  const p = container.firstElementChild;
+  assert.equal(p.childNodes.length, 3);
+  assert.equal(p.childNodes[0].nodeType, 3, 'first child is a Text node');
+  assert.equal(p.childNodes[0].textContent, 'Lorem ');
+  assert.equal(p.childNodes[1].tagName, 'STRONG');
+  assert.equal(p.childNodes[2].nodeType, 3, 'last child is a Text node');
+  assert.equal(p.childNodes[2].textContent, ' dolor');
+  assert.equal(p.textContent, 'Lorem ipsum dolor');
+});
+
+test('domBuilder: `text` shorthand never parses markup, unlike `content`', () => {
+  const container = document.createElement('div');
+  domBuilder([{ tag: 'p', children: [{ text: 'Testo <strong>non</strong> analizzato' }] }], container);
+
+  const p = container.firstElementChild;
+  assert.equal(p.children.length, 0, 'no elements parsed out of the text node');
+  assert.equal(p.childNodes.length, 1);
+  assert.equal(p.textContent, 'Testo <strong>non</strong> analizzato');
+});
+
+test('domBuilder: `text` shorthand accepts numbers and respects condition/callback', () => {
+  const container = document.createElement('div');
+  let received = null;
+  domBuilder([{
+    tag: 'p',
+    children: [
+      { text: 42 },
+      { text: 'skipped', condition: false },
+      { text: 'kept', callback: node => { received = node; } }
+    ]
+  }], container);
+
+  const p = container.firstElementChild;
+  assert.equal(p.childNodes.length, 2);
+  assert.equal(p.childNodes[0].textContent, '42');
+  assert.equal(p.childNodes[1].textContent, 'kept');
+  assert.equal(received, p.childNodes[1]);
+  assert.equal(received.nodeType, 3);
+});
+
+test('domBuilder: `text` shorthand respects insertMode before/after', () => {
+  const parentEl = document.createElement('div');
+  const anchor = document.createElement('span');
+  anchor.className = 'anchor';
+  parentEl.appendChild(anchor);
+
+  domBuilder([{ text: 'before-' }], anchor, { insertMode: 'before' });
+  domBuilder([{ text: '-after' }], anchor, { insertMode: 'after' });
+
+  assert.equal(parentEl.childNodes.length, 3);
+  assert.equal(parentEl.childNodes[0].textContent, 'before-');
+  assert.equal(parentEl.childNodes[1], anchor);
+  assert.equal(parentEl.childNodes[2].textContent, '-after');
+});

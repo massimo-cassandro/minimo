@@ -132,12 +132,21 @@ export function buildSelect({
 
   id = id || randomId();
 
-  // normalizing option as an array
-  if(options && !Array.isArray(options)) {
-    options = Object.entries(options);
+  // normalizing options as an array of [value, text] pairs
+  /** @type {Array<[string|number, string]>} */
+  let optionsList = [];
 
-  } else if(options && !Array.isArray(options[0])) {
-    options =  options.map(o => Object.values(o));
+  if(options) {
+    if(!Array.isArray(options)) {
+      optionsList = /** @type {Array<[string|number, string]>} */ (Object.entries(options));
+
+    } else if(!Array.isArray(options[0])) {
+      optionsList = /** @type {Array<Record<string, string>>} */ (options)
+        .map(o => /** @type {[string|number, string]} */ (Object.values(o)));
+
+    } else {
+      optionsList = /** @type {Array<[string|number, string]>} */ (options);
+    }
   }
 
 
@@ -157,18 +166,15 @@ export function buildSelect({
         },
         children: [
           ...(addEmptyOption? ['option[value:]'] : []),
-          ...(options
-            ? options.map(([value, text]) => ({
-              tag: 'option',
-              attrs: {
-                value: value,
-                // eslint-disable-next-line eqeqeq
-                selected: value == selectedValue
-              },
-              content: text
-            }))
-            : []
-          )
+          ...optionsList.map(([value, text]) => ({
+            tag: 'option',
+            attrs: {
+              value: value,
+              // eslint-disable-next-line eqeqeq
+              selected: value == selectedValue
+            },
+            content: text
+          }))
         ],
         callback: callback
       }
@@ -186,6 +192,8 @@ export function buildSelect({
  * @param {string | null} args.id - `id` attribute.
  * @param {string | number | null} [args.value=1] - checkbox `value` attribute.
  * @param {boolean} [args.checked=false] - checkbox `checked` attribute.
+ * @param {boolean} [args.switch=false] - When true, the checkbox is rendered as a switch
+ *    (`.form-switch` wrapper, `role="switch"` and the native `switch` attribute).
  * @param {string | null} [args.wrapperClass=null] - optional class to be added to the `.form-group` wrapper (used only when `addFormGroup` is true).
  * @param {boolean} [args.addFormGroup=true] - When true, wraps the checkbox in a `.form-group` element.
  * @param {boolean} [args.condition=true] - When false, the function returns `null` without building anything.
@@ -200,6 +208,7 @@ export function buildCheckbox({
   id = null,
   value = 1,
   checked = false,
+  switch: isSwitch = false,
   wrapperClass = null,
   addFormGroup = true,
   condition = true,
@@ -213,17 +222,24 @@ export function buildCheckbox({
   }
 
   /*
-  <div class="form-group">
+  <div class="form-group"> <- optional
     <div class="form-check">
       <input type="checkbox" id="..." name="..." class="form-check-input" value="1">
       <label for="..." class="form-label">...</label>
+    </div>
+  </div>
+
+  <div class="form-group"> <- optional
+    <div class="form-check form-switch">
+      <input class="form-check-input" type="checkbox" role="switch" switch id="my-switch">
+      <label class="form-label" for="my-switch">My label</label>
     </div>
   </div>
   */
   id = id || randomId();
 
   const tag = {
-    className: classnames('form-check', !addFormGroup && !help && wrapperClass),
+    className: classnames('form-check', isSwitch && 'form-switch', !addFormGroup && !help && wrapperClass),
     children: [
       {
         tag: 'input',
@@ -234,7 +250,9 @@ export function buildCheckbox({
           type: 'checkbox',
           value: value,
           name: name,
-          checked: checked
+          checked: checked,
+          // native switch control (WebKit only for now), with the css fallback elsewhere
+          ...(isSwitch? {role: 'switch', switch: ''} : {})
         },
         callback: callback
       },

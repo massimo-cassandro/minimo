@@ -5,46 +5,48 @@
 // Re-generate with: node build-tokens.mjs --config <path/to/config>
 // -----------------------------------------------------------------------
 {
-  "switch": {
-    "width": {
-      "$type": "dimension",
-      "$value": "2.25em"
-    },
-    "height": {
-      "$type": "dimension",
-      "$value": "1.25em"
-    },
-    "thumb": {
-      "inset": {
+  "form": {
+    "switch": {
+      "width": {
         "$type": "dimension",
-        "$value": ".125em"
-      }
-    },
-    "transition": {
-      "duration": {
-        "$type": "duration",
-        "$value": ".2s"
-      }
-    },
-    "background": {
-      "color": {
-        "$type": "color",
-        "$value": "{neutral.100}"
-      }
-    },
-    "cursor": {
-      "background": {
-        "color": {
-          "$type": "color",
-          "$value": "{body.background.color}"
+        "$value": "2.25em"
+      },
+      "height": {
+        "$type": "dimension",
+        "$value": "1.25em"
+      },
+      "thumb": {
+        "inset": {
+          "$type": "dimension",
+          "$value": ".125em"
         }
-      }
-    },
-    "checked": {
+      },
+      "transition": {
+        "duration": {
+          "$type": "duration",
+          "$value": ".2s"
+        }
+      },
       "background": {
         "color": {
           "$type": "color",
-          "$value": "{primary.100}"
+          "$value": "{neutral.100}"
+        }
+      },
+      "cursor": {
+        "background": {
+          "color": {
+            "$type": "color",
+            "$value": "{body.background.color}"
+          }
+        }
+      },
+      "checked": {
+        "background": {
+          "color": {
+            "$type": "color",
+            "$value": "{primary.100}"
+          }
         }
       }
     }

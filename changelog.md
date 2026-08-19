@@ -39,3 +39,5 @@
 * 1.20.0 (03 ago 2026) - css classes types & build-tokens improvements
 * 1.21.0 (14 ago 2026) - css layers
 * 1.22.0 (18 ago 2026) - switch
+* 1.23.0 (19 ago 2026) - domBuilder: `text` children elements
+* 1.24.0 (19 ago 2026) - updateVersion: `noLogv0` option

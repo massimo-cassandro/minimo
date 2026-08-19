@@ -18,8 +18,12 @@ import { parseDomString } from './parseDomString.js';
  *   A string or number is set as plain text (`textContent`) unless it contains `<`, in which case it is
  *   treated as markup: sanitized and inserted via the native Sanitizer API (`Element.setHTML`) where
  *   supported, falling back to raw `innerHTML` on browsers without it.
- * @property {boolean} [condition=true] - When false, the element is skipped.
- * @property {(function(HTMLElement): void) | null} [callback] - Callback invoked after the element is created.
+ * @property {string | number} [text] - Literal text node shorthand: inserts a plain `Text` node (never
+ *   parsed as markup) in place of an element, so it can sit as a sibling of tags within `children`/`content`
+ *   arrays. Mutually exclusive with `tag`/`content`/`children`: when set (and `tag` is absent), every other
+ *   property except `condition` and `callback` is ignored.
+ * @property {boolean} [condition=true] - When false, the element (or text node) is skipped.
+ * @property {(function(HTMLElement|Text): void) | null} [callback] - Callback invoked after the element (or text node) is created.
  * @property {Array<DomBuilderItem|string>} [children] - Configuration array for child elements. Accepts strings (shorthand per `parseDomString`) and/or configuration objects.
  */
 
@@ -53,6 +57,18 @@ import { parseDomString } from './parseDomString.js';
  * ]
  * ```
  *
+ * To mix literal text and tags as siblings within the same element (e.g. `Lorem <strong>ipsum</strong> dolor`),
+ * use the `text` shorthand in `children`/`content`, since a plain string item is always parsed as a tag
+ * (see `parseDomString`), never as a text node:
+ *
+ * ```javascript
+ * children: [
+ *   { text: 'Lorem ' },
+ *   { tag: 'strong', content: 'ipsum' },
+ *   { text: ' dolor' }
+ * ]
+ * ```
+ *
  * IDs and classes can be specified either as top-level object keys or inside the `attrs` object.
  * When both are present, top-level properties take precedence.
  *
@@ -74,8 +90,9 @@ import { parseDomString } from './parseDomString.js';
  * - `id` {string | null} - Unique element ID.
  * - `attrs` {[string, *] | [string, *][] | Object<string, *>} - Attributes: a `[name, value]` pair, array of pairs, or `{name: value}` object.
  * - `content` {string | number | Function | Element | DomBuilderItem[] | null} - Element content. A string/number is set as `textContent` unless it contains `<`, in which case it's sanitized and inserted as markup (`Element.setHTML`, falling back to `innerHTML`).
- * - `condition` {boolean} - When false, the element is skipped. Default `true`.
- * - `callback` {(function(HTMLElement): void) | null} - Invoked after the element is created.
+ * - `text` {string | number} - Literal text node shorthand: inserts a plain `Text` node (never parsed as markup) as a sibling of other items, in place of an element. Mutually exclusive with `tag`/`content`/`children`.
+ * - `condition` {boolean} - When false, the element (or text node) is skipped. Default `true`.
+ * - `callback` {(function(HTMLElement|Text): void) | null} - Invoked after the element (or text node) is created.
  * - `children` {Array<DomBuilderItem|string>} - Configuration array for child elements (same format, nested).
  *
  * IDs and classes can be specified either as top-level object keys or inside `attrs`; top-level properties take precedence.
@@ -109,7 +126,7 @@ export function domBuilder(structureArray = [], parent, options = {}) {
   /** @type {HTMLElement | DocumentFragment | null} */
   let target = useFragment ? document.createDocumentFragment() : (parent ?? null);
 
-  /** @type {Map<HTMLElement | DocumentFragment, HTMLElement>} tracks, for `insertMode: 'after'`, the last inserted sibling per parent node */
+  /** @type {Map<HTMLElement | DocumentFragment, Node>} tracks, for `insertMode: 'after'`, the last inserted sibling per parent node */
   const afterAnchors = new Map();
 
   /** @type {HTMLElement | null} */
@@ -134,6 +151,34 @@ export function domBuilder(structureArray = [], parent, options = {}) {
     if (item != null && (item.condition ?? true)) {
 
       const safeItem = item; // const binding so TypeScript tracks non-null type in nested closures
+
+      // `{ text: '...' }` shorthand: a literal Text node, never parsed as markup, inserted in
+      // place of an element so it can sit as a sibling of tags within `children`/`content` arrays
+      if (safeItem.tag == null && (typeof safeItem.text === 'string' || typeof safeItem.text === 'number')) {
+
+        const textNode = document.createTextNode(String(safeItem.text));
+
+        if (target) {
+          if (options.insertMode === 'before') {
+            const anchor = /** @type {HTMLElement} */ (target);
+            anchor.parentNode?.insertBefore(textNode, anchor);
+
+          } else if (options.insertMode === 'after') {
+            const anchor = afterAnchors.get(/** @type {HTMLElement} */ (target)) ?? /** @type {HTMLElement} */ (target);
+            anchor.parentNode?.insertBefore(textNode, anchor.nextSibling);
+            afterAnchors.set(/** @type {HTMLElement} */ (target), textNode);
+
+          } else {
+            target.appendChild(textNode);
+          }
+        }
+
+        if (safeItem.callback && typeof safeItem.callback === 'function') {
+          safeItem.callback(textNode);
+        }
+
+        return;
+      }
 
       // when tag is an array, create a series of nested elements;
       // the last one receives the remaining object properties
