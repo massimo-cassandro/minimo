@@ -110,6 +110,7 @@ export function buildInput({
  * @param {string | null} [args.wrapperClass=null] - optional class to be added to the `.form-group` wrapper.
  * @param {string | null} [args.className=null] - optional class to be added to the `input`.
  * @param {boolean} [args.condition=true] - When false, the function returns `null` without building anything.
+ * @param {boolean} [args.useBsClass=false] - When true, uses BS5 class (`form-select`) instead of `form-control`
  * @param {string | HTMLElement | null} args.help - Optional help text.
  * @param {(function(HTMLElement): void) | null} args.callback - Optional callback function.
  * @param {Record<string, any> | null}  [args.attrs={}] - Optional attributes object.
@@ -124,6 +125,7 @@ export function buildSelect({
   addEmptyOption = true,
   wrapperClass = null,
   className = null,
+  useBsClass = false,
   condition = true,
   help = null,
   attrs = {},
@@ -158,7 +160,7 @@ export function buildSelect({
       `label.form-label[for:${id}] ${label}`,
       {
         tag: 'select',
-        className: classnames('form-control', className, attrs?.class),
+        className: classnames(useBsClass? 'form-select' : 'form-control', className, attrs?.class),
         id: id,
         attrs: {
           ...(attrs??{}),
