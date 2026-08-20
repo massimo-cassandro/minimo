@@ -127,10 +127,13 @@
   border: var(--jt-sort-arrows-wrapper-border, 1px solid #666);
   border-radius: 99rem;
   box-shadow: var(--jt-sort-arrows-wrapper-box-shadow, 0 0 5px rgb(0 0 0 / .4));
-  transition: scale, translate .1s linear;
   transform-origin: bottom right;
   scale: 0;
   translate: var(--sort-arrows-wrapper-translate-x) 35%;
+
+  @media screen and (prefers-reduced-motion: no-preference) {
+    transition: scale, translate .1s linear;
+  }
 
   /* sorting has been activated for this col */
   .sortingOn & {

@@ -21,7 +21,10 @@
   border-radius: var(--mpopup-border-radius);
   box-shadow: var(--mpopup-drop-shadow);
   scale: 0;
-  transition: scale .2s ease-out;
+
+  @media screen and (prefers-reduced-motion: no-preference) {
+    transition: scale .2s ease-out;
+  }
 
   &::backdrop {
     overscroll-behavior: contain;

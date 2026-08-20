@@ -82,9 +82,11 @@ background-image.
 
 @media (prefers-reduced-motion: no-preference) {
   .form-switch .form-check-input {
-    transition:
-      background-color var(--form-switch-transition-duration) linear,
-      background-position var(--form-switch-transition-duration) ease-in-out;
+    @media screen and (prefers-reduced-motion: no-preference) {
+      transition:
+        background-color var(--form-switch-transition-duration) linear,
+        background-position var(--form-switch-transition-duration) ease-in-out;
+    }
   }
 }
 

@@ -122,7 +122,10 @@ html, body {
 
 .unsplashPhoto, .credits {
   opacity: 0;
-  transition: opacity .3s linear;
+
+  @media screen and (prefers-reduced-motion: no-preference) {
+    transition: opacity .3s linear;
+  }
 
   .show & {
     opacity: 1;
@@ -154,7 +157,10 @@ html, body {
   max-width: 90dvw;
   padding: 1rem 2rem;
   text-align: center;
-  transition: translate .3s ease-in-out;
+
+  @media screen and (prefers-reduced-motion: no-preference) {
+    transition: translate .3s ease-in-out;
+  }
 
   h1 {
     margin: 0;

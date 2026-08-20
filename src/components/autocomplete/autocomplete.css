@@ -54,7 +54,10 @@
         padding: .3rem .5rem;
         background-color: var(--ac-list-item-bg);
         border-radius: .35rem;
-        transition: all .2s ease;
+
+        @media screen and (prefers-reduced-motion: no-preference) {
+          transition: all .2s ease;
+        }
 
         .badge {
           color: #fff;

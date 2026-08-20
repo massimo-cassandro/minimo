@@ -13,7 +13,10 @@
   background: var(--bg-color);
   border: 2px solid var(--fg-color);
   border-radius: .3rem;
-  transition: opacity .3s linear;
+
+  @media screen and (prefers-reduced-motion: no-preference) {
+    transition: opacity .3s linear;
+  }
 
   &.hidden {
     opacity: 0;
