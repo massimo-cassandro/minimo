@@ -15,7 +15,10 @@ https://projects.lukehaas.me/css-loaders/ (#6)
   text-indent: -9999em;
   border-radius: 50%;
   transform: translateZ(0);
-  animation: loader 1.7s infinite ease, round 1.7s infinite ease;
+
+  @media (prefers-reduced-motion: no-preference) {
+    animation: loader 1.7s infinite ease, round 1.7s infinite ease;
+  }
 }
 
 @keyframes loader {

@@ -10,7 +10,10 @@
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-4);
   transform: translateY(-200vh);
-  animation: dialog-in .3s ease-out;
+
+  @media (prefers-reduced-motion: no-preference) { /* reduce */
+    animation: dialog-in .3s ease-out;
+  }
 
 
   &[open] {

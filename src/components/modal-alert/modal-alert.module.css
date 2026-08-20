@@ -129,7 +129,10 @@
 
 .mAnimated {
   transform: translateY(-500%);
-  animation: dialog-in .3s ease-out;
+
+  @media (prefers-reduced-motion: no-preference) {
+    animation: dialog-in .3s ease-out;
+  }
 
   &[open] {
     transform: none;
