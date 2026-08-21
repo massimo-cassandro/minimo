@@ -100,6 +100,7 @@ import { parseDomString } from './parseDomString.js';
  * @param {Object} [options={}] - Configuration options.
  * @param {boolean} [options.emptyParent=false] - When true, the parent element is emptied before building.
  * @param {'append'|'before'|'after'} [options.insertMode='append'] - How each root element of `structureArray` is attached to `parent`: `append` inserts it as a child (default), `before`/`after` insert it as a previous/next sibling of `parent`, preserving `structureArray` order. Only applies to the elements produced by this call — nested `domBuilder` calls (`content`, `children`) always append.
+ * @param {boolean} [options.debug=false] - When true, logs `structureArray` to the console after each string item has been parsed via `parseDomString` (i.e. the elaborated array actually used to build the DOM).
  * @returns {HTMLElement|null} The first created element, or null if nothing was created.
  */
 
@@ -109,6 +110,7 @@ export function domBuilder(structureArray = [], parent, options = {}) {
   options = {
     emptyParent: false,
     insertMode: 'append',
+    debug: false,
     ...options
   };
 
@@ -136,6 +138,9 @@ export function domBuilder(structureArray = [], parent, options = {}) {
   /** @type {HTMLElement | DocumentFragment | null} */
   let grand_parent = null;
 
+  /** @type {Array<DomBuilderItem|null>} */
+  const elaboratedStructureArray = [];
+
   structureArray.forEach(inputItem => {
 
     /** @type {DomBuilderItem | null} */
@@ -146,7 +151,7 @@ export function domBuilder(structureArray = [], parent, options = {}) {
       item = /** @type {DomBuilderItem} */ (inputItem);
     }
 
-    // console.log(item);
+    elaboratedStructureArray.push(item);
 
     if (item != null && (item.condition ?? true)) {
 
@@ -299,6 +304,11 @@ export function domBuilder(structureArray = [], parent, options = {}) {
     }
 
   });
+
+  if (options.debug) {
+    // eslint-disable-next-line no-console
+    console.log('[domBuilder] structureArray:', elaboratedStructureArray);
+  }
 
   if (useFragment && parent && target) {
     parent.appendChild(target);
