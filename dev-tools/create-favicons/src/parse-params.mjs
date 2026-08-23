@@ -56,9 +56,9 @@ export function parseParams(config_params = null, work_dir = process.cwd()) {
     // da un raster non è possibile ricavare una favicon vettoriale
     params.generate_svg_favicon = getImgExt(params.small_src_img?? params.src_img) === 'svg';
 
-    // creazione dir output se non esiste
+    // creazione dir output se non esiste (incluse le dir intermedie mancanti)
     if (!fs.existsSync(params.output_dir)){
-      fs.mkdirSync(params.output_dir);
+      fs.mkdirSync(params.output_dir, { recursive: true });
     }
 
     // definizione snippet_path e creazione dir se necessario
@@ -69,7 +69,7 @@ export function parseParams(config_params = null, work_dir = process.cwd()) {
       params.snippet_path = params.snippet_path?? params.output_dir;
 
       if (!params.snippet_target_file && !fs.existsSync(params.snippet_path )){
-        fs.mkdirSync(params.snippet_path );
+        fs.mkdirSync(params.snippet_path, { recursive: true });
       }
 
       params.snippet_language = params.snippet_language.toLowerCase();

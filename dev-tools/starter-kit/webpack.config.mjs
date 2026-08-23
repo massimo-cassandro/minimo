@@ -364,7 +364,6 @@ const config = {
       ]
     ),
 
-    // TODO author dinamico https://docs.npmjs.com/cli/v11/configuring-npm/package-json#people-fields-author-contributors
     // =>> plugins: BannerPlugin
     new webpack.BannerPlugin({
       banner: () => {
