@@ -9,14 +9,16 @@
     "target": "es2023",
     "module": "ES6",
     "paths": {
-      "@css/*": ["./src/css/*"],
-      "@src/*": ["./src/*"],
-      "@icons/*": ["./icons/*"],
-      "@imgs/*": ["./imgs/*"],
-      "@frontend/*": ["./*"],
-      "@minimo/*": ["__NODE_MODULES__/@massimo-cassandro/minimo/src/*"],
-      "@minimoCharts/*": ["__NODE_MODULES__/@massimo-cassandro/minimo/charts/*"]
+      "@css/*": ["app/css/*"],
+      "@src/*": ["app/src/*"],
+      "@icons/*": ["app/icons/*"],
+      "@imgs/*": ["app/imgs/*"],
+
+      "@frontend/*": ["fromtend/*"],
+
+      "@minimo/*": ["./node_modules/@massimo-cassandro/minimo/src/*"],
+      "@minimoCharts/*": ["./node_modules/@massimo-cassandro/minimo/charts/*"]
     }
   },
-  "exclude": ["__NODE_MODULES__", "dist", "docs", "build", "public"]
+  "exclude": ["node_modules", "dist", "docs", "build", "public"]
 }

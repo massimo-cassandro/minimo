@@ -150,12 +150,12 @@ const CopyWebpackPluginPatterns = [
 // =>> entries
 // NB: percorsi dalla root del progetto
 const entries = {
-  'xxxxxx': './src/index.js'
+  'xxxxxx': './index.js'
 
   // css critici inlinati nei template html: il suffisso `.critical` nel nome
   // della entry attiva l'istanza PurgeCSS dedicata con purge stretto
   // (vedi purgecss-setup.mjs) e la regola dedicata in css-rules.mjs
-  // ,'xxxxxx.critical': './src/xxxxxx.critical.css'
+  // ,'xxxxxx.critical': './index-critical.css'
 };
 
 
@@ -410,6 +410,7 @@ const config = {
           // webpack.config.mjs NON è in una sottodirectory)
           // path.resolve(__dirname, '../templates/**/*.twig'),
           // path.resolve(__dirname, '../src/**/*.php'),
+          path.resolve(__dirname, './index.js'), // entry js di default (vedi starter-install.sh)
           path.resolve(__dirname, './src/**/*.{js,mjs,jsx}'),
           path.resolve(__dirname, './src/**/*.ejs'), // template html di webpack
           path.resolve(__dirname, './error-pages/**/*.js'),
@@ -449,6 +450,8 @@ const config = {
         // delle dipendenze (vedi webpack-modules/purgecss-variables-safelist.mjs)
         variablesSafelist: {
           declarationGlobs: [
+            path.resolve(__dirname, './index.css'), // entry css di default (vedi starter-install.sh)
+            path.resolve(__dirname, './index-critical.css'),
             path.resolve(__dirname, './src/**/*.css'),
             path.resolve(__dirname, './error-pages/**/*.css'),
             `${minimo_path}/src/**/*.css`,

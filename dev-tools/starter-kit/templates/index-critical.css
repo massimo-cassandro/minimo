@@ -1,5 +1,6 @@
 /*
-  Template di entry css critical — rinominare e adattare.
+  Entry css critical di default (index-critical.css) — adattare al progetto.
+  Per ulteriori entry critical specifiche di pagina, copiare e rinominare.
 
   Le entry con suffisso `.critical` generano asset destinati a essere
   INLINATI nei template html: devono restare AUTOSUFFICIENTI e minimi.

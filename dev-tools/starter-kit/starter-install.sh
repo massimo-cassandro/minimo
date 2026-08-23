@@ -3,8 +3,8 @@
 # IMPORTANTE: questo script è idempotente e deve restare tale.
 # Può essere rilanciato più volte sullo stesso progetto (anche via `npx starter-kit`
 # per aggiornare un setup esistente) senza sovrascrivere nulla né creare duplicati:
-# i file esistenti vengono saltati o copiati con prefisso NEW-, i merge di
-# package.json e *.code-workspace non duplicano le chiavi già presenti.
+# i file esistenti vengono saltati o copiati con prefisso NEW- (o _ per
+# package.json e *.code-workspace).
 # Ogni modifica futura deve conservare questa proprietà.
 
 RED='\033[0;31m'
@@ -19,8 +19,8 @@ if [ -z "$ZSH_VERSION" ]; then
 fi
 
 # --no-npm: salta le installazioni npm (utile per testare rapidamente lo script)
-# --root / --frontend: posizione della configurazione frontend (salta il prompt,
-#   utile per esecuzioni non interattive)
+# --root / --frontend / --app: posizione della configurazione frontend (salta
+#   il prompt, utile per esecuzioni non interattive)
 SKIP_NPM=0
 FRONTEND_CHOICE=""
 for ARG in "$@"; do
@@ -28,6 +28,7 @@ for ARG in "$@"; do
     --no-npm) SKIP_NPM=1 ;;
     --root) FRONTEND_CHOICE=1 ;;
     --frontend) FRONTEND_CHOICE=2 ;;
+    --app) FRONTEND_CHOICE=3 ;;
   esac
 done
 
@@ -64,7 +65,11 @@ BLOCKED_FILES=()
 
 # Wrapper: copia solo se il file non esiste, altrimenti registra il blocco.
 # Con terzo argomento "new", se la destinazione esiste già la copia viene
-# comunque creata con prefisso NEW- (da integrare manualmente o rimuovere)
+# comunque creata con prefisso NEW- (da integrare manualmente o rimuovere).
+# Con terzo argomento "underscore", stesso comportamento ma con prefisso _
+# (usato per package.json e *.code-workspace: il file esistente non viene
+# toccato, il template arriva accanto con un _ davanti al nome, da integrare
+# o rimuovere manualmente)
 safe_cat() {
   local src="$1"
   local dest="$2"
@@ -74,38 +79,28 @@ safe_cat() {
     return 1
   fi
   if [ -e "$dest" ]; then
-    if [ "$mode" = "new" ]; then
-      local new_dest="$(dirname "$dest")/NEW-$(basename "$dest")"
-      cat "$src" >| "$new_dest"
-      BLOCKED_FILES+=("$dest → copiato come $new_dest")
-    else
-      BLOCKED_FILES+=("$dest")
-    fi
+    case "$mode" in
+      new)
+        local new_dest="$(dirname "$dest")/NEW-$(basename "$dest")"
+        cat "$src" >| "$new_dest"
+        BLOCKED_FILES+=("$dest → copiato come $new_dest")
+        ;;
+      underscore)
+        local new_dest="$(dirname "$dest")/_$(basename "$dest")"
+        cat "$src" >| "$new_dest"
+        BLOCKED_FILES+=("$dest → copiato come $new_dest")
+        ;;
+      *)
+        BLOCKED_FILES+=("$dest")
+        ;;
+    esac
   else
     cat "$src" > "$dest"
   fi
 }
 
 echo -e "${GREEN}...package.json${NC}"
-if [ ! -f package.json ]; then
-  safe_cat "${TEMPLATES_DIR}/package-tpl.json" package.json
-elif [ ! -f "${TEMPLATES_DIR}/package-tpl.json" ]; then
-  echo -e "${RED}Sorgente mancante: ${TEMPLATES_DIR}/package-tpl.json${NC}"
-else
-  # package.json esistente: merge con il template, aggiungendo in fondo
-  # le chiavi del template prefissate con '_' (ordine originale preservato)
-  node -e '
-    const fs = require("fs");
-    const existing = JSON.parse(fs.readFileSync("package.json", "utf8"));
-    const tpl = JSON.parse(fs.readFileSync(process.argv[1], "utf8"));
-    for (const [key, value] of Object.entries(tpl)) {
-      existing["_" + key] = value;
-    }
-    fs.writeFileSync("package.json", JSON.stringify(existing, null, 2) + "\n");
-  ' "${TEMPLATES_DIR}/package-tpl.json"
-  echo -e "${YELLOW}package.json esistente: chiavi del template aggiunte in fondo con prefisso '_' (da integrare o rimuovere)${NC}"
-  BLOCKED_FILES+=("package.json → merge: chiavi template aggiunte con prefisso \`_\`")
-fi
+safe_cat "${BASE_URL}/package-tpl.json" package.json underscore
 
 echo -e "${GREEN}...gitignore${NC}"
 safe_cat "${TEMPLATES_DIR}/_gitignore" .gitignore new
@@ -116,20 +111,24 @@ else
   echo -e "\n${GREEN}Where do you want to install the frontend configuration?${NC}"
   echo "1) Root directory"
   echo "2) 'frontend' Directory"
-  read "?Choose (1 or 2) [default: 1]: " choice < /dev/tty
-  choice=${choice:-1}
+  echo "3) 'app' Directory"
+  read "?Choose (1, 2 or 3) [default: 2]: " choice < /dev/tty
+  choice=${choice:-2}
 fi
 
-if [ "$choice" = "2" ]; then
-  FRONTEND_INSTALL_PATH="./frontend"
-  echo -e "${GREEN}Files will be installed in: ./frontend${NC}"
-else
+if [ "$choice" = "1" ]; then
   FRONTEND_INSTALL_PATH="."
   echo -e "${GREEN}Files will be installed in: root directory${NC}"
+elif [ "$choice" = "3" ]; then
+  FRONTEND_INSTALL_PATH="./app"
+  echo -e "${GREEN}Files will be installed in: ./app${NC}"
+else
+  FRONTEND_INSTALL_PATH="./frontend"
+  echo -e "${GREEN}Files will be installed in: ./frontend${NC}"
 fi
 
-if [ "$FRONTEND_INSTALL_PATH" = "./frontend" ]; then
-  mkdir -p frontend
+if [ "$FRONTEND_INSTALL_PATH" != "." ]; then
+  mkdir -p "$FRONTEND_INSTALL_PATH"
 fi
 
 
@@ -138,8 +137,8 @@ echo -e "\n${GREEN}...config files & utilities${NC}"
 safe_cat "${TEMPLATES_DIR}/_browserslistrc"            .browserslistrc new
 safe_cat "${TEMPLATES_DIR}/_editorconfig"              .editorconfig new
 safe_cat "${TEMPLATES_DIR}/_prettierrc"                .prettierrc new
-safe_cat "${TEMPLATES_DIR}/_root_htaccess"             _root_htaccess
-safe_cat "${TEMPLATES_DIR}/_root_robots.txt"           _root_robots.txt
+safe_cat "${TEMPLATES_DIR}/_root_htaccess"             "${FRONTEND_INSTALL_PATH}/_root_htaccess"
+safe_cat "${TEMPLATES_DIR}/_root_robots.txt"           "${FRONTEND_INSTALL_PATH}/_root_robots.txt"
 
 # jsconfig.json: sta SEMPRE nella root del progetto (è anche il file di
 # riferimento di vscode). I suoi path sono quindi relativi alla root: il
@@ -148,7 +147,7 @@ safe_cat "${TEMPLATES_DIR}/_root_robots.txt"           _root_robots.txt
 if [ "$FRONTEND_INSTALL_PATH" = "." ]; then
   FRONTEND_REL="./"
 else
-  FRONTEND_REL="./frontend/"
+  FRONTEND_REL="${FRONTEND_INSTALL_PATH}/"
 fi
 JSCONFIG_TPL="${TEMPLATES_DIR}/jsconfig.json"
 if [ ! -f "$JSCONFIG_TPL" ]; then
@@ -161,23 +160,15 @@ else
 fi
 
 # code-workspace: se un file .code-workspace esiste già (qualunque sia il nome),
-# le chiavi del template vengono aggiunte in fondo con prefisso '_'
+# il template viene copiato accanto con un _ davanti al nome esistente
 WORKSPACE_TPL="${TEMPLATES_DIR}/__project__.code-workspace"
 WORKSPACE_FILES=( *.code-workspace(N) )
 if [ ${#WORKSPACE_FILES[@]} -gt 1 ]; then
-  echo -e "${RED}Trovati più file .code-workspace (${WORKSPACE_FILES[*]}): merge non eseguito${NC}"
+  echo -e "${RED}Trovati più file .code-workspace (${WORKSPACE_FILES[*]}): copia saltata${NC}"
 elif [ ${#WORKSPACE_FILES[@]} -eq 0 ]; then
   safe_cat "$WORKSPACE_TPL" __project__.code-workspace
-elif [ ! -f "$WORKSPACE_TPL" ]; then
-  echo -e "${RED}Sorgente mancante: ${WORKSPACE_TPL}${NC}"
 else
-  WORKSPACE_FILE="${WORKSPACE_FILES[1]}"
-  if node "${BASE_URL}/src/merge-jsonc.mjs" "$WORKSPACE_TPL" "$WORKSPACE_FILE"; then
-    echo -e "${YELLOW}${WORKSPACE_FILE} esistente: chiavi del template aggiunte in fondo con prefisso '_' (da integrare o rimuovere)${NC}"
-    BLOCKED_FILES+=("${WORKSPACE_FILE} → merge: chiavi template aggiunte con prefisso \`_\`")
-  else
-    echo -e "${RED}Merge di ${WORKSPACE_FILE} non riuscito${NC}"
-  fi
+  safe_cat "$WORKSPACE_TPL" "${WORKSPACE_FILES[1]}" underscore
 fi
 
 
@@ -260,14 +251,17 @@ for CANDIDATE in "./node_modules/@massimo-cassandro/minimo" "${BASE_URL}/../..";
 done
 
 if [ -z "$MINIMO_PKG_DIR" ]; then
-  echo -e "${RED}Sorgenti di minimo non trovati (né in ./node_modules/@massimo-cassandro/minimo né in ${BASE_URL}/../..): css di base e tokens-config non copiati${NC}"
-  BLOCKED_FILES+=("css di base + tokens-config.mjs → sorgenti minimo non trovati")
+  if [ "$SKIP_NPM" = "1" ]; then
+    echo -e "${YELLOW}(--no-npm) css di base, index.css, tokens-config e config favicons non copiati: npm i è stato saltato, quindi @massimo-cassandro/minimo non è ancora installato in node_modules (rilancia lo script senza --no-npm per completare la copia)${NC}"
+    BLOCKED_FILES+=("css di base + index.css + tokens-config.mjs + create-favicons-cfg.mjs → saltati (--no-npm)")
+  else
+    echo -e "${RED}Sorgenti di minimo non trovati (né in ./node_modules/@massimo-cassandro/minimo né in ${BASE_URL}/../..): css di base, index.css, tokens-config e config favicons non copiati${NC}"
+    BLOCKED_FILES+=("css di base + index.css + tokens-config.mjs + create-favicons-cfg.mjs → sorgenti minimo non trovati")
+  fi
 else
   echo "sorgenti minimo: ${MINIMO_PKG_DIR}"
 
-  # css di partenza del progetto: solo i file destinati a essere personalizzati.
-  # minimo.css NON viene copiato: i moduli css del framework vanno importati dal
-  # pacchetto (`@import '@minimo/css/...'`, vedi entry-tpl.css)
+  # css di partenza del progetto: solo i file destinati a essere personalizzati
   for FILE in custom-properties.css custom-media.css fonts.css; do
     safe_cat "${MINIMO_PKG_DIR}/src/${FILE}" "${FRONTEND_INSTALL_PATH}/src/css/${FILE}"
   done
@@ -275,18 +269,28 @@ else
   # config di build-tokens: collocato accanto al css generato (custom-properties.css).
   # NB: i percorsi relativi nel file vanno adattati alla sua posizione effettiva
   safe_cat "${MINIMO_PKG_DIR}/design-tokens/tokens-config-sample.mjs" "${FRONTEND_INSTALL_PATH}/src/css/tokens-config.mjs"
+
+  # entry css principale del progetto: copia diretta di minimo.css, rinominato
+  # index.css e collocato sulla root di installazione (non in /src)
+  safe_cat "${MINIMO_PKG_DIR}/src/minimo.css" "${FRONTEND_INSTALL_PATH}/index.css"
+
+  # favicons: config di default per `npx create-favicons`
+  safe_cat "${MINIMO_PKG_DIR}/dev-tools/create-favicons/src/default-params.mjs" "${FRONTEND_INSTALL_PATH}/favicons/create-favicons-cfg.mjs"
 fi
 
-# template delle entry css (globale/di pagina e critical): ogni entry deve
-# importare direttamente custom-properties.css (vedi commenti nei file stessi)
-safe_cat "${TEMPLATES_DIR}/entry-tpl.css"          "${FRONTEND_INSTALL_PATH}/src/entry-tpl.css"
-safe_cat "${TEMPLATES_DIR}/entry-tpl.critical.css" "${FRONTEND_INSTALL_PATH}/src/entry-tpl.critical.css"
+# entry css critical (inlinata nei template html) e entry js, sulla root di
+# installazione accanto a index.css
+safe_cat "${TEMPLATES_DIR}/index-critical.css" "${FRONTEND_INSTALL_PATH}/index-critical.css"
+safe_cat "${TEMPLATES_DIR}/app_index.js"       "${FRONTEND_INSTALL_PATH}/index.js"
+
+# favicons: istruzioni d'uso di `npx create-favicons`
+safe_cat "${TEMPLATES_DIR}/favicons-readme.md" "${FRONTEND_INSTALL_PATH}/favicons/readme.md"
 
 set +C
 
 # Riepilogo finale dei file già esistenti
 if [ ${#BLOCKED_FILES[@]} -gt 0 ]; then
-  echo -e "\n${YELLOW}*** File già esistenti (non copiati o copiati con prefisso NEW-): ***${NC}"
+  echo -e "\n${YELLOW}*** File già esistenti (non copiati o copiati con prefisso NEW-/_): ***${NC}"
   for F in "${BLOCKED_FILES[@]}"; do
     echo -e "${YELLOW}  ✗ $F${NC}"
   done

@@ -127,8 +127,11 @@ cosa fa ogni modulo, come aggiornare i moduli in un progetto esistente.
 
 ## Note
 
-- `merge-jsonc` è già stato spostato in `src/merge-jsonc.mjs` (convertito in ESM):
-  la dir `src/` ospita le utility interne dell'installer, NON copiate nei progetti;
+- `merge-jsonc` (già spostato in `src/merge-jsonc.mjs`, convertito in ESM) è
+  stato rimosso: `package.json` e `*.code-workspace` esistenti non vengono più
+  mergiati, il template viene copiato accanto con un `_` davanti al nome
+  (vedi FIX.md, punto 1). La dir `src/` (utility interne dell'installer, NON
+  copiate nei progetti) non esiste più, essendo rimasta senza contenuto;
   `webpack-modules/` resta la dir dei moduli copiati nei progetti.
 - Criterio di "fatto": si deve poter copiare l'intera `webpack-modules/` aggiornata
   in un progetto esistente senza toccare il suo `webpack.config.mjs` e ottenere
