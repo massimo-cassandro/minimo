@@ -139,6 +139,7 @@ safe_cat "${TEMPLATES_DIR}/_editorconfig"              .editorconfig new
 safe_cat "${TEMPLATES_DIR}/_prettierrc"                .prettierrc new
 safe_cat "${TEMPLATES_DIR}/_root_htaccess"             "${FRONTEND_INSTALL_PATH}/_root_htaccess"
 safe_cat "${TEMPLATES_DIR}/_root_robots.txt"           "${FRONTEND_INSTALL_PATH}/_root_robots.txt"
+safe_cat "${TEMPLATES_DIR}/CLAUDE-frontend.md"         "${FRONTEND_INSTALL_PATH}/CLAUDE.md"
 
 # jsconfig.json: sta SEMPRE nella root del progetto (è anche il file di
 # riferimento di vscode). I suoi path sono quindi relativi alla root: il
