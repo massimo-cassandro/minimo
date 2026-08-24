@@ -61,6 +61,10 @@ const config = {
       name: 'LAYOUT',
       prefixes: ['body', 'layout'],
     },
+    {
+      name: 'UI',
+      prefixes: ['ui'],
+    },
   ],
 
 

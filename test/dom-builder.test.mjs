@@ -129,6 +129,43 @@ test('domBuilder: content as a number is set as text', () => {
   assert.equal(container.firstElementChild.textContent, '42');
 });
 
+test('domBuilder: content as an Element is appended as-is, not stringified', () => {
+  const container = document.createElement('div');
+  const inner = document.createElement('strong');
+  inner.textContent = 'ipsum';
+
+  domBuilder([{ tag: 'p', content: inner }], container);
+
+  const p = container.firstElementChild;
+  assert.equal(p.children.length, 1);
+  assert.equal(p.firstElementChild, inner, 'the very same Element instance must be appended');
+  assert.equal(p.textContent, 'ipsum');
+});
+
+test('domBuilder: content as a DocumentFragment appends its children, not "[object DocumentFragment]"', () => {
+  const container = document.createElement('div');
+  const fragment = document.createDocumentFragment();
+  fragment.appendChild(document.createElement('input'));
+  fragment.appendChild(document.createElement('button'));
+
+  domBuilder([{ tag: 'form', content: fragment }], container);
+
+  const form = container.firstElementChild;
+  assert.equal(form.children.length, 2, 'both fragment children must land in the parent');
+  assert.equal(form.children[0].tagName, 'INPUT');
+  assert.equal(form.children[1].tagName, 'BUTTON');
+});
+
+test('domBuilder: content as a function returning a Node is appended as-is', () => {
+  const container = document.createElement('div');
+  const fragment = document.createDocumentFragment();
+  fragment.appendChild(document.createElement('em'));
+
+  domBuilder([{ tag: 'p', content: () => fragment }], container);
+
+  assert.equal(container.firstElementChild.firstElementChild.tagName, 'EM');
+});
+
 test('domBuilder: content with "<" falls back to innerHTML when Element.setHTML is unsupported', () => {
   assert.equal(typeof document.createElement('div').setHTML, 'undefined', 'sanity check: jsdom has no setHTML');
 

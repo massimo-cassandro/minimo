@@ -14,10 +14,11 @@ import { parseDomString } from './parseDomString.js';
  * @property {string | string[]} [classname] - Alias for `className`.
  * @property {string | null} [id] - Unique element ID.
  * @property {[string, *] | [string, *][] | Object<string, *>} [attrs] - Attributes: a `[name, value]` pair, array of pairs, or `{name: value}` object.
- * @property {string | number | Function | Element | DomBuilderItem[] | null} [content] - Element content.
+ * @property {string | number | Function | Node | DomBuilderItem[] | null} [content] - Element content.
  *   A string or number is set as plain text (`textContent`) unless it contains `<`, in which case it is
  *   treated as markup: sanitized and inserted via the native Sanitizer API (`Element.setHTML`) where
- *   supported, falling back to raw `innerHTML` on browsers without it.
+ *   supported, falling back to raw `innerHTML` on browsers without it. A `Node` (an `Element`, a
+ *   `DocumentFragment`, ...) is appended as-is, either directly or returned from a function.
  * @property {string | number} [text] - Literal text node shorthand: inserts a plain `Text` node (never
  *   parsed as markup) in place of an element, so it can sit as a sibling of tags within `children`/`content`
  *   arrays. Mutually exclusive with `tag`/`content`/`children`: when set (and `tag` is absent), every other
@@ -44,7 +45,7 @@ import { parseDomString } from './parseDomString.js';
  *     className: 'xxx' | ['class1', 'class2'], // also `class`
  *     id: 'element-id',
  *     attrs: [attr_name, attr_value] | [[...], [...]] | {name: value},
- *     content: 'xxx' | 'xxx <strong>yyy</strong>' | 123 | domBuilder Array | function | Element, // see DomBuilderItem.content above
+ *     content: 'xxx' | 'xxx <strong>yyy</strong>' | 123 | domBuilder Array | function | Node, // see DomBuilderItem.content above
  *     condition: true | false,
  *     callback: el => ...,
  *     children: [...]
@@ -89,7 +90,7 @@ import { parseDomString } from './parseDomString.js';
  * - `className` / `class` / `classname` {string | string[]} - CSS class(es): a single string or an array (falsy values filtered out).
  * - `id` {string | null} - Unique element ID.
  * - `attrs` {[string, *] | [string, *][] | Object<string, *>} - Attributes: a `[name, value]` pair, array of pairs, or `{name: value}` object.
- * - `content` {string | number | Function | Element | DomBuilderItem[] | null} - Element content. A string/number is set as `textContent` unless it contains `<`, in which case it's sanitized and inserted as markup (`Element.setHTML`, falling back to `innerHTML`).
+ * - `content` {string | number | Function | Node | DomBuilderItem[] | null} - Element content. A string/number is set as `textContent` unless it contains `<`, in which case it's sanitized and inserted as markup (`Element.setHTML`, falling back to `innerHTML`). A `Node` (`Element`, `DocumentFragment`, ...), passed directly or returned from a function, is appended as-is.
  * - `text` {string | number} - Literal text node shorthand: inserts a plain `Text` node (never parsed as markup) as a sibling of other items, in place of an element. Mutually exclusive with `tag`/`content`/`children`.
  * - `condition` {boolean} - When false, the element (or text node) is skipped. Default `true`.
  * - `callback` {(function(HTMLElement|Text): void) | null} - Invoked after the element (or text node) is created.
@@ -232,16 +233,21 @@ export function domBuilder(structureArray = [], parent, options = {}) {
 
         } else {
 
-          /** @type {string | Element | null} */
+          /** @type {string | Node | null} */
           let content = null;
           if (typeof safeItem.content === 'function') {
             content = safeItem.content();
+
+          } else if (safeItem.content instanceof Node) {
+            content = safeItem.content;
 
           } else if (safeItem.content != null) {
             content = String(safeItem.content);
           }
 
-          if (content instanceof Element) {
+          if (content instanceof Node) {
+            // Element, DocumentFragment, Text, ... appended as-is (a DocumentFragment's
+            // children are moved into `el`, emptying the fragment, per native DOM behavior)
             el.appendChild(content);
 
           } else if (content != null) {

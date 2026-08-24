@@ -278,9 +278,9 @@ else
   safe_cat "${MINIMO_PKG_DIR}/dev-tools/create-favicons/src/default-params.mjs" "${FRONTEND_INSTALL_PATH}/favicons/create-favicons-cfg.mjs"
 fi
 
-# entry css critical (inlinata nei template html) e entry js, sulla root di
+# entry css critical (inline nei template html) e entry js, sulla root di
 # installazione accanto a index.css
-safe_cat "${TEMPLATES_DIR}/index-critical.css" "${FRONTEND_INSTALL_PATH}/index-critical.css"
+safe_cat "${TEMPLATES_DIR}/layout-critical.css" "${FRONTEND_INSTALL_PATH}/src/css/layout-critical.css"
 safe_cat "${TEMPLATES_DIR}/app_index.js"       "${FRONTEND_INSTALL_PATH}/index.js"
 
 # favicons: istruzioni d'uso di `npx create-favicons`
