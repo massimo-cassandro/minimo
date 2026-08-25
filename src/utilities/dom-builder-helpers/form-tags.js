@@ -409,7 +409,6 @@ export function buildFakeField({
  *   domBuilder items is passed, it is rendered via `children` instead of `content`.
  * @param {string} [args.type=button] - button type.
  * @param {string | null} args.id - `id` attribute.
- * @param {string | number | null} [args.value=null] - button `value` attribute.
  * @param {string | null} [args.class=null] - optional class to be added to the button element.
  * @param {string | null} [args.classname=null] - Alias for `class`.
  * @param {string | null} [args.className=null] - Alias for `class`.
@@ -422,7 +421,6 @@ export function buildButton({
   content,
   type = 'button',
   id = null,
-  value = null,
   class: classArg = null,
   classname: classnameArg = null,
   className: classNameArg = null,
@@ -440,8 +438,7 @@ export function buildButton({
     id: id,
     attrs: {
       ...(attrs??{}),
-      type: type,
-      value: value
+      type: type
     },
     ...(Array.isArray(content)
       ? { children: content }
