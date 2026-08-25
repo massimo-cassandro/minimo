@@ -25,7 +25,7 @@ import { parseDomString } from './parseDomString.js';
  *   property except `condition` and `callback` is ignored.
  * @property {boolean} [condition=true] - When false, the element (or text node) is skipped.
  * @property {(function(HTMLElement|Text): void) | null} [callback] - Callback invoked after the element (or text node) is created.
- * @property {Array<DomBuilderItem|string>} [children] - Configuration array for child elements. Accepts strings (shorthand per `parseDomString`) and/or configuration objects.
+ * @property {Array<DomBuilderItem|string|Node>} [children] - Configuration array for child elements. Accepts strings (shorthand per `parseDomString`), configuration objects, and/or `Node`s (an `Element`, a `DocumentFragment`, ...) inserted as-is.
  */
 
 /**
@@ -85,7 +85,7 @@ import { parseDomString } from './parseDomString.js';
  * object-level properties take precedence.
  *
  * @function domBuilder
- * @param {Array<DomBuilderItem|string>} [structureArray=[]] - Configuration array. Accepts strings (shorthand per `parseDomString`) and/or configuration objects, each supporting:
+ * @param {Array<DomBuilderItem|string|Node>} [structureArray=[]] - Configuration array. Accepts strings (shorthand per `parseDomString`), configuration objects, and/or `Node`s (an `Element`, a `DocumentFragment`, ...) inserted as-is; each configuration object supports:
  * - `tag` / `tagName` {string | string[]} - HTML tag name, or array of nested tags (each is parent of the next). Default `'div'`.
  * - `className` / `class` / `classname` {string | string[]} - CSS class(es): a single string or an array (falsy values filtered out).
  * - `id` {string | null} - Unique element ID.
@@ -94,7 +94,7 @@ import { parseDomString } from './parseDomString.js';
  * - `text` {string | number} - Literal text node shorthand: inserts a plain `Text` node (never parsed as markup) as a sibling of other items, in place of an element. Mutually exclusive with `tag`/`content`/`children`.
  * - `condition` {boolean} - When false, the element (or text node) is skipped. Default `true`.
  * - `callback` {(function(HTMLElement|Text): void) | null} - Invoked after the element (or text node) is created.
- * - `children` {Array<DomBuilderItem|string>} - Configuration array for child elements (same format, nested).
+ * - `children` {Array<DomBuilderItem|string|Node>} - Configuration array for child elements (same format, nested; also accepts `Node`s inserted as-is).
  *
  * IDs and classes can be specified either as top-level object keys or inside `attrs`; top-level properties take precedence.
  * @param {HTMLElement} [parent] - Parent element the structure is attached to (see `options.insertMode`).
@@ -106,7 +106,7 @@ import { parseDomString } from './parseDomString.js';
  */
 
 
-export function domBuilder(structureArray = [], parent, options = {}) {
+export function domBuilder(/** @type {Array<DomBuilderItem|string|Node>} */ structureArray = [], parent, options = {}) {
 
   options = {
     emptyParent: false,
@@ -143,6 +143,34 @@ export function domBuilder(structureArray = [], parent, options = {}) {
   const elaboratedStructureArray = [];
 
   structureArray.forEach(inputItem => {
+
+    // A DOM Node (Element, DocumentFragment, ...) passed directly: inserted as-is,
+    // bypassing element creation and config parsing entirely.
+    if (inputItem instanceof Node) {
+
+      elaboratedStructureArray.push(/** @type {DomBuilderItem} */ (/** @type {unknown} */ (inputItem)));
+
+      if (target) {
+        if (options.insertMode === 'before') {
+          const anchor = /** @type {HTMLElement} */ (target);
+          anchor.parentNode?.insertBefore(inputItem, anchor);
+
+        } else if (options.insertMode === 'after') {
+          const anchor = afterAnchors.get(/** @type {HTMLElement} */ (target)) ?? /** @type {HTMLElement} */ (target);
+          anchor.parentNode?.insertBefore(inputItem, anchor.nextSibling);
+          afterAnchors.set(/** @type {HTMLElement} */ (target), inputItem);
+
+        } else {
+          target.appendChild(inputItem);
+        }
+      }
+
+      if (mainElement == null && inputItem instanceof Element) {
+        mainElement = /** @type {HTMLElement} */ (inputItem);
+      }
+
+      return;
+    }
 
     /** @type {DomBuilderItem | null} */
     let item;

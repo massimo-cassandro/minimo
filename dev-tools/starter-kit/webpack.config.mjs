@@ -252,6 +252,19 @@ const config = {
       directory: path.join(__dirname, '/'),
       serveIndex: true
     },
+    /*
+    proxy: [
+      {
+        // /login, /logout (redirect Google) e /api/... (fetch AJAX) vanno
+        // inoltrati al server PHP reale (npm run "php server", vedi
+        // package.json e app/router.php), che webpack-dev-server non può
+        // eseguire da solo.
+        context: ['/api', '/login', '/logout'],
+        target: process.env.PHP_BASE_URL || 'http://localhost:8000'
+      }
+    ],
+    static: false,
+    */
     open: { app: { name: 'Google Chrome' } },
     compress: true,
     hot: true,
