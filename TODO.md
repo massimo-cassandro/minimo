@@ -6,6 +6,8 @@ Riferimento centralizzato dei prossimi interventi. Le dir con prefisso `TODO ` i
 
 ## V2
   * vedi TODO con `epic=v2`
+  * vedi inclusione eslint-stylelint qui sotto se non già eseguita
+  * aggiungi sezione `breaking changes` nel readme per documentare cosa va aggiornato nel passare da v1 a v2
 
 
 ## CUSTOM PROPERTIES:
@@ -164,6 +166,45 @@ rendere l'utilizzo condizionale (esempio):
     }
     ```
 
+## ESLINT-CONFIG / STYLELINT-CONFIG
+
+Prompt d'esecuzione (piano già concordato con l'utente, da eseguire quando richiesto):
+
+Unifica in minimo i due package esterni `@massimo-cassandro/eslint-config` e `@massimo-cassandro/stylelint-config`, che vivono come repo a sé stanti accanto alla dir di minimo (`/Users/mazz/Sites/eslint-config` e `/Users/mazz/Sites/stylelint-config`). Non toccare questi due repo originali.
+
+1. Crea `dev-tools/eslint-config/`:
+   - `index.js` — copia identica di `eslint-config/index.js`
+   - `README.md` — copia di `eslint-config/README.md`, aggiornando il comando d'installazione/import per riflettere il nuovo path (`@massimo-cassandro/minimo/eslint-config` invece del pacchetto a sé stante)
+   - `changelog.md` — copia di `eslint-config/changelog.md`
+
+2. Crea `dev-tools/stylelint-config/`:
+   - `index.js` — copia identica di `stylelint-config/index.js`
+   - `README.md` — copia di `stylelint-config/README.md`, stesso aggiornamento import path
+   - `changelog.md` — copia di `stylelint-config/changelog.md`
+   - `test/test.module.scss` — copia dell'unico file di test presente
+
+3. `package.json` di minimo:
+   - aggiungi due export path: `"./eslint-config": "./dev-tools/eslint-config/index.js"` e `"./stylelint-config": "./dev-tools/stylelint-config/index.js"`
+   - aggiungi a `devDependencies` (servono a minimo per lintare se stesso): `@eslint/js`, `eslint`, `globals`, `stylelint`, `@stylistic/stylelint-config`, `@stylistic/stylelint-plugin`, `stylelint-config-css-modules`, `stylelint-config-recess-order`, `stylelint-config-standard`, `stylelint-config-standard-scss`, `stylelint-scss`, `stylelint-order` (quest'ultimo è extended da `stylelint-config/index.js` ma manca nel `package.json` originale — presente solo come peer dep transitiva di `stylelint-config-recess-order`: aggiungerlo esplicitamente)
+   - aggiungi gli stessi pacchetti anche a `peerDependencies`, con `peerDependenciesMeta.<pkg>.optional: true` (stessa policy già in uso per `@svgdotjs/svg.js`, `blurhash`, ecc. — vedi CLAUDE.md "Politica sulle dipendenze esterne")
+   - rimuovi da `devDependencies` `@massimo-cassandro/eslint-config` e `@massimo-cassandro/stylelint-config`
+
+4. Root di minimo — aggiorna `eslint.config.mjs` e `stylelint.config.mjs` per puntare alle copie interne (`./dev-tools/eslint-config/index.js` e `./dev-tools/stylelint-config/index.js`) invece che ai pacchetti npm esterni
+
+5. Dependabot: nessuna azione necessaria — i due `dependabot.yml` di `eslint-config`/`stylelint-config` sono identici a quello già presente in `minimo/.github/dependabot.yml` (stesso ecosystem npm, `directory: "/"`, stessa schedule/labels): i nuovi pacchetti aggiunti al `package.json` di minimo sono già coperti automaticamente
+
+6. `dev-tools/starter-kit/starter-install.sh`:
+   - rimuovi le righe `npm_i -D @massimo-cassandro/eslint-config` e `npm_i -D @massimo-cassandro/stylelint-config`
+   - sostituiscile con l'installazione diretta, nel progetto consumer, dei pacchetti peer richiesti dai config (eslint, stylelint e plugin correlati elencati sopra), dato che `@massimo-cassandro/minimo` (già installato dallo script) fornirà ora i config stessi
+
+7. Template starter-kit — vanno aggiornati anche i file copiati nei progetti consumer, non solo lo script di install:
+   - `dev-tools/starter-kit/templates/eslint.config.mjs`: `import eslint_config from '@massimo-cassandro/eslint-config';` → `import eslint_config from '@massimo-cassandro/minimo/eslint-config';`
+   - `dev-tools/starter-kit/templates/stylelint.config.mjs`: `extends: ['@massimo-cassandro/stylelint-config']` → `extends: ['@massimo-cassandro/minimo/stylelint-config']`
+
+Non toccare: i due repo originali (`/Users/mazz/Sites/eslint-config`, `/Users/mazz/Sites/stylelint-config`); LICENSE (minimo ha già la propria, MIT); `.editorconfig` e `*.code-workspace` dei due progetti originali (non vanno copiati, già coperti dalle impostazioni di minimo).
+
+**Da valutare:** se effettuare questo switch dei percorsi (starter-kit + template + root config di minimo) subito, oppure rimandarlo al rilascio della versione 2 di minimo, trattandolo come parte dei breaking change già previsti lì (vedi sezione [V2](#v2)) — dato che cambia il modo in cui i progetti consumer devono importare i config.
+
 ## FORM-MULTISELECT
   * `src/components/TODO form-multiselect/`
 
@@ -218,7 +259,6 @@ rendere l'utilizzo condizionale (esempio):
   * unificare con `_wrk/popup-page`?
 
 ## MINIMO
-  * includere anche stylelint ed eslint config??
   * includere e successivamente archiviare `auto-datatables-bs5` e `ckeditor-utilities`
   * Includere layout-tools? è adattabile a minimo?
   * completare readme

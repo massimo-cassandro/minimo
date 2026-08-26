@@ -16,7 +16,8 @@ import './sf-macro.css';
  * @param {string} [options.addBtnClass='sf-macro-riga-add'] - Class name of the row-add button. (default: 'sf-macro-riga-add')
  * @param {string} [options.containerClass='sf-macro-container'] - Class name of the rows container. (default: 'sf-macro-container')
  * @param {((newRow: Element | null, addBtn: Element | null) => void) | null} [options.add_callback=null] - Called after a row is added; receives the new row and the add button. (default: null)
- * @param {(() => void) | null} [options.del_callback=null] - Called after a row is removed. (default: null)
+ * @param {((row: Element | null, closeBtn: Element | null) => boolean | Promise<boolean>) | null} [options.preDelCallback=null] - Called when the row-remove button is pressed, before the row is removed; receives the row and the close button. May return a Promise (e.g. to await a confirm dialog): the row is removed only if the resolved value is not `false`. (default: null)
+ * @param {((row: Element | null, closeBtn: Element | null) => void) | null} [options.del_callback=null] - Called after a row is removed; receives the removed row (now detached) and the close button. (default: null)
  * @param {boolean} [options.insertAtTop=false] - When true, new rows are inserted at the top. (default: false)
  * @returns {void}
  */
@@ -30,6 +31,7 @@ export function sf_macro({
   addBtnClass = 'sf-macro-riga-add',
   containerClass = 'sf-macro-container',
   add_callback = null,
+  preDelCallback = null,
   del_callback = null,
   insertAtTop = false
 }={}) {
@@ -74,11 +76,35 @@ export function sf_macro({
       }
 
     } else {
-      target.closest(row_selector)?.remove();
+      const riga = target.closest(row_selector);
 
-      if(del_callback && typeof del_callback === 'function') {
-        del_callback();
+      const remove_row = () => {
+        riga?.remove();
+
+        if(del_callback && typeof del_callback === 'function') {
+          del_callback(riga, action_btn);
+        }
+      };
+
+      if(preDelCallback && typeof preDelCallback === 'function') {
+        const pre_del_result = preDelCallback(riga, action_btn);
+
+        // Supports both a sync boolean and an async (Promise-returning)
+        // preDelCallback (e.g. awaiting a confirm dialog) without requiring
+        // the caller to manage the row removal itself.
+        if(pre_del_result instanceof Promise) {
+          pre_del_result.then(ok => {
+            if(ok !== false) remove_row();
+          });
+          return;
+        }
+
+        if(pre_del_result === false) {
+          return;
+        }
       }
+
+      remove_row();
     }
 
   }, false);

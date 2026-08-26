@@ -5,3 +5,4 @@
 * 1.25.0 (24 ago 2026) - domBuilder: ability to use Node fragments for `content`
 * 1.26.0 (25 ago 2026) - DomBuilder: ability to add Nodes to `children` element
 * 1.27.0 (25 ago 2026) - domBuilder: buildButton utility
+* 1.28.0 (26 ago 2026) - sf-macro: preDelCallback option

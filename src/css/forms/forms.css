@@ -39,6 +39,11 @@
   color: var(--form-label-color);
 }
 
+/*  per uso label implicito, senza id e for */
+label:has(.form-control) {
+  display: block;
+  width: 100%;
+}
 
 .form-control, .form-control-static {
   display: block;
