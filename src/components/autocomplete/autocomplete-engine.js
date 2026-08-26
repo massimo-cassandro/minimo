@@ -98,7 +98,7 @@ export const ac_default_params = {
 
 /**
  * Initialises an autocomplete field using @tarekraafat/autocomplete.js.
- * @param {Record<string, any>} [params={}]
+ * @param {Record<string, any>} [params={}] (default: {})
  * @returns {void}
  */
 export default function (params = {}) {
@@ -284,8 +284,7 @@ export default function (params = {}) {
         }
       }); // end autoComplete
 
-      // TODO[epic=autocomplete]
-      // improve and make the callback invocation more efficient
+      // TODO improve and make the callback invocation more efficient
 
       // reset hidden field when the autocomplete value is cleared or mismatched
       const check_ac = () => {

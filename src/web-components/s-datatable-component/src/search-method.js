@@ -23,13 +23,13 @@ const PUNCTUATION_RX = /[.,/#!$%^&*;:{}=\-_`~()]/g;
  * troverebbe "S.p.A.".
  *
  * @param {*} str Valore da normalizzare (convertito con String()).
- * @param {object} [opts]
+ * @param {object} [opts] (default: {})
  * @param {'base'|'accent'|'case'|'variant'} [opts.sensitivity='base']
  *        'base'    → ignora maiuscole/minuscole e diacritici
  *        'accent'  → ignora maiuscole/minuscole, mantiene i diacritici
  *        'case'    → distingue maiuscole/minuscole, ignora i diacritici
- *        'variant' → distingue tutto
- * @param {boolean} [opts.ignorePunctuation=true]
+ *        'variant' → distingue tutto (default: 'base')
+ * @param {boolean} [opts.ignorePunctuation=true] (default: true)
  * @returns {string}
  */
 export function normalizeSearchString(str, opts = {}) {
@@ -63,7 +63,7 @@ export function normalizeSearchString(str, opts = {}) {
  * Comportamento AND: tutti i termini devono essere presenti
  * (come nella demo https://fiduswriter.github.io/simple-datatables/demos/22-and-search/).
  *
- * @param {object} [colSettings] Definizione della colonna (per `sensitivity` / `ignorePunctuation`).
+ * @param {object} [colSettings] Definizione della colonna (per `sensitivity` / `ignorePunctuation`). (default: {})
  * @returns {(terms: string[], cell: object) => boolean}
  */
 export function makeSearchMethod(colSettings = {}) {

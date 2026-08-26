@@ -13,7 +13,7 @@
  * If the linked field is disabled, the constraint is removed on focus
  * and restored when the linked field is re-enabled.
  *
- * @param {Document|Element} context - root element to search within (defaults to `document`)
+ * @param {Document|Element} context - root element to search within (default: document)
  * @returns {void}
  */
 export function linkedDates(context = document) {

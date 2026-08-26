@@ -98,6 +98,17 @@ minimo/
 
 **Lingua dei commenti**: i commenti `TODO`/`FIX` (e simili, es. `FIXME`) vanno scritti **in italiano**. Tutti gli altri commenti nel codice vanno scritti **in inglese**.
 
+**Caratteri Unicode**: dove nel codice si trovano caratteri Unicode letterali (es. em dash, freccie, valuta), vanno lasciati così come sono — non vanno convertiti nella relativa sequenza di escape JS (`\uXXXX`), né viceversa.
+
+**Valori di default nei JSDoc**: quando un parametro `@param` ha un valore di default (assegnato nella firma della funzione, in una destrutturazione, o definito altrove, es. un oggetto `defaults`), il commento del `@param` deve terminare con `(default: xxxx)`, così da renderlo visibile nei tooltip di VSCode anche quando non si usa la sintassi `[nome=valore]`. Esempio:
+
+```js
+/**
+ * @param {number} [retries=3] - Numero di tentativi (default: 3)
+ * @param {string} [mode] - Modalità di esecuzione (default: "auto")
+ */
+```
+
 ---
 
 ## File pubblicati su npm

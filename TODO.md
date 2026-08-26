@@ -1,8 +1,11 @@
-# TODO — @massimo-cassandro/minimo
+# minimo TODO
 
 Riferimento centralizzato dei prossimi interventi. Le dir con prefisso `TODO ` in `src/` indicano codice già spostato da `_wrk/` in attesa di integrazione.
 
 ---
+
+## V2
+  * vedi TODO con `epic=v2`
 
 
 ## CUSTOM PROPERTIES:

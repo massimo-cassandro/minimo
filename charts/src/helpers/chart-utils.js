@@ -5,7 +5,7 @@
 /**
  * Tronca un numero a un numero specifico di decimali.
  * @param {number} number - Il numero da troncare.
- * @param {number} [decimals=4] - Il numero di decimali da mantenere.
+ * @param {number} [decimals=4] - Il numero di decimali da mantenere. (default: 4)
  * @returns {number} Il numero troncato.
  */
 export function truncateDecimal(number, decimals = 4) {
@@ -50,14 +50,14 @@ export function polarToCartesianString(degrees_angle, cx, cy, circleRadius) {
  * Lo `start_angle` è il punto di inizio e `percentage` è la lunghezza percentuale dell'arco rispetto a `max_angle`.
  *
  * @param {Object} options - Opzioni di configurazione.
- * @param {number} [options.start_angle=0] - Angolo di partenza in gradi.
+ * @param {number} [options.start_angle=0] - Angolo di partenza in gradi. (default: 0)
  * @param {number|null} options.percentage - Lunghezza dell'arco in percentuale (da 0 a 1).
- * @param {number} [options.max_arc=360] - L'estensione massima dell'arco in gradi.
+ * @param {number} [options.max_arc=360] - L'estensione massima dell'arco in gradi. (default: 360)
  * @param {Object} options.center - Coordinate del centro.
  * @param {number|null} options.center.x - Coordinata X del centro.
  * @param {number|null} options.center.y - Coordinata Y del centro.
  * @param {number|null} options.radius - Raggio dell'arco.
- * @param {boolean} [options.clockwise=true] - Direzione oraria se true.
+ * @param {boolean} [options.clockwise=true] - Direzione oraria se true. (default: true)
  * @returns {{arc_length: number, start: {x: number, y: number}, end: {x: number, y: number}}} Coordinate di inizio, fine e lunghezza.
  */
 export function calcArcCoords(options) {
@@ -141,9 +141,9 @@ export function getElementFromContainer(container) {
 /**
  * Analizza il contenitore e restituisce informazioni sulle sue dimensioni, eseguendo alcune azioni di base.
  * @param {Object} params - Parametri di input.
- * @param {string|Element|null} [params.container=null] - Il contenitore del grafico.
- * @param {number|null} [params.width=null] - Larghezza predefinita (opzionale).
- * @param {number|null} [params.height=null] - Altezza predefinita (opzionale).
+ * @param {string|Element|null} [params.container=null] - Il contenitore del grafico. (default: null)
+ * @param {number|null} [params.width=null] - Larghezza predefinita (opzionale). (default: null)
+ * @param {number|null} [params.height=null] - Altezza predefinita (opzionale). (default: null)
  * @returns {[Element|null, number|null, number|null]} Un array contenente l'elemento, la larghezza e l'altezza.
  */
 export function parseContainer({ container = null, width = null, height = null }) {

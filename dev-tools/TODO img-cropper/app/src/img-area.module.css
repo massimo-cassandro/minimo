@@ -1,0 +1,41 @@
+
+.imgAreaWrapper {
+  position: relative;
+  display: grid;
+  place-content: center;
+
+  padding: 5px;
+
+  color: var(--gray-medium);
+
+  background-color: var(--gray-xlight);
+  border-radius: var(--std-radius);
+
+  &.dragover {
+    color: var(--accent-base);
+
+    &.hasImg {
+      outline: 5px dashed currentColor;
+    }
+  }
+}
+
+.dropAreaBackground {
+  position: absolute;
+  inset: 4rem;
+
+  display: grid;
+  place-content: center;
+
+  border: 5px dashed currentColor;
+  border-radius: var(--radius-base);
+
+  svg {
+    width: 6rem;
+    fill: currentColor;
+  }
+
+  .hasImg & {
+    display: none;
+  }
+}

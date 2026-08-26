@@ -1,0 +1,10 @@
+
+
+.codePanelWrapper {
+
+  padding: var(--size-xs);
+  font-family: var(--font-family-mono);
+  color: #fff;
+  background-color: var(--stone-11);
+  border-radius: var(--std-radius);
+}

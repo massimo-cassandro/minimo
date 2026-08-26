@@ -1,0 +1,41 @@
+
+/* Il tag img che contiene l'immagine da elaborare */
+.cropImg {
+  display: block;
+  width: auto;
+  max-width: 100%;
+  height: auto;
+  max-height: 100%;
+}
+.cropBadge {
+  position: absolute;
+  z-index: 100;
+  padding: .3rem .8rem;
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-sm);
+  color: #fff;
+  pointer-events: none;
+  background: color-mix(in srgb, var(--stone-12) 85%, transparent);
+  border-radius: var(--std-radius);
+}
+
+
+/* stylelint-disable selector-class-pattern, declaration-no-important  */
+:global(.cropper-container) {
+  --_cropper-point-color: #c00;
+  --_cropper-point-size: .8rem;
+
+}
+
+:global(.cropper-point) {
+  width: var(--_cropper-point-size) !important;
+  height: var(--_cropper-point-size) !important;
+  background-color: var(--_cropper-point-color) !important;
+  opacity: 1 !important;
+}
+
+:global(.cropper-line) {
+  background-color: var(--_cropper-point-color);
+}
+/* stylelint-enable selector-class-pattern, declaration-no-important  */
+

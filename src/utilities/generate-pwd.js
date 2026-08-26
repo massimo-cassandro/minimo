@@ -3,7 +3,7 @@
  * Generates a random password using uppercase letters and digits,
  * excluding visually ambiguous characters (O, I, 0).
  *
- * @param {number} [min_length=8] - Minimum password length (matches `minlength` attribute).
+ * @param {number} [min_length=8] - Minimum password length (matches `minlength` attribute). (default: 8)
  * @returns {string} The generated password.
  */
 export function generatePwd(min_length = 8) {

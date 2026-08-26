@@ -73,7 +73,7 @@ import caretRightIcon from '../../icons/caret-right.svg?inline';
  * @property {string}  [_renderNullAs]       Stringa da mostrare al posto di valori null/undefined.
  *                                           Default: `'&mdash;'` (trattino em).
  *                                           Applicato al valore della cella e ai segnaposto
- *                                           di `_cellRender` che si risolvono a null.
+ *                                           di `_cellRender` che si risolvono a null. (default: '&mdash;')
  * @property {'id'|'email'|'sf_datetime'} [_renderMode]
  *                                           Modalità di visualizzazione predefinita:
  *                                           - `id`          – colonna numerica, non ricercabile, allineata a destra
@@ -96,22 +96,22 @@ import caretRightIcon from '../../icons/caret-right.svg?inline';
  * @param {ColDefinition[]} cols     Definizione delle colonne. Le chiavi con prefisso `_` sono
  *                                  proprietà di questo componente; le restanti vengono passate
  *                                  direttamente a simple-datatables (es. `sortable`, `searchable`).
- *                                  Default: `[]`
+ *                                  Default: `[]` (default: [])
  *
  * @param {number}        perPage          Numero di righe per pagina.
- *                                           Default: `25`
+ *                                           Default: `25` (default: 25)
  *
  * @param {string}        renderNullAs     Stringa globale da mostrare al posto di valori null/undefined
  *                                           in tutte le colonne. Può essere sovrascritto per singola
  *                                           colonna con `_renderNullAs`.
- *                                           Default: `\u2014` (em dash)
+ *                                           Default: `\u2014` (em dash) (default: '\u2014')
  *
  * @param {boolean}       updateFooterOnPageChange     Se true, la callback `_footerRender` riceve i soli record
  *                                           della pagina corrente (subtotale di pagina). Se false
  *                                           (default), riceve l'intero set filtrato indipendentemente
  *                                           dalla paginazione (totale complessivo).
  *                                           Quando è false il footer si aggiorna solo al cambio di
- *                                           filtro, non al cambio pagina.
+ *                                           filtro, non al cambio pagina. (default: false)
  *
  * @param {string[]}      refs  Elenco di percorsi URL da cui, se si proviene,
  *                                           la pagina corrente viene ripristinata dal cookie
@@ -166,7 +166,7 @@ function getNestedValue(obj, path) {
  *
  * @param {string|Function|Node} tpl      Template da risolvere.
  * @param {object|null}     row           Oggetto riga corrente (null per le intestazioni).
- * @param {object}          [opts]        Opzioni aggiuntive.
+ * @param {object}          [opts]        Opzioni aggiuntive. (default: {})
  * @param {string}          [opts.nullAs] Stringa da usare come fallback per i segnaposto
  *                                        che si risolvono a null (default: `''`).
  *                                        Se non fornita i segnaposto non trovati diventano ''.
@@ -380,7 +380,7 @@ class SimpleDatatableAdapter extends HTMLElement {
    * Ricarica i dati (eventualmente da un nuovo URL e/o con nuove colonne),
    * con possibilità di applicare un filtro contestuale al termine del fetch.
    *
-   * @param {object} [overrides]
+   * @param {object} [overrides] (default: {})
    * @param {string} [overrides.json]    Nuovo URL dati (ignorato se `data` è presente)
    * @param {Array}  [overrides.data]    Dati inline (array di oggetti); ha precedenza su `json`
    * @param {Array}  [overrides.cols]    Nuove colonne

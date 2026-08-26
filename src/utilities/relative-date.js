@@ -6,17 +6,17 @@
 
 /**
  * @typedef {object} RelativeDateOptions
- * @property {boolean} [useRelativeTime=true] - Show times near the date as "in xx minutes" (before) or "now" (within `relativeTimeMinutesAfter`)
- * @property {string} [nowString] - String to display when the date is right now
- * @property {number} [relativeTimeMinutesBefore] - Minutes before the date within which to show "in xx minutes"
- * @property {number} [relativeTimeMinutesAfter] - Minutes after the date within which to show the now string
- * @property {boolean} [relativeTimeShowTime] - Show the actual time alongside relative date labels
- * @property {string} [relativeTimeShowTimeMarkup] - HTML markup for the time portion; `@@time@@` is replaced with the localized time string
- * @property {boolean} [firstLetterUpperCase] - Capitalize the first letter of the returned string
- * @property {Intl.DateTimeFormatOptions} [dateFormat] - Format for non-relative dates (beyond day after tomorrow)
- * @property {Intl.DateTimeFormatOptions} [timeFormat] - Format for time displayed in relative date labels
- * @property {string[]} [relativeStrings] - Labels for yesterday / today / tomorrow / day after tomorrow (in chronological order)
- * @property {string} [locale] - Locale string for date/time formatting
+ * @property {boolean} [useRelativeTime=true] - Show times near the date as "in xx minutes" (before) or "now" (within `relativeTimeMinutesAfter`) (default: true)
+ * @property {string} [nowString] - String to display when the date is right now (default: 'adesso')
+ * @property {number} [relativeTimeMinutesBefore] - Minutes before the date within which to show "in xx minutes" (default: 30)
+ * @property {number} [relativeTimeMinutesAfter] - Minutes after the date within which to show the now string (default: 30)
+ * @property {boolean} [relativeTimeShowTime] - Show the actual time alongside relative date labels (default: true)
+ * @property {string} [relativeTimeShowTimeMarkup] - HTML markup for the time portion; `@@time@@` is replaced with the localized time string (default: ' <span class="time-info">(alle @@time@@)</span>')
+ * @property {boolean} [firstLetterUpperCase] - Capitalize the first letter of the returned string (default: true)
+ * @property {Intl.DateTimeFormatOptions} [dateFormat] - Format for non-relative dates (beyond day after tomorrow) (default: { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric', hour12: false, hour: '2-digit', minute: '2-digit' })
+ * @property {Intl.DateTimeFormatOptions} [timeFormat] - Format for time displayed in relative date labels (default: { hour12: false, hour: '2-digit', minute: '2-digit' })
+ * @property {string[]} [relativeStrings] - Labels for yesterday / today / tomorrow / day after tomorrow (in chronological order) (default: ['ieri alle', 'oggi alle', 'domani alle', 'dopodomani alle'])
+ * @property {string} [locale] - Locale string for date/time formatting (default: 'it-IT')
  */
 
 /**
@@ -27,18 +27,18 @@
  * expands dotted `@param` properties (needed for editor IntelliSense to list each property) when
  * the base type is the literal `object`; a named typedef there would error (TS8032).
  * @param {Date | string} date - Date to display (Date object or ISO string)
- * @param {object} [options={}]
- * @param {boolean} [options.useRelativeTime=true] - Show times near the date as "in xx minutes" (before) or "now" (within `relativeTimeMinutesAfter`)
- * @param {string} [options.nowString] - String to display when the date is right now
- * @param {number} [options.relativeTimeMinutesBefore] - Minutes before the date within which to show "in xx minutes"
- * @param {number} [options.relativeTimeMinutesAfter] - Minutes after the date within which to show the now string
- * @param {boolean} [options.relativeTimeShowTime] - Show the actual time alongside relative date labels
- * @param {string} [options.relativeTimeShowTimeMarkup] - HTML markup for the time portion; `@@time@@` is replaced with the localized time string
- * @param {boolean} [options.firstLetterUpperCase] - Capitalize the first letter of the returned string
- * @param {Intl.DateTimeFormatOptions} [options.dateFormat] - Format for non-relative dates (beyond day after tomorrow)
- * @param {Intl.DateTimeFormatOptions} [options.timeFormat] - Format for time displayed in relative date labels
- * @param {string[]} [options.relativeStrings] - Labels for yesterday / today / tomorrow / day after tomorrow (in chronological order)
- * @param {string} [options.locale] - Locale string for date/time formatting
+ * @param {object} [options={}] (default: {})
+ * @param {boolean} [options.useRelativeTime=true] - Show times near the date as "in xx minutes" (before) or "now" (within `relativeTimeMinutesAfter`) (default: true)
+ * @param {string} [options.nowString] - String to display when the date is right now (default: 'adesso')
+ * @param {number} [options.relativeTimeMinutesBefore] - Minutes before the date within which to show "in xx minutes" (default: 30)
+ * @param {number} [options.relativeTimeMinutesAfter] - Minutes after the date within which to show the now string (default: 30)
+ * @param {boolean} [options.relativeTimeShowTime] - Show the actual time alongside relative date labels (default: true)
+ * @param {string} [options.relativeTimeShowTimeMarkup] - HTML markup for the time portion; `@@time@@` is replaced with the localized time string (default: ' <span class="time-info">(alle @@time@@)</span>')
+ * @param {boolean} [options.firstLetterUpperCase] - Capitalize the first letter of the returned string (default: true)
+ * @param {Intl.DateTimeFormatOptions} [options.dateFormat] - Format for non-relative dates (beyond day after tomorrow) (default: { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric', hour12: false, hour: '2-digit', minute: '2-digit' })
+ * @param {Intl.DateTimeFormatOptions} [options.timeFormat] - Format for time displayed in relative date labels (default: { hour12: false, hour: '2-digit', minute: '2-digit' })
+ * @param {string[]} [options.relativeStrings] - Labels for yesterday / today / tomorrow / day after tomorrow (in chronological order) (default: ['ieri alle', 'oggi alle', 'domani alle', 'dopodomani alle'])
+ * @param {string} [options.locale] - Locale string for date/time formatting (default: 'it-IT')
  * @returns {string} HTML `<time>` element as a string
  *
  * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/RelativeTimeFormat
@@ -83,7 +83,7 @@ export function relativeDate(date, options = {}) {
 
   /**
    * @param {Date | string} dateInput
-   * @param {RelativeDateOptions} [overrideOptions={}]
+   * @param {RelativeDateOptions} [overrideOptions={}] (default: {})
    * @returns {string}
    */
   const parseDate = (dateInput, overrideOptions = {}) => {

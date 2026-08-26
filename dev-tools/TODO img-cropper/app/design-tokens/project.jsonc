@@ -1,0 +1,157 @@
+{
+
+  "font": {
+
+    "family": {
+      "$type": "string",
+      "$value": "'Montserrat Alternates', sans-serif"
+    },
+    "family-mono": {
+      "$type": "string",
+      "$value": "'Monaspace Neon Var', 'Monaspace Neon', 'Aptos Mono', 'Roboto Mono', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'Liberation Mono', 'Andale Mono', 'Courier New', monospace"
+    }
+  },
+  "primary": {
+    "base": {
+      "$type": "color",
+      "$value": "#3F5B0A"
+    },
+    "on-base": {
+      "$type": "color",
+      "$value": "#fff"
+    },
+    "low": {
+      "$type": "color",
+      "$value": "#cad7b3"
+    },
+    "on-low": {
+      "$type": "color",
+      "$value": "{text.color}"
+    },
+    "gradient-low": {
+      "$type": "gradient",
+      "$value": {
+        "type": "linear",
+        "angle": 90,
+        "stops": [
+          {
+            "color": "{primary.low}",
+            "position": 0,
+          },
+          {
+            "color": "{primary.low}",
+            "position": 0.7,
+            "alpha": 0.9
+          },
+          {
+            "color": "transparent",
+            "position": 1,
+          }
+        ]
+      }
+
+    }
+  },
+
+  "accent": {
+    "base": {
+      "$type": "color",
+      "$value": "#650853"
+    },
+    "on-base": {
+      "$type": "color",
+      "$value": "#fff"
+    }
+  },
+
+  "body": {
+    "background": {
+      "color": {
+        "$type": "color",
+        "$value": "#DCDDDA"
+      }
+    }
+  },
+  "text": {
+    "color": {
+      "$type": "color",
+      "$value": "#000"
+    }
+  },
+
+  "panels": {
+    "min-height": {
+      "$type": "dimension",
+      "$value": "6rem"
+    },
+    "max-height": {
+      "$type": "dimension",
+      "$value": "60rem"
+
+    }
+  },
+  "std": {
+    "border": {
+      //--std-border: 1px solid var(--gray-medium);
+      "$type": "border",
+      "$value": {
+        "color": "{gray.medium}",
+        "width": "1px",
+        "style": "solid"
+      }
+    },
+    "radius": {
+      "$type": "dimension",
+      "$value": "{radius.xxs}"
+    }
+  },
+
+  "form": {
+    "control": {
+      "background": {
+        "color": {
+          "$type": "color",
+          "$value": "{gray.xxlight}"
+
+        }
+
+      }
+
+    }
+  },
+
+  "gray": {
+    "xdark": {
+      "$type": "color",
+      "$value": "#282627"
+    },
+    "dark": {
+      "$type": "color",
+      "$value": "#3c3a3b"
+    },
+    "medium": {
+      "$type": "color",
+      "$value": "#504d50"
+    },
+    "base": {
+      "$type": "color",
+      "$value": "#747275"
+    },
+    "light": {
+      "$type": "color",
+      "$value": "#98989a"
+    },
+    "xlight": {
+      "$type": "color",
+      "$value": "#ebebeb"
+    },
+    "xxlight": {
+      "$type": "color",
+      "$value": "#f4f4f4"
+    }
+  }
+
+}
+
+
+

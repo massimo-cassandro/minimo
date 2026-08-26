@@ -199,10 +199,10 @@ export function disposeSliding(target) {
  * CSS animates height to 0, then snaps display to none.
  *
  * @param {HTMLElement} target
- * @param {object} [options]
- * @param {boolean} [options.wrap=true] - auto-generates a wrapper `<div class="slide">` around `target` (see module docs above); when `false`, the `.slide` class is added directly to `target`.
+ * @param {object} [options] (default: {})
+ * @param {boolean} [options.wrap=true] - auto-generates a wrapper `<div class="slide">` around `target` (see module docs above); when `false`, the `.slide` class is added directly to `target`. (default: true)
  * @param {number} [options.duration] - overrides the `--slide-duration` CSS var (ms); if omitted, the CSS value is used.
- * @param {(() => void) | null} [options.callback] - invoked after the transition ends.
+ * @param {(() => void) | null} [options.callback] - invoked after the transition ends. (default: null)
  * @returns {Promise<void>}
  */
 export async function slideUp(target, options = {}) {
@@ -218,10 +218,10 @@ export async function slideUp(target, options = {}) {
  * display snaps to block, then CSS animates height from 0 (via @starting-style) to auto.
  *
  * @param {HTMLElement} target
- * @param {object} [options]
- * @param {boolean} [options.wrap=true] - auto-generates a wrapper `<div class="slide">` around `target` (see module docs above); when `false`, the `.slide` class is added directly to `target`.
+ * @param {object} [options] (default: {})
+ * @param {boolean} [options.wrap=true] - auto-generates a wrapper `<div class="slide">` around `target` (see module docs above); when `false`, the `.slide` class is added directly to `target`. (default: true)
  * @param {number} [options.duration] - overrides the `--slide-duration` CSS var (ms); if omitted, the CSS value is used.
- * @param {(() => void) | null} [options.callback] - invoked after the transition ends.
+ * @param {(() => void) | null} [options.callback] - invoked after the transition ends. (default: null)
  * @returns {Promise<void>}
  */
 export async function slideDown(target, options = {}) {
@@ -237,10 +237,10 @@ export async function slideDown(target, options = {}) {
  * Reads the current data-slide value on the slide element to decide direction.
  *
  * @param {HTMLElement} target
- * @param {object} [options]
- * @param {boolean} [options.wrap=true] - auto-generates a wrapper `<div class="slide">` around `target` (see module docs above); when `false`, the `.slide` class is added directly to `target`.
+ * @param {object} [options] (default: {})
+ * @param {boolean} [options.wrap=true] - auto-generates a wrapper `<div class="slide">` around `target` (see module docs above); when `false`, the `.slide` class is added directly to `target`. (default: true)
  * @param {number} [options.duration] - overrides the `--slide-duration` CSS var (ms); if omitted, the CSS value is used.
- * @param {(() => void) | null} [options.callback] - invoked after the transition ends.
+ * @param {(() => void) | null} [options.callback] - invoked after the transition ends. (default: null)
  * @returns {Promise<void>}
  */
 export async function slideToggle(target, options = {}) {

@@ -1,0 +1,265 @@
+:root {
+  --primary: #2196f3;
+  --success: #4caf50;
+  --danger: #f44336;
+  --bg: #f4f7f9;
+  --dark: #2d3436;
+}
+
+body {
+  margin: 20px;
+  font-family: 'Segoe UI', sans-serif;
+  background: var(--bg);
+}
+
+.main-container {
+  display: flex;
+  gap: 20px;
+  max-width: 1600px;
+  margin: auto;
+}
+
+.left-panel {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Maniglie Cropper */
+  .cropper-point {
+    width: 12px !important;
+    height: 12px !important;
+    background-color: var(--primary) !important;
+    opacity: 1 !important;
+  }
+
+  .cropper-point.point-se {
+    width: 18px !important;
+    height: 18px !important;
+    border-radius: 50%;
+  }
+
+  #crop-dimension-badge {
+    position: absolute;
+    z-index: 100;
+    display: none;
+    padding: 4px 12px;
+    font-family: monospace;
+    font-size: 12px;
+    color: #fff;
+    pointer-events: none;
+    background: rgba(0, 0, 0, 0.85);
+    border-radius: 4px;
+  }
+
+  .upload-area {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 400px;
+    background: #fff;
+    border: 3px dashed #cbd5e0;
+    border-radius: 8px;
+  }
+
+  #main-image {
+    display: none;
+    max-width: 100%;
+  }
+
+.panel {
+  padding: 15px;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.controls-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.control-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.preset-manager {
+  padding-top: 10px;
+  margin-top: 10px;
+  border-top: 1px dashed #ddd;
+}
+
+.flex-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 5px;
+}
+
+.small-in {
+  width: 60px;
+  padding: 5px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.help-text {
+  margin: 0;
+  font-size: 11px;
+  color: #888;
+}
+
+.output-split-container {
+  display: flex;
+  gap: 20px;
+  height: 400px;
+}
+
+.output-cards-col {
+  display: flex;
+  flex: 0 0 380px;
+  flex-direction: column;
+  gap: 10px;
+  padding-right: 10px;
+  overflow-y: auto;
+  border-right: 1px solid #eee;
+}
+
+.output-code-col {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.crop-card {
+  position: relative;
+  display: flex;
+  overflow: hidden;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+}
+
+.crop-card-left {
+  flex-shrink: 0;
+  width: 100px;
+  height: 100px;
+  cursor: zoom-in;
+  background: #eee;
+}
+
+.crop-card-left canvas {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.crop-card-right {
+  flex: 1;
+  padding: 12px;
+  font-size: 11px;
+}
+
+.crop-card-right b {
+  font-size: 13px;
+  color: var(--primary);
+  text-transform: uppercase;
+}
+
+.delete-crop {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  font-size: 18px;
+  line-height: 1;
+  color: #ccc;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.delete-crop:hover {
+  color: var(--danger);
+}
+
+#code-preview {
+  flex: 1;
+  padding: 15px;
+  font-family: Consolas, monospace;
+  font-size: 11px;
+  color: #fab1a0;
+  background: var(--dark);
+  border: none;
+  border-radius: 6px;
+}
+
+.sidebar-g {
+  width: 240px;
+  /* max-height: 95vh; */
+  padding: 15px;
+  overflow-y: auto;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+}
+
+.thumb-container {
+  padding: 8px;
+  margin-bottom: 20px;
+  cursor: pointer;
+  border: 1px solid #eee;
+  border-radius: 6px;
+  transition: transform 0.2s;
+}
+
+.thumb-container:hover {
+  border-color: var(--primary);
+  transform: translateY(-2px);
+}
+
+.thumb-container img {
+  width: 100%;
+  max-height: 140px;
+  object-fit: contain;
+  border-radius: 4px;
+}
+
+button {
+  padding: 8px 15px;
+  font-weight: 700;
+  color: white;
+  cursor: pointer;
+  background: var(--primary);
+  border: none;
+  border-radius: 4px;
+}
+
+.btn-sm {
+  padding: 5px 10px;
+  font-size: 11px;
+  background: var(--dark);
+}
+
+.danger {
+  background: var(--danger);
+}
+
+.full-btn {
+  width: 100%;
+}
+
+.zoom-popup {
+  position: fixed;
+  z-index: 2000;
+  display: none;
+  pointer-events: none;
+  background: white;
+  border: 2px solid var(--primary);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+}

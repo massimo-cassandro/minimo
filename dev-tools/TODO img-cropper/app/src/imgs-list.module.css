@@ -1,0 +1,60 @@
+.imgsListWrapper {
+
+  overflow: hidden;
+  border: var(--std-border);
+  border-radius: var(--std-radius);
+}
+
+.listStatusWrapper {
+  display: flex;
+  flex-flow: row wrap;
+  gap: 1rem;
+  align-items: center;
+  justify-content: flex-start;
+  padding: .2rem .4rem;
+  border-bottom: var(--std-border);
+}
+
+.imgList {
+  display: flex;
+  flex-flow: column nowrap;
+  gap: .3rem;
+  padding: .3rem;
+  overflow-y: auto;
+}
+
+.imgsListItem {
+  position: relative;
+  display: flex;
+  flex-flow: row nowrap;
+  gap: .5rem;
+  align-items: center;
+  justify-content: flex-start;
+
+  border: var(--std-border);
+  border-radius: var(--std-radius);
+}
+.thumbWrapper {
+  width: var(--_thumb-size); /* custom prop definita in layout.js */
+  height: var(--_thumb-size);
+  background-color: var(--stone-1);
+  border-inline-end: var(--std-border);
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: center;
+  }
+}
+
+.imgsInfoWrapper {
+  font-size: var(--font-size-sm);
+}
+.filename {
+  font-weight: var(--font-weight-bold);
+}
+.closeBtn {
+  position: absolute;
+  top: -3px;
+  left: -3px;
+}

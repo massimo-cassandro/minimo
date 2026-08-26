@@ -21,12 +21,12 @@ References
 /**
  * Displays a snackbar / toast notification using the Popover API.
  * @param {string} message - The message to display.
- * @param {Object} [options={}]
- * @param {string | null} [options.status=null] - Status variant: `danger`, `warning`, `info`, or `success`.
- * @param {number | false | null} [options.duration=4000] - Auto-close delay in ms; `false` or `null` disables auto-close.
- * @param {boolean} [options.close_btn=true] - Whether to show the close button.
- * @param {Function | null} [options.action=null] - Action callback.
- * @param {string | null} [options.action_text=null] - Label for the action button.
+ * @param {Object} [options={}] (default: {})
+ * @param {string | null} [options.status=null] - Status variant: `danger`, `warning`, `info`, or `success`. (default: null)
+ * @param {number | false | null} [options.duration=4000] - Auto-close delay in ms; `false` or `null` disables auto-close. (default: 4000)
+ * @param {boolean} [options.close_btn=true] - Whether to show the close button. (default: true)
+ * @param {Function | null} [options.action=null] - Action callback. (default: null)
+ * @param {string | null} [options.action_text=null] - Label for the action button. (default: null)
  * @returns {{ close: function(): void }}
  */
 export function snackbar(message, options = {}){

@@ -1,0 +1,78 @@
+.mainWrapper {
+
+  display: grid;
+  grid-template-areas:
+    'title imgControls'
+    'img img'
+    'imgInfo appControls'
+    'list code';
+
+  grid-template-rows: auto minmax(37.5rem, 70dvh) auto auto;
+  grid-template-columns: .8fr 1.2fr;
+
+  gap: 1rem;
+  padding: var(--size-lg);
+
+  &.expanded {
+    grid-template-rows: auto 80rem auto auto;
+
+  }
+
+}
+
+.panel {
+  padding: var(--size-xs);
+  background-color: var(--gray-xlight);
+  border: var(--std-border);
+  border-radius: var(--std-radius);
+}
+
+.title {
+  grid-area: title;
+  justify-self: start;
+  /* grid-area: 1 / 1 / 1 / -1; */
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  /* text-align: left; */
+}
+
+.imgControlPanel {
+  grid-area: imgControls;
+  justify-self: end;
+}
+
+.imgArea {
+  grid-area: img;
+}
+
+
+.imgInfoPanel {
+  grid-area: imgInfo;
+}
+
+
+.appControlPanel {
+  grid-area: appControls;
+  min-height: var(--_panels-min-height);
+}
+
+
+.imgsList, .codePanel {
+  min-height: var(--_panels-min-height);
+  max-height: var(--_panels-max-height);
+}
+
+.imgsList {
+  grid-area: list;
+
+}
+
+.codePanel {
+  grid-area: code;
+  min-height: var(--_panels-min-height);
+}
+
+
+svg {
+  aspect-ratio: 1;
+}

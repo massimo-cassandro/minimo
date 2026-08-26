@@ -1,0 +1,62 @@
+
+
+/* .imgControlsWrapper {
+  position: relative;
+} */
+
+.imgControlsInner {
+  /* position: sticky;
+  top: 0; */
+  display: flex;
+  flex-flow: row nowrap;
+  gap: 1rem;
+  align-items: center;
+  justify-content: flex-start;
+
+  .iconBtn {
+
+    --_btn-bg-color: transparent;
+    --_btn-fg-color: var(--primary-base);
+
+    display: block;
+    padding: .2em;
+    color: var(--_btn-fg-color);
+    background-color: var(--_btn-bg-color);
+    border-radius: var(--radius-pill);
+
+    &[disabled] {
+      --_btn-fg-color: var(--gray-light);
+      cursor: default;
+      opacity: .8;
+    }
+
+    svg {
+      width: 2.5em;
+    }
+
+    @media (hover: hover) {
+      &:not([disabled]):hover {
+        --_btn-bg-color: var(--btn-primary-hover-background-color);
+        --_btn-fg-color: var(--accent-base);
+      }
+    }
+
+    &:focus, &:active {
+      outline: var(--btn-focus-outline-width) solid var(--btn-primary-focus-outline-color);
+    }
+
+    &:active {
+      --_btn-background-color: var(--btn-primary-active-background-color);
+      --_btn-fg-color: var(--btn-primary-active-color);
+    }
+  }
+}
+
+.fileInput {
+  position: absolute;
+  z-index: -1;
+  width: .1px;
+  height: .1px;
+  overflow: hidden;
+  opacity: 0;
+}

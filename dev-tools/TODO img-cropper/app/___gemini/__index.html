@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Cropper Expert - V3.0 LocalStorage</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="main-container">
+    <div class="left-panel">
+        <div id="drop-zone" class="upload-area">
+            <div id="image-container" style="position: relative;">
+                <p id="placeholder-text">Trascina immagine o clicca Upload</p>
+                <img id="main-image">
+                <div id="crop-dimension-badge">0 x 0</div>
+            </div>
+            <input type="file" id="file-input" hidden accept="image/*">
+            <button id="upload-btn" onclick="document.getElementById('file-input').click()">UPLOAD (B)</button>
+        </div>
+
+        <div class="controls-row">
+            <div class="panel section-d">
+                <h3>PRESET ETICHETTE E RATIO</h3>
+                <div class="control-group">
+                    <label>Seleziona Etichetta Attiva:</label>
+                    <select id="label-selector" onchange="applyLabelPreset()"></select>
+                </div>
+                <div class="preset-manager">
+                    <label>Configura Ratio per Etichetta:</label>
+                    <div class="flex-row">
+                        <input type="number" id="setup-w" class="small-in" placeholder="W">
+                        <span>/</span>
+                        <input type="number" id="setup-h" class="small-in" placeholder="H">
+                        <button onclick="saveLabelPreset()" class="btn-sm">SALVA RATIO</button>
+                    </div>
+                    <p class="help-text">Inserisci 0/0 o lascia vuoto per Proporzione Libera.</p>
+                </div>
+            </div>
+
+            <div class="panel section-f">
+                <h3>INFO IMMAGINE</h3>
+                <div id="image-info">
+                    <p>NOME: <span id="info-name">-</span></p>
+                    <p>ORIGINALE: <span id="info-size">-</span></p>
+                    <p>FORMATO: <span id="info-format">-</span></p>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel section-h">
+            <h3>OUTPUT RITAGLI (Raggruppati per Immagine)</h3>
+            <div class="output-split-container">
+                <div class="output-cards-col" id="output-list"></div>
+                <div class="output-code-col">
+                    <div class="format-bar">
+                        <select id="output-format-selector" onchange="renderOutputArea()">
+                            <option value="js">JS Array</option>
+                            <option value="json">JSON Pure</option>
+                            <option value="twig" selected>TWIG Array</option>
+                            <option value="php">PHP Array</option>
+                        </select>
+                    </div>
+                    <textarea id="code-preview" readonly></textarea>
+                    <div class="actions">
+                        <button onclick="copyArrayToClipboard()" class="full-btn">COPIA CODICE</button>
+                        <button onclick="clearAllLocalStorage()" class="danger full-btn">RESET TOTALE (Pulisce LocalStorage)</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="sidebar-g" id="history-sidebar">
+        <h3>STORICO IMMAGINI</h3>
+    </div>
+</div>
+
+<div id="zoom-preview" class="zoom-popup"><canvas id="zoom-canvas"></canvas></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+<script src="script.js"></script>
+</body>
+</html>

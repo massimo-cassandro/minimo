@@ -13,13 +13,13 @@ import * as styles from './unsplash-page.module.css';
  * and attribution overlay.
  * @param {Object} settings
  * @param {HTMLElement | null} settings.targetElement - Container element where the photo will be rendered.
- * @param {string | null} [settings.className=null] - Extra class added to the container.
+ * @param {string | null} [settings.className=null] - Extra class added to the container. (default: null)
  * @param {string | null} settings.unsplashDataUrl - URL returning Unsplash photo JSON.
  * @param {string | null} settings.utmSource - UTM source value for attribution links.
  * @param {string | null} settings.title - Main heading text.
- * @param {string | null} [settings.text=null] - Optional body text.
- * @param {string | null} [settings.backLink=null] - Optional back-link HTML.
- * @param {boolean} [settings.hidePhotoLink=true] - When true, the Unsplash link is shown only on hover.
+ * @param {string | null} [settings.text=null] - Optional body text. (default: null)
+ * @param {string | null} [settings.backLink=null] - Optional back-link HTML. (default: null)
+ * @param {boolean} [settings.hidePhotoLink=true] - When true, the Unsplash link is shown only on hover. (default: true)
  * @returns {Promise<void>}
  */
 

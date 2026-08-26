@@ -43,7 +43,7 @@ const PARTICLE_CASING_MAP = new Map(PARTICELLE.map(term => [term.toLowerCase(), 
  * and optionally enforcing the exact casing of custom words.
  *
  * @param {string} str - input string to process
- * @param {string[]} custom_words - list of words whose exact casing must be preserved (e.g. `['iPhone', 'macOS']`)
+ * @param {string[]} [custom_words] - list of words whose exact casing must be preserved (e.g. `['iPhone', 'macOS']`) (default: [])
  * @returns {string} processed string, or empty string if input is falsy
  */
 export function betterText(str, custom_words = []) {

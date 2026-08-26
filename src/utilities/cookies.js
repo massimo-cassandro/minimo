@@ -5,7 +5,7 @@
  * Returns the value of a cookie by name.
  * @param {string} name
  * @param {object} [options]
- * @param {boolean} [options.parseJson=false] - If true, JSON-parses the value and returns an object instead of a string.
+ * @param {boolean} [options.parseJson=false] - If true, JSON-parses the value and returns an object instead of a string. (default: false)
  * @returns {string | object | null}
  */
 export function getCookie(name, {parseJson = false} = {}) {
@@ -25,8 +25,8 @@ export function getCookie(name, {parseJson = false} = {}) {
  * @param {object} params
  * @param {string} params.name
  * @param {string} params.value
- * @param {string|null} [params.path=null]
- * @param {number|null} [params.expire=null] - Max-Age in seconds
+ * @param {string|null} [params.path=null] (default: null)
+ * @param {number|null} [params.expire=null] - Max-Age in seconds (default: null)
  * @example
  * // Cookie scoped to the current page only, lasting 15 days
  * setCookie({

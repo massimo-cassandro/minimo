@@ -1,0 +1,45 @@
+
+
+.appControlPanelWrapper {
+  /* padding: .5rem;
+  border: var(--std-border); */
+
+  .fieldset {
+    padding: 0 0 var(--size-sm);
+    border: none;
+    /* border-block-end: 1px solid var(--gray-medium); */
+
+    &:not(:first-child) {
+      margin-block-start: var(--size-xl);
+    }
+    &:last-of-type {
+      padding-block-end: 0;
+      /* border-block-end: none; */
+    }
+
+    /* stylelint-disable-next-line selector-class-pattern */
+    :global(legend:not(.form-label)) {
+
+      display: block;
+      width: 100%;
+      padding: 2px 6px;
+      margin: 0 0 var(--size-sm);
+      font-weight: var(--font-weight-bold);
+      color: var(--primary-on-low);
+      background-image: var(--primary-gradient-low);
+      border-radius: var(--radius-xxs);
+    }
+
+  }
+}
+
+/* blocco edit crop */
+.editCropWrapper {
+  display: block; /* tmp */
+
+}
+
+/* form group */
+.cropFieldWrapper {
+  display: block; /* tmp */
+}

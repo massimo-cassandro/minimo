@@ -8,7 +8,7 @@
  *
  * @param {string} str - string yo be truncated
  * @param {number} maxLength - truncated string max length
- * @param {string} suffix
+ * @param {string} suffix (default: '…')
  * @returns {string|undefined} truncated string, or undefined if str is falsy
  *
  */

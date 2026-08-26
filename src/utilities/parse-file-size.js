@@ -10,7 +10,7 @@
  * parseFileSize(10485760);  // "10 MB"
  *
  * @param {number} bytes - file size in bytes
- * @param {number} [decimals=1] - max number of decimal digits
+ * @param {number} [decimals=1] - max number of decimal digits (default: 1)
  * @returns {string} formatted size (e.g. "1.5 MB")
  */
 export function parseFileSize(bytes, decimals = 1) {

@@ -1,0 +1,20 @@
+{
+  "__help": "https://code.visualstudio.com/docs/languages/jsconfig",
+  "compilerOptions": {
+    "ignoreDeprecations": "6.0",
+    "baseUrl": ".",
+    "allowSyntheticDefaultImports": false,
+
+    "target": "es2023",
+    "module": "ES6",
+    "paths": {
+      "@src/*": ["app/src/*"],
+      "@css/*": ["app/css/*"],
+      "@icons/*": ["app/icons/*"],
+      "@app/*": ["app/*"],
+
+      "@minimo/*": ["./node_modules/@massimo-cassandro/minimo/src/*"]
+    }
+  },
+  "exclude": ["node_modules", "dist", "docs", "build", "public", "_private"]
+}

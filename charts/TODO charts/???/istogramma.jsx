@@ -8,7 +8,7 @@ import InfoBox from './InfoBox';
 // import Legenda from '../components/legenda';
 import { formatDelta } from '@appsDashboard/componenti-condivisi/utilities';
 
-// TODO[epic=dashboard] valori negativi
+// TODO valori negativi
 
 function Istogramma(props) {
 

@@ -39,27 +39,27 @@ function closeDialog(el) {
  * When multiple options conflict, the first applicable one in the list above takes precedence.
  *
  * @param {Object} params
- * @param {string | null} [params.dialogExtraClassName=null] - Extra class added to the dialog element.
- * @param {string | DomBuilderItem[] | null} [params.content=null] - Plain text, HTML, or a domBuilder array.
- * @param {string | null} [params.contentExtraClassName=null] - Extra class added to the content wrapper.
- * @param {HTMLElement | null} [params.triggerElement=null] - Optional element that triggered the popup; when set, `aria-haspopup`, `aria-controls` and `aria-expanded` are managed on it.
- * @param {boolean} [params.addFocus=true] - if true, dialog receives focus after opening
- * @param {string | null} [params.headerExtraClassName=null] - Extra class added to the header wrapper.
- * @param {string | null} [params.footerExtraClassName=null] - Extra class added to the footer wrapper.
- * @param {string | number | null} [params.dialogWidth=null] - optional dialog width value - if set, overrides main css custom prop
- * @param {string | number | null} [params.dialogMinWidth=null] - optional dialog min-width value - if set, overrides main css custom prop
- * @param {string | number | null} [params.dialogMaxWidth=null] - optional dialog max-width value - if set, overrides main css custom prop
- * @param {string | number | null} [params.dialogHeight=null] - optional dialog height value - if set, overrides main css custom prop
- * @param {string | number | null} [params.dialogMinHeight=null] - optional dialog min-height value - if set, overrides main css custom prop
- * @param {string | number | null} [params.dialogMaxHeight=null] - optional dialog max-height value - if set, overrides main css custom prop
- * @param {string | null} [params.iframeUrl=null] - URL to load in an iframe.
- * @param {string | null} [params.ajaxUrl=null] - URL for Ajax content loading.
- * @param {((el: HTMLDialogElement) => void) | null} [params.openCallback=null] - Called with the dialog element after opening, receives the dialog element (`openCallback(dialogEl)`).
- * @param {((el: HTMLDialogElement) => void) | null} [params.closeCallback=null] - Called with the dialog element just before it is removed, receives the dialog element (`closeCallback(dialogEl)`). NB: `dialogEl` is removed immediately after closing.
- * @param {((data: *, el: Element) => void) | null} [params.ajaxCallback=null] - Called with the Ajax response and the content element.
- * @param {boolean} [params.addScrollbarPadding=false] - Adds right padding to compensate for the scrollbar.
- * @param {string | DomBuilderItem[] | null} [params.headerContent=null] - Header content: plain text, HTML, or a domBuilder array.
- * @param {string | DomBuilderItem[] | null} [params.footerContent=null] - Footer content: plain text, HTML, or a domBuilder array.
+ * @param {string | null} [params.dialogExtraClassName=null] - Extra class added to the dialog element. (default: null)
+ * @param {string | DomBuilderItem[] | null} [params.content=null] - Plain text, HTML, or a domBuilder array. (default: null)
+ * @param {string | null} [params.contentExtraClassName=null] - Extra class added to the content wrapper. (default: null)
+ * @param {HTMLElement | null} [params.triggerElement=null] - Optional element that triggered the popup; when set, `aria-haspopup`, `aria-controls` and `aria-expanded` are managed on it. (default: null)
+ * @param {boolean} [params.addFocus=true] - if true, dialog receives focus after opening (default: true)
+ * @param {string | null} [params.headerExtraClassName=null] - Extra class added to the header wrapper. (default: null)
+ * @param {string | null} [params.footerExtraClassName=null] - Extra class added to the footer wrapper. (default: null)
+ * @param {string | number | null} [params.dialogWidth=null] - optional dialog width value - if set, overrides main css custom prop (default: null)
+ * @param {string | number | null} [params.dialogMinWidth=null] - optional dialog min-width value - if set, overrides main css custom prop (default: null)
+ * @param {string | number | null} [params.dialogMaxWidth=null] - optional dialog max-width value - if set, overrides main css custom prop (default: null)
+ * @param {string | number | null} [params.dialogHeight=null] - optional dialog height value - if set, overrides main css custom prop (default: null)
+ * @param {string | number | null} [params.dialogMinHeight=null] - optional dialog min-height value - if set, overrides main css custom prop (default: null)
+ * @param {string | number | null} [params.dialogMaxHeight=null] - optional dialog max-height value - if set, overrides main css custom prop (default: null)
+ * @param {string | null} [params.iframeUrl=null] - URL to load in an iframe. (default: null)
+ * @param {string | null} [params.ajaxUrl=null] - URL for Ajax content loading. (default: null)
+ * @param {((el: HTMLDialogElement) => void) | null} [params.openCallback=null] - Called with the dialog element after opening, receives the dialog element (`openCallback(dialogEl)`). (default: null)
+ * @param {((el: HTMLDialogElement) => void) | null} [params.closeCallback=null] - Called with the dialog element just before it is removed, receives the dialog element (`closeCallback(dialogEl)`). NB: `dialogEl` is removed immediately after closing. (default: null)
+ * @param {((data: *, el: Element) => void) | null} [params.ajaxCallback=null] - Called with the Ajax response and the content element. (default: null)
+ * @param {boolean} [params.addScrollbarPadding=false] - Adds right padding to compensate for the scrollbar. (default: false)
+ * @param {string | DomBuilderItem[] | null} [params.headerContent=null] - Header content: plain text, HTML, or a domBuilder array. (default: null)
+ * @param {string | DomBuilderItem[] | null} [params.footerContent=null] - Footer content: plain text, HTML, or a domBuilder array. (default: null)
  * @returns {HTMLDialogElement} The dialog element.
  */
 

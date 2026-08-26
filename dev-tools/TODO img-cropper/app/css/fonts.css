@@ -1,0 +1,18 @@
+/*
+  https://fontsource.org/fonts/rethink-sans/install
+
+*/
+
+@import '@fontsource/monaspace-neon/latin-400.css';
+
+/*
+- Weights: `[100,200,300,400,500,600,700,800,900]`
+- Styles: `[italic,normal]`
+- Subsets: `[cyrillic,cyrillic-ext,latin,latin-ext,vietnamese]`
+*/
+@import '@fontsource/montserrat-alternates/400.css';
+@import '@fontsource/montserrat-alternates/400-italic.css';
+@import '@fontsource/montserrat-alternates/500.css';
+@import '@fontsource/montserrat-alternates/500-italic.css';
+@import '@fontsource/montserrat-alternates/700.css';
+@import '@fontsource/montserrat-alternates/700-italic.css';

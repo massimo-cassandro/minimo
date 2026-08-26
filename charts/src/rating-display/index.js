@@ -15,115 +15,115 @@ import { rad30, getDisplayBackgroundPath, calcolaPuntoInterno, normalizeAngle, i
 export async function ratingDisplay({
 
   /**
-   * @param {boolean} [debug=false] - Modalità debug: se attiva mostra i riferimenti grafici (centri di rotazione, angoli) e i metadati data-debug-info.
+   * @param {boolean} [debug=false] - Modalità debug: se attiva mostra i riferimenti grafici (centri di rotazione, angoli) e i metadati data-debug-info. (default: false)
    */
   debug = false,
 
   /**
-   * @param {HTMLElement|string|null} [container=null] - Elemento DOM o selettore CSS dove iniettare il grafico. Se null, la funzione restituisce l'SVG come stringa.
+   * @param {HTMLElement|string|null} [container=null] - Elemento DOM o selettore CSS dove iniettare il grafico. Se null, la funzione restituisce l'SVG come stringa. (default: null)
    */
   container = null,
 
   /**
-   * @param {number|null} [width=null] - Larghezza del documento SVG. Obbligatoria se eseguito in ambiente Node.
+   * @param {number|null} [width=null] - Larghezza del documento SVG. Obbligatoria se eseguito in ambiente Node. (default: null)
    */
   width = null,
 
   /**
    * @param {number|function} [centerGap=r=>r/8] - Distanza tra il centro della circonferenza esterna e ciascuna delle circonferenze interne (*dA* e *dB* nella documentzione).
-   * Numero o funzione del raggio dato.
+   * Numero o funzione del raggio dato. (default: r => r/9)
    */
   centerGap = r => r/9,
 
   /**
    * @param {number|function} [scaleEndThickness=r=>r/8] - Spessore finale della scala (indicato con *s* nella documentazione).
-   * Numero o funzione del raggio dato.
+   * Numero o funzione del raggio dato. (default: r => r/5)
    */
   scaleEndThickness = r => r/5,
 
   /**
-   * @param {number} [portions=5] - Numero di porzioni (sezioni di colore) in cui è diviso il tachimetro.
+   * @param {number} [portions=5] - Numero di porzioni (sezioni di colore) in cui è diviso il tachimetro. (default: 5)
    */
   portions = 5,
 
   /**
    * @param {number} [portionGap=10] - Distanza tra una porzione e la successiva.
    * Corrisponde all'angolo in gradi tra le due semirette passanti per il centro della circonferenza esterna e i segmenti laterali delle porzioni.
-   * Indicato con *gamma* nella documentazione
+   * Indicato con *gamma* nella documentazione (default: 2)
    */
   portionGap = 2,
 
   /**
-   * @param {Object} [svgAttrs={}] - Attributi aggiuntivi (es. class, id) da applicare al tag SVG radice.
+   * @param {Object} [svgAttrs={}] - Attributi aggiuntivi (es. class, id) da applicare al tag SVG radice. (default: {})
    */
   svgAttrs = {},
 
   /**
-   * @param {Object} [displayBackgroundAttrs] - Attributi grafici (fill, stroke) per l'arco di sfondo esterno.
+   * @param {Object} [displayBackgroundAttrs] - Attributi grafici (fill, stroke) per l'arco di sfondo esterno. (default: { fill: 'none' })
    */
   displayBackgroundAttrs = {
     fill: 'none',
   },
 
   /**
-   * @param {number} [displayPadding=10] - Spazio tra il bordo del background e gli elementi interni del display.
+   * @param {number} [displayPadding=10] - Spazio tra il bordo del background e gli elementi interni del display. (default: 10)
    */
   displayPadding = 10,
 
   /**
-   * @param {number} [scaleStartValue=0] - Valore minimo della scala numerica da cui parte il calcolo della posizione.
+   * @param {number} [scaleStartValue=0] - Valore minimo della scala numerica da cui parte il calcolo della posizione. (default: 0)
    */
   scaleStartValue = 0,
 
   /**
-   * @param {boolean} [rodPositionForceCenter=false] - Se true, l'asticella punta sempre al centro della fascia; se false, segue la proporzione del valore esatto.
+   * @param {boolean} [rodPositionForceCenter=false] - Se true, l'asticella punta sempre al centro della fascia; se false, segue la proporzione del valore esatto. (default: false)
    */
   rodPositionForceCenter = false,
 
 
   /**
-   * @param {number|null} [value=null] - Valore numerico da rappresentare. Determina il colore e la posizione dell'asticella.
+   * @param {number|null} [value=null] - Valore numerico da rappresentare. Determina il colore e la posizione dell'asticella. (default: null)
    */
   value = null,
 
   /**
-   * @param {string[]|null} [scaleColors=null] - Array di colori per le porzioni della scala. Se null, usa i colori di default della chartInstance.
+   * @param {string[]|null} [scaleColors=null] - Array di colori per le porzioni della scala. Se null, usa i colori di default della chartInstance. (default: null)
    */
   scaleColors = null,
 
-  /** * @param {Object|null} [scaleAttrs=null] - Attributi SVG aggiuntivi applicati ai percorsi (path) delle porzioni della scala.
+  /** * @param {Object|null} [scaleAttrs=null] - Attributi SVG aggiuntivi applicati ai percorsi (path) delle porzioni della scala. (default: null)
    */
   scaleAttrs = null,
 
   /**
-   * @param {string|null} [scaleTicksColor=null] - Colore dei segni di separazione tra le porzioni. Se null, usa lo stesso colore della porzione adiacente.
+   * @param {string|null} [scaleTicksColor=null] - Colore dei segni di separazione tra le porzioni. Se null, usa lo stesso colore della porzione adiacente. (default: null)
    */
   scaleTicksColor = null,
 
   /**
-   * @param {Object} [rodAttrs] - Attributi per l'asticella indicatrice e il suo anello centrale.
+   * @param {Object} [rodAttrs] - Attributi per l'asticella indicatrice e il suo anello centrale. (default: { fill: '#000' })
    */
   rodAttrs = {
     fill: '#000'
   },
 
   /**
-   * @param {Object[]|null} [displayLabel=null] - Testo centrale sotto l'asticella. Array di max 2 oggetti: {label, font, fill, fontFilePath}.
+   * @param {Object[]|null} [displayLabel=null] - Testo centrale sotto l'asticella. Array di max 2 oggetti: {label, font, fill, fontFilePath}. (default: null)
    */
   displayLabel = null,
 
   /**
-   * @param {number} [displayLabelTopMargin=4] - Distanza verticale tra l'anello dell'asticella e la prima riga dell'etichetta.
+   * @param {number} [displayLabelTopMargin=4] - Distanza verticale tra l'anello dell'asticella e la prima riga dell'etichetta. (default: 4)
    */
   displayLabelTopMargin = 4,
 
   /**
-   * @param {number} [displayLabelRowGap=2] - Spazio verticale tra la prima e la seconda riga dell'etichetta principale.
+   * @param {number} [displayLabelRowGap=2] - Spazio verticale tra la prima e la seconda riga dell'etichetta principale. (default: 2)
    */
   displayLabelRowGap = 2,
 
   /**
-   * @param {Object[]|null} [miniDisplay=null] - Configurazione mini display secondari (max 2). Srray di uno o due oggetti
+   * @param {Object[]|null} [miniDisplay=null] - Configurazione mini display secondari (max 2). Srray di uno o due oggetti (default: null)
    * @param {string} miniDisplay[].position - Posizione: 'sx' | 'dx' (alias: 'left' | 'right').
    * @param {number} miniDisplay[].value - Valore numerico da rappresentare.
    * @param {string} miniDisplay[].type - Tipo di visualizzazione: 'gauge' (tachimetro) o 'value' (testo di `value`).
@@ -135,22 +135,22 @@ export async function ratingDisplay({
   miniDisplay = null,
 
   /**
-    * @param {number} [miniDisplayTopMargin=0] - Distanza verticale tra la base del display principale e l'inizio dei mini display.
+    * @param {number} [miniDisplayTopMargin=0] - Distanza verticale tra la base del display principale e l'inizio dei mini display. (default: 0)
    */
   miniDisplayTopMargin = 0,
 
   /**
-    * @param {number} [miniDisplayLabelTopMargin=0] - Distanza verticale tra la base dell'arco del mini display e le sue etichette.
+    * @param {number} [miniDisplayLabelTopMargin=0] - Distanza verticale tra la base dell'arco del mini display e le sue etichette. (default: 0)
    */
   miniDisplayLabelTopMargin = 0,
 
   /**
-   * @param {number} [miniDisplayLabelRowGap=2] - Distanza tra le righe di testo (mdLabel) del mini display.
+   * @param {number} [miniDisplayLabelRowGap=2] - Distanza tra le righe di testo (mdLabel) del mini display. (default: 2)
    */
   miniDisplayLabelRowGap = 2,
 
   /**
-   * @param {boolean} [animation=false] - Se true, abilita l'animazione dell'asticella (richiede implementazione specifica).
+   * @param {boolean} [animation=false] - Se true, abilita l'animazione dell'asticella (richiede implementazione specifica). (default: false)
    */
   animation = false,
 

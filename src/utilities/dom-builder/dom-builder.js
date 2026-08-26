@@ -7,8 +7,8 @@ import { parseDomString } from './parseDomString.js';
 
 /**
  * @typedef {Object} DomBuilderItem
- * @property {string | string[]} [tag='div'] - HTML tag name or array of nested tags (each is parent of the next). Also `tagName`.
- * @property {string | string[]} [tagName='div'] - Alias for `tag`.
+ * @property {string | string[]} [tag='div'] - HTML tag name or array of nested tags (each is parent of the next). Also `tagName`. (default: 'div')
+ * @property {string | string[]} [tagName='div'] - Alias for `tag`. (default: 'div')
  * @property {string | string[]} [className] - CSS class(es): a single string or an array (falsy values filtered out).
  * @property {string | string[]} [class] - Alias for `className`.
  * @property {string | string[]} [classname] - Alias for `className`.
@@ -23,7 +23,7 @@ import { parseDomString } from './parseDomString.js';
  *   parsed as markup) in place of an element, so it can sit as a sibling of tags within `children`/`content`
  *   arrays. Mutually exclusive with `tag`/`content`/`children`: when set (and `tag` is absent), every other
  *   property except `condition` and `callback` is ignored.
- * @property {boolean} [condition=true] - When false, the element (or text node) is skipped.
+ * @property {boolean} [condition=true] - When false, the element (or text node) is skipped. (default: true)
  * @property {(function(HTMLElement|Text): void) | null} [callback] - Callback invoked after the element (or text node) is created.
  * @property {Array<DomBuilderItem|string|Node>} [children] - Configuration array for child elements. Accepts strings (shorthand per `parseDomString`), configuration objects, and/or `Node`s (an `Element`, a `DocumentFragment`, ...) inserted as-is.
  */
@@ -96,12 +96,12 @@ import { parseDomString } from './parseDomString.js';
  * - `callback` {(function(HTMLElement|Text): void) | null} - Invoked after the element (or text node) is created.
  * - `children` {Array<DomBuilderItem|string|Node>} - Configuration array for child elements (same format, nested; also accepts `Node`s inserted as-is).
  *
- * IDs and classes can be specified either as top-level object keys or inside `attrs`; top-level properties take precedence.
+ * IDs and classes can be specified either as top-level object keys or inside `attrs`; top-level properties take precedence. (default: [])
  * @param {HTMLElement} [parent] - Parent element the structure is attached to (see `options.insertMode`).
- * @param {Object} [options={}] - Configuration options.
- * @param {boolean} [options.emptyParent=false] - When true, the parent element is emptied before building.
- * @param {'append'|'before'|'after'} [options.insertMode='append'] - How each root element of `structureArray` is attached to `parent`: `append` inserts it as a child (default), `before`/`after` insert it as a previous/next sibling of `parent`, preserving `structureArray` order. Only applies to the elements produced by this call — nested `domBuilder` calls (`content`, `children`) always append.
- * @param {boolean} [options.debug=false] - When true, logs `structureArray` to the console after each string item has been parsed via `parseDomString` (i.e. the elaborated array actually used to build the DOM).
+ * @param {Object} [options={}] - Configuration options. (default: {})
+ * @param {boolean} [options.emptyParent=false] - When true, the parent element is emptied before building. (default: false)
+ * @param {'append'|'before'|'after'} [options.insertMode='append'] - How each root element of `structureArray` is attached to `parent`: `append` inserts it as a child (default), `before`/`after` insert it as a previous/next sibling of `parent`, preserving `structureArray` order. Only applies to the elements produced by this call — nested `domBuilder` calls (`content`, `children`) always append. (default: 'append')
+ * @param {boolean} [options.debug=false] - When true, logs `structureArray` to the console after each string item has been parsed via `parseDomString` (i.e. the elaborated array actually used to build the DOM). (default: false)
  * @returns {HTMLElement|null} The first created element, or null if nothing was created.
  */
 

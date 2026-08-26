@@ -1,0 +1,35 @@
+
+
+/* .imgInfoPanelWrapper {
+  padding: .5rem;
+  border: var(--std-border);
+  border-radius: var(--std-radius);
+} */
+
+
+.infoTable {
+  display: grid;
+  /* grid-template-rows: repeat(2, 1fr); */
+  grid-template-columns: auto 1fr;
+  gap: .3rem;
+  /* align-items: center; */
+  /* justify-items: start; */
+}
+.infoRow {
+  display: grid;
+  grid-template-columns: subgrid;
+  grid-column: span 2;
+  gap: .3rem;
+}
+
+.infoKey, .infoValue {
+  align-content: center;
+  padding: .1rem .3rem;
+}
+
+.infoKey {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+  text-align: end;
+}
+/* .infoValue {} */

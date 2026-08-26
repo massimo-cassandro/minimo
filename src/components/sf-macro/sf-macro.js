@@ -1,19 +1,34 @@
 /*! minimo - Symfony Macro Manager */
 import './sf-macro.css';
 
+// TODO[epic=v2] in una v. 2 di minimo, rinominare wrapper_selector e row_selector in
+// wrapperClass e rowClass (NB: classi, non selettori, per uniformità con closeBtnClass/addBtnClass/containerClass
+// aggiunti sotto) e rendere tutti i parametri camelCase.
+// TODO[epic=v2] valutare se rendere opzionale, tramite parametro, l'importazione statica
+// di sf-macro.css qui sopra (questione lasciata in sospeso).
+
 /**
  * Initialises Symfony macro collection fields (repeatable fieldsets).
- * @param {Object} [options={}]
- * @param {string} [options.wrapper_selector='.sf-macro-wrapper'] - Selector for the outer wrapper element.
- * @param {string} [options.row_selector='.sf-macro-riga'] - Selector for each repeatable row.
- * @param {((newRow: Element | null, addBtn: Element | null) => void) | null} [options.add_callback=null] - Called after a row is added; receives the new row and the add button.
- * @param {(() => void) | null} [options.del_callback=null] - Called after a row is removed.
- * @param {boolean} [options.insertAtTop=false] - When true, new rows are inserted at the top.
+ * @param {Object} [options={}] (default: {})
+ * @param {string} [options.wrapper_selector='.sf-macro-wrapper'] - Selector for the outer wrapper element. (default: '.sf-macro-wrapper')
+ * @param {string} [options.row_selector='.sf-macro-riga'] - Selector for each repeatable row. (default: '.sf-macro-riga')
+ * @param {string} [options.closeBtnClass='sf-macro-close-btn'] - Class name of the row-remove button. (default: 'sf-macro-close-btn')
+ * @param {string} [options.addBtnClass='sf-macro-riga-add'] - Class name of the row-add button. (default: 'sf-macro-riga-add')
+ * @param {string} [options.containerClass='sf-macro-container'] - Class name of the rows container. (default: 'sf-macro-container')
+ * @param {((newRow: Element | null, addBtn: Element | null) => void) | null} [options.add_callback=null] - Called after a row is added; receives the new row and the add button. (default: null)
+ * @param {(() => void) | null} [options.del_callback=null] - Called after a row is removed. (default: null)
+ * @param {boolean} [options.insertAtTop=false] - When true, new rows are inserted at the top. (default: false)
  * @returns {void}
  */
 export function sf_macro({
   wrapper_selector = '.sf-macro-wrapper',
   row_selector = '.sf-macro-riga',
+  // Change closeBtnClass/addBtnClass/containerClass only if you don't want to use
+  // the default sf-macro.css: unused default classes are not stripped by this
+  // component, that cleanup is delegated to PurgeCSS (or equivalent) downstream.
+  closeBtnClass = 'sf-macro-close-btn',
+  addBtnClass = 'sf-macro-riga-add',
+  containerClass = 'sf-macro-container',
   add_callback = null,
   del_callback = null,
   insertAtTop = false
@@ -30,17 +45,17 @@ export function sf_macro({
     const target = /** @type {HTMLElement} */ (e.target);
 
     const action_btn = /** @type {HTMLElement | null} */ (
-      target.closest('.sf-macro-riga-add, .sf-macro-close-btn')
+      target.closest(`.${addBtnClass}, .${closeBtnClass}`)
     );
     if (!action_btn) return;
 
     const fset = /** @type {HTMLElement | null} */ (target.closest(wrapper_selector));
     if (!fset) return;
 
-    const macro_container = /** @type {HTMLElement | null} */ (fset.querySelector('.sf-macro-container'));
+    const macro_container = /** @type {HTMLElement | null} */ (fset.querySelector(`.${containerClass}`));
     if (!macro_container) return;
 
-    if(action_btn.matches('.sf-macro-riga-add')) {
+    if(action_btn.matches(`.${addBtnClass}`)) {
 
       const macro_template = macro_container.dataset.template ?? '';
       const righe_macro = macro_container.querySelectorAll(row_selector).length;
