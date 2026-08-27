@@ -24,7 +24,7 @@
   }
 }
 
-/* single checkbozes and radios are centered */
+/* single checkboxes and radios are vertically centered */
 .form-group:not(.form-collection-fset):has(.form-check:not(.form-check-top-label)) {
   align-self: center;
   .form-check {
@@ -39,7 +39,17 @@
   color: var(--form-label-color);
 }
 
-/*  per uso label implicito, senza id e for */
+/*
+with implicit label, without id and for.
+Example:
+
+<div class="form-group">
+  <label>
+    <span class="form-label">...</span>
+    <select class="form-control">...</select>
+  </label>
+</div>
+*/
 label:has(.form-control) {
   display: block;
   width: 100%;

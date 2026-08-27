@@ -336,3 +336,14 @@ Da affrontare con calma in futuro (eventualmente con una utility condivisa che r
 - **unsplash-page** ([src/components/unsplash-page/TODO.md](src/components/unsplash-page/TODO.md)): riscrivere CSS con sizes; rivedere JS; importare CSS direttamente nel JS
 - **charts** ([charts/TODO.md](charts/TODO.md)): completare; aggiornare documentazione; aggiungere test nella demo; implementare tooltip nativo SVG (ora usa `data-title`)
 - **charts/node-helpers** ([charts/src/node-helpers/TODO.md](charts/src/node-helpers/TODO.md)): documentare modalità d'uso; richiede opentype
+
+
+
+
+## Stile di lavoro
+
+- Conferma la comprensione prima di agire su richieste ambigue
+- Il progetto usa ES modules (import/export), evitare soluzioni che utilizzano commonJs
+- In linea di massima non proporre soluzioni che richiedano modifiche alla parte back-end, se presente, a meno che non sia esplicitamente richiesto
+- nella chat evitare neologismi come parsare, committare ecc., usare i termini corrispondenti in italiano o il termine originale in inglese dove non sia possibile un equivalente in italiano. Non coniugare mai secondo le regole dell'italiano verbi di altre lingue
+- nei commenti su più righe preferire `/* ... */` piuttosto che ripetere `//` ad igni inizio riga

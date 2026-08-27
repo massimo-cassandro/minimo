@@ -100,7 +100,7 @@ import { parseDomString } from './parseDomString.js';
  * @param {HTMLElement} [parent] - Parent element the structure is attached to (see `options.insertMode`).
  * @param {Object} [options={}] - Configuration options. (default: {})
  * @param {boolean} [options.emptyParent=false] - When true, the parent element is emptied before building. (default: false)
- * @param {'append'|'before'|'after'} [options.insertMode='append'] - How each root element of `structureArray` is attached to `parent`: `append` inserts it as a child (default), `before`/`after` insert it as a previous/next sibling of `parent`, preserving `structureArray` order. Only applies to the elements produced by this call — nested `domBuilder` calls (`content`, `children`) always append. (default: 'append')
+ * @param {'append'|'prepend'|'before'|'after'} [options.insertMode='append'] - How each root element of `structureArray` is attached to `parent`: `append` inserts it as the last child (default), `prepend` as the first child, `before`/`after` insert it as a previous/next sibling of `parent`. In every mode, `structureArray` order is preserved. Only applies to the elements produced by this call — nested `domBuilder` calls (`content`, `children`) always append. (default: 'append')
  * @param {boolean} [options.debug=false] - When true, logs `structureArray` to the console after each string item has been parsed via `parseDomString` (i.e. the elaborated array actually used to build the DOM). (default: false)
  * @returns {HTMLElement|null} The first created element, or null if nothing was created.
  */
@@ -119,12 +119,12 @@ export function domBuilder(/** @type {Array<DomBuilderItem|string|Node>} */ stru
     parent.innerHTML = '';
   }
 
-  // For the default 'append' insert mode, root-level siblings are accumulated into a
-  // DocumentFragment and attached to `parent` with a single appendChild at the end,
-  // instead of one appendChild per sibling. 'before'/'after' modes need `target` to stay
+  // For the 'append'/'prepend' insert modes, root-level siblings are accumulated into a
+  // DocumentFragment and attached to `parent` with a single appendChild/insertBefore at
+  // the end, instead of one call per sibling. 'before'/'after' modes need `target` to stay
   // the real, live parent node throughout the loop for anchor resolution (see afterAnchors
   // below), so batching is skipped for those.
-  const useFragment = !!parent && options.insertMode === 'append';
+  const useFragment = !!parent && (options.insertMode === 'append' || options.insertMode === 'prepend');
 
   /** @type {HTMLElement | DocumentFragment | null} */
   let target = useFragment ? document.createDocumentFragment() : (parent ?? null);
@@ -345,7 +345,11 @@ export function domBuilder(/** @type {Array<DomBuilderItem|string|Node>} */ stru
   }
 
   if (useFragment && parent && target) {
-    parent.appendChild(target);
+    if (options.insertMode === 'prepend') {
+      parent.insertBefore(target, parent.firstChild);
+    } else {
+      parent.appendChild(target);
+    }
   }
 
   return mainElement;
