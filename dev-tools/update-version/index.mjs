@@ -78,7 +78,7 @@ async function run() {
       ('v.' + params.newSemver) +
       (params.logRow.descr
         ? ' - ' + params.logRow.descr
-        : params.updateMode === 'patch'
+        : params.updateMode === 'patch' && !(params.noLogV0 && params.semverArray[0] === 0)
           ? ' - Fix / Dependencies upd'
           : '')
     );
