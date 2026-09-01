@@ -59,6 +59,24 @@ import caretRightIcon from '../../icons/caret-right.svg?inline';
  *                                           Il <tfoot> viene aggiunto solo se almeno una colonna lo definisce.
  *                                           La cella eredita le classi CSS (allineamento) della colonna.
  *
+ * @property {string|boolean} [_collapseKey] Percorso (notazione punto) del campo da usare come chiave
+ *                                           di raggruppamento per collassare valori ripetuti su righe
+ *                                           consecutive. `true` = riusa `_field`. Colonne diverse con lo
+ *                                           stesso `_collapseKey` collassano insieme come un unico gruppo
+ *                                           logico. La prima riga di ogni pagina mostra sempre il valore
+ *                                           pieno, anche se continua un gruppo iniziato nella pagina precedente.
+ * @property {string|Function} [_collapsePlaceholder] Testo da mostrare al posto del valore ripetuto
+ *                                           quando la colonna collassa. Accetta lo stesso ventaglio di
+ *                                           `_cellRender`/`_cellTitle` (via `resolveTemplate`): stringa
+ *                                           semplice, stringa mustache-like con segnaposto `[[key]]`
+ *                                           (interpolati sulla riga corrente), o funzione `(row) => string`.
+ *                                           Default `null` (anche se la funzione ritorna null/undefined) =
+ *                                           il testo della cella resta invariato (utile insieme alla sola
+ *                                           `_collapseClass`). (default: null)
+ * @property {string} [_collapseClass]       Classe CSS da assegnare alla cella quando collassata. Nessuna
+ *                                           classe di default: il trattamento visivo è a discrezione del
+ *                                           consumer. (default: null)
+ *
  * @property {string|Function} [_sortValue]   Percorso del campo da usare per l'ORDINAMENTO al posto
  *                                           del contenuto visualizzato, oppure una funzione
  *                                           `(row) => string|number` per casi complessi
@@ -256,6 +274,17 @@ class SimpleDatatableAdapter extends HTMLElement {
      * null = nessun filtro attivo → _renderTfoot usa rawData direttamente.
      */
     this._filteredData = null;
+
+    /**
+     * Cache del contenuto "vero" (pre-collapse) delle celle con `_collapseKey`,
+     * chiavata per `${jidx}:${colIdx}` — non per nodo DOM: simple-datatables
+     * riusa/sposta i nodi <td> tra un render e l'altro (il suo motore di diff
+     * confronta due virtual-dom interni, non il DOM reale), quindi lo stesso
+     * nodo fisico può ospitare righe diverse dopo un sort. Popolata al primo
+     * incontro di ogni cella (prima di un'eventuale collapse) in _applyCollapse,
+     * svuotata ad ogni nuovo caricamento dati in _load().
+     */
+    this._collapseOrigCache = new Map();
 
     // Handler bound per poterli rimuovere in disconnectedCallback
     this._onSearch      = this._handleSearch.bind(this);
@@ -688,6 +717,7 @@ class SimpleDatatableAdapter extends HTMLElement {
       // Conserva i dati grezzi e le definizioni di colonna per il tfoot
       this._rawData    = rawData;
       this._footerCols = cols;
+      this._collapseOrigCache.clear(); // i jidx ripartono da zero, la cache precedente non è più valida
 
       this.columns = cols.map((col_settings, idx) => {
         col_settings = parseCols(col_settings);
@@ -887,13 +917,24 @@ class SimpleDatatableAdapter extends HTMLElement {
       // ── Tfoot ─────────────────────────────────────────────────────────────
       // Eseguito sempre, indipendentemente dalla presenza della paginazione.
       this._renderTfoot();
+
+      // ── Collapse valori ripetuti ────────────────────────────────────────
+      this._applyCollapse();
     });
 
     // Salva la pagina corrente nel cookie ad ogni cambio di pagina;
     // aggiorna il tfoot solo se updateFooterOnPageChange è attivo.
+    // _applyCollapse va invece ricalcolato sempre: ogni cambio pagina
+    // rirenderizza righe nuove, la cui adiacenza va rivalutata.
     this._dt.on('datatable.page', page => {
       this._savePageCookie(page);
       if (this._getParam('updateFooterOnPageChange', false)) this._renderTfoot();
+      this._applyCollapse();
+    });
+
+    // Un cambio di ordinamento altera l'adiacenza delle righe: ricalcola il collapse.
+    this._dt.on('datatable.sort', () => {
+      this._applyCollapse();
     });
 
     // Aggiorna il tfoot ad ogni cambio di filtro (ricerca / multisearch).
@@ -928,6 +969,7 @@ class SimpleDatatableAdapter extends HTMLElement {
 
       this._filteredCount = this._filteredData?.length ?? rawData.length;
       this._renderTfoot();
+      this._applyCollapse();
     };
     this._dt.on('datatable.search',      onFilter);
     this._dt.on('datatable.multisearch', onFilter);
@@ -1032,6 +1074,98 @@ class SimpleDatatableAdapter extends HTMLElement {
     });
 
     tfoot.replaceChildren(tr);
+  }
+
+
+  // ─── Collapse valori ripetuti ────────────────────────────────────────────────
+
+  /**
+   * Sostituisce, nelle colonne con `_collapseKey`, il valore delle celle che
+   * ripetono la chiave di raggruppamento della riga precedente con un
+   * segnaposto (`_collapsePlaceholder`) e/o una classe CSS (`_collapseClass`).
+   *
+   * Opera sulle sole righe effettivamente renderizzate nel <tbody> (già
+   * filtrate/ordinate/paginate da simple-datatables), risalendo al dato raw
+   * di ciascuna tramite l'attributo `data-jidx`. La prima riga di ogni
+   * pagina non viene mai collassata, anche se continua un gruppo iniziato
+   * nella pagina precedente.
+   *
+   * Va richiamato ad ogni evento che rirenderizza il <tbody>: datatable.init,
+   * datatable.page, datatable.sort, datatable.search, datatable.multisearch.
+   *
+   * IMPORTANTE — perché serve una cache e non basta ricalcolare "a fresco":
+   * il motore di render di simple-datatables (_renderTable) confronta due
+   * *virtual dom* interni (quello dell'ultimo render e quello nuovo) e applica
+   * al DOM reale solo le differenze fra i due. Non guarda mai il DOM reale in
+   * lettura. Se una cella che abbiamo collassato manualmente (fuori da questo
+   * ciclo) risulta testualmente identica fra vecchio e nuovo virtual dom — cosa
+   * tutt'altro che rara dopo un sort, perché è esattamente la condizione che fa
+   * scattare il collapse — la libreria non genera alcuna patch per quella cella
+   * e il nostro `»` resta lì, sbagliato, anche se la riga non è più un duplicato.
+   * Inoltre i nodi <td> non sono associati in modo stabile a una riga: dopo un
+   * sort lo stesso nodo fisico può ospitare dati di una riga diversa. Per questo
+   * il valore originale va cachato per identità di riga (`data-jidx`), non per
+   * nodo DOM: `this._collapseOrigCache`, chiave `${jidx}:${colIdx}`, popolata al
+   * primo incontro di ogni cella (sempre prima di un'eventuale collapse, quindi
+   * il valore catturato è garantito genuino) e usata per ripristinare il
+   * contenuto pieno quando la riga non è (più) un duplicato.
+   */
+  _applyCollapse() {
+    const cols = this._footerCols;
+    if (!cols?.some(col => col._collapseKey)) return;
+
+    const rawData = this._rawData;
+    const table   = this.querySelector('table');
+    if (!table || !rawData) return;
+
+    const rows = [...table.querySelectorAll('tbody tr')];
+    if (!rows.length) return;
+
+    const cache = this._collapseOrigCache;
+
+    const rowRaw = rows.map(tr => {
+      const jidx = tr.dataset.jidx;
+      return jidx != null ? rawData[jidx] : null;
+    });
+
+    cols.forEach((col, colIdx) => {
+      if (!col._collapseKey) return;
+      const keyPath        = col._collapseKey === true ? col._field : col._collapseKey;
+      const collapseClass  = col._collapseClass ?? null;
+
+      rows.forEach((tr, i) => {
+        const jidx = tr.dataset.jidx;
+        const cur  = rowRaw[i];
+        if (jidx == null || cur == null) return;
+
+        const cell = tr.children[colIdx];
+        if (!cell) return;
+
+        // Prima cattura per questa riga/colonna: il contenuto attuale è per
+        // forza quello vero, perché non lo abbiamo ancora toccato noi.
+        const cacheKey = `${jidx}:${colIdx}`;
+        if (!cache.has(cacheKey)) cache.set(cacheKey, cell.innerHTML);
+
+        const prev = i > 0 ? rowRaw[i - 1] : null;
+        const curVal  = getNestedValue(cur, keyPath);
+        const prevVal = prev != null ? getNestedValue(prev, keyPath) : null;
+        // i === 0: mai collassata, anche se continua un gruppo di pagina precedente
+        const shouldCollapse = i > 0 && curVal != null && curVal === prevVal;
+
+        if (shouldCollapse) {
+          // _collapsePlaceholder: stringa, mustache-like ([[key]]) o funzione (row) => string,
+          // stesso ventaglio di resolveTemplate già usato per _cellRender/_cellTitle.
+          // null (anche di ritorno da funzione) = lascia il testo della cella invariato.
+          const placeholder = resolveTemplate(col._collapsePlaceholder, cur);
+          if (placeholder != null && cell.innerHTML !== placeholder) cell.innerHTML = placeholder;
+          if (collapseClass) cell.classList.add(collapseClass);
+        } else {
+          const orig = cache.get(cacheKey);
+          if (cell.innerHTML !== orig) cell.innerHTML = orig;
+          if (collapseClass) cell.classList.remove(collapseClass);
+        }
+      });
+    });
   }
 
 

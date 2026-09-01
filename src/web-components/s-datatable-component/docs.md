@@ -272,6 +272,30 @@ cols: [
                    //     return `<strong>${tot.toLocaleString('it-IT')} €</strong>`;
                    //   }
 
+    _collapseKey,        // Percorso (notazione punto) del campo da usare come chiave di
+                          // raggruppamento per collassare valori ripetuti su righe consecutive.
+                          // `true` = riusa _field. Colonne diverse con la stessa _collapseKey
+                          // collassano insieme come un unico gruppo logico (es. più colonne
+                          // che riportano dati della stessa "commessa" su più righe/attività).
+                          //
+                          // Opera sulle righe effettivamente renderizzate (già filtrate/ordinate/
+                          // paginate): la prima riga di ogni pagina mostra sempre il valore pieno,
+                          // anche se continua un gruppo iniziato nella pagina precedente.
+                          // Si ricalcola automaticamente ad ogni cambio pagina, ordinamento,
+                          // ricerca o multisearch.
+
+    _collapsePlaceholder, // Testo da mostrare al posto del valore ripetuto. Accetta lo stesso
+                          // ventaglio di _render/_cellTitle: stringa semplice, stringa mustache-like
+                          // con segnaposto [[chiave]] (interpolati sulla riga corrente), oppure
+                          // funzione (row) => string. Default null (anche se la funzione ritorna
+                          // null/undefined) = il testo della cella resta invariato (utile insieme
+                          // alla sola _collapseClass, quando basta l'effetto visivo a segnalare
+                          // il collasso).
+
+    _collapseClass,       // Classe CSS da assegnare alla cella collassata. Nessuna classe di
+                          // default: il trattamento visivo (es. attenuazione cromatica) è a
+                          // discrezione del consumer nel proprio CSS applicativo.
+
     // ── Proprietà native simple-datatables (senza prefisso _) ────────────
 
     type,          // Tipo di dato: 'string' | 'number' | 'date' | 'boolean' | 'html' | 'other'
@@ -358,6 +382,38 @@ non cambiano navigando tra le pagine e si aggiornano solo quando cambia la ricer
 
 Con `updateFooterOnPageChange: true` la callback riceve i record della pagina corrente: utile per
 subtotali di pagina; il footer si aggiorna sia al cambio filtro sia al cambio pagina.
+
+### Esempio con collapse – valori ripetuti su righe consecutive
+
+Utile quando ogni riga è un dettaglio (es. un'attività) ma alcune colonne riportano dati di un
+gruppo più ampio (es. la commessa a cui l'attività appartiene), ripetuti identici su più righe
+consecutive quando la tabella è ordinata per quel gruppo.
+
+```javascript
+const cols = [
+  {
+    _field: 'commessaId',
+    _heading: 'Commessa',
+    _collapseKey: true,               // riusa _field ('commessaId') come chiave di gruppo
+    _collapsePlaceholder: '»',        // mostrato al posto del valore ripetuto
+  },
+  {
+    _field: 'budgetCommessa',
+    _heading: 'Budget',
+    type: 'number',
+    _collapseKey: 'commessaId',       // stessa chiave: collassa insieme alla colonna precedente
+    _collapseClass: 'text-muted',     // classe CSS a discrezione del consumer
+  },
+  {
+    _field: 'attivita',
+    _heading: 'Attività',             // colonna di dettaglio, mai collassata
+  },
+];
+```
+
+La prima riga di ogni pagina mostra sempre il valore pieno, anche se continua un gruppo iniziato
+nella pagina precedente. Il calcolo si ricalcola automaticamente ad ogni cambio pagina, ordinamento,
+ricerca o multisearch (opera sulle righe effettivamente renderizzate, non sui dati grezzi).
 
 ## Testo info
 
