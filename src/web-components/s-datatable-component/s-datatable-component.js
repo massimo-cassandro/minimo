@@ -230,6 +230,50 @@ function resolveTemplate(tpl, row, { nullAs = '', warnColIdx } = {}) {
   return tpl;
 }
 
+/**
+ * computeCellValue
+ *
+ * Calcola il valore "genuino" (pre-collapse, pre-render) del contenuto di una
+ * cella a partire dal dato grezzo — stessa logica usata da _load() per
+ * costruire this.data. Usata anche da _applyCollapse() per popolare la cache
+ * dei valori originali: a differenza di una lettura da `cell.innerHTML`,
+ * NON dipende mai dal DOM, quindi non risente di eventuali contenuti stantii
+ * lasciati da un patch saltato del motore di diffing di simple-datatables
+ * (vedi commento in _applyCollapse per i dettagli del problema).
+ *
+ * @param {object} row          Oggetto riga grezzo.
+ * @param {object} col_item     Definizione di colonna (elemento di `cols`).
+ * @param {string} globalNullAs Valore globale di fallback per null/undefined.
+ * @param {number} [col_idx]    Indice di colonna, per i warning di chiavi mancanti
+ *                               di resolveTemplate (omesso = nessun warning).
+ * @returns {*}                 Valore/contenuto della cella.
+ */
+function computeCellValue(row, col_item, globalNullAs, col_idx) {
+  let value = getNestedValue(row, col_item._field);
+
+  const nullAs = col_item._renderNullAs !== undefined
+    ? col_item._renderNullAs
+    : globalNullAs;
+
+  if (col_item._cellRender) {
+    value = resolveTemplate(col_item._cellRender, row, { nullAs, warnColIdx: col_idx });
+
+  // sf_date o sf_datetime -> si prende il solo valore di date
+  } else if ((col_item._renderMode === 'sf_datetime' || col_item._renderMode === 'sf_date') && value != null) {
+    value = value.date.replace(' ', 'T') +
+      (value.timezone === 'UTC' ? 'Z' : '');
+  }
+
+  // Applica _renderNullAs al valore della cella se null/undefined
+  // e la cella non ha già un template che gestisce la visualizzazione.
+  // se _renderMode è impostato, il valore null è gestito direttamente dal gestore predefinito
+  if (value == null && col_item._cellRender == null && col_item._renderMode == null) {
+    value = nullAs;
+  }
+
+  return value;
+}
+
 let _deprecationWarned = false;
 
 /**
@@ -618,13 +662,15 @@ class SimpleDatatableAdapter extends HTMLElement {
         attributes: { 'data-jidx': idx },
 
         cells: cols.map((col_item, col_idx) => {
-          let value = getNestedValue(row, col_item._field);
+          // _cellRender: se presente annulla `render` nativo di simple-datatables,
+          // per evitare conflitti (side-effect sulla definizione di colonna,
+          // va applicato una sola volta, qui, non dentro computeCellValue).
+          if (col_item._cellRender) col_item.render = null;
 
-          // _renderNullAs: stringa da mostrare quando il valore è null/undefined.
-          // Precedenza: _renderNullAs di colonna > renderNullAs globale > '&mdash;'
-          const nullAs = col_item._renderNullAs !== undefined
-            ? col_item._renderNullAs
-            : globalNullAs;
+          // Valore genuino della cella: stessa logica condivisa con
+          // _applyCollapse(), che la riusa per popolare la cache dei valori
+          // pre-collapse senza mai leggere il DOM.
+          let value = computeCellValue(row, col_item, globalNullAs, col_idx);
 
           // _sortValue: valore alternativo per l'ordinamento.
           // Accetta un percorso stringa o una funzione (row) => string|number.
@@ -644,31 +690,6 @@ class SimpleDatatableAdapter extends HTMLElement {
                 : raw;
             })()
             : null;
-
-
-          // _cellRender: template per il rendering del valore.
-          // Accetta stringa mustache-like ([[key]]), funzione (row) => string|Node,
-          // oppure un elemento DOM direttamente (serializzato via outerHTML).
-          // Delega a resolveTemplate, passando nullAs e l'indice di colonna
-          // per i warning di chiavi mancanti.
-          if (col_item._cellRender) {
-            col_item.render = null; // se presente lo annulla ad evitare conflitti
-            value = resolveTemplate(col_item._cellRender, row, { nullAs, warnColIdx: col_idx });
-
-          // sf_date o sf_datetime -> si prende il solo valore di date
-          } else if ((col_item._renderMode === 'sf_datetime' || col_item._renderMode === 'sf_date') && value != null) {
-            value = value.date.replace(' ', 'T') +
-              (value.timezone === 'UTC' ? 'Z' : '');
-          }
-
-// TODO rendere più snella la gestione di questi casi (???)
-// TODO passare il valore `nullAs` al render predefinito
-          // Applica _renderNullAs al valore della cella se null/undefined
-          // e la cella non ha già un template che gestisce la visualizzazione.
-          // se _renderMode è impostato, il valore null è gestito direttamente dal gestore predefinito
-          if (value == null && col_item._cellRender == null && col_item._renderMode == null) {
-            value = nullAs;
-          }
 
           // _searchValue: valore alternativo per la ricerca.
           // Viene scritto in `attributes['data-search']` della cella: la
@@ -1093,22 +1114,30 @@ class SimpleDatatableAdapter extends HTMLElement {
    * Va richiamato ad ogni evento che rirenderizza il <tbody>: datatable.init,
    * datatable.page, datatable.sort, datatable.search, datatable.multisearch.
    *
-   * IMPORTANTE — perché serve una cache e non basta ricalcolare "a fresco":
-   * il motore di render di simple-datatables (_renderTable) confronta due
-   * *virtual dom* interni (quello dell'ultimo render e quello nuovo) e applica
-   * al DOM reale solo le differenze fra i due. Non guarda mai il DOM reale in
-   * lettura. Se una cella che abbiamo collassato manualmente (fuori da questo
-   * ciclo) risulta testualmente identica fra vecchio e nuovo virtual dom — cosa
-   * tutt'altro che rara dopo un sort, perché è esattamente la condizione che fa
-   * scattare il collapse — la libreria non genera alcuna patch per quella cella
-   * e il nostro `»` resta lì, sbagliato, anche se la riga non è più un duplicato.
-   * Inoltre i nodi <td> non sono associati in modo stabile a una riga: dopo un
-   * sort lo stesso nodo fisico può ospitare dati di una riga diversa. Per questo
-   * il valore originale va cachato per identità di riga (`data-jidx`), non per
-   * nodo DOM: `this._collapseOrigCache`, chiave `${jidx}:${colIdx}`, popolata al
-   * primo incontro di ogni cella (sempre prima di un'eventuale collapse, quindi
-   * il valore catturato è garantito genuino) e usata per ripristinare il
-   * contenuto pieno quando la riga non è (più) un duplicato.
+   * IMPORTANTE — perché serve una cache, e perché va popolata da
+   * computeCellValue() e MAI da cell.innerHTML:
+   *
+   * Il motore di render di simple-datatables confronta due *virtual dom*
+   * interni (quello dell'ultimo render e quello nuovo, calcolati sempre dal
+   * dato genuino: non contengono mai il nostro `»`) e applica al DOM reale
+   * solo le differenze fra i due — non guarda mai il DOM reale in lettura, e
+   * i nodi <td> non sono associati in modo stabile a una riga (dopo un sort o
+   * un cambio pagina lo stesso nodo fisico può essere riciclato per una riga
+   * diversa). Quando il vecchio e il nuovo virtual dom di un nodo riciclato
+   * coincidono testualmente — frequente in tabelle con molti valori ripetuti,
+   * proprio il caso che fa scattare il collapse — la libreria salta la patch
+   * e lascia il nodo così com'è, con il nostro `»` scritto in un giro
+   * precedente ancora lì (bug osservato: righe che avrebbero dovuto tornare
+   * piene restavano `»` proprio in questo scenario, riprodotto con dati reali
+   * su più pagine).
+   *
+   * Per questo la cache (`this._collapseOrigCache`, chiave `${jidx}:${colIdx}`,
+   * svuotata ad ogni nuovo caricamento dati in _load) NON può fidarsi di
+   * `cell.innerHTML` al primo incontro di una cella: quel contenuto potrebbe
+   * già essere un `»` stantio lasciato da un patch saltato, non il valore
+   * genuino. Va invece ricalcolato direttamente dai dati grezzi tramite
+   * computeCellValue() — la stessa funzione usata da _load() — che non
+   * dipende mai dal DOM ed è quindi immune a questo problema.
    */
   _applyCollapse() {
     const cols = this._footerCols;
@@ -1122,6 +1151,7 @@ class SimpleDatatableAdapter extends HTMLElement {
     if (!rows.length) return;
 
     const cache = this._collapseOrigCache;
+    const globalNullAs = this._getParam('renderNullAs', '\u2014');
 
     const rowRaw = rows.map(tr => {
       const jidx = tr.dataset.jidx;
@@ -1141,10 +1171,13 @@ class SimpleDatatableAdapter extends HTMLElement {
         const cell = tr.children[colIdx];
         if (!cell) return;
 
-        // Prima cattura per questa riga/colonna: il contenuto attuale è per
-        // forza quello vero, perché non lo abbiamo ancora toccato noi.
+        // Prima cattura per questa riga/colonna: calcolata dal dato grezzo,
+        // MAI da cell.innerHTML (vedi commento del metodo: il DOM può
+        // contenere un `»` stantio lasciato da un patch saltato).
         const cacheKey = `${jidx}:${colIdx}`;
-        if (!cache.has(cacheKey)) cache.set(cacheKey, cell.innerHTML);
+        if (!cache.has(cacheKey)) {
+          cache.set(cacheKey, String(computeCellValue(cur, col, globalNullAs) ?? ''));
+        }
 
         const prev = i > 0 ? rowRaw[i - 1] : null;
         const curVal  = getNestedValue(cur, keyPath);

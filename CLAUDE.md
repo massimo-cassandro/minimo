@@ -310,7 +310,6 @@ Da affrontare con calma in futuro (eventualmente con una utility condivisa che r
 
 | File | Riga | Nota |
 |---|---|---|
-| [src/web-components/s-datatable-component/s-datatable-component.js](src/web-components/s-datatable-component/s-datatable-component.js#L607) | 607–608 | TODO: semplificare gestione casi; passare `nullAs` al render predefinito |
 | [src/web-components/s-datatable-component/src/parse-cols.js](src/web-components/s-datatable-component/src/parse-cols.js#L55) | 55 | TODO: distinguere `null` da `false` |
 
 ### Charts
