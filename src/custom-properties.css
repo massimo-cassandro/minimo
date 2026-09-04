@@ -278,7 +278,7 @@
 
   --mpopup-backdrop-color: rgb(0 0 0 / .6);
   --mpopup-background-color: var(--body-background-color);
-  --mpopup-border-radius: var(--size-base);
+  --mpopup-border-radius: var(--radius-base);
   --mpopup-btn-close-size: 1.6rem;
   --mpopup-content-padding: var(--size-base) var(--size-sm) var(--size-sm);
   --mpopup-content-scrollbar-padding-i-end: var(--size-md);

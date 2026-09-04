@@ -52,7 +52,7 @@ export default {
     border: {
       radius: {
         $type: 'dimension',
-        $value: '{size.base}',
+        $value: '{radius.base}',
       }
     },
 
