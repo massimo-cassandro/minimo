@@ -40,7 +40,7 @@ function closeDialog(el) {
  *
  * @param {Object} params
  * @param {string | null} [params.dialogExtraClassName=null] - Extra class added to the dialog element. (default: null)
- * @param {string | DomBuilderItem[] | null} [params.content=null] - Plain text, HTML, or a domBuilder array. (default: null)
+ * @param {string | DomBuilderItem | DomBuilderItem[] | null} [params.content=null] - Plain text, HTML, a domBuilder object, or a domBuilder array. (default: null)
  * @param {string | null} [params.contentExtraClassName=null] - Extra class added to the content wrapper. (default: null)
  * @param {HTMLElement | null} [params.triggerElement=null] - Optional element that triggered the popup; when set, `aria-haspopup`, `aria-controls` and `aria-expanded` are managed on it. (default: null)
  * @param {boolean} [params.addFocus=true] - if true, dialog receives focus after opening (default: true)
@@ -58,8 +58,8 @@ function closeDialog(el) {
  * @param {((el: HTMLDialogElement) => void) | null} [params.closeCallback=null] - Called with the dialog element just before it is removed, receives the dialog element (`closeCallback(dialogEl)`). NB: `dialogEl` is removed immediately after closing. (default: null)
  * @param {((data: *, el: Element) => void) | null} [params.ajaxCallback=null] - Called with the Ajax response and the content element. (default: null)
  * @param {boolean} [params.addScrollbarPadding=false] - Adds right padding to compensate for the scrollbar. (default: false)
- * @param {string | DomBuilderItem[] | null} [params.headerContent=null] - Header content: plain text, HTML, or a domBuilder array. (default: null)
- * @param {string | DomBuilderItem[] | null} [params.footerContent=null] - Footer content: plain text, HTML, or a domBuilder array. (default: null)
+ * @param {string | DomBuilderItem | DomBuilderItem[] | null} [params.headerContent=null] - Header content: plain text, HTML, a domBuilder object, or a domBuilder array. (default: null)
+ * @param {string | DomBuilderItem | DomBuilderItem[] | null} [params.footerContent=null] - Footer content: plain text, HTML, a domBuilder object, or a domBuilder array. (default: null)
  * @returns {HTMLDialogElement} The dialog element.
  */
 
@@ -84,7 +84,7 @@ export function modalPopup({
   /** iframe url */
   iframeUrl = null,
 
-  /** content: plain text, html or domBuilder array */
+  /** content: plain text, html, domBuilder object or domBuilder array */
   content = null,
 
   /** Ajax url and callback.
@@ -98,13 +98,13 @@ export function modalPopup({
   closeCallback = null,
   addScrollbarPadding = false, // adds extra right padding to compensate for the scrollbar
 
-  /** header content: plain text, HTML or domBuilder array */
+  /** header content: plain text, HTML, domBuilder object or domBuilder array */
   headerContent = null,
 
   /** extra classname added to header */
   headerExtraClassName = null,
 
-  /** footer content: plain text, HTML or domBuilder array */
+  /** footer content: plain text, HTML, domBuilder object or domBuilder array */
   footerContent = null,
 
   /** extra classname added to footer */
@@ -118,6 +118,17 @@ export function modalPopup({
 
   if(content == null && (ajaxUrl == null || ajaxCallback == null) && iframeUrl == null) {
     throw '[modalContent] parametri `content`, `ajaxUrl`/ `ajaxCallback` e `iframeUrl` mancanti';
+  }
+
+  // allow a single domBuilder object (in addition to a domBuilder array) by wrapping it in an array
+  if(content != null && typeof content === 'object' && !Array.isArray(content)) {
+    content = [content];
+  }
+  if(headerContent != null && typeof headerContent === 'object' && !Array.isArray(headerContent)) {
+    headerContent = [headerContent];
+  }
+  if(footerContent != null && typeof footerContent === 'object' && !Array.isArray(footerContent)) {
+    footerContent = [footerContent];
   }
 
   let mode;
