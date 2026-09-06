@@ -12,6 +12,8 @@ YELLOW='\033[0;33m'
 GREEN='\033[0;32m'
 NC='\033[0m' # No Color
 
+DEBUG=TRUE
+
 # Questo script richiede zsh: se lanciato con sh/bash blocca l'esecuzione
 if [ -z "$ZSH_VERSION" ]; then
   printf "${RED}Errore: lanciare con 'zsh starter-install.sh', non con sh/bash.${NC}\n" >&2
@@ -146,6 +148,11 @@ devDependencies=(
   # @principalstudio/html-webpack-inject-preload file-loader
 )
 
+if [ "$DEBUG" = "TRUE" ]; then
+  dependencies=( @massimo-cassandro/minimo )
+  devDependencies=()
+fi
+
 for pkg in "${dependencies[@]}"; do
   npm i -S "$pkg"
 done
@@ -170,9 +177,9 @@ echo -e "${GREEN}...MINIMO FILES${NC}"
 # installato in node_modules (stessa versione che userà il progetto)
 MINIMO_PKG_DIR=./node_modules/@massimo-cassandro/minimo
 
-safe_cat "${MINIMO_PKG_DIR}/src/custom-properties.css" "${FRONTEND_INSTALL_PATH}/css/${FILE}"
-safe_cat "${MINIMO_PKG_DIR}/src/custom-media.css" "${FRONTEND_INSTALL_PATH}/css/${FILE}"
-safe_cat "${MINIMO_PKG_DIR}/src/fonts.css" "${FRONTEND_INSTALL_PATH}/css/${FILE}"
+safe_cat "${MINIMO_PKG_DIR}/src/custom-properties.css" "${FRONTEND_INSTALL_PATH}/css/custom-properties.css"
+safe_cat "${MINIMO_PKG_DIR}/src/custom-media.css" "${FRONTEND_INSTALL_PATH}/css/custom-media.css"
+safe_cat "${MINIMO_PKG_DIR}/src/fonts.css" "${FRONTEND_INSTALL_PATH}/css/fonts.css"
 
 # config di build-tokens: collocato accanto al css generato (custom-properties.css).
 safe_cat "${MINIMO_PKG_DIR}/design-tokens/tokens-config-sample.mjs" "${FRONTEND_INSTALL_PATH}/css/tokens-config.mjs"
