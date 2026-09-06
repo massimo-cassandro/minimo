@@ -13,22 +13,22 @@ import TerserPlugin from 'terser-webpack-plugin';
 import CssMinimizerPlugin from 'css-minimizer-webpack-plugin';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import CopyWebpackPlugin from 'copy-webpack-plugin';
-import Dotenv from 'dotenv-webpack';
+// import Dotenv from 'dotenv-webpack';
 import RemoveEmptyScriptsPlugin from 'webpack-remove-empty-scripts';
 // import { WebpackManifestPlugin } from 'webpack-manifest-plugin';
 // import HtmlWebpackInjectAttributesPlugin from 'html-webpack-inject-attributes-plugin';
 
-import { cssRules } from './webpack-modules/css-rules.mjs';
-import { createPurgeCSSPlugins } from './webpack-modules/purgecss-setup.mjs';
-import { getJsConfigAliases } from './webpack-modules/get-jsConfig-aliases.mjs';
-import { svgRules } from './webpack-modules/svg-rules.mjs';
+import { cssRules } from './webpack-config-modules/css-rules.mjs';
+import { createPurgeCSSPlugins } from './webpack-config-modules/purgecss-setup.mjs';
+import { getJsConfigAliases } from './webpack-config-modules/get-jsConfig-aliases.mjs';
+import { svgRules } from './webpack-config-modules/svg-rules.mjs';
 
 // --- config ---
 const __filename = fileURLToPath(import.meta.url)
   ,__dirname = path.dirname(__filename);
 
 // Risolve un percorso a partire dalla root del progetto, che coincide con la dir
-// di questo file solo se il frontend NON è in una sottodirectory (es. ./frontend):
+// di questo file solo se il frontend NON è in una sottodirectory (es. ./app):
 // vengono provate entrambe le posizioni, in fallback la prima
 const fromProjectRoot = (relPath) => {
   const candidates = ['./', '../'].map(p => path.resolve(__dirname, p, relPath));
@@ -36,21 +36,23 @@ const fromProjectRoot = (relPath) => {
 };
 
 const isDevelopment = process.env.NODE_ENV === 'development'
+  ,devServerPort = 5704
+  // ,apiPort = 8104
   ,useSass = false
   ,inlineCssInDevMode = true
   ,useSvgo = true
   ,useSvgr = false // svg per react
-  ,svgoConfig = useSvgo? (await import('./webpack-modules/svgo.config.mjs')).default : null
-  ,postcssConfig_path = path.resolve(__dirname, './webpack-modules/postcss.config.mjs')
+  ,svgoConfig = useSvgo? (await import('./webpack-config-modules/svgo.config.mjs')).default : null
+  ,postcssConfig_path = path.resolve(__dirname, './webpack-config-modules/postcss.config.mjs')
   // dir di output: relativa a QUESTO file ('../build' se il frontend è in una
   // sottodirectory, './build' se webpack.config.mjs è nella root del progetto)
-  ,output_dir = path.resolve(__dirname, '../build')
+  ,output_dir = path.resolve(__dirname, './build')
   // ,output_dir = isDevelopment? '_dev' : 'build' // symfony
   // dir delle favicons generate da `npx create-favicons` (vedi package.json):
   // il path assoluto serve a CopyWebpackPlugin/HtmlWebpackPlugin (i path
   // relativi sarebbero risolti dal cwd, non da questo file), mentre la regexp
   // resta relativa perché viene confrontata con i path dei moduli
-  ,favicons_path = path.resolve(__dirname, './favicons/output')
+  ,favicons_path = path.resolve(__dirname, './app/favicons/output')
   ,favicons_path_regexp = /favicons\/output/ // source pattern per le favicons (regexp o null)
   // NB: jsconfig.json va tenuto in questa stessa dir (gli alias sono risolti
   // a partire dalla sua posizione)
@@ -95,9 +97,10 @@ const shared_chunk_paths = (module) => {
   const sep = '[\\\\/]'; // stringa che produce [\\/] nel pattern
   const pathsRegexp = new RegExp([
     'node_modules',
-    'frontend/src/js',
-    'frontend/src/web-components',
-    'frontend/src/components',
+    'app/js',
+    'app/src',
+    'app/src/web-components',
+    'app/src/components',
   ].map(p => `${sep}${p.replace(/\//g, sep)}${sep}`).join('|'));
 
   return pathsRegexp.test(module.nameForCondition?.() ?? '');
@@ -136,7 +139,7 @@ const CopyWebpackPluginPatterns = [
 ];
 
 // =>> PurgeCSS
-// Istanze e opzioni sono in webpack-modules/purgecss-setup.mjs: qui restano
+// Istanze e opzioni sono in webpack-config-modules/purgecss-setup.mjs: qui restano
 // solo i flag e i dati di progetto (vedi createPurgeCSSPlugins nei `plugins`).
 
 // recupero metadata immagini
@@ -176,11 +179,11 @@ const config = {
   },
 
   // https://webpack.js.org/configuration/dotenv/
-  dotenv: {
-    prefix: 'APP_',
-    dir: '/',
-    template: ['.env', '.env.development'] //, '.env.local', '.env.[mode]', '.env.[mode].local'],
-  },
+  // dotenv: {
+  //   prefix: 'APP_',
+  //   dir: '/',
+  //   template: ['.env', '.env.development'] //, '.env.local', '.env.[mode]', '.env.[mode].local'],
+  // },
 
   devtool: isDevelopment ? 'inline-source-map' : false,
 
@@ -252,34 +255,30 @@ const config = {
       directory: path.join(__dirname, '/'),
       serveIndex: true
     },
+    open: { app: { name: 'Google Chrome' } },
+    compress: true,
+    hot: true,
+    port: devServerPort,
     /*
     proxy: [
       {
-        // /login, /logout (redirect Google) e /api/... (fetch AJAX) vanno
-        // inoltrati al server PHP reale (npm run "php server", vedi
-        // package.json e app/router.php), che webpack-dev-server non può
-        // eseguire da solo.
-        context: ['/api', '/login', '/logout'],
-        target: process.env.PHP_BASE_URL || 'http://localhost:8000'
+        context: ['/api'],
+        target: process.env.API_URL || `http://localhost:${apiPort}`
       }
     ],
     static: false,
     */
-    open: { app: { name: 'Google Chrome' } },
-    compress: true,
-    hot: true,
-    port: 5700
   },
 
   // =>> plugins
   plugins: [
     // =>> plugins: Dotenv
-    new Dotenv({
-      path: isDevelopment ? './.env.development' : './.env',
-      expand: true,
-      ignoreStub: true,
-      allowEmptyValues: true
-    }),
+    // new Dotenv({
+    //   path: isDevelopment ? './.env.development' : './.env',
+    //   expand: true,
+    //   ignoreStub: true,
+    //   allowEmptyValues: true
+    // }),
     new webpack.ProvidePlugin({
       process: 'process/browser.js'
     }),
@@ -404,7 +403,7 @@ const config = {
     // =>> plugins: PurgeCSSPlugin (per ultimo, attivo anche in dev)
     // https://github.com/FullHuman/purgecss/tree/main/packages/purgecss-webpack-plugin
     // https://purgecss.com/configuration.html
-    // istanze e opzioni in webpack-modules/purgecss-setup.mjs (qui solo flag/dati progetto)
+    // istanze e opzioni in webpack-config-modules/purgecss-setup.mjs (qui solo flag/dati progetto)
     // `usePurgeCss: false` disattiva il purge per intero (utile per isolare rapidamente
     // eventuali problemi legati ad esso); `purgeCSSOptions` (variables/keyframes/debug,
     // vedi sopra) si applica solo quando è attivo
@@ -460,7 +459,7 @@ const config = {
 
         // elenco generato: usi di var() nei blocchi `purgecss ignore` e nei css
         // shadow-DOM/`?raw`, override cross-asset (seeds), con chiusura transitiva
-        // delle dipendenze (vedi webpack-modules/purgecss-variables-safelist.mjs)
+        // delle dipendenze (vedi webpack-config-modules/purgecss-variables-safelist.mjs)
         variablesSafelist: {
           declarationGlobs: [
             path.resolve(__dirname, './index.css'), // entry css di default (vedi starter-install.sh)

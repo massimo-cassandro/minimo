@@ -1,10 +1,10 @@
+//@ts-nocheck
 // webpack-modules/postcss.config.mjs
 import path from 'path';
 import { fileURLToPath } from 'url';
 import globalData from '@csstools/postcss-global-data';
 import customMedia from 'postcss-custom-media';
 import autoprefixer from 'autoprefixer';
-import cssnano from 'cssnano';
 
 
 const __filename = fileURLToPath(import.meta.url);
@@ -52,7 +52,6 @@ export default (loaderContext) => {
     // require('@csstools/postcss-light-dark-function'), /* NB non funziona benissimo... */
 
 
-    plugins.push(cssnano({ preset: 'default' }));
   }
 
 

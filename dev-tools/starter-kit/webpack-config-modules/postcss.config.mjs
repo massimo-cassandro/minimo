@@ -29,13 +29,13 @@ export default (loaderContext) => {
     // in ogni asset e interferirebbe con il purge, vedi sopra)
     globalData({
       files: [
-        path.resolve(__dirname, '../src/css/custom-media.css'),
+        path.resolve(__dirname, '../app/css/custom-media.css'),
       ]
     }),
 
     // jitProps({
     //   files: [
-    //     path.resolve(__dirname, '../src/css/custom-properties.css'),
+    //     path.resolve(__dirname, '../app/css/custom-properties.css'),
     //   ]
     // }),
 
