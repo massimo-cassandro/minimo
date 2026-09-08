@@ -1,7 +1,7 @@
 // mostra un triangolo rettangolo disposto orizzontalmente che mostra
 // la porzione di raggiungimento di un obiettivo
 
-import { parseContainer, getElementFromContainer } from './helpers/chart-utils.js';
+import { parseContainer, getElementFromContainer, waitForContainerSize } from './helpers/chart-utils.js';
 import { createTextEl } from './helpers/create-text-element.js';
 
 export async function goal({
@@ -158,10 +158,11 @@ export async function goal({
     // calcolo width
     [, width] = parseContainer({ container: container, width: width, height: height });
 
-
-    if(!width || !height) {
+    if(!container && (!width || !height)) {
       throw `width e/o height mancanti: width: ${width}, height: ${height} (chartHeight: ${chartHeight})`;
     }
+
+    ({ width, height } = await waitForContainerSize(container, { width, height }, debug));
 
     // larghezza iniziale grafico
     // al netto del padding orizzontale pari a 1/2 cursore, in modo che sia visibile interamente

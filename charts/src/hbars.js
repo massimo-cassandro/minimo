@@ -2,7 +2,7 @@
 // categorie sull'asse verticale (a sinistra), valori sull'asse orizzontale (in basso)
 
 import { parseStdAxisOpts } from './helpers/parse-std-axis-opts.js';
-import { parseContainer } from './helpers/chart-utils.js';
+import { parseContainer, waitForContainerSize } from './helpers/chart-utils.js';
 import { cartesianAxis } from './helpers/cartesian-axis.js';
 import { legenda } from './helpers/legenda.js';
 
@@ -150,7 +150,7 @@ const default_params = {
     Null per nessuna eleborazione.
     La funzione di default assume che il valore sia di tipo numerico
   */
-  labelYFormatter: etiValue =>  Math.ceil(etiValue / 1e3)
+  labelYFormatter: etiValue =>  (Math.ceil(etiValue / 1e3) || 0) // `|| 0` normalizza -0 (altrimenti mostrato come "-0")
     .toLocaleString('it-IT', {
       minimumFractionDigits: 0,
       maximumFractionDigits: 0
@@ -186,12 +186,14 @@ export async function hbars(params) {
     }
 
     // container
-    [, params.width, params.height] = parseContainer({ container: params.container, width: params.width, height: params.height });
+    let containerElement;
+    [containerElement, params.width, params.height] = parseContainer({ container: params.container, width: params.width, height: params.height });
 
-
-    if(!params.width || !params.height) {
+    if(!containerElement && (!params.width || !params.height)) {
       throw `width e/o height mancanti: width: ${params.width}, height: ${params.height}`;
     }
+
+    ({ width: params.width, height: params.height } = await waitForContainerSize(containerElement, { width: params.width, height: params.height }, params.debug));
 
     // =>> legenda
     // costruzione delle opzioni per la legenda

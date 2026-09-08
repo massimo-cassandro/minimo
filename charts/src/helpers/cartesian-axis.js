@@ -375,6 +375,15 @@ async function cartesianAxisHorizontal(chartInstance, {
         chart_area.bottom + ticksLength + 2 // 2 è un distanziatore tra l'etichetta e la linea
       );
 
+      // eventuale correzione ultima etichetta (evita che esca dal margine destro dell'svg)
+      if(stepIdx === stepY_count) {
+        const labelX2 = labelEl.bbox().x2;
+
+        if(labelX2 > width - padding) {
+          labelEl.dx(-(labelX2 - width + padding/2));
+        }
+      }
+
       // =>> griglia verticale (ortogonale all'asse valori)
       // viene omessa solo la linea che coincide con l'asse categorie (la linea dello zero)
       if(showYgrid && Math.abs(x - zero_x) > 0.01) {

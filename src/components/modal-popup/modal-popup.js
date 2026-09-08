@@ -100,6 +100,7 @@ function getDomBuilderContentProps(value) {
  * @param {string | number | null} [params.dialogHeight=null] - optional dialog height value - if set, overrides main css custom prop (default: null)
  * @param {string | number | null} [params.dialogMinHeight=null] - optional dialog min-height value - if set, overrides main css custom prop (default: null)
  * @param {string | number | null} [params.dialogMaxHeight=null] - optional dialog max-height value - if set, overrides main css custom prop (default: null)
+ * @param {string | number | null} [params.dialogContentPadding=null] - optional dialog content padding value - if set, overrides main css custom prop (default: null)
  * @param {string | null} [params.iframeUrl=null] - URL to load in an iframe. (default: null)
  * @param {string | null} [params.ajaxUrl=null] - URL for Ajax content loading. (default: null)
  * @param {((el: HTMLDialogElement) => void) | null} [params.openCallback=null] - Called with the dialog element after opening, receives the dialog element (`openCallback(dialogEl)`). (default: null)
@@ -119,13 +120,14 @@ export function modalPopup({
   /** extra classname added to dialogInner */
   contentExtraClassName = null,
 
-  /** optional values for maon custom props overriding */
+  /** optional values for main custom props overriding */
   dialogWidth     = null,
   dialogMinWidth  = null,
   dialogMaxWidth  = null,
   dialogHeight    = null,
   dialogMinHeight = null,
   dialogMaxHeight = null,
+  dialogContentPadding = null,
 
   addFocus = true,
 
@@ -198,15 +200,17 @@ export function modalPopup({
     dialogHeight,
     dialogMinHeight,
     dialogMaxHeight,
+    dialogContentPadding,
   };
   /** @type {Record<string, string>} */
   const cpropsMap = {
-    dialogWidth     : '--mpopup-width',
-    dialogMinWidth  : '--mpopup-min-width',
-    dialogMaxWidth  : '--mpopup-max-width',
-    dialogHeight    : '--mpopup-height',
-    dialogMinHeight : '--mpopup-min-height',
-    dialogMaxHeight : '--mpopup-max-height'
+    dialogWidth          : '--mpopup-width',
+    dialogMinWidth       : '--mpopup-min-width',
+    dialogMaxWidth       : '--mpopup-max-width',
+    dialogHeight         : '--mpopup-height',
+    dialogMinHeight      : '--mpopup-min-height',
+    dialogMaxHeight      : '--mpopup-max-height',
+    dialogContentPadding : '--mpopup-content-padding'
   };
   /** @type {string[]} */
   let dialogStyle = [];

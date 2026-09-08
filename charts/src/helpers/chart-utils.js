@@ -155,3 +155,50 @@ export function parseContainer({ container = null, width = null, height = null }
 
   return [containerElement, width, height];
 }
+
+/**
+ * Attende che il container abbia dimensioni valide, utile quando è temporaneamente
+ * nascosto (es. `display: none` dentro un tab o un pannello non ancora attivo) al
+ * momento della creazione del grafico. Se `width`/`height` sono già entrambe valide
+ * risolve immediatamente, altrimenti osserva il container con un `ResizeObserver` ed
+ * attende che torni visibile. Non ha timeout: se il container non torna mai visibile
+ * la promise resta in sospeso.
+ * @param {Element|null} containerElement - L'elemento container (può essere null).
+ * @param {Object} size - Dimensioni già note.
+ * @param {number|null} size.width - Larghezza già nota (se valida, non si attende il container).
+ * @param {number|null} size.height - Altezza già nota (se valida, non si attende il container).
+ * @param {boolean} [debug=false] - Se true, logga in console quando l'attesa ha inizio. (default: false)
+ * @returns {Promise<{width: number, height: number}>} Le dimensioni effettive una volta disponibili.
+ */
+export function waitForContainerSize(containerElement, { width = null, height = null } = {}, debug = false) {
+  if (width && height) {
+    return Promise.resolve({ width, height });
+  }
+
+  if (!containerElement) {
+    return Promise.resolve({ width, height });
+  }
+
+  return new Promise(resolve => {
+
+    if (debug) {
+      // eslint-disable-next-line no-console
+      console.warn('MinimoCharts → in attesa che il container ottenga dimensioni valide (es. tab/pannello nascosto)', containerElement);
+    }
+
+    const observer = new ResizeObserver(entries => {
+      for (const entry of entries) {
+        const observedWidth = width || entry.contentRect.width;
+        const observedHeight = height || entry.contentRect.height;
+
+        if (observedWidth && observedHeight) {
+          observer.disconnect();
+          resolve({ width: observedWidth, height: observedHeight });
+          return;
+        }
+      }
+    });
+
+    observer.observe(containerElement);
+  });
+}
