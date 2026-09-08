@@ -277,9 +277,11 @@ export async function lines(params) {
       max_value,
       min_value,
       chart_area,
+      stepY_count,
       stepY_value,
       stepY_size,
-      stepX_size
+      stepX_size,
+      zero_y
     } = parseStdAxisOpts({
       max_value: params.max_value,
       min_value: params.min_value,
@@ -305,10 +307,12 @@ export async function lines(params) {
         max_value,
         min_value,
         chart_area,
+        stepY_count,
         stepY_value,
         stepY_size,
         stepX_size,
-        stepX_count
+        stepX_count,
+        zero_y
       }
     });
 

@@ -10,9 +10,9 @@ A collection of standalone Node.js CLI utilities to help manage a web project's 
 
 ## starter-kit
 
-`starter-kit/starter-install.sh` bootstraps a new frontend project: it copies the starter config files (`package.json`, `.gitignore`, `jsconfig.json`, eslint/stylelint configs, webpack config and modules, ...) and installs all the required dev dependencies.
+`starter-kit/starter-install.sh` bootstraps a new frontend project: it copies the starter config files (`package.json`, `.gitignore`, `jsconfig.json`, eslint/stylelint configs, webpack config and modules, ...) into the project root and the frontend files (webpack template, `CLAUDE.md`, `_root_htaccess`/`_root_robots.txt`, ...) into a fixed `./app` folder, then installs all the required dev dependencies.
 
-The script **requires zsh** (it exits with an error if launched with `sh` or `bash`). Existing files are never overwritten: root config files are copied with a `NEW-` prefix, while `package.json` and the `*.code-workspace` file are merged (template keys are appended at the end, prefixed with `_`).
+The script **requires zsh** (it exits with an error if launched with `sh` or `bash`). Existing files are never overwritten: they are copied alongside with a `NEW-` prefix (to be integrated manually or removed). If the `./app` folder already exists, the whole frontend file set is copied into `./NEW-app` instead.
 
 ### If minimo is already installed
 
@@ -22,7 +22,7 @@ The script is exposed as a `bin` of the package:
 npx starter-kit
 ```
 
-Since the installation is fully overwrite-safe, the script can also be **re-run at any time to update** an existing setup (e.g. to refresh the webpack modules or reinstall the dev dependencies): existing files are skipped or copied with the `NEW-` prefix, and the `package.json` / `*.code-workspace` merges are idempotent (running the script again neither duplicates nor overwrites anything).
+Since the installation is fully overwrite-safe, the script can also be **re-run at any time to update** an existing setup (e.g. to refresh the webpack modules or reinstall the dev dependencies): existing files are copied with the `NEW-` prefix, so running the script again never duplicates or overwrites anything.
 
 ### Without installing minimo
 
@@ -31,14 +31,6 @@ To bootstrap a project **before** installing the whole package, download only th
 ```bash
 curl -sL "$(npm view @massimo-cassandro/minimo dist.tarball)" | tar xz package/dev-tools/starter-kit
 zsh package/dev-tools/starter-kit/starter-install.sh
-rm -rf package
-```
-
-To test the installation skipping all `npm install` commands, use the `--no-npm` parameter:
-
-```bash
-curl -sL "$(npm view @massimo-cassandro/minimo dist.tarball)" | tar xz package/dev-tools/starter-kit
-zsh package/dev-tools/starter-kit/starter-install.sh --no-npm
 rm -rf package
 ```
 

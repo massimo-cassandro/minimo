@@ -1,3 +1,6 @@
+// barre orizzontali — analogo di bars.js con assi invertiti:
+// categorie sull'asse verticale (a sinistra), valori sull'asse orizzontale (in basso)
+
 import { parseStdAxisOpts } from './helpers/parse-std-axis-opts.js';
 import { parseContainer } from './helpers/chart-utils.js';
 import { cartesianAxis } from './helpers/cartesian-axis.js';
@@ -36,39 +39,37 @@ const default_params = {
     Se uno dei due valori non è impostato o ricavabile, viene generato un errore.
     NB: il padding del container viene considerato nelle dimensioni del grafico,
     è preferibile non impostarlo.
-    Il valore 'auto' di height fa sì che l'altezza dell'svg sia calcolata sulla base
-    del numero di barre e dei valori `barsGap` e `barsHeight`
   */
   width: null, // null || <value>
-  height: 300, // <value> || null || 'auto'
+  height: 300, // <value> || null
 
   /** attributi facoltativi per l'svg (classe, ecc) */
   svgAttrs: {},
 
   /**
-    valori numerici per la definizione delle linee
+    valori numerici per la definizione delle barre
     è un array di array, in cui ogni subarray contiene i valori di una singola serie di barre
   */
   values: [],
 
-  /** spazio tra una barre e l'altra */
+  /** spazio tra una barra e l'altra, all'interno dello stesso gruppo di categoria */
   barsGap: 5,
 
-  /** spazio tra una serie e l'altra */
+  /** spazio tra un gruppo di categoria e l'altro */
   seriesGap: 10,
 
-  /** bars top corner radius */
+  /** bars corner radius (lato esterno, lontano dallo zero) */
   barsCornerRadius: 6,
 
   /**
-    etichette corrispondenti ai vari valori. Sono posizionate sull'asse X
+    etichette di categoria, una per ogni gruppo di barre. Sono posizionate sull'asse verticale (a sinistra)
   */
   xLabels: [],
 
   /**  spazio extra attorno al bordo */
   padding: 10,
 
-  /**  suddivisioni asse Y */
+  /**  suddivisioni asse dei valori (in basso) */
   stepY_count: 4,
 
   /**  px, altezza o larghezza ticks (secondo l'orientamento) */
@@ -85,14 +86,14 @@ const default_params = {
   legenda: {},
 
   /**
-    larghezza area etichette asse y
+    larghezza area etichette di categoria (asse verticale, a sinistra)
   */
   yAxisLabelWidth: 60,
 
-  /**  altezza area etichette asse x */
+  /**  altezza area etichette dell'asse dei valori (in basso) */
   xAxisLabelHeight: 50,
 
-  /** titoli assi */
+  /** titoli assi: yAxisTitle → asse categorie (a sinistra), xAxisTitle → asse valori (in basso) */
   yAxisTitle: null,
   yAxisTitleAttrs: {...default_font_attrs, size: 18},
   yAxisTitleFontFilePath: null,
@@ -102,10 +103,10 @@ const default_params = {
   xAxisTitleFontFilePath: null,
 
   /**
-    valori minimi e massimi per l'asse Y, se null vengono calcolati automaticamente.
+    valori minimi e massimi per l'asse dei valori, se null vengono calcolati automaticamente.
     Il calcolo automatico di min_value usa 0 come soglia massima, per far sì che le
     barre partano da 0 quando i dati sono tutti positivi, estendendo il minimo verso
-    il basso solo se sono presenti valori negativi
+    sinistra solo se sono presenti valori negativi
   */
   max_value: null,
   min_value: null,
@@ -126,16 +127,16 @@ const default_params = {
   ticksAttrs: default_lines_attrs,
 
   /**
-    griglia assi x e y, in corrispondenza dei ticks
+    griglia: showXgrid → griglia orizzontale (asse categorie), showYgrid → griglia verticale (asse valori)
   */
-  showXgrid: false, // griglia verticale
-  showYgrid: true, // griglia orizzontale
+  showXgrid: false,
+  showYgrid: true,
   gridLinesAttrs: default_lines_attrs,
 
-  labelXAttrs: default_font_attrs, // contiene gli attributi fonts (come in MinimoCharts.defaults.font) e l'attributo `fill`
+  labelXAttrs: default_font_attrs, // etichette di categoria (a sinistra)
   labelXFontFilePath: null,  // percorso font per textToPath
 
-  labelYAttrs: default_font_attrs, // contiene gli attributi fonts (come in MinimoCharts.defaults.font) e l'attributo `fill`
+  labelYAttrs: default_font_attrs, // etichette dell'asse dei valori (in basso)
   labelYFontFilePath: null,  // percorso font per textToPath
 
 
@@ -145,7 +146,7 @@ const default_params = {
 
 
   /**
-    Funzione per formattare le etichette dei valori dell'asse Y.
+    Funzione per formattare le etichette dell'asse dei valori (in basso).
     Null per nessuna eleborazione.
     La funzione di default assume che il valore sia di tipo numerico
   */
@@ -157,7 +158,7 @@ const default_params = {
     (etiValue > 0? '\u2009K' : ''), // \u2009: thin space (https://www.compart.com/en/unicode/U+2009)
 
 };
-export async function bars(params) {
+export async function hbars(params) {
 
   const chartInstance = this;
 
@@ -232,17 +233,17 @@ export async function bars(params) {
     });
 
 
-    // numero di step dell'asse X
+    // numero di step dell'asse delle categorie
     const stepX_count = params.values.reduce((prev, curr) => Math.max(prev, curr.length), 0) + 1;
 
     const svgCanvas = chartInstance.createSvgCanvas(params.container, params.debug)
-      // .size(params.width, params.height)
       .viewbox(0, 0, params.width, params.height)
       .attr({...params.svgAttrs});
 
 
     // pre-elaborazione e calcolo di alcuni elementi (chartArea)
-    // nuove variabili definite da parseStdAxisOpts
+    // nuove variabili definite da parseStdAxisOpts (orientation:'horizontal':
+    // stepY_* si riferiscono all'asse dei valori (X), stepX_* all'asse delle categorie (Y))
     const {
       max_value,
       min_value,
@@ -251,8 +252,9 @@ export async function bars(params) {
       stepY_value,
       stepY_size,
       stepX_size,
-      zero_y
+      zero_y: zero_x
     } = parseStdAxisOpts({
+      orientation: 'horizontal',
       max_value: params.max_value,
       min_value: params.min_value,
       values: flatValues,
@@ -268,12 +270,13 @@ export async function bars(params) {
     }); // elaborazione standard
 
     // =>> costruzione assi e griglia.
-    // Gli argomenti di cartesianAxis sono uguali a quelli di bars
+    // Gli argomenti di cartesianAxis sono uguali a quelli di hbars
     // con l'aggiunta di quelli calcolati da parseStdAxisOpts
     // non tutti sono necessari ma vengono passati lo stesso per comodità
     const cartesianAxisGroup = await cartesianAxis(chartInstance, {
       ...params,
-      xLabelsOnTicks: false, // posiziona l'etichetta al centro di ogni step X
+      orientation: 'horizontal',
+      xLabelsOnTicks: false, // posiziona l'etichetta di categoria al centro di ogni step
       ...{
         max_value,
         min_value,
@@ -283,7 +286,7 @@ export async function bars(params) {
         stepY_size,
         stepX_size,
         stepX_count,
-        zero_y
+        zero_y: zero_x
       }
     });
 
@@ -293,18 +296,19 @@ export async function bars(params) {
     // =>> disegno barre
     // *********************************
 
-    // calcolo larghezza barre
-    const barsWidth = (stepX_size - params.seriesGap - (params.barsGap * (params.values.length - 1))) / params.values.length
-      // il raggio dell'angolo non può essere più grande della barra stessa, né negativo
-      // (barsWidth può risultare negativo se seriesGap/barsGap non lasciano spazio sufficiente per tutte le serie)
-      ,barsCornerRadius = Math.max(0, Math.min(params.barsCornerRadius, barsWidth / 2))
+    // calcolo altezza (spessore) barre
+    const barsHeight = (stepX_size - params.seriesGap - (params.barsGap * (params.values.length - 1))) / params.values.length
+      // il raggio dell'angolo non può essere più grande dello spessore della barra stessa, né negativo
+      // (barsHeight può risultare negativo se seriesGap/barsGap non lasciano spazio sufficiente per tutte le serie,
+      // frequente qui perché l'asse delle categorie è vincolato all'altezza del grafico, spesso più stretta della larghezza)
+      ,barsCornerRadius = Math.max(0, Math.min(params.barsCornerRadius, barsHeight / 2))
     ;
 
 
     const barsGroup = svgCanvas.group()
       .attr({ 'data-debug-info': params.debug? 'Gruppo barre' : null });
 
-    let barX = chart_area.left + params.seriesGap / 2;
+    let barY = chart_area.top + params.seriesGap / 2;
 
     for (let thisStepIdx = 0; thisStepIdx < stepX_count; thisStepIdx++) {
 
@@ -319,53 +323,53 @@ export async function bars(params) {
         const isLast = idx === thisStepValues.length - 1;
 
         if (itemValue != null) {
-          // valori negativi: la barra scende dalla linea dello zero verso il basso,
-          // invece di crescere dal basso verso l'alto
+          // valori negativi: la barra si estende dalla linea dello zero verso sinistra,
+          // invece di crescere da sinistra verso destra
           const isNegative = itemValue < 0,
-            // calcolo coordinata Y del valore e altezza assoluta della barra,
-            // usando come baseline la linea dello zero (zero_y) invece del fondo del grafico
-            itemY = chart_area.top + chart_area.height - (((itemValue - min_value) * chart_area.height) / (max_value - min_value)),
-            barTop = isNegative? zero_y : itemY,
-            barBottom = isNegative? itemY : zero_y,
-            barH = barBottom - barTop,
-            parteVerticaleBarra = barH - barsCornerRadius;
+            // calcolo coordinata X del valore, usando come baseline la linea dello zero (zero_x)
+            // invece del margine sinistro del grafico. Nessuna inversione: l'asse X cresce verso destra
+            itemX = chart_area.left + (((itemValue - min_value) * chart_area.width) / (max_value - min_value)),
+            barLeft = isNegative? itemX : zero_x,
+            barRight = isNegative? zero_x : itemX,
+            barW = barRight - barLeft,
+            parteOrizzontaleBarra = barW - barsCornerRadius;
           let path;
 
-          if(parteVerticaleBarra > 0) {
+          if(parteOrizzontaleBarra > 0) {
 
-            if(barH <= barsCornerRadius) {
+            if(barW <= barsCornerRadius) {
 
-              const altezzaCornerRadius = barH;
+              const larghezzaCornerRadius = barW;
 
               path = isNegative
-                // angoli arrotondati in basso (lato lontano dallo zero), spigolo vivo in alto
-                ? `M${barX},${barTop}` +
-                  `q0,${altezzaCornerRadius} ${barsCornerRadius},${altezzaCornerRadius}` +
-                  `h${barsWidth - barsCornerRadius * 2}` +
-                  `q${barsCornerRadius},0 ${barsCornerRadius},-${altezzaCornerRadius}` +
+                // angoli arrotondati a sinistra (lato lontano dallo zero), spigolo vivo a destra
+                ? `M${zero_x},${barY}` +
+                  `q-${larghezzaCornerRadius},0 -${larghezzaCornerRadius},${barsCornerRadius}` +
+                  `v${barsHeight - barsCornerRadius * 2}` +
+                  `q0,${barsCornerRadius} ${larghezzaCornerRadius},${barsCornerRadius}` +
                   'z'
-                // angoli arrotondati in alto (lato lontano dallo zero), spigolo vivo in basso
-                : `M${barX},${barBottom}` +
-                  `q0,-${altezzaCornerRadius} ${barsCornerRadius},-${altezzaCornerRadius}` +
-                  `h${barsWidth - barsCornerRadius * 2}` +
-                  `q${barsCornerRadius},0 ${barsCornerRadius},${altezzaCornerRadius}` +
+                // angoli arrotondati a destra (lato lontano dallo zero), spigolo vivo a sinistra
+                : `M${zero_x},${barY}` +
+                  `q${larghezzaCornerRadius},0 ${larghezzaCornerRadius},${barsCornerRadius}` +
+                  `v${barsHeight - barsCornerRadius * 2}` +
+                  `q0,${barsCornerRadius} -${larghezzaCornerRadius},${barsCornerRadius}` +
                   'z';
 
             } else {
               path = isNegative
-                ? `M${barX},${barTop}` +
-                  `v${parteVerticaleBarra}` +
+                ? `M${zero_x},${barY}` +
+                  `h-${parteOrizzontaleBarra}` +
+                  `q-${barsCornerRadius},0 -${barsCornerRadius},${barsCornerRadius}` +
+                  `v${barsHeight - barsCornerRadius * 2}` +
                   `q0,${barsCornerRadius} ${barsCornerRadius},${barsCornerRadius}` +
-                  `h${barsWidth - barsCornerRadius * 2}` +
-                  `q${barsCornerRadius},0 ${barsCornerRadius},-${barsCornerRadius}` +
-                  `v-${parteVerticaleBarra}` +
+                  `h${parteOrizzontaleBarra}` +
                   'z'
-                : `M${barX},${barBottom}` +
-                  `v-${parteVerticaleBarra}` +
-                  `q0,-${barsCornerRadius} ${barsCornerRadius},-${barsCornerRadius}` +
-                  `h${barsWidth - barsCornerRadius * 2}` +
+                : `M${zero_x},${barY}` +
+                  `h${parteOrizzontaleBarra}` +
                   `q${barsCornerRadius},0 ${barsCornerRadius},${barsCornerRadius}` +
-                  `v${parteVerticaleBarra}` +
+                  `v${barsHeight - barsCornerRadius * 2}` +
+                  `q0,${barsCornerRadius} -${barsCornerRadius},${barsCornerRadius}` +
+                  `h-${parteOrizzontaleBarra}` +
                   'z';
             }
 
@@ -377,10 +381,10 @@ export async function bars(params) {
           }
         }
 
-        barX += barsWidth + (isLast ? 0 : params.barsGap);
+        barY += barsHeight + (isLast ? 0 : params.barsGap);
       }
 
-      barX += params.seriesGap;
+      barY += params.seriesGap;
     }
 
 
@@ -409,7 +413,7 @@ export async function bars(params) {
 
 
   } catch(e) {
-    console.error( 'MinimoCharts / bars →', e ); // eslint-disable-line
+    console.error( 'MinimoCharts / hbars →', e ); // eslint-disable-line
   }
 
 }

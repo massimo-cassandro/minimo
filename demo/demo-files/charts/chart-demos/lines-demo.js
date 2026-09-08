@@ -22,9 +22,9 @@ export async function linesTest(chartInstance, nodeCfg = null) {
       è un array di array, in cui ogni subarray contiene i valori di una singola linea
     */
     values: [
-      [1050, 1400, 3450, 1230, 1450, 1203],
-      [1600, 1404, 3106, 3085, 1730, 2405],
-      [1765, 3407, 1598, 3555, 4416, 1051],
+      [1050, 1400, -3450, 1230, 1450, 1203],
+      [1600, 1404, 3106, 3085, -1730, 2405],
+      [1765, 3407, 1598, 3555, -4416, -1051],
     ],
 
     /**

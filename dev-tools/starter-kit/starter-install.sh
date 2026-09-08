@@ -3,8 +3,9 @@
 # IMPORTANTE: questo script è idempotente e deve restare tale.
 # Può essere rilanciato più volte sullo stesso progetto (anche via `npx starter-kit`
 # per aggiornare un setup esistente) senza sovrascrivere nulla né creare duplicati:
-# i file esistenti vengono saltati o copiati con prefisso NEW- (o _ per
-# package.json e *.code-workspace).
+# i file esistenti vengono copiati con prefisso NEW- (da integrare manualmente
+# o rimuovere); la cartella di installazione del frontend, fissa su ./app, se
+# già esistente viene sostituita con ./NEW-app.
 # Ogni modifica futura deve conservare questa proprietà.
 
 RED='\033[0;31m'
@@ -12,7 +13,7 @@ YELLOW='\033[0;33m'
 GREEN='\033[0;32m'
 NC='\033[0m' # No Color
 
-DEBUG=TRUE
+DEBUG=FALSE
 
 # Questo script richiede zsh: se lanciato con sh/bash blocca l'esecuzione
 if [ -z "$ZSH_VERSION" ]; then

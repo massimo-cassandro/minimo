@@ -3,10 +3,10 @@ import { MinimoCharts } from '@minimoCharts/index.js';
 import { barsTest } from './chart-demos/bars-demo.js';
 import { goalTest } from './chart-demos/goal-demo.js';
 import { linesTest } from './chart-demos/lines-demo.js';
+import { hBarsTest } from './chart-demos/hbars-demo.js';
 
 // import { ratingDisplayTest } from '../../../charts/TODO charts/test/test-src/rating-display-test.js';
 // import { pieTest } from './src/pie-test.js';
-// import { hBarsTest } from './src/hbars-test.js';
 // import { signalBarsTest } from './src/signal-bars-test.js';
 // import { radialBarsTest } from './src/radial-bars-test.js';
 // import { settimanaleMensileTest } from './src/settimanale-mensile-test.js';
@@ -34,10 +34,10 @@ export async function chartsDemo(){
   await barsTest(chartInstance);
   await goalTest(chartInstance);
   await linesTest(chartInstance);
+  await hBarsTest(chartInstance);
 
   // await ratingDisplayTest(chartInstance);
   // pieTest(cfg);
-  // hBarsTest(cfg);
   // signalBarsTest(cfg);
   // radialBarsTest(cfg);
   // settimanaleMensileTest(cfg);

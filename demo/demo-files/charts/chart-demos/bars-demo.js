@@ -27,9 +27,9 @@ export async function barsTest(chartInstance, nodeCfg = null) {
     //   [1765, 3407, 1598, 3555, 4416, 1051, 1573, 3225, 6412, 1698, 6840],
     // ],
     values: [
-      [50,  8, 50, 30, 50, 63, 77, 67, 49, 69, 75, 249.6],
-      [30, 14,  6, 85, 30, 65, 71, 66, 48, 19, 24, 28],
-      [65, 37, 98, 55, 16, 61, 73, 25, 42, 98, 40],
+      [50,  8, 50, 30, 50, 63, 77, 67, 49, 69, 75, -49.6],
+      [30, 14,  6, 85, 30, -65, 71, 66, 48, -19, 24, 28],
+      [65, 37, 98, 55, 16, 61, 73, 25, -42, 98, 40],
     ],
 
     /** spazio tra una barra e l'altra */
@@ -88,7 +88,7 @@ export async function barsTest(chartInstance, nodeCfg = null) {
   return barsChart(chartInstance, { // il return è necessario per i test node
     ...opts,
     // max_value: max,
-    min_value: 0, //min,
+    // min_value: null, // calcolato automaticamente da bars.js (0, o il minimo reale se sono presenti valori negativi)
     container: '#bars',
 
     ...(nodeCfg??{})

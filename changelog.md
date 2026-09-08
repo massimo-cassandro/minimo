@@ -7,3 +7,4 @@
 * 1.27.0 (25 ago 2026) - domBuilder: buildButton utility
 * 1.28.0 (26 ago 2026) - sf-macro: preDelCallback option
 * 1.29.0 (01 set 2026) - s-datatable: collapse data mode
+* 1.30.0 (08 set 2026) - hbar chart

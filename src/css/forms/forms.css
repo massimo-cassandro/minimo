@@ -105,6 +105,11 @@ label:has(.form-control) {
   }
 }
 
+.form-control[type='number'] {
+  font-feature-settings: 'lnum', 'tnum';
+  font-variant-numeric: lining-nums tabular-nums;
+}
+
 /* da bootstrap */
 select.form-control {
 
