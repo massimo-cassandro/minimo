@@ -28,6 +28,54 @@ function closeDialog(el) {
 }
 
 /**
+ * Wraps a single domBuilder object (not an array, not a DOM Node) into an array,
+ * so `content`/`headerContent`/`footerContent` can be handled uniformly with domBuilder arrays.
+ * @param {*} value
+ * @returns {*}
+ */
+function normalizeContentParam(value) {
+  if(value != null && typeof value === 'object' && !Array.isArray(value) && !(value instanceof Node)) {
+    return [value];
+  }
+  return value;
+}
+
+/**
+ * @param {*} value - a non-null `content`/`headerContent`/`footerContent` value
+ * @returns {'domBuilder' | 'node' | 'function' | 'html'}
+ */
+function getContentKind(value) {
+  if(Array.isArray(value)) {
+    return 'domBuilder';
+  }
+  if(value instanceof Node) {
+    return 'node';
+  }
+  if(typeof value === 'function') {
+    return 'function';
+  }
+  return 'html';
+}
+
+/**
+ * Resolves the `content`/`children` domBuilder props for a `headerContent`/`footerContent` value.
+ * The `function` kind is not handled here: it is invoked separately, from the item's `callback`,
+ * once the container element exists.
+ * @param {*} value
+ * @returns {{content: string | Node | null, children: DomBuilderItem[] | undefined}}
+ */
+function getDomBuilderContentProps(value) {
+  if(value == null) {
+    return { content: null, children: undefined };
+  }
+  const kind = getContentKind(value);
+  return {
+    content: (kind === 'html' || kind === 'node') ? value : null,
+    children: kind === 'domBuilder' ? value : undefined
+  };
+}
+
+/**
  * modalPopup
  * Opens a popup dialog with the given content.
  *
@@ -40,7 +88,7 @@ function closeDialog(el) {
  *
  * @param {Object} params
  * @param {string | null} [params.dialogExtraClassName=null] - Extra class added to the dialog element. (default: null)
- * @param {string | DomBuilderItem | DomBuilderItem[] | null} [params.content=null] - Plain text, HTML, a domBuilder object, or a domBuilder array. (default: null)
+ * @param {string | DomBuilderItem | DomBuilderItem[] | Node | ((container: HTMLElement) => void) | null} [params.content=null] - Plain text, HTML, a domBuilder object, a domBuilder array, a DOM node (appended as-is), or a function invoked with the content container element to populate it directly (`content(dialogContentEl)`). (default: null)
  * @param {string | null} [params.contentExtraClassName=null] - Extra class added to the content wrapper. (default: null)
  * @param {HTMLElement | null} [params.triggerElement=null] - Optional element that triggered the popup; when set, `aria-haspopup`, `aria-controls` and `aria-expanded` are managed on it. (default: null)
  * @param {boolean} [params.addFocus=true] - if true, dialog receives focus after opening (default: true)
@@ -58,8 +106,8 @@ function closeDialog(el) {
  * @param {((el: HTMLDialogElement) => void) | null} [params.closeCallback=null] - Called with the dialog element just before it is removed, receives the dialog element (`closeCallback(dialogEl)`). NB: `dialogEl` is removed immediately after closing. (default: null)
  * @param {((data: *, el: Element) => void) | null} [params.ajaxCallback=null] - Called with the Ajax response and the content element. (default: null)
  * @param {boolean} [params.addScrollbarPadding=false] - Adds right padding to compensate for the scrollbar. (default: false)
- * @param {string | DomBuilderItem | DomBuilderItem[] | null} [params.headerContent=null] - Header content: plain text, HTML, a domBuilder object, or a domBuilder array. (default: null)
- * @param {string | DomBuilderItem | DomBuilderItem[] | null} [params.footerContent=null] - Footer content: plain text, HTML, a domBuilder object, or a domBuilder array. (default: null)
+ * @param {string | DomBuilderItem | DomBuilderItem[] | Node | ((container: HTMLElement) => void) | null} [params.headerContent=null] - Header content: plain text, HTML, a domBuilder object, a domBuilder array, a DOM node, or a function invoked with the header container element to populate it directly. (default: null)
+ * @param {string | DomBuilderItem | DomBuilderItem[] | Node | ((container: HTMLElement) => void) | null} [params.footerContent=null] - Footer content: same accepted types as `headerContent`, invoked with the footer container element. (default: null)
  * @returns {HTMLDialogElement} The dialog element.
  */
 
@@ -84,7 +132,7 @@ export function modalPopup({
   /** iframe url */
   iframeUrl = null,
 
-  /** content: plain text, html, domBuilder object or domBuilder array */
+  /** content: plain text, html, domBuilder object/array, DOM node, or function(container) */
   content = null,
 
   /** Ajax url and callback.
@@ -98,13 +146,13 @@ export function modalPopup({
   closeCallback = null,
   addScrollbarPadding = false, // adds extra right padding to compensate for the scrollbar
 
-  /** header content: plain text, HTML, domBuilder object or domBuilder array */
+  /** header content: plain text, HTML, domBuilder object/array, DOM node, or function(container) */
   headerContent = null,
 
   /** extra classname added to header */
   headerExtraClassName = null,
 
-  /** footer content: plain text, HTML, domBuilder object or domBuilder array */
+  /** footer content: plain text, HTML, domBuilder object/array, DOM node, or function(container) */
   footerContent = null,
 
   /** extra classname added to footer */
@@ -121,22 +169,13 @@ export function modalPopup({
   }
 
   // allow a single domBuilder object (in addition to a domBuilder array) by wrapping it in an array
-  if(content != null && typeof content === 'object' && !Array.isArray(content)) {
-    content = [content];
-  }
-  if(headerContent != null && typeof headerContent === 'object' && !Array.isArray(headerContent)) {
-    headerContent = [headerContent];
-  }
-  if(footerContent != null && typeof footerContent === 'object' && !Array.isArray(footerContent)) {
-    footerContent = [footerContent];
-  }
+  content = normalizeContentParam(content);
+  headerContent = normalizeContentParam(headerContent);
+  footerContent = normalizeContentParam(footerContent);
 
   let mode;
-  if(content != null && Array.isArray(content)) {
-    mode = 'domBuilder';
-
-  } else if (content != null) {
-    mode = 'html';
+  if(content != null) {
+    mode = getContentKind(content);
 
   } else if (ajaxUrl != null && ajaxCallback != null) {
     mode = 'ajax';
@@ -210,13 +249,17 @@ export function modalPopup({
               id: headerId,
               className: classnames(styles.header, headerExtraClassName),
               condition: headerContent != null,
-              content: Array.isArray(headerContent) ? null : headerContent,
-              children: Array.isArray(headerContent) ? headerContent : undefined
+              ...getDomBuilderContentProps(headerContent),
+              callback: el => {
+                if(headerContent != null && getContentKind(headerContent) === 'function') {
+                  /** @type {(container: HTMLElement) => void} */ (headerContent)(/** @type {HTMLElement} */ (el));
+                }
+              }
             },
             {
               className: classnames(styles.content, contentExtraClassName),
-              content: mode === 'html'
-                ? content
+              content: (mode === 'html' || mode === 'node')
+                ? /** @type {string | Node} */ (content)
                 : mode === 'ajax'
                   ? spinner()
                   : null,
@@ -233,7 +276,11 @@ export function modalPopup({
                 }
               ],
               callback: el => {
-                dialogContentEl = el;
+                dialogContentEl = /** @type {HTMLElement} */ (el);
+
+                if(mode === 'function') {
+                  /** @type {(container: HTMLElement) => void} */ (content)(dialogContentEl);
+                }
 
                 if(mode === 'ajax') {
                   try {
@@ -241,7 +288,7 @@ export function modalPopup({
                     (async () => {
                       const response = await fetch(safeAjaxUrl),
                         data = await response.json();
-                      el.innerHTML = '';
+                      dialogContentEl.innerHTML = '';
                       ajaxCallback?.(data, dialogContentEl);
                     })();
 
@@ -258,8 +305,12 @@ export function modalPopup({
             {
               className: classnames(styles.footer, footerExtraClassName),
               condition: footerContent != null,
-              content: Array.isArray(footerContent) ? null : footerContent,
-              children: Array.isArray(footerContent) ? footerContent : undefined
+              ...getDomBuilderContentProps(footerContent),
+              callback: el => {
+                if(footerContent != null && getContentKind(footerContent) === 'function') {
+                  /** @type {(container: HTMLElement) => void} */ (footerContent)(/** @type {HTMLElement} */ (el));
+                }
+              }
             },
           ]
         }
