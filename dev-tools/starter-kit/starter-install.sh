@@ -3,14 +3,20 @@
 # IMPORTANTE: questo script è idempotente e deve restare tale.
 # Può essere rilanciato più volte sullo stesso progetto (anche via `npx starter-kit`
 # per aggiornare un setup esistente) senza sovrascrivere nulla né creare duplicati:
-# i file esistenti vengono copiati con prefisso NEW- (da integrare manualmente
-# o rimuovere); la cartella di installazione del frontend, fissa su ./app, se
-# già esistente viene sostituita con ./NEW-app.
+# per i singoli file, se il contenuto esistente è identico al sorgente la copia
+# viene saltata; se è diverso e non esiste ancora un OLD- corrispondente, il
+# file esistente viene rinominato con prefisso OLD- (preservato da quel momento
+# in poi, non viene più toccato nelle esecuzioni successive) e il nuovo file
+# prende il nome originale; se l'OLD- corrispondente esiste già, viene invece
+# sovrascritto direttamente il file "nuovo", senza aggiungere ulteriori prefissi.
+# Stessa logica, a livello di intera cartella e senza diff sui singoli file
+# contenuti, per le cartelle installate (./app, ./webpack-config-modules).
 # Ogni modifica futura deve conservare questa proprietà.
 
 RED='\033[0;31m'
 YELLOW='\033[0;33m'
 GREEN='\033[0;32m'
+DIM='\033[2m' # Dim
 NC='\033[0m' # No Color
 
 DEBUG=FALSE
@@ -36,7 +42,12 @@ WEBPACK_MODULES_INSTALL_PATH="./webpack-config-modules"
 set -C
 
 
-# Wrapper: copia il file, se esiste viene copiato con prefisso NEW- (da integrare manualmente o rimuovere).
+# Wrapper: copia il file. Se dest esiste con contenuto identico al sorgente,
+# la copia viene saltata. Se il contenuto è diverso: la prima volta il file
+# esistente viene rinominato con prefisso OLD- (preservato da quel momento in
+# poi, mai più toccato) e il nuovo file prende il nome originale; se l'OLD-
+# corrispondente esiste già, viene invece sovrascritto direttamente il file
+# "nuovo", senza aggiungere ulteriori prefissi.
 safe_cat() {
   local src="$1"
   local dest="$2"
@@ -45,18 +56,27 @@ safe_cat() {
     return 1
   fi
   if [ -e "$dest" ]; then
-    local new_dest="$(dirname "$dest")/NEW-$(basename "$dest")"
-    cat "$src" >| "$new_dest"
-  else
-    cat "$src" > "$dest"
+    if cmp -s "$src" "$dest"; then
+      return 0
+    fi
+    local old_dest="$(dirname "$dest")/OLD-$(basename "$dest")"
+    if [ ! -e "$old_dest" ]; then
+      mv "$dest" "$old_dest"
+    fi
   fi
+  cat "$src" >| "$dest"
 }
 
 FRONTEND_INSTALL_PATH="./app"
-# se la cartella esiste già, i moduli vengono copiati in NEW-webpack-modules
-# (da integrare manualmente o rimuovere)
+# se la cartella esiste già: la prima volta viene rinominata per intero in
+# OLD-app (preservata, mai più toccata); se OLD-app esiste già, la cartella
+# esistente non viene rinominata e i file al suo interno vengono gestiti
+# singolarmente dalla stessa logica di safe_cat.
 if [ -d "$FRONTEND_INSTALL_PATH" ]; then
-  FRONTEND_INSTALL_PATH="./NEW-$(basename "$FRONTEND_INSTALL_PATH")"
+  OLD_FRONTEND_INSTALL_PATH="$(dirname "$FRONTEND_INSTALL_PATH")/OLD-$(basename "$FRONTEND_INSTALL_PATH")"
+  if [ ! -e "$OLD_FRONTEND_INSTALL_PATH" ]; then
+    mv "$FRONTEND_INSTALL_PATH" "$OLD_FRONTEND_INSTALL_PATH"
+  fi
 fi
 
 echo -e "${GREEN}Files will be installed in: '${FRONTEND_INSTALL_PATH}'${NC}"
@@ -85,10 +105,16 @@ safe_cat "${WEBPACK_CONFIG_SOURCE_PATH}/webpack-template.ejs" "${FRONTEND_INSTAL
 
 
 echo -e "${GREEN}..WEBPACK CONFIG MODULES${NC}"
-# se la cartella esiste già, i moduli vengono copiati in NEW-webpack-modules
-# (da integrare manualmente o rimuovere)
+# se la cartella esiste già: la prima volta viene rinominata per intero in
+# OLD-webpack-config-modules (preservata, mai più toccata); se l'OLD-
+# corrispondente esiste già, la cartella esistente non viene rinominata e i
+# file al suo interno vengono gestiti singolarmente dalla stessa logica di
+# safe_cat.
 if [ -d "$WEBPACK_MODULES_INSTALL_PATH" ]; then
-  WEBPACK_MODULES_INSTALL_PATH="./NEW-$(basename "$WEBPACK_MODULES_INSTALL_PATH")"
+  OLD_WEBPACK_MODULES_INSTALL_PATH="$(dirname "$WEBPACK_MODULES_INSTALL_PATH")/OLD-$(basename "$WEBPACK_MODULES_INSTALL_PATH")"
+  if [ ! -e "$OLD_WEBPACK_MODULES_INSTALL_PATH" ]; then
+    mv "$WEBPACK_MODULES_INSTALL_PATH" "$OLD_WEBPACK_MODULES_INSTALL_PATH"
+  fi
 fi
 
 mkdir -p "$WEBPACK_MODULES_INSTALL_PATH"
@@ -155,11 +181,13 @@ if [ "$DEBUG" = "TRUE" ]; then
 fi
 
 for pkg in "${dependencies[@]}"; do
+  echo -e "${DIM}...installing "$pkg"${NC}"
   npm i -S "$pkg"
 done
 
 for pkg in "${devDependencies[@]}"; do
-  npm i -S "$pkg"
+  echo -e "${DIM}...installing "$pkg"${NC}"
+  npm i -D "$pkg"
 done
 
 echo -e "\n${GREEN}...creating default folders${NC}"
