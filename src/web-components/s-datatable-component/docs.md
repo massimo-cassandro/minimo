@@ -176,6 +176,68 @@ document.dispatchEvent(new CustomEvent('datatable:search', {
 }));
 ```
 
+## Parametri/attributi
+
+Tutti i parametri sono leggibili sia da attributo HTML che da script (`init()`).
+Ordine di precedenza: config (script) > attributo HTML > default interno.
+
+### Parametri del componente
+
+```javascript
+{
+  json,          // URL da cui recuperare i dati (struttura attesa: { data: [...] }).
+                 // Ignorato se `data` è presente.
+
+  data,          // Dati inline, array di oggetti plain. Ha precedenza su `json`.
+                 // Utile in contesti SSR (Twig, Blade, ...) dove il JSON è già
+                 // disponibile server-side; per grandi dataset preferire `json`.
+
+  cols,          // Definizione delle colonne. Vedi "Parametro cols" più sotto.
+                 // Default: []
+
+  tableClass,    // Classi CSS del tag <table>, in sostituzione di 'table table-bordered'.
+                 // La classe interna styles.table (necessaria al layout) viene
+                 // comunque sempre applicata.
+                 // Default: 'table table-bordered'
+
+  renderNullAs,  // Stringa globale da mostrare al posto di valori null/undefined,
+                 // sovrascrivibile per singola colonna con `_renderNullAs`.
+                 // Default: '—' (em dash)
+
+  updateFooterOnPageChange, // Se true, `_footerRender` riceve solo i record della
+                 // pagina corrente (subtotale). Se false, l'intero set filtrato
+                 // (il footer si aggiorna solo al cambio filtro, non pagina).
+                 // Default: false
+
+  refs,          // string[] di percorsi URL da cui, se si proviene, la pagina
+                 // corrente viene ripristinata dal cookie di sessione 'sd-pag'.
+                 // Confronto su pathname (query string/hash ignorati): es. ['/utenti']
+                 // intercetta anche '/utenti/1234'.
+
+  topSlot,       // Elemento DOM o markup HTML nell'area in alto a sinistra.
+                 // Solo via init() (non leggibile da attributo HTML). Ignorato
+                 // se showInfoAtTop è true. Vedi sezione dedicata più sotto.
+
+  showInfoAtTop, // Replica il testo dell'area info anche in alto a sinistra.
+                 // Ha priorità su topSlot se true. Vedi sezione dedicata più sotto.
+                 // Default: true
+}
+```
+
+### Parametri nativi di simple-datatables
+
+```javascript
+{
+  perPage,       // Numero di righe per pagina, passato direttamente come opzione
+                 // nativa `perPage` del costruttore DataTable.
+                 // Default: 25
+}
+```
+
+Tutte le altre opzioni native di simple-datatables (`searchable`, `sortable`, `paging`,
+`pagerDelta`, `perPageSelect`, `locale`, `labels`, `classes`, `template`, ...) sono
+impostate internamente dal componente e **non** sono configurabili da attributo/script.
+
 ## Parametro `cols`
 
 Array di oggetti di configurazione delle colonne. Le chiavi con prefisso `_` sono
@@ -194,7 +256,7 @@ cols: [
 
     _title,        // Testo del tooltip sull'intestazione (attributo `title` dell'<abbr>).
 
-    _render,       // Template HTML per il contenuto della cella.
+    _cellRender,   // Template HTML per il contenuto della cella.
                    // Accetta:
                    //   - stringa mustache-like: i segnaposto [[chiave]] vengono sostituiti
                    //     con i valori della riga (notazione punto: [[owner.nome]]).
@@ -203,14 +265,33 @@ cols: [
                    //     warning (il dato è semplicemente assente, non un errore di config).
                    //   - funzione (row) => string
 
-    _renderMode,   // Preset di visualizzazione predefiniti. Valori disponibili:
-                   //   'id'          – colonna numerica, non ricercabile, allineata a destra
-                   //   'email'       – va a capo prima e dopo la @
-                   //   'boolean'     – icona spunta/croce con colore semantico
-                   //   'sf_datetime' – data/ora da oggetto Symfony ({ date, timezone })
+    _renderMode,   // Preset di visualizzazione predefiniti (vedi parseCols). Vengono
+                   // applicati solo se la colonna non definisce già l'opzione nativa
+                   // `render`. Valori disponibili:
+                   //   'id'            – colonna numerica (type 'number'), non ricercabile,
+                   //                     allineata a destra
+                   //   'email'         – va a capo prima e dopo la @
+                   //   'bool_true_only' – come type: 'boolean' (icona spunta con colore
+                   //                     semantico) ma per i valori falsi non mostra
+                   //                     nessuna icona. Per il booleano standard
+                   //                     (spunta/croce) usare la proprietà nativa
+                   //                     type: 'boolean', non è previsto un _renderMode.
+                   //   'sf_datetime'   – data e ora da oggetto Symfony ({ date, timezone }),
+                   //                     pre-elaborato in _load
+                   //   'sf_date'       – come 'sf_datetime', ma mostra solo la data
+                   //   'datetime'      – data e ora da stringa/valore parsabile da `new Date()`
+                   //   'date'          – come 'datetime', ma mostra solo la data
+                   //                     (date/datetime: formato it-IT, allineamento a destra,
+                   //                     data-order impostato per l'ordinamento; null → '—')
+                   //   'numeric'       – numero formattato it-IT (separatore migliaia,
+                   //                     decimali come nel dato), type 'number', classi
+                   //                     text-end text-numeric; null/NaN → '—'
+                   //   'euro'          – come 'numeric', con 2 decimali fissi, senza simbolo
+                   //   'euro_currency' – come 'euro', con simbolo di valuta (€)
+                   //   'euro_no_dec'   – come 'euro', senza decimali
 
     _sortValue,    // Percorso del campo da usare per l'ORDINAMENTO al posto del contenuto
-                   // visualizzato. Utile quando la cella contiene HTML composto (_render).
+                   // visualizzato. Utile quando la cella contiene HTML composto (_cellRender).
                    // Supporta notazione punto.
                    // Implementato tramite l'attributo data-order sulla cella, letto
                    // nativamente da simple-datatables.
@@ -285,7 +366,7 @@ cols: [
                           // ricerca o multisearch.
 
     _collapsePlaceholder, // Testo da mostrare al posto del valore ripetuto. Accetta lo stesso
-                          // ventaglio di _render/_cellTitle: stringa semplice, stringa mustache-like
+                          // ventaglio di _cellRender/_cellTitle: stringa semplice, stringa mustache-like
                           // con segnaposto [[chiave]] (interpolati sulla riga corrente), oppure
                           // funzione (row) => string. Default null (anche se la funzione ritorna
                           // null/undefined) = il testo della cella resta invariato (utile insieme
@@ -303,7 +384,51 @@ cols: [
     searchable,    // false per escludere la colonna dalla ricerca globale
     hidden,        // true per nascondere la colonna (esclusa anche dalla ricerca)
     sort,          // 'asc' | 'desc' per ordinamento iniziale (solo su colonna singola)
-    // ... tutte le altre opzioni columns di simple-datatables
+
+    format,        // Formato datetime quando `type` è 'date' (default: 'YYYY-MM-DD')
+
+    render,        // Callback (data, cell, rowIndex, cellIndex) => contenuto cella.
+                   // È l'opzione nativa usata internamente per implementare i preset
+                   // _renderMode. Se `_cellRender` è impostata, `render` viene annullata
+                   // (per evitare conflitti); se invece `render` è impostata
+                   // esplicitamente dal consumer, i preset _renderMode vengono
+                   // ignorati (vedi parseCols — la logica dei preset scatta solo se
+                   // `render` non è già definita sulla colonna).
+
+    filter,        // Array di valori (o predicati (value) => boolean) da usare per un
+                   // filtro a tendina sulla colonna, in alternativa all'ordinamento.
+
+    headerClass,   // Classi CSS per la cella <th> di intestazione.
+
+    cellClass,     // Classi CSS per la cella <td> del corpo tabella.
+
+    numeric,       // Default true. Se true, sequenze numeriche nelle stringhe sono
+                   // trattate come un unico numero in ordinamento (es. "file 1.jpg"
+                   // prima di "file 100.jpg").
+
+    caseFirst,     // 'false' | 'upper' | 'lower' — ordine di maiuscole/minuscole
+                   // nell'ordinamento stringa (default: 'false' = ordine del locale).
+
+    sortSequence,  // Array di 'asc'/'desc' con cui alternare l'ordinamento ai click
+                   // successivi sull'intestazione (ciascun valore ammesso una sola volta).
+
+    sensitivity,   // 'base' | 'accent' | 'case' | 'variant' — sensibilità di
+                   // ricerca/ordinamento a maiuscole e accenti (default: 'base').
+
+    ignorePunctuation, // Default true. Ignora la punteggiatura in ricerca/ordinamento.
+
+    searchItemSeparator, // Separatore usato per suddividere il contenuto della cella
+                   // durante la ricerca (default: ' ').
+
+    searchMethod,  // Funzione (query, cell, row, columnIndex, source) => boolean che
+                   // sostituisce il metodo di ricerca predefinito sulla colonna.
+                   // È l'opzione nativa usata internamente da _searchValue (vedi sopra):
+                   // impostarla esplicitamente insieme a _searchValue sulla stessa
+                   // colonna genera un conflitto (l'ultima assegnata sovrascrive l'altra).
+
+    locale,        // Locale per l'ordinamento stringa, es. 'de-DE-u-co-phonebk'
+                   // (default: 'en-US').
+
   }
 ]
 ```
@@ -315,12 +440,12 @@ const cols = [
   {
     _field: 'commessa',
     _heading: 'Commessa / fornitore',
-    _render: '[[commessa]]<br><small class="text-muted">[[fornitore]]</small>',
+    _cellRender: '[[commessa]]<br><small class="text-muted">[[fornitore]]</small>',
   },
   {
     _field: 'owner.cognome',
     _heading: 'Owner',
-    _render: '[[owner.nome]] [[owner.cognome]]',
+    _cellRender: '[[owner.nome]] [[owner.cognome]]',
     _sortValue: 'owner.cognome',              // ordina per cognome
     _searchValue: 'owner.cognome owner.nome', // cerca su cognome e nome (AND)
   },

@@ -119,6 +119,13 @@ import caretRightIcon from '../../icons/caret-right.svg?inline';
  * @param {number}        perPage          Numero di righe per pagina.
  *                                           Default: `25` (default: 25)
  *
+ * @param {string}        tableClass       Classi CSS del tag `<table>`, in sostituzione delle
+ *                                           classi di default `table table-bordered`. La classe
+ *                                           interna `styles.table` (necessaria al layout del
+ *                                           componente) viene sempre applicata, a prescindere da
+ *                                           questo parametro.
+ *                                           Default: `'table table-bordered'` (default: 'table table-bordered')
+ *
  * @param {string}        renderNullAs     Stringa globale da mostrare al posto di valori null/undefined
  *                                           in tutte le colonne. Può essere sovrascritto per singola
  *                                           colonna con `_renderNullAs`.
@@ -266,8 +273,15 @@ function computeCellValue(row, col_item, globalNullAs, col_idx) {
 
   // Applica _renderNullAs al valore della cella se null/undefined
   // e la cella non ha già un template che gestisce la visualizzazione.
-  // se _renderMode è impostato, il valore null è gestito direttamente dal gestore predefinito
-  if (value == null && col_item._cellRender == null && col_item._renderMode == null) {
+  // se _renderMode è impostato, il valore null è gestito direttamente dal gestore predefinito;
+  // le colonne booleane (type: 'boolean', anche senza _renderMode) sono escluse allo stesso modo,
+  // altrimenti nullAs (stringa non vuota) verrebbe letto come true dal render booleano
+  if (
+    value == null &&
+    col_item._cellRender == null &&
+    col_item._renderMode == null &&
+    col_item.type !== 'boolean'
+  ) {
     value = nullAs;
   }
 
@@ -796,6 +810,7 @@ class SimpleDatatableAdapter extends HTMLElement {
     this.appendChild(table);
 
     const perPage = +this._getParam('perPage', 25);
+    const tableClass = this._getParam('tableClass', 'table table-bordered');
 
     this._dt = new DataTable(table, {
       locale: 'it',
@@ -846,7 +861,7 @@ class SimpleDatatableAdapter extends HTMLElement {
         empty                   : styles.empty,
 
         // table
-        table                   : `table table-bordered ${styles.table}`,
+        table                   : `${styles.table} ${tableClass}`,
         // buttons in thead per il sort
         sorter                  : `btn-reset ${styles.sortBtn}`,
         ascending               : styles.sortAscending,

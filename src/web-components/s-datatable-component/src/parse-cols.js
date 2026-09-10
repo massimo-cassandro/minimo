@@ -40,8 +40,8 @@ export function parseCols(col_obj){
         ...col_obj,
         type: 'number',
         searchable: false,
-        cellClass: 'text-end',
-        headerClass: 'text-end',
+        cellClass: classnames('text-end', col_obj.cellClass),
+        headerClass: classnames('text-end', col_obj.headerClass),
       };
 
     } else if(col_obj._renderMode === 'email') {
@@ -53,13 +53,15 @@ export function parseCols(col_obj){
 
     // campi booleani
     } else if (col_obj.type === 'boolean' || col_obj._renderMode === 'bool_true_only') {
-      // TODO caso in cui il valore è null nel caso si voglia differenziarlo da false
+      // il valore null arriva qui "genuino" (computeCellValue non applica _renderNullAs
+      // alle colonne booleane), ma è comunque trattato come false (icona rossa/vuota)
+      // TODO distinguere visivamente il caso null da false, se necessario
 
       return {
         ...col_obj,
         type: 'boolean',
         cellClass: styles.hasIcon,
-        headerClass: 'text-center',
+        headerClass: classnames('text-center', col_obj.headerClass),
         render: (value, td) => {
 
           if(Boolean(value)) {
@@ -81,8 +83,8 @@ export function parseCols(col_obj){
       return {
         ...col_obj,
         type: 'string',
-        cellClass: 'text-end',
-        headerClass: 'text-end',
+        cellClass: classnames('text-end', col_obj.cellClass),
+        headerClass: classnames('text-end', col_obj.headerClass),
 
         render: (value, cell /*, dataIndex, rowIndex */) => { // value si riferisce al valore già trasformato nella pre-elaborazione dei dati
           /* {
@@ -119,15 +121,18 @@ export function parseCols(col_obj){
         }
       };
 
-    } else if(col_obj._renderMode === 'numeric') {
-      return {
-        ...col_obj,
-        // le classi definite dall'utente vengono unite, non sostituite
-        cellClass: classnames('text-end text-numeric', col_obj.cellClass),
-        headerClass: classnames('text-end text-numeric', col_obj.headerClass), // NB: usata anche per il footer
-      };
+    } else if( col_obj._renderMode === 'numeric' ||
+      col_obj._renderMode === 'euro' ||
+      col_obj._renderMode === 'euro_currency' ||
+      col_obj._renderMode === 'euro_no_dec') {
 
-    } else if(col_obj._renderMode === 'euro_no_dec') {
+      const digits = col_obj._renderMode === 'numeric'
+        ? undefined
+        : col_obj._renderMode === 'euro_no_dec'
+          ? 0
+          : 2;
+
+
       return {
         ...col_obj,
         render: (value, cell) => {
@@ -139,9 +144,11 @@ export function parseCols(col_obj){
           } else {
             cell.attributes['data-order'] = value;
             return Number(value).toLocaleString('it-IT', {
-              minimumFractionDigits: 0,
-              maximumFractionDigits: 0,
+              minimumFractionDigits: digits,
+              maximumFractionDigits: digits,
               useGrouping: 'always',
+              style: col_obj._renderMode === 'euro_currency' ? 'currency' : 'decimal',
+              currency: col_obj._renderMode === 'euro_currency' ? 'EUR' : undefined
             });
           }
         },

@@ -180,15 +180,16 @@ if [ "$DEBUG" = "TRUE" ]; then
   devDependencies=()
 fi
 
+for pkg in "${devDependencies[@]}"; do
+  echo -e "${DIM}...installing "$pkg"${NC}"
+  npm i -D "$pkg"
+done
+
 for pkg in "${dependencies[@]}"; do
   echo -e "${DIM}...installing "$pkg"${NC}"
   npm i -S "$pkg"
 done
 
-for pkg in "${devDependencies[@]}"; do
-  echo -e "${DIM}...installing "$pkg"${NC}"
-  npm i -D "$pkg"
-done
 
 echo -e "\n${GREEN}...creating default folders${NC}"
 mkdir -p \

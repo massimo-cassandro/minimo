@@ -14,7 +14,7 @@
       "@icons/*": ["app/icons/*"],
       "@imgs/*": ["app/imgs/*"],
 
-      "@frontend/*": ["fromtend/*"],
+      "@app/*": ["app/*"],
 
       "@minimo/*": ["./node_modules/@massimo-cassandro/minimo/src/*"],
       "@minimoCharts/*": ["./node_modules/@massimo-cassandro/minimo/charts/*"]

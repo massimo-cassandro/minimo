@@ -36,31 +36,36 @@ const fromProjectRoot = (relPath) => {
 };
 
 const isDevelopment = process.env.NODE_ENV === 'development'
-  ,devServerPort = 5704
-  // ,apiPort = 8104
+  ,devServerPort = 570x
+  // ,apiPort = 800x
   ,useSass = false
   ,inlineCssInDevMode = true
   ,useSvgo = true
   ,useSvgr = false // svg per react
   ,svgoConfig = useSvgo? (await import('./webpack-config-modules/svgo.config.mjs')).default : null
   ,postcssConfig_path = path.resolve(__dirname, './webpack-config-modules/postcss.config.mjs')
+
   // dir di output: relativa a QUESTO file ('../build' se il frontend è in una
   // sottodirectory, './build' se webpack.config.mjs è nella root del progetto)
   ,output_dir = path.resolve(__dirname, './build')
   // ,output_dir = isDevelopment? '_dev' : 'build' // symfony
+
   // dir delle favicons generate da `npx create-favicons` (vedi package.json):
   // il path assoluto serve a CopyWebpackPlugin/HtmlWebpackPlugin (i path
   // relativi sarebbero risolti dal cwd, non da questo file), mentre la regexp
   // resta relativa perché viene confrontata con i path dei moduli
-  ,favicons_path = path.resolve(__dirname, './app/favicons/output')
+  ,favicons_path = path.resolve(__dirname, './app/favicons/output') // commentare se non usato
   ,favicons_path_regexp = /favicons\/output/ // source pattern per le favicons (regexp o null)
+
   // NB: jsconfig.json va tenuto in questa stessa dir (gli alias sono risolti
   // a partire dalla sua posizione)
   ,jsConfigAliases = getJsConfigAliases(path.resolve(__dirname, './jsconfig.json'))
   ,packageJson = JSON.parse(fs.readFileSync(fromProjectRoot('package.json'), 'utf-8'))
+
   // path del pacchetto minimo (il suo js genera markup con classi proprie e il
   // suo css dichiara custom properties: entrambi vanno visti da PurgeCSS)
   ,minimo_path = fromProjectRoot('node_modules/@massimo-cassandro/minimo')
+
   ,usePurgeCss = true // false per disattivare PurgeCSS (debug rapido di problemi legati al purge)
   ,purgeCSSOptions = {
     variables: false, // rimuove le custom properties non usate (sostituisce jit-props)
@@ -113,10 +118,7 @@ const shared_chunk_paths = (module) => {
 // (null o array vuoto per disattivare)
 // https://github.com/webpack/copy-webpack-plugin/tree/main?tab=readme-ov-file#copy-webpack-plugin
 const CopyWebpackPluginPatterns = [
-  {
-    from: `${favicons_path}/icon-*.png`,
-    to: '[name][ext]'
-  },
+
   // {
   //   from: '*.webp',
   //   to: 'imgs/[name].[contenthash].[ext]',
@@ -128,7 +130,7 @@ const CopyWebpackPluginPatterns = [
   //   }
   // },
   // {
-  //   from: 'src/php',
+  //   from: 'app/php',
   //   to: 'php',
   //   globOptions: {
   //     dot: true,
@@ -199,11 +201,11 @@ const config = {
 
   /* SYMFONY:
   output: {
-    path: path.resolve(__dirname, `../public/${output_dir}` ),
+    path: path.resolve(__dirname, `./public/${output_dir}` ),
     // filename: '[name].js',
     filename: '[name].[contenthash].js',
     publicPath: `/${output_dir}/`,
-    clean: false //!isDevelopment,
+    clean: !isDevelopment || !!process.env.WEBPACK_SERVE,
   },
   */
 
@@ -259,16 +261,43 @@ const config = {
     compress: true,
     hot: true,
     port: devServerPort,
-    /*
-    proxy: [
-      {
-        context: ['/api'],
-        target: process.env.API_URL || `http://localhost:${apiPort}`
-      }
-    ],
-    static: false,
-    */
+    client: { overlay: true, },
   },
+
+  // =>> devServer (con symfony)
+  // reverse proxy davanti a `symfony serve` (porta 8102, vedi package.json):
+  // il browser va aperto su questo dev server (non su :8102). Le richieste per
+  // gli asset (path che iniziano per output.publicPath, es. /_dev/*) vengono
+  // servite da webpack (in memoria, con HMR); tutto il resto (pagine Twig,
+  // route Symfony, chiamate ajax con url relativi) viene proxato a Symfony.
+  // Symfony resta un processo separato e ignaro del dev server: continua a
+  // risolvere asset() leggendo manifest.json da disco, per questo serve
+  // devMiddleware.writeToDisk: true (vedi anche `output.clean` sopra, sempre
+  // false in dev per non ripulire il manifest tra una build e l'altra)
+  // devServer: {
+  //   host: '0.0.0.0', // come symfony serve --listen-ip=0.0.0.0
+  //   port: devServerPort,
+  //   allowedHosts: 'all', // necessario per accesso da altri device in LAN
+  //   // senza contenthash (vedi output.filename / MiniCssExtractPlugin sopra) i
+  //   // filename restano stabili tra una modifica e l'altra: impedisce al browser
+  //   // di servire una versione stale in cache su reload manuale
+  //   headers: { 'Cache-Control': 'no-store' },
+  //   hot: true,
+  //   open: { app: { name: 'Google Chrome' } }, // apertura automatica del browser all'avvio
+  //   static: false, // niente static serving proprio: tutto il resto passa dal proxy verso Symfony
+  //   devMiddleware: { writeToDisk: true, },
+  //   client: { overlay: true, },
+  //   proxy: [
+  //     {
+  //       context: ['**'], // ['/api'],
+  //       target: process.env.API_URL || `http://localhost:${apiPort}`
+  //       // NON impostare changeOrigin: deve restare l'Host visto dal browser
+  //       // (questo dev server), altrimenti gli url assoluti eventualmente
+  //       // generati da Symfony (redirect, form action, ecc.) punterebbero a
+  //       // `:${apiPort}` invece che a questo dev server
+  //     }
+  //   ],
+  // },
 
   // =>> plugins
   plugins: [
@@ -332,7 +361,7 @@ const config = {
     // =>> plugins: HtmlWebpackPlugin
     new HtmlWebpackPlugin({
       filename: 'index.html',
-      template: path.resolve(__dirname, './src/tpl/index.ejs'),
+      template: path.resolve(__dirname, './app/tpl/index.ejs'),
       inject: 'body',
       title: 'XXXXX',
       minify: !isDevelopment
@@ -420,12 +449,12 @@ const config = {
           // progetti symfony: template twig e classi generate lato php
           // (percorsi relativi alla root del progetto: adattare il `../` se
           // webpack.config.mjs NON è in una sottodirectory)
-          // path.resolve(__dirname, '../templates/**/*.twig'),
-          // path.resolve(__dirname, '../src/**/*.php'),
-          path.resolve(__dirname, './index.js'), // entry js di default (vedi starter-install.sh)
-          path.resolve(__dirname, './src/**/*.{js,mjs,jsx}'),
-          path.resolve(__dirname, './src/**/*.ejs'), // template html di webpack
-          path.resolve(__dirname, './error-pages/**/*.js'),
+          // path.resolve(__dirname, './templates/**/*.twig'),
+          // path.resolve(__dirname, './app/**/*.php'),
+          path.resolve(__dirname, './app/index.js'), // entry js di default (vedi starter-install.sh)
+          path.resolve(__dirname, './app/src/**/*.{js,mjs,jsx}'),
+          path.resolve(__dirname, './app/src/**/*.ejs'), // template html di webpack
+          path.resolve(__dirname, './app/error-pages/**/*.js'),
           // il js di minimo genera markup con classi proprie (snackbar, unsplash-page, ecc.)
           `${minimo_path}/src/**/*.{js,mjs}`,
         ],
@@ -462,14 +491,14 @@ const config = {
         // delle dipendenze (vedi webpack-config-modules/purgecss-variables-safelist.mjs)
         variablesSafelist: {
           declarationGlobs: [
-            path.resolve(__dirname, './index.css'), // entry css di default (vedi starter-install.sh)
-            path.resolve(__dirname, './index-critical.css'),
-            path.resolve(__dirname, './src/**/*.css'),
-            path.resolve(__dirname, './error-pages/**/*.css'),
+            path.resolve(__dirname, './app/index.css'), // entry css di default (vedi starter-install.sh)
+            path.resolve(__dirname, './app/index-critical.css'),
+            path.resolve(__dirname, './app/src/**/*.css'),
+            path.resolve(__dirname, './app/error-pages/**/*.css'),
             `${minimo_path}/src/**/*.css`,
           ],
           shadowGlobs: [
-            path.resolve(__dirname, './src/web-components/**/*.css'),
+            path.resolve(__dirname, './app/src/web-components/**/*.css'),
             `${minimo_path}/src/web-components/**/*.css`,
           ],
           seeds: [
@@ -486,7 +515,14 @@ const config = {
   ], // end plugins
 
   module: {
+
     rules: [
+
+      // =>> icons.js è un barrel di puri re-export: nessun side effect
+      // {
+      //   test: /[/\\]icons\.js$/,
+      //   sideEffects: false
+      // },
 
       // =>> rules: js / jsx
       {
@@ -605,21 +641,21 @@ const config = {
       },
 
       // =>> Video
-      {
-        test: /\.(?:mp4|webm)$/i,
-        // type: 'asset/resource',
-        type: 'javascript/auto',
-        use: [
-          {
-            loader: 'file-loader',
-            options: {
-              name: '[name].[contenthash][ext]',
-              outputPath: 'video/',
-              esModule: false,
-            }
-          }
-        ]
-      },
+      // {
+      //   test: /\.(?:mp4|webm)$/i,
+      //   // type: 'asset/resource',
+      //   type: 'javascript/auto',
+      //   use: [
+      //     {
+      //       loader: 'file-loader',
+      //       options: {
+      //         name: '[name].[contenthash][ext]',
+      //         outputPath: 'video/',
+      //         esModule: false,
+      //       }
+      //     }
+      //   ]
+      // },
 
       // =>> rules: Fonts
       {
