@@ -222,6 +222,13 @@
   --inner-nav-gap: var(--size-lg);
   --inner-nav-margin-block: var(--size-base);
 
+  --jt-info-color: var(--text-muted);
+  --jt-info-font-size: var(--font-size-sm);
+  --jt-info-gap: var(--size-sm);
+  --jt-info-outer-padding-block-end: var(--size-xs);
+  --jt-search-max-width: 20rem;
+  --jt-wrapper-margin-block: var(--size-md);
+
   --line-height-base: 1.5;
   --line-height-sm: 1.4;
   --line-height-xs: 1.25;

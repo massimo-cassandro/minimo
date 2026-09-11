@@ -6,6 +6,7 @@ import { modalPopupDemo } from './demo-files/modal-popup-demo/modal-popup-demo.j
 import { slideUpDownToggleDemo } from './demo-files/slide-up-down-toggle-demo/slide-up-down-toggle-demo.js';
 import { unsplashPageDemo } from './demo-files/unsplash-page-demo/unsplash-page-demo.js';
 import { modalAlertDemo } from './demo-files/modal-alert-demo/modal-alert-demo.js';
+import { jsonTableDemo } from './demo-files/json-table/json-table-demo.js';
 
 import chartsHTML  from './demo-files/charts/charts.html';
 import { chartsDemo } from './demo-files/charts/charts-demo.js';
@@ -35,6 +36,10 @@ export const routes = [
   {
     key: 'modal-alert',
     callback: modalAlertDemo,
+  },
+  {
+    key: 'json-table',
+    callback: jsonTableDemo,
   },
   {
     key: 'buttons',

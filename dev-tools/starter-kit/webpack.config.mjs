@@ -36,8 +36,8 @@ const fromProjectRoot = (relPath) => {
 };
 
 const isDevelopment = process.env.NODE_ENV === 'development'
-  ,devServerPort = 570x
-  // ,apiPort = 800x
+  ,devServerPort = [[port5700]]
+  // ,apiPort = [[port8000]]
   ,useSass = false
   ,inlineCssInDevMode = true
   ,useSvgo = true

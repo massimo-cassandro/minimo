@@ -1,0 +1,57 @@
+/*! minimo - json-table */
+
+/* Custom properties (`--jt-*`) are defined in `json-table.minimo.tokens.mjs`
+   and compiled into minimo's custom-properties.css by build-tokens */
+
+/* purgecss start ignore */
+
+json-table {
+  display: block;
+}
+
+.wrapper {
+  position: relative;
+  display: block;
+  margin-block: var(--jt-wrapper-margin-block);
+}
+
+.infoOuter {
+  padding-block-end: var(--jt-info-outer-padding-block-end);
+}
+
+.info {
+  display: flex;
+  flex-flow: column wrap;
+  gap: var(--jt-info-gap);
+  justify-content: stretch;
+}
+
+.resultInfo {
+  font-size: var(--jt-info-font-size);
+  color: var(--jt-info-color);
+  text-align: center;
+}
+
+@media (--media-medium-viewport-up) {
+  .info {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .resultInfo {
+    flex: 1;
+    text-align: start;
+  }
+
+  .search {
+    flex: 0 1 var(--jt-search-max-width);
+  }
+}
+
+.table {
+  /* vertical spacing is handled by the wrapper */
+  margin-block: 0;
+}
+
+/* purgecss end ignore */

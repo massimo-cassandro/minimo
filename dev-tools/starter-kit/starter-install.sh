@@ -27,6 +27,21 @@ if [ -z "$ZSH_VERSION" ]; then
   exit 1
 fi
 
+# Porta da utilizzare: l'utente inserisce un numero da 0 a 99 (default 0), che
+# viene normalizzato a due cifre e usato come suffisso delle porte 80xx e 57xx.
+# I valori sostituiscono i segnaposto [[port8000]] e [[port5700]] presenti in
+# package-tpl.json e webpack.config.mjs (vedi safe_cat_with_ports).
+read "PORT_INPUT?Porta da utilizzare (0-99) [0]: "
+PORT_INPUT=${PORT_INPUT:-0}
+if [[ ! "$PORT_INPUT" =~ '^[0-9]{1,2}$' ]]; then
+  printf "${RED}Errore: inserire un numero intero tra 0 e 99.${NC}\n" >&2
+  exit 1
+fi
+PORT_SUFFIX=${(l:2::0:)PORT_INPUT}
+PORT_8000="80${PORT_SUFFIX}"
+PORT_5700="57${PORT_SUFFIX}"
+echo -e "${DIM}Porte: ${PORT_8000} (server), ${PORT_5700} (webpack dev server)${NC}"
+
 BASE_URL=${0:A:h}
 
 echo "BASE_URL: ${BASE_URL}"
@@ -67,6 +82,27 @@ safe_cat() {
   cat "$src" >| "$dest"
 }
 
+# Come safe_cat, ma sostituisce i segnaposto [[port8000]] e [[port5700]] con
+# le porte scelte all'avvio. La sostituzione viene fatta su un file temporaneo
+# che è poi passato a safe_cat: il confronto per l'idempotenza avviene quindi
+# sul contenuto già sostituito (stessa porta => copia saltata).
+safe_cat_with_ports() {
+  local src="$1"
+  local dest="$2"
+  if [ ! -f "$src" ]; then
+    echo -e "${RED}Sorgente mancante: $src${NC}"
+    return 1
+  fi
+  local tmp="$(mktemp)"
+  sed -e "s/\[\[port8000\]\]/${PORT_8000}/g" \
+      -e "s/\[\[port5700\]\]/${PORT_5700}/g" \
+      "$src" >| "$tmp"
+  safe_cat "$tmp" "$dest"
+  local rc=$?
+  rm -f "$tmp"
+  return $rc
+}
+
 FRONTEND_INSTALL_PATH="./app"
 # se la cartella esiste già: la prima volta viene rinominata per intero in
 # OLD-app (preservata, mai più toccata); se OLD-app esiste già, la cartella
@@ -85,8 +121,8 @@ mkdir -p "${FRONTEND_INSTALL_PATH}"
 
 
 echo -e "${GREEN}...ROOT FILES${NC}"
-safe_cat "${BASE_URL}/package-tpl.json"  package.json
-safe_cat "${WEBPACK_CONFIG_SOURCE_PATH}/webpack.config.mjs"  webpack.config.mjs
+safe_cat_with_ports "${BASE_URL}/package-tpl.json"  package.json
+safe_cat_with_ports "${WEBPACK_CONFIG_SOURCE_PATH}/webpack.config.mjs"  webpack.config.mjs
 
 safe_cat "${SOURCE_FILES_DIR}/_gitignore" .gitignore
 safe_cat "${SOURCE_FILES_DIR}/_browserslistrc" .browserslistrc
@@ -231,6 +267,14 @@ safe_cat "${SOURCE_FILES_DIR}/app_index.js" "${FRONTEND_INSTALL_PATH}/index.js"
 # layout critical css
 safe_cat "${SOURCE_FILES_DIR}/layout-critical.css" "${FRONTEND_INSTALL_PATH}/css/layout-critical.css"
 
+
+# copia tutti i file presenti in ${SOURCE_FILES_DIR}/_private,
+echo -e "${GREEN}..._PRIVATE FILES${NC}"
+mkdir -p "_private"
+for FILE in "${SOURCE_FILES_DIR}/_private"/*; do
+  [ -f "$FILE" ] || continue
+  safe_cat "$FILE" "_private/$(basename "$FILE")"
+done
 
 
 set +C

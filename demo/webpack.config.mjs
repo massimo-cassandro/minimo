@@ -140,7 +140,7 @@ const config = {
     open: { app: { name: 'Google Chrome' } },
     compress: true,
     hot: true,
-    port: 5700
+    port: 5701
   },
 
   // =>> plugins
