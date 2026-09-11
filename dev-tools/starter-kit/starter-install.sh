@@ -30,7 +30,7 @@ fi
 # Porta da utilizzare: l'utente inserisce un numero da 0 a 99 (default 0), che
 # viene normalizzato a due cifre e usato come suffisso delle porte 80xx e 57xx.
 # I valori sostituiscono i segnaposto [[port8000]] e [[port5700]] presenti in
-# package-tpl.json e webpack.config.mjs (vedi safe_cat_with_ports).
+# package-tpl.json, webpack.config.mjs e altri (vedi safe_cat_with_ports).
 read "PORT_INPUT?Porta da utilizzare (0-99) [0]: "
 PORT_INPUT=${PORT_INPUT:-0}
 if [[ ! "$PORT_INPUT" =~ '^[0-9]{1,2}$' ]]; then
@@ -273,7 +273,7 @@ echo -e "${GREEN}..._PRIVATE FILES${NC}"
 mkdir -p "_private"
 for FILE in "${SOURCE_FILES_DIR}/_private"/*; do
   [ -f "$FILE" ] || continue
-  safe_cat "$FILE" "_private/$(basename "$FILE")"
+  safe_cat_with_ports "$FILE" "_private/$(basename "$FILE")"
 done
 
 
