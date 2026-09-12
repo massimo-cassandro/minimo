@@ -18,5 +18,11 @@
     "bootstrapIntelliSense": {
       "enable": false
     },
+    "favorites.resources": [
+      {
+        "filePath": "node_modules/@massimo-cassandro",
+        "group": "Default"
+      }
+    ],
   }
 }

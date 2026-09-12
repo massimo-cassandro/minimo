@@ -5,7 +5,6 @@ import { classnames } from '../../../utilities/classnames.js';
 
 /** @typedef {import('./defaults.js').JsonTableParams} JsonTableParams */
 /** @typedef {import('./main-builder.js').JsonTableElements} JsonTableElements */
-/** @typedef {import('../../../utilities/dom-builder/dom-builder.js').DomBuilderItem} DomBuilderItem */
 
 /**
  * Builds the domBuilder configuration of the info section (info text + search input).
@@ -54,7 +53,7 @@ export function infoSection(params, elements) {
               children: [
                 {
                   tag: 'input',
-                  className: params.searchInputClass,
+                  className: classnames(params.searchInputClass),
                   attrs: {
                     type: 'search',
                     title: params.searchInputTitle,

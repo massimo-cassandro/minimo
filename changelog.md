@@ -10,3 +10,4 @@
 * 1.30.0 (08 set 2026) - hbar chart
 * 1.31.0 (08 set 2026) - modalPopup update
 * 1.32.0 (09 set 2026) - starter-kit upd
+* 1.33.0 (12 set 2026) - Stylelint config dev tool

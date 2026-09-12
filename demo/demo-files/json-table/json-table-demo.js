@@ -3,6 +3,8 @@ import { JsonTable } from '@src/web-components/json-table/json-table-component.j
 import { domBuilder } from '@src/utilities/dom-builder/dom-builder.js';
 
 import demoData from './demo-data.js';
+import * as styles from './json-table-demo.module.css';
+
 
 /*
   WORK IN PROGRESS: at this stage <json-table> only builds the outer structure

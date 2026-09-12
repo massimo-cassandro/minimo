@@ -1,12 +1,13 @@
 {
   "name": "@massimo-cassandro/minimo",
-  "version": "1.32.4",
+  "version": "1.33.0",
   "description": "Light css framework & utilities",
   "type": "module",
   "main": "./index.js",
   "exports": {
     ".": "./index.js",
     "./charts": "./charts/index.js",
+    "./stylelint-config": "./dev-tools/stylelint-config/index.js",
     "./css/*": "./src/css/*.css",
     "./tokens/*": "./design-tokens/tokens/*",
     "./*": "./*"
@@ -94,7 +95,6 @@
   },
   "devDependencies": {
     "@massimo-cassandro/eslint-config": "^3.0.16",
-    "@massimo-cassandro/stylelint-config": "^2.3.15",
     "@types/node": "^26.2.0",
     "jsdom": "^30.0.1",
     "style-dictionary": "^5.5.1"
@@ -102,9 +102,18 @@
   "dependencies": {
     "@inquirer/input": "^5.1.2",
     "@inquirer/select": "^5.2.1",
+    "@stylistic/stylelint-config": "^5.0.0",
+    "@stylistic/stylelint-plugin": "^5.3.0",
     "clipboardy": "^5.3.2",
     "sharp": "^0.35.3",
     "sharp-ico": "^0.1.5",
+    "stylelint": "^17.15.0",
+    "stylelint-config-css-modules": "^4.6.0",
+    "stylelint-config-recess-order": "^7.8.0",
+    "stylelint-config-standard": "^40.0.0",
+    "stylelint-config-standard-scss": "^17.0.0",
+    "stylelint-order": "^8.1.1",
+    "stylelint-scss": "^7.2.0",
     "svgo": "^4.0.2"
   },
   "directories": {

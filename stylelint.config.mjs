@@ -1,6 +1,6 @@
 export default {
   extends: [
-    '@massimo-cassandro/stylelint-config',
+    './dev-tools/stylelint-config/index.js',
   ],
 
   // File da ignorare durante l'analisi

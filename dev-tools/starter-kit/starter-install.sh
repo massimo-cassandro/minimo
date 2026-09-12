@@ -42,6 +42,50 @@ PORT_8000="80${PORT_SUFFIX}"
 PORT_5700="57${PORT_SUFFIX}"
 echo -e "${DIM}Porte: ${PORT_8000} (server), ${PORT_5700} (webpack dev server)${NC}"
 
+# Pacchetti opzionali: installati come devDependency solo su conferma
+# esplicita dell'utente (vedi ciclo di domande più sotto). Include sia
+# devDependency "pure" del progetto, sia i peer dependencies opzionali di
+# @massimo-cassandro/minimo (vedi package.json di minimo, campi
+# peerDependencies/peerDependenciesMeta: elenco mantenuto a mano, non letto
+# dinamicamente da minimo — se cambiano va aggiornato manualmente anche qui).
+# In entrambi i casi vengono installati con `npm i -D`: in questo progetto
+# `dependencies` contiene solo @massimo-cassandro/minimo, tutto il resto
+# (tooling di build e librerie usate dai singoli componenti) è devDependency.
+# Ogni voce è "<pacchetto>|<descrizione>" (pacchetto allineato a colonna fissa
+# solo per leggibilità, non richiesto dal parsing).
+optionalPackages=(
+  "dotenv-webpack                               | gestione variabili d'ambiente (.env) nel bundle webpack"
+  "@principalstudio/html-webpack-inject-preload | injection dei tag <link rel=preload> nell'html generato"
+  "postcss-jit-props                            | include nel CSS compilato solo le custom properties effettivamente usate"
+  "@svgdotjs/svg.js                             | richiesto da charts/ di minimo"
+  "blurhash                                     | richiesto da unsplash-page di minimo (create-blurhash-canvas)"
+  "simple-datatables                            | richiesto da s-datatable-component di minimo"
+  "style-dictionary                             | richiesto da design-tokens/utilities di minimo (build-tokens)"
+)
+
+# Chiede conferma per un singolo pacchetto opzionale (default: No).
+ask_optional_pkg() {
+  local pkg="$1"
+  local desc="$2"
+  local reply
+  read "reply?Installare il pacchetto opzionale '$pkg' (${desc})? [y/N]: "
+  [[ "$reply" =~ ^[Yy]$ ]]
+}
+
+selectedOptionalPkgs=()
+
+if [ "$DEBUG" != "TRUE" ]; then
+  echo -e "\n${GREEN}...PACCHETTI OPZIONALI${NC}"
+  for entry in "${optionalPackages[@]}"; do
+    pkg="${entry%%|*}"
+    pkg="${pkg%% *}"
+    desc="${entry#*| }"
+    if ask_optional_pkg "$pkg" "$desc"; then
+      selectedOptionalPkgs+=("$pkg")
+    fi
+  done
+fi
+
 BASE_URL=${0:A:h}
 
 echo "BASE_URL: ${BASE_URL}"
@@ -170,7 +214,6 @@ dependencies=(
 
 devDependencies=(
   @massimo-cassandro/eslint-config
-  @massimo-cassandro/stylelint-config
 
   @babel/core
   @babel/preset-env
@@ -193,7 +236,6 @@ devDependencies=(
   process
   purgecss-webpack-plugin
   responsive-loader
-  style-dictionary
   style-loader
   svg-url-loader
   svgo
@@ -205,11 +247,11 @@ devDependencies=(
   webpack-dev-server
   webpack-manifest-plugin
   webpack-remove-empty-scripts
-
-  # da installare solo se necessari
-  # dotenv-webpack
-  # @principalstudio/html-webpack-inject-preload file-loader
 )
+
+# pacchetti opzionali selezionati dall'utente (vedi ciclo di domande a inizio
+# script), aggiunti all'array di installazione già definito sopra
+devDependencies+=("${selectedOptionalPkgs[@]}")
 
 if [ "$DEBUG" = "TRUE" ]; then
   dependencies=( @massimo-cassandro/minimo )
@@ -276,6 +318,14 @@ for FILE in "${SOURCE_FILES_DIR}/_private"/*; do
   safe_cat_with_ports "$FILE" "_private/$(basename "$FILE")"
 done
 
+
+if [ ${#selectedOptionalPkgs[@]} -gt 0 ]; then
+  echo -e "\n${YELLOW}Pacchetti opzionali installati:${NC}"
+  for pkg in "${selectedOptionalPkgs[@]}"; do
+    echo -e "${YELLOW}  - $pkg${NC}"
+  done
+  echo -e "${YELLOW}Potrebbe essere necessaria una modifica alla configurazione webpack e/o postcss per utilizzare questi pacchetti.${NC}"
+fi
 
 set +C
 echo -e "\n\n${GREEN}*** END ***${NC}"
