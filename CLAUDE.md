@@ -16,7 +16,6 @@ minimo/
 ├── _wrk/                           # repo vecchi in lavorazione, da integrare in minimo (non pubblicato)
 │   ├── spinner/                    # componente spinner
 │   ├── popup-page/                 # pagina popup
-│   ├── auto-datatable-customization/
 │   ├── alert-autoclose.js          # single-file utilities
 │   ├── flash-alerts.js
 │   ├── img-viewer-dom-builder.js
@@ -58,7 +57,9 @@ minimo/
 │   │   └── TODO vanilla-cookie-consent/ # spostato da _wrk, in attesa di integrazione
 │   └── web-components/
 │       ├── s-datatable-component/  # web component per simple-datatables ⚠️ da deprecare (verrà sostituito da json-table)
-│       └── TODO json-table/        # spostato da _wrk, ★ futuro sostituto di s-datatable-component (vedi sotto)
+│       ├── json-table/             # ★ in corso di realizzazione, sostituto di s-datatable-component (vedi sotto)
+│       ├── TODO json-table/        # spostato da _wrk, materiale sorgente di riferimento per lo sviluppo di json-table/ (vedi sotto)
+│       └── TODO js-file-uploader/  # progetto esterno (non da _wrk), in attesa di integrazione — vedi TODO.md sezione FILE-UPLOADER
 ├── charts/                         # grafici SVG (usa @svgdotjs/svg.js come peer dep opzionale)
 │   ├── index.js                    # export: barsChart, goalChart, linesChart, MinimoCharts
 │   ├── src/
@@ -89,7 +90,7 @@ minimo/
 | Build demo | Webpack |
 | Build token | Style Dictionary v5 |
 | CSS | PostCSS, CSS Modules (componenti) |
-| Linting | ESLint (`@massimo-cassandro/eslint-config`), Stylelint (`@massimo-cassandro/stylelint-config`) |
+| Linting | ESLint (`@massimo-cassandro/eslint-config`, esterno), Stylelint (incorporato in `dev-tools/stylelint-config/`, esposto come `@massimo-cassandro/minimo/stylelint-config`) |
 | Formattazione | Prettier |
 
 ---
@@ -116,12 +117,18 @@ minimo/
 Dal `files` di `package.json`:
 - `./index.js`
 - `src/**/*.{js,mjs,css,svg,md}`
+- `types/**/*.d.ts`
+- `design-tokens/README.md`, `design-tokens/tokens-config-sample.mjs`
 - `design-tokens/tokens/**/*.{tokens.json,tokens.jsonc}`
 - `design-tokens/_src/**/*.{tokens.json,tokens.jsonc,mjs,js,md}`
 - `design-tokens/utilities/**/*.{mjs,md}`
-- `charts/**/*.{js,md}`
+- `charts/**/*.{js,mjs,md}`
+- `dev-tools/**/*` (incluso `dev-tools/stylelint-config/`)
+- `snippets/**/*`
 
-**Nota:** la cartella `_wrk/` non viene pubblicata.
+Escluse ovunque le cartelle/file con prefisso `TODO` (`!**/TODO*/**`, `!**/TODO*`).
+
+**Nota:** la cartella `_wrk/` non viene pubblicata su npm (non inclusa nel campo `files`).
 
 ---
 
@@ -153,7 +160,7 @@ Contiene porzioni di codice **slegate dal framework** ma utili per l'integrazion
 - `config-templates/` — template di configurazione (`.env`, `.htaccess`, robots.txt, babel, rollup, dependabot, ...)
 - altri script di utilità sparsi (validazioni IT — codice fiscale, partita IVA —, festività, anti-spam email, build custom device list)
 
-Non viene pubblicato su npm (non incluso nel campo `files` di `package.json`).
+Viene pubblicato su npm (incluso nel campo `files` di `package.json`).
 
 ---
 
@@ -173,6 +180,8 @@ Esempi attuali/previsti:
 - `@tarekraafat/autocomplete.js` — richiesto da `src/components/autocomplete/` (TODO: aggiungere a `peerDependenciesMeta`)
 
 Ogni nuovo componente che introduce una dipendenza esterna deve seguire questa stessa logica: aggiungere la libreria a `peerDependencies` con `"optional": true` in `peerDependenciesMeta`, e documentare l'installazione richiesta.
+
+**Deroga per i config di lint condivisi:** `stylelint-config` (incorporato in `dev-tools/stylelint-config/`, vedi sopra) fa eccezione a questa policy: i pacchetti che richiede (`stylelint`, `@stylistic/stylelint-config`, `@stylistic/stylelint-plugin`, `stylelint-config-css-modules`, `stylelint-config-recess-order`, `stylelint-config-standard`, `stylelint-config-standard-scss`, `stylelint-order`, `stylelint-scss`) sono dichiarati in `dependencies`, non in `peerDependencies`. Motivo: servono anche a minimo stesso per lintare il proprio codice, e mettendoli in `dependencies` arrivano automaticamente ai progetti consumer che installano `@massimo-cassandro/minimo` e usano `extends: ['@massimo-cassandro/minimo/stylelint-config']`, senza passi d'installazione aggiuntivi. Stessa logica prevista per `eslint-config` quando verrà incorporato allo stesso modo (vedi [TODO.md § ESLINT-CONFIG](TODO.md#eslint-config)).
 
 ---
 
@@ -223,16 +232,20 @@ L'opzione preferibile sarebbe strutturare meglio l'integrazione con **PurgeCSS**
 
 `_wrk/` raccoglie parti di repo preesistenti da valutare per l'integrazione in minimo con la stessa logica work-in-progress. Non viene pubblicata su npm (non inclusa nel campo `files` di `package.json`), ma **è inclusa nel repo git**. Ogni elemento può essere integrato, rifattorizzato **oppure cestinato** se ritenuto inutile o obsoleto.
 
-### json-table ★ (priorità alta)
+**Direzione:** il materiale non ancora valutato in `_wrk/` (e in `archived/`) è in fase di verifica da parte dell'utente. Quanto non verrà integrato in minimo confluirà esclusivamente in `archived/`, non resterà in `_wrk/`: `_wrk/` è quindi destinata a svuotarsi nel tempo, non un parcheggio permanente.
 
-`src/web-components/TODO json-table/` (spostato da `_wrk/json-table/`, in attesa di integrazione) è il sostituto designato di `s-datatable-component`. Il componente attuale (`src/web-components/s-datatable-component/`) è stato creato per ragioni di fretta ed **è destinato alla deprecazione** non appena `json-table` sarà pronto per la produzione.
+### json-table ★ (priorità alta, in corso di realizzazione)
+
+`src/web-components/json-table/` è il sostituto designato di `s-datatable-component`, **in sviluppo attivo** (avviato l'11/9/2026). Il componente attuale (`src/web-components/s-datatable-component/`) è stato creato per ragioni di fretta ed **è destinato alla deprecazione** non appena `json-table` sarà pronto per la produzione.
+
+`src/web-components/TODO json-table/` (spostato da `_wrk/json-table/`) **non è il nuovo componente**: resta come materiale sorgente di riferimento (piano di sviluppo, vecchia implementazione) durante la riscrittura, e verrà eliminato — TODO.md incluso — a fine lavoro.
 
 **json-table** è un generatore di tabelle HTML da dati JSON (Ajax o statici), con search, sorting, paginazione, senza dipendenze esterne (no jQuery, no librerie terze come simple-datatables). Già pubblicato separatamente come `@massimo-cassandro/json-table`.
 
-Struttura attuale in `src/web-components/TODO json-table/src/`:
+Struttura di riferimento in `src/web-components/TODO json-table/src/`:
 - `js/` — moduli: `main-builder`, `table-builder`, `table-row/thead/tfoot`, `parse-data-row`, `parse-params`, `get-ajax-data`, `init-ajax-table`, `init-static-table`, `set-search-listener`, `set-sort-listeners`, `static-data-sorting`, `info-section`, `update-info`, `utilities`, `defaults`, `default-columns-data-types`
 - `css/` — CSS modules: `main-builder`, `table`, `info-section`, `icons`, `utility`
-- `__json-table-react/` — versione React (WIP separato)
+- `__json-table-react/` — versione React (WIP separato, non più mantenuto, solo riferimento)
 - `index.js` — entry point
 
 TODO aperti su json-table ([src/web-components/TODO json-table/TODO.md](src/web-components/TODO%20json-table/TODO.md)):
@@ -244,7 +257,7 @@ TODO aperti su json-table ([src/web-components/TODO json-table/TODO.md](src/web-
 
 ### Altri elementi in `_wrk/`
 
-`js-utilities/` e `recaptcha/` sono stati **cestinati** (rimossi senza migrazione). `modal-popup/` è stato integrato in produzione in `src/components/modal-popup/`. `vanilla-cookie-consent/` è stato spostato in `src/components/TODO vanilla-cookie-consent/` e `json-table/` in `src/web-components/TODO json-table/` (vedi sopra), entrambi in attesa di integrazione. `unsplash-page-demo/` e `modal-alert-demo/` sono stati rimossi da `_wrk/`; quest'ultimo è ora in `demo/demo-files/TODO modal-alert-demo/`. `charts/` (vecchia versione 1a vers da rifattorizzare) è stato spostato in `charts/TODO charts/`, accanto alla nuova versione. `__snippets/twig/` (snippet Twig/Symfony: form theme, shared includes, select2, sf-macro, contenuti, error-pages, ...) è stato smistato: le parti ancora utili sono confluite in `archived/` e `snippets/`, il resto è stato **cestinato**; sono rimaste in `__snippets/` solo le sottocartelle `style-dictionary/` e `utilities/`.
+`js-utilities/` e `recaptcha/` sono stati **cestinati** (rimossi senza migrazione). `modal-popup/` è stato integrato in produzione in `src/components/modal-popup/`. `vanilla-cookie-consent/` è stato spostato in `src/components/TODO vanilla-cookie-consent/`, in attesa di integrazione. `json-table/` è stato spostato in `src/web-components/TODO json-table/` come riferimento per lo sviluppo del nuovo componente (vedi sopra). `unsplash-page-demo/` e `modal-alert-demo/` sono stati rimossi da `_wrk/`; quest'ultimo è ora in `demo/demo-files/TODO modal-alert-demo/`. `charts/` (vecchia versione 1a vers da rifattorizzare) è stato spostato in `charts/TODO charts/`, accanto alla nuova versione. `__snippets/twig/` (snippet Twig/Symfony: form theme, shared includes, select2, sf-macro, contenuti, error-pages, ...) è stato smistato: le parti ancora utili sono confluite in `archived/` e `snippets/`, il resto è stato **cestinato**; sono rimaste in `__snippets/` solo le sottocartelle `style-dictionary/` e `utilities/`. `auto-datatable-customization/` è stato **eliminato definitivamente** (12/9/2026, nessuna migrazione). `js-file-uploader` (progetto esterno, non proveniente da `_wrk/`) è stato aggiunto direttamente in `src/web-components/TODO js-file-uploader/`, in attesa di integrazione (vedi [TODO.md sezione FILE-UPLOADER](TODO.md#file-uploader)).
 
 Elementi ancora presenti in `_wrk/`:
 
@@ -252,7 +265,6 @@ Elementi ancora presenti in `_wrk/`:
 |---|---|---|
 | `spinner/` | da valutare | Componente spinner (attualmente in minimo solo come CSS) |
 | `popup-page/` | da valutare | Componente popup page — da integrare o cestinare |
-| `auto-datatable-customization/` | da valutare | Da integrare o cestinare |
 | `alert-autoclose.js` | da valutare | Da integrare o cestinare |
 | `flash-alerts.js` | da valutare | Da integrare o cestinare |
 | `img-viewer-dom-builder.js` | da valutare | Da integrare o cestinare |

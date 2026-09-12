@@ -1,0 +1,9 @@
+.moduleCss { // comment
+  color: #000;
+  // comment
+
+}
+
+:global(.non-module-class) {
+  font-weight: 500;
+}

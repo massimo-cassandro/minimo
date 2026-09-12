@@ -9,8 +9,9 @@ npm i @massimo-cassandro/minimo
 
 # optional:
 npm i -D @massimo-cassandro/eslint-config
-npm i -D @massimo-cassandro/stylelint-config
 ```
+
+> Note: a stylelint config is bundled with minimo itself (no separate install needed) — see [dev-tools/stylelint-config/README.md](dev-tools/stylelint-config/README.md).
 
 > Note: **minimo** is designed to be used with WebPack using the configuration you can find in the [starter-kit folder](./dev-tools/starter-kit/) of this repository. If changes are made (for example, to how SVG files are imported), things may not work as expected.
 >

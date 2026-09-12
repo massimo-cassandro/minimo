@@ -6,7 +6,7 @@ Riferimento centralizzato dei prossimi interventi. Le dir con prefisso `TODO ` i
 
 ## V2
   * vedi TODO con `epic=v2`
-  * vedi inclusione eslint-stylelint qui sotto se non già eseguita
+  * vedi inclusione eslint-config qui sotto se non già eseguita (stylelint-config già incorporato)
   * aggiungi sezione `breaking changes` nel readme per documentare cosa va aggiornato nel passare da v1 a v2
 
 
@@ -166,50 +166,40 @@ rendere l'utilizzo condizionale (esempio):
     }
     ```
 
-## ESLINT-CONFIG / STYLELINT-CONFIG
+## ESLINT-CONFIG
 
-Prompt d'esecuzione (piano già concordato con l'utente, da eseguire quando richiesto):
-
-Unifica in minimo i due package esterni `@massimo-cassandro/eslint-config` e `@massimo-cassandro/stylelint-config`, che vivono come repo a sé stanti accanto alla dir di minimo (`/Users/mazz/Sites/eslint-config` e `/Users/mazz/Sites/stylelint-config`). Non toccare questi due repo originali.
+`stylelint-config` è già stato incorporato in minimo (v.1.33.0, 12/9/2026): vedi `dev-tools/stylelint-config/`, export path `@massimo-cassandro/minimo/stylelint-config`. Resta da fare lo stesso per l'altro package esterno, `@massimo-cassandro/eslint-config` (repo a sé stante in `/Users/mazz/Sites/eslint-config`; non toccare il repo originale), replicando lo schema effettivamente seguito per stylelint (non quello originariamente ipotizzato — vedi note sotto):
 
 1. Crea `dev-tools/eslint-config/`:
    - `index.js` — copia identica di `eslint-config/index.js`
    - `README.md` — copia di `eslint-config/README.md`, aggiornando il comando d'installazione/import per riflettere il nuovo path (`@massimo-cassandro/minimo/eslint-config` invece del pacchetto a sé stante)
-   - `changelog.md` — copia di `eslint-config/changelog.md`
 
-2. Crea `dev-tools/stylelint-config/`:
-   - `index.js` — copia identica di `stylelint-config/index.js`
-   - `README.md` — copia di `stylelint-config/README.md`, stesso aggiornamento import path
-   - `changelog.md` — copia di `stylelint-config/changelog.md`
-   - `test/test.module.scss` — copia dell'unico file di test presente
+2. `package.json` di minimo:
+   - aggiungi l'export path `"./eslint-config": "./dev-tools/eslint-config/index.js"`
+   - aggiungi in `dependencies` (non `devDependencies`+`peerDependencies` come da ipotesi iniziale: per i config condivisi si è scelta una deroga esplicita alla policy generale sulle dipendenze esterne — vedi CLAUDE.md "Politica sulle dipendenze esterne" — così i pacchetti richiesti arrivano in automatico ai consumer che installano minimo, senza passi d'installazione aggiuntivi) i pacchetti richiesti dal config: `@eslint/js`, `eslint`, `globals`
+   - rimuovi da `devDependencies` `@massimo-cassandro/eslint-config`
 
-3. `package.json` di minimo:
-   - aggiungi due export path: `"./eslint-config": "./dev-tools/eslint-config/index.js"` e `"./stylelint-config": "./dev-tools/stylelint-config/index.js"`
-   - aggiungi a `devDependencies` (servono a minimo per lintare se stesso): `@eslint/js`, `eslint`, `globals`, `stylelint`, `@stylistic/stylelint-config`, `@stylistic/stylelint-plugin`, `stylelint-config-css-modules`, `stylelint-config-recess-order`, `stylelint-config-standard`, `stylelint-config-standard-scss`, `stylelint-scss`, `stylelint-order` (quest'ultimo è extended da `stylelint-config/index.js` ma manca nel `package.json` originale — presente solo come peer dep transitiva di `stylelint-config-recess-order`: aggiungerlo esplicitamente)
-   - aggiungi gli stessi pacchetti anche a `peerDependencies`, con `peerDependenciesMeta.<pkg>.optional: true` (stessa policy già in uso per `@svgdotjs/svg.js`, `blurhash`, ecc. — vedi CLAUDE.md "Politica sulle dipendenze esterne")
-   - rimuovi da `devDependencies` `@massimo-cassandro/eslint-config` e `@massimo-cassandro/stylelint-config`
+3. Root di minimo — aggiorna `eslint.config.mjs` per puntare alla copia interna (`./dev-tools/eslint-config/index.js`) invece che al pacchetto npm esterno
 
-4. Root di minimo — aggiorna `eslint.config.mjs` e `stylelint.config.mjs` per puntare alle copie interne (`./dev-tools/eslint-config/index.js` e `./dev-tools/stylelint-config/index.js`) invece che ai pacchetti npm esterni
+4. Dependabot: nessuna azione necessaria (stesso ecosystem/directory già coperto da `minimo/.github/dependabot.yml`)
 
-5. Dependabot: nessuna azione necessaria — i due `dependabot.yml` di `eslint-config`/`stylelint-config` sono identici a quello già presente in `minimo/.github/dependabot.yml` (stesso ecosystem npm, `directory: "/"`, stessa schedule/labels): i nuovi pacchetti aggiunti al `package.json` di minimo sono già coperti automaticamente
+5. `dev-tools/starter-kit/starter-install.sh`: rimuovi la riga `@massimo-cassandro/eslint-config` da `devDependencies`. Non serve aggiungere nulla al suo posto: i pacchetti richiesti da eslint-config sono in `dependencies` di minimo e arrivano quindi in automatico ai progetti consumer (stesso comportamento già verificato con stylelint-config, che infatti non è mai stato aggiunto né ai `devDependencies` fissi né ai pacchetti opzionali dello script)
 
-6. `dev-tools/starter-kit/starter-install.sh`:
-   - rimuovi le righe `npm_i -D @massimo-cassandro/eslint-config` e `npm_i -D @massimo-cassandro/stylelint-config`
-   - sostituiscile con l'installazione diretta, nel progetto consumer, dei pacchetti peer richiesti dai config (eslint, stylelint e plugin correlati elencati sopra), dato che `@massimo-cassandro/minimo` (già installato dallo script) fornirà ora i config stessi
+6. `dev-tools/starter-kit/source_files/eslint.config.mjs`: `import eslint_config from '@massimo-cassandro/eslint-config';` → `import eslint_config from '@massimo-cassandro/minimo/eslint-config';`
 
-7. Template starter-kit — vanno aggiornati anche i file copiati nei progetti consumer, non solo lo script di install:
-   - `dev-tools/starter-kit/templates/eslint.config.mjs`: `import eslint_config from '@massimo-cassandro/eslint-config';` → `import eslint_config from '@massimo-cassandro/minimo/eslint-config';`
-   - `dev-tools/starter-kit/templates/stylelint.config.mjs`: `extends: ['@massimo-cassandro/stylelint-config']` → `extends: ['@massimo-cassandro/minimo/stylelint-config']`
+7. `README.md` (root) — rimuovi `npm i -D @massimo-cassandro/eslint-config` dalla sezione Install (la riga per stylelint-config è già stata rimossa)
 
-Non toccare: i due repo originali (`/Users/mazz/Sites/eslint-config`, `/Users/mazz/Sites/stylelint-config`); LICENSE (minimo ha già la propria, MIT); `.editorconfig` e `*.code-workspace` dei due progetti originali (non vanno copiati, già coperti dalle impostazioni di minimo).
+Non toccare: il repo originale `/Users/mazz/Sites/eslint-config`; LICENSE (minimo ha già la propria, MIT); `.editorconfig` e `*.code-workspace` del progetto originale (non vanno copiati, già coperti dalle impostazioni di minimo).
 
-**Da valutare:** se effettuare questo switch dei percorsi (starter-kit + template + root config di minimo) subito, oppure rimandarlo al rilascio della versione 2 di minimo, trattandolo come parte dei breaking change già previsti lì (vedi sezione [V2](#v2)) — dato che cambia il modo in cui i progetti consumer devono importare i config.
+**Da valutare:** se effettuare questo switch (starter-kit + source_files + root config di minimo) subito, oppure rimandarlo al rilascio della versione 2 di minimo, trattandolo come parte dei breaking change già previsti lì (vedi sezione [V2](#v2)) — dato che cambia il modo in cui i progetti consumer devono importare il config.
 
 ## FORM-MULTISELECT
   * `src/components/TODO form-multiselect/`
 
 ## JSON-TABLE
-  * `src/web-components/TODO json-table/`
+  * in corso di realizzazione: `src/web-components/json-table/`
+  * `src/web-components/TODO json-table/` resta come materiale sorgente di riferimento (piano/vecchia implementazione), da eliminare a fine lavoro
+  * vedi anche CLAUDE.md sezione "Cartella `_wrk` — repo in migrazione"
 
 ## VANILLA-COOKIE-CONSENT
   * `src/components/TODO vanilla-cookie-consent/`
@@ -316,8 +306,9 @@ Non toccare: i due repo originali (`/Users/mazz/Sites/eslint-config`, `/Users/ma
   * Opzione calcolo percorso file nello snippet, in base alla sua posizione
 
 ## FILE-UPLOADER
+  * `src/web-components/TODO js-file-uploader/`
   * includere e riscrivere `js-file-uploader` come web-component
-  * runominare in file-uploader senza js-
+  * rinominare in file-uploader senza js-
   * rifattorizzare (vedi todo nel repo)
   * prevedere possibilità di uso anche senza framework minimo
 

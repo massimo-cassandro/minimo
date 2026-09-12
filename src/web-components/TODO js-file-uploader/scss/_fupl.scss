@@ -1,0 +1,49 @@
+.fupl {
+  position: relative;
+  padding: 1rem;
+  background-color: $fupl-background-color;
+  outline: 2px dashed $fupl-outline-color;
+  outline-offset: 0;
+  transition: outline-offset .15s ease-in-out, background-color .15s linear;
+
+  &.fupl-is-dragover:not(.fupl-sorting) {
+
+    background-color: $fupl-background-color-dragover;
+    outline-color: $fupl-outline-color-dragover;
+    outline-offset: -.5rem;
+
+    .fupl-panel {
+      border: none;
+    }
+
+    [disabled] & {
+      position: relative;
+      background-color: transparent;
+      outline-color: $fupl-disabled-color;
+      outline-offset: 0;
+
+      &::before {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        display: block;
+        font-size: 2rem;
+        color: $fupl-disabled-color;
+        content: 'Non è possibile caricare file';
+        transform: translate(-50%, -50%);
+      }
+
+      .fupl-result, .fupl-panel {
+        opacity: 0;
+      }
+    }
+  }
+
+  [disabled] & {
+    /* stylelint-disable declaration-no-important */
+    font-style: italic !important;
+    color: $fupl-disabled-color !important;
+    /* stylelint-enable declaration-no-important */
+    cursor: no-drop;
+  }
+}

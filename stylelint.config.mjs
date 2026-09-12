@@ -7,13 +7,12 @@ export default {
   ignoreFiles: [
     'node_modules/**/*.{css,scss}',
     'vendor/**/*.{css,scss}',
-    'templates/**/*.{css,scss}',
     'dist/**/*.css',
     'build/**/*.css',
     'public/**/*.css',
     'test/**/*.css',
     'docs/**/*.css',
-    'demo/**/*.css',
+    'demo/build/**/*.css',
   ],
 
   // Overrides

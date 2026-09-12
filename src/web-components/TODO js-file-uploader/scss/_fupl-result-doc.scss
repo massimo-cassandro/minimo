@@ -1,0 +1,51 @@
+.fupl-type-doc {
+
+  .fupl-doc-wrapper {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: flex-start;
+    max-width: 100%;
+    margin-bottom: .2rem;
+  }
+
+  .fupl-remove {
+    flex: 0;
+  }
+  .fupl-doc {
+    flex: 1;
+    padding-left: .4rem;
+  }
+
+  &.fupl-multiple {
+
+    .fupl-item {
+      padding: .2rem;
+      border: 1px solid $fupl-items-border-color;
+      border-radius: $fupl-items-border-radius;
+    }
+
+    .fupl-result {
+
+      // @include fupl-media-query-min(sm) {
+      //   display: grid;
+      //   grid-gap: 1.5rem;
+      //   gap: 1.5rem;
+      //   grid-template-columns: repeat(2, minmax(40%, 1fr));
+      // }
+      @include fupl-media-query-min(md) {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(25%, 1fr));
+        gap: 1.5rem;
+        grid-gap: 1.5rem; // obsolete, mantained for compatibility
+      }
+      @include fupl-media-query-min(lg) {
+        grid-template-columns: repeat(auto-fill, minmax(20%, 1fr));
+      }
+      // @include fupl-media-query-min(xl) {
+      //   grid-template-columns: repeat(5, minmax(15%, 1fr));
+      // }
+    }
+  }
+}

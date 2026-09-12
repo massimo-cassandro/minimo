@@ -1,0 +1,10 @@
+.fupl {
+  input[type='file'] {
+    position: absolute;
+    z-index: -1;
+    width: .1px;
+    height: .1px;
+    overflow: hidden;
+    opacity: 0;
+  }
+}

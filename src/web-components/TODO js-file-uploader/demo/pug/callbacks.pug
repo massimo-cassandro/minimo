@@ -1,0 +1,24 @@
+extends tpl/tpl.pug
+block variables
+  - title = 'Callbacks demo'
+block intro
+  p.
+    An alert will be triggered for each configurable callback, also printing
+    function arguments in console.
+  p.
+    Take a look at #[a(href="https://github.com/massimo-cassandro/js-file-uploader#callbacks") callbacks section]
+    of redme for more info.
+
+block fupl
+  div.file-uploader2(
+    data-filetype="img"
+    data-uploader_legend="true"
+    data-uploader_legend_text="Callbacks demo"
+  )
+
+
+
+block js
+  script(src="./js/callbacks-demo.js" type="module")
+
+
