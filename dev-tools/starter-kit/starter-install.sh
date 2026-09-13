@@ -2,15 +2,22 @@
 
 # IMPORTANTE: questo script è idempotente e deve restare tale.
 # Può essere rilanciato più volte sullo stesso progetto (anche via `npx starter-kit`
-# per aggiornare un setup esistente) senza sovrascrivere nulla né creare duplicati:
-# per i singoli file, se il contenuto esistente è identico al sorgente la copia
-# viene saltata; se è diverso e non esiste ancora un OLD- corrispondente, il
-# file esistente viene rinominato con prefisso OLD- (preservato da quel momento
-# in poi, non viene più toccato nelle esecuzioni successive) e il nuovo file
-# prende il nome originale; se l'OLD- corrispondente esiste già, viene invece
-# sovrascritto direttamente il file "nuovo", senza aggiungere ulteriori prefissi.
-# Stessa logica, a livello di intera cartella e senza diff sui singoli file
-# contenuti, per le cartelle installate (./app, ./webpack-config-modules).
+# per aggiornare un setup esistente) senza sovrascrivere nulla né creare duplicati.
+# Per i singoli file installati sulla root del progetto e dentro
+# ./webpack-config-modules: se il contenuto esistente è identico al sorgente la
+# copia viene saltata; se è diverso e non esiste ancora un OLD- corrispondente,
+# il file esistente viene rinominato con prefisso OLD- (preservato da quel
+# momento in poi, non viene più toccato nelle esecuzioni successive) e il nuovo
+# file prende il nome originale; se l'OLD- corrispondente esiste già, viene
+# invece sovrascritto direttamente il file "nuovo", senza aggiungere ulteriori
+# prefissi. Stessa logica, a livello di intera cartella (senza diff sui
+# singoli file contenuti al suo interno prima della prima installazione), per
+# ./webpack-config-modules.
+# ./app segue invece una logica più semplice: viene rinominata per intero in
+# OLD-app solo la prima volta che esiste già (preservata da quel momento in
+# poi, mai più toccata); i file al suo interno vengono sempre sovrascritti
+# senza controllo né backup individuale (force_cat), dato che l'intera
+# cartella precedente resta comunque disponibile in OLD-app.
 # Ogni modifica futura deve conservare questa proprietà.
 
 RED='\033[0;31m'
@@ -93,8 +100,6 @@ echo "BASE_URL: ${BASE_URL}"
 SOURCE_FILES_DIR="${BASE_URL}/source_files"
 
 # webpack
-WEBPACK_CONFIG_SOURCE_PATH="$BASE_URL"
-WEBPACK_MODULES_SOURCE_PATH="${BASE_URL}/webpack-config-modules"
 WEBPACK_MODULES_INSTALL_PATH="./webpack-config-modules"
 
 # protezione contro la sovrascrittura
@@ -147,11 +152,83 @@ safe_cat_with_ports() {
   return $rc
 }
 
+# A differenza di safe_cat, sovrascrive sempre senza confrontare né
+# backuppare (nessun OLD- a livello di singolo file). Usata per i file
+# installati dentro FRONTEND_INSTALL_PATH (./app), la cui idempotenza è già
+# garantita a livello di intera cartella (OLD-app, vedi più sotto): non ha
+# senso ripetere il controllo su ogni singolo file al suo interno.
+force_cat() {
+  local src="$1"
+  local dest="$2"
+  if [ ! -f "$src" ]; then
+    echo -e "${RED}Sorgente mancante: $src${NC}"
+    return 1
+  fi
+  cat "$src" >| "$dest"
+}
+
+# Copia ricorsivamente tutti i file di una struttura sorgente (source_files/root
+# o source_files/app) in una destinazione, preservando la struttura delle
+# sotto-cartelle così com'è in source_files: aggiungere, spostare o rinominare
+# file lì non richiede modifiche a questo script.
+# Il terzo argomento (opzionale) è il nome di una funzione di rename invocata
+# su ogni singolo basename, per i casi in cui il nome del file sorgente non
+# coincide con quello di destinazione (vedi rename_root_file).
+# Il quarto argomento (opzionale, default: safe_cat_with_ports) è la funzione
+# di copia da usare per ogni file: safe_cat_with_ports confronta e backuppa
+# il singolo file (sostituzione porte no-op se non contiene placeholder);
+# force_cat sovrascrive sempre senza controlli (vedi sopra, usata per ./app).
+install_tree() {
+  local src_root="$1"
+  local dest_root="$2"
+  local rename_fn="$3"
+  local copy_fn="${4:-safe_cat_with_ports}"
+  local file rel dir base new_base dest
+  while IFS= read -r file; do
+    rel="${file#"$src_root"/}"
+    dir="$(dirname "$rel")"
+    base="$(basename "$rel")"
+    if [ -n "$rename_fn" ]; then
+      new_base="$("$rename_fn" "$base")"
+    else
+      new_base="$base"
+    fi
+    if [ "$dir" = "." ]; then
+      dest="${dest_root}/${new_base}"
+    else
+      mkdir -p "${dest_root}/${dir}"
+      dest="${dest_root}/${dir}/${new_base}"
+    fi
+    "$copy_fn" "$file" "$dest"
+  done < <(find "$src_root" -type f)
+}
+
+# Rename applicato ai file di source_files/root/ in fase di copia:
+# - prefisso singolo underscore -> dotfile (es. _gitignore -> .gitignore);
+#   il doppio underscore (__project__.code-workspace) non viene toccato,
+#   il nome resta invariato
+# - suffisso -tpl prima dell'estensione -> rimosso (es. package-tpl.json ->
+#   package.json), usato per i file template che altrimenti confliggerebbero
+#   con l'omonimo file dello starter-kit stesso
+rename_root_file() {
+  local name="$1"
+  if [[ "$name" == _* && "$name" != __* ]]; then
+    echo ".${name#_}"
+    return
+  fi
+  if [[ "$name" == *-tpl.* ]]; then
+    echo "${name/-tpl./.}"
+    return
+  fi
+  echo "$name"
+}
+
 FRONTEND_INSTALL_PATH="./app"
 # se la cartella esiste già: la prima volta viene rinominata per intero in
 # OLD-app (preservata, mai più toccata); se OLD-app esiste già, la cartella
-# esistente non viene rinominata e i file al suo interno vengono gestiti
-# singolarmente dalla stessa logica di safe_cat.
+# esistente non viene rinominata. In entrambi i casi i file al suo interno
+# vengono poi sempre sovrascritti senza controlli individuali (force_cat):
+# l'idempotenza è garantita a livello di intera cartella, non di singolo file.
 if [ -d "$FRONTEND_INSTALL_PATH" ]; then
   OLD_FRONTEND_INSTALL_PATH="$(dirname "$FRONTEND_INSTALL_PATH")/OLD-$(basename "$FRONTEND_INSTALL_PATH")"
   if [ ! -e "$OLD_FRONTEND_INSTALL_PATH" ]; then
@@ -160,50 +237,6 @@ if [ -d "$FRONTEND_INSTALL_PATH" ]; then
 fi
 
 echo -e "${GREEN}Files will be installed in: '${FRONTEND_INSTALL_PATH}'${NC}"
-mkdir -p "${FRONTEND_INSTALL_PATH}"
-
-
-
-echo -e "${GREEN}...ROOT FILES${NC}"
-safe_cat_with_ports "${BASE_URL}/package-tpl.json"  package.json
-safe_cat_with_ports "${WEBPACK_CONFIG_SOURCE_PATH}/webpack.config.mjs"  webpack.config.mjs
-
-safe_cat "${SOURCE_FILES_DIR}/_gitignore" .gitignore
-safe_cat "${SOURCE_FILES_DIR}/_browserslistrc" .browserslistrc
-safe_cat "${SOURCE_FILES_DIR}/_editorconfig" .editorconfig
-safe_cat "${SOURCE_FILES_DIR}/_prettierrc" .prettierrc
-safe_cat "${SOURCE_FILES_DIR}/jsconfig.json" jsconfig.json
-safe_cat "${SOURCE_FILES_DIR}/__project__.code-workspace" __project__.code-workspace
-safe_cat "${SOURCE_FILES_DIR}/eslint.config.mjs" eslint.config.mjs
-safe_cat "${SOURCE_FILES_DIR}/stylelint.config.mjs" stylelint.config.mjs
-
-echo -e "${GREEN}...APP FILES${NC}"
-safe_cat "${SOURCE_FILES_DIR}/_root_htaccess"             "${FRONTEND_INSTALL_PATH}/_root_htaccess"
-safe_cat "${SOURCE_FILES_DIR}/_root_robots.txt"           "${FRONTEND_INSTALL_PATH}/_root_robots.txt"
-safe_cat "${SOURCE_FILES_DIR}/CLAUDE-frontend.md"         "${FRONTEND_INSTALL_PATH}/CLAUDE.md"
-safe_cat "${WEBPACK_CONFIG_SOURCE_PATH}/webpack-template.ejs" "${FRONTEND_INSTALL_PATH}/tpl/index.ejs"
-
-
-echo -e "${GREEN}..WEBPACK CONFIG MODULES${NC}"
-# se la cartella esiste già: la prima volta viene rinominata per intero in
-# OLD-webpack-config-modules (preservata, mai più toccata); se l'OLD-
-# corrispondente esiste già, la cartella esistente non viene rinominata e i
-# file al suo interno vengono gestiti singolarmente dalla stessa logica di
-# safe_cat.
-if [ -d "$WEBPACK_MODULES_INSTALL_PATH" ]; then
-  OLD_WEBPACK_MODULES_INSTALL_PATH="$(dirname "$WEBPACK_MODULES_INSTALL_PATH")/OLD-$(basename "$WEBPACK_MODULES_INSTALL_PATH")"
-  if [ ! -e "$OLD_WEBPACK_MODULES_INSTALL_PATH" ]; then
-    mv "$WEBPACK_MODULES_INSTALL_PATH" "$OLD_WEBPACK_MODULES_INSTALL_PATH"
-  fi
-fi
-
-mkdir -p "$WEBPACK_MODULES_INSTALL_PATH"
-
-# copia tutti i file presenti in webpack-modules,
-for FILE in "${WEBPACK_MODULES_SOURCE_PATH}"/*; do
-  [ -f "$FILE" ] || continue
-  safe_cat "$FILE" "${WEBPACK_MODULES_INSTALL_PATH}/$(basename "$FILE")"
-done
 
 
 echo -e "\n${GREEN}...NODE MODULES${NC}"
@@ -271,6 +304,9 @@ done
 
 echo -e "\n${GREEN}...creating default folders${NC}"
 mkdir -p \
+  "_private" \
+  "${FRONTEND_INSTALL_PATH}" \
+  "${FRONTEND_INSTALL_PATH}/assets" \
   "${FRONTEND_INSTALL_PATH}/src" \
   "${FRONTEND_INSTALL_PATH}/css" \
   "${FRONTEND_INSTALL_PATH}/tpl" \
@@ -280,43 +316,66 @@ mkdir -p \
   "${FRONTEND_INSTALL_PATH}/error-pages"
 
 
-echo -e "${GREEN}...MINIMO FILES${NC}"
-# Sorgenti di minimo da copiare nel progetto: si usa il pacchetto appena
-# installato in node_modules (stessa versione che userà il progetto)
-MINIMO_PKG_DIR=./node_modules/@massimo-cassandro/minimo
-
-safe_cat "${MINIMO_PKG_DIR}/src/custom-properties.css" "${FRONTEND_INSTALL_PATH}/css/custom-properties.css"
-safe_cat "${MINIMO_PKG_DIR}/src/custom-media.css" "${FRONTEND_INSTALL_PATH}/css/custom-media.css"
-safe_cat "${MINIMO_PKG_DIR}/src/fonts.css" "${FRONTEND_INSTALL_PATH}/css/fonts.css"
-
-# config di build-tokens: collocato accanto al css generato (custom-properties.css).
-safe_cat "${MINIMO_PKG_DIR}/design-tokens/tokens-config-sample.mjs" "${FRONTEND_INSTALL_PATH}/css/tokens-config.mjs"
-
-# entry css principale del progetto: copia diretta di minimo.css, rinominato
-# index.css e collocato sulla root di installazione (non in /src)
-safe_cat "${MINIMO_PKG_DIR}/src/minimo.css" "${FRONTEND_INSTALL_PATH}/index.css"
-
-# favicons: config di default per `npx create-favicons`
-safe_cat "${MINIMO_PKG_DIR}/dev-tools/create-favicons/src/default-params.mjs" "${FRONTEND_INSTALL_PATH}/favicons/create-favicons-cfg.mjs"
-# favicons: istruzioni d'uso di `npx create-favicons`
-safe_cat "${SOURCE_FILES_DIR}/favicons-readme.md" "${FRONTEND_INSTALL_PATH}/favicons/readme.md"
 
 
-# entry css critical (inline nei template html) e entry js, sulla root di
-# installazione accanto a index.css
-safe_cat "${SOURCE_FILES_DIR}/app_index.js" "${FRONTEND_INSTALL_PATH}/index.js"
+echo -e "${GREEN}...FILES${NC}"
 
-# layout critical css
-safe_cat "${SOURCE_FILES_DIR}/layout-critical.css" "${FRONTEND_INSTALL_PATH}/css/layout-critical.css"
+echo -e "${DIM}...webpack config modules${NC}"
+# se la cartella esiste già: la prima volta viene rinominata per intero in
+# OLD-webpack-config-modules (preservata, mai più toccata); se l'OLD-
+# corrispondente esiste già, la cartella esistente non viene rinominata e i
+# file al suo interno vengono gestiti singolarmente dalla stessa logica di
+# safe_cat (via install_tree, più sotto).
+if [ -d "$WEBPACK_MODULES_INSTALL_PATH" ]; then
+  OLD_WEBPACK_MODULES_INSTALL_PATH="$(dirname "$WEBPACK_MODULES_INSTALL_PATH")/OLD-$(basename "$WEBPACK_MODULES_INSTALL_PATH")"
+  if [ ! -e "$OLD_WEBPACK_MODULES_INSTALL_PATH" ]; then
+    mv "$WEBPACK_MODULES_INSTALL_PATH" "$OLD_WEBPACK_MODULES_INSTALL_PATH"
+  fi
+fi
 
+mkdir -p "$WEBPACK_MODULES_INSTALL_PATH"
+
+# copia tutti i file di source_files/root/ nella root del progetto (inclusa
+# webpack-config-modules/, gestita sopra a livello di cartella) e tutti i
+# file di source_files/app/ dentro FRONTEND_INSTALL_PATH: struttura e nomi
+# di destinazione sono già quelli definiti in source_files (per root/ con
+# l'unica eccezione del rename dei dotfile e dei template "-tpl", vedi
+# rename_root_file), quindi aggiungere/spostare/rinominare file lì non
+# richiede modifiche a questo script. Per app/ si usa force_cat (nessun
+# controllo/backup per singolo file, vedi commento su FRONTEND_INSTALL_PATH).
+echo -e "${DIM}...root${NC}"
+install_tree "${SOURCE_FILES_DIR}/root" "." rename_root_file
+echo -e "${DIM}...app${NC}"
+install_tree "${SOURCE_FILES_DIR}/app" "${FRONTEND_INSTALL_PATH}" "" force_cat
 
 # copia tutti i file presenti in ${SOURCE_FILES_DIR}/_private,
-echo -e "${GREEN}..._PRIVATE FILES${NC}"
-mkdir -p "_private"
+echo -e "${DIM}..._private${NC}"
 for FILE in "${SOURCE_FILES_DIR}/_private"/*; do
   [ -f "$FILE" ] || continue
   safe_cat_with_ports "$FILE" "_private/$(basename "$FILE")"
 done
+
+#----------------------------------------------
+# copia altri file dai sorgenti minimo
+#----------------------------------------------
+# Sorgenti di minimo da copiare nel progetto: si usa il pacchetto appena
+# installato in node_modules (stessa versione che userà il progetto)
+MINIMO_PKG_DIR=./node_modules/@massimo-cassandro/minimo
+
+force_cat "${MINIMO_PKG_DIR}/src/custom-properties.css" "${FRONTEND_INSTALL_PATH}/css/custom-properties.css"
+force_cat "${MINIMO_PKG_DIR}/src/custom-media.css" "${FRONTEND_INSTALL_PATH}/css/custom-media.css"
+force_cat "${MINIMO_PKG_DIR}/src/fonts.css" "${FRONTEND_INSTALL_PATH}/css/fonts.css"
+
+# config di build-tokens: collocato accanto al css generato (custom-properties.css).
+force_cat "${MINIMO_PKG_DIR}/design-tokens/tokens-config-sample.mjs" "${FRONTEND_INSTALL_PATH}/css/tokens-config.mjs"
+
+
+# entry css principale del progetto: copia diretta di minimo.css, rinominato
+# index.css e collocato sulla root di installazione (non in /src)
+force_cat "${MINIMO_PKG_DIR}/src/minimo.css" "${FRONTEND_INSTALL_PATH}/index.css"
+
+# favicons: config di default per `npx create-favicons`
+force_cat "${MINIMO_PKG_DIR}/dev-tools/create-favicons/src/default-params.mjs" "${FRONTEND_INSTALL_PATH}/favicons/create-favicons-cfg.mjs"
 
 
 if [ ${#selectedOptionalPkgs[@]} -gt 0 ]; then

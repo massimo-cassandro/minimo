@@ -120,24 +120,41 @@ const shared_chunk_paths = (module) => {
 const CopyWebpackPluginPatterns = [
 
   // {
-  //   from: '*.webp',
-  //   to: 'imgs/[name].[contenthash].[ext]',
-  //   context: './source/path/', // viene rimosso nella copia
+  //   from: 'app/api',
+  //   to: 'api',
   //   globOptions: {
   //     dot: true,
   //     gitignore: true,
-  //     ignore: [ '**/.DS_Store' ]
+  //     ignore: [
+  //       '**/.DS_Store',
+  //       // config.php e config-prod.php sono
+  //       // gestiti a parte nei pattern successivi (config.php è sempre
+  //       // scritto a mano per ambiente, mai copiato dalla build)
+  //       // '**/config.php',
+  //       // '**/config-prod.php',
+  //     ]
   //   }
   // },
   // {
-  //   from: 'app/php',
-  //   to: 'php',
-  //   globOptions: {
-  //     dot: true,
-  //     gitignore: true,
-  //     ignore: [ '**/.DS_Store', ...(isDevelopment ? [] : [ '**/init-dev.php' ]) ]
-  //   }
-  // }
+  //   from: 'app/api/config-prod.php',
+  //   to: 'api/config.php'
+  // },
+  // {
+  //   from: './app/assets/root_htaccess',
+  //   to: '.htaccess',
+  //   toType: 'file'
+  // },
+  // {
+  //   from: './app/assets/robots.txt',
+  //   to: 'robots.txt',
+  //   toType: 'file'
+  // },
+  // {
+  //   from: './app/assets/api_htaccess',
+  //   to: 'api/.htaccess',
+  //   toType: 'file',
+  //   // context: 'app/api'
+  // },
 ];
 
 // =>> PurgeCSS

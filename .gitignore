@@ -15,7 +15,7 @@ vendor
 
 # frontend
 node_modules
-_private
+/_private
 public/_dev
 design-tokens/unresolved-unused-props.md
 
