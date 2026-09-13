@@ -70,7 +70,7 @@ const CopyWebpackPluginPatterns = [
 // Vengono create DUE istanze, attive in ENTRAMBE le modalità (dev e prod),
 // così i problemi di purge emergono subito durante lo sviluppo:
 // - `purgeCSSPluginCritical`: solo le entry `*.critical` (purge stretto, gli asset
-//   devono essere autosufficienti e minimi perché inlinati nei template html)
+//   devono essere autosufficienti e minimi perché inline nei template html)
 // - `purgeCSSPlugin`: tutti gli asset (il doppio passaggio sui critical è idempotente)
 //
 // NB (watch mode): i template twig NON sono osservati da webpack: dopo aver
@@ -135,7 +135,7 @@ const purgeCSSSafelistBase = {
   ]
 };
 
-// css della pagina critici (inlinati nei template): purge stretto,
+// css della pagina critici (inline nei template): purge stretto,
 // devono essere autosufficienti e minimi
 const purgeCSSPluginCritical = new PurgeCSSPlugin({
   ...purgeCSSCommonOptions,
@@ -399,7 +399,7 @@ const config = {
         );
       },
       raw: true,
-      // niente banner nei critical css: vengono inlinati nei template html
+      // niente banner nei critical css: vengono inseriti inline nei template html
       exclude: /\.critical/ // chunk name
     }),
 

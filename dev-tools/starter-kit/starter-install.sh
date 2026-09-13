@@ -364,15 +364,15 @@ MINIMO_PKG_DIR=./node_modules/@massimo-cassandro/minimo
 
 force_cat "${MINIMO_PKG_DIR}/src/custom-properties.css" "${FRONTEND_INSTALL_PATH}/css/custom-properties.css"
 force_cat "${MINIMO_PKG_DIR}/src/custom-media.css" "${FRONTEND_INSTALL_PATH}/css/custom-media.css"
-force_cat "${MINIMO_PKG_DIR}/src/fonts.css" "${FRONTEND_INSTALL_PATH}/css/fonts.css"
+
+# entry css principale del progetto: copia diretta di minimo.css, rinominato
+# index.css e collocato sulla root di installazione (non in /src)
+force_cat "${MINIMO_PKG_DIR}/src/minimo.css" "${FRONTEND_INSTALL_PATH}/index.css"
 
 # config di build-tokens: collocato accanto al css generato (custom-properties.css).
 force_cat "${MINIMO_PKG_DIR}/design-tokens/tokens-config-sample.mjs" "${FRONTEND_INSTALL_PATH}/css/tokens-config.mjs"
 
 
-# entry css principale del progetto: copia diretta di minimo.css, rinominato
-# index.css e collocato sulla root di installazione (non in /src)
-force_cat "${MINIMO_PKG_DIR}/src/minimo.css" "${FRONTEND_INSTALL_PATH}/index.css"
 
 # favicons: config di default per `npx create-favicons`
 force_cat "${MINIMO_PKG_DIR}/dev-tools/create-favicons/src/default-params.mjs" "${FRONTEND_INSTALL_PATH}/favicons/create-favicons-cfg.mjs"

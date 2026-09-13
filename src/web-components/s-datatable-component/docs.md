@@ -279,7 +279,7 @@ cols: [
                    //   'sf_datetime'   – data e ora da oggetto Symfony ({ date, timezone }),
                    //                     pre-elaborato in _load
                    //   'sf_date'       – come 'sf_datetime', ma mostra solo la data
-                   //   'datetime'      – data e ora da stringa/valore parsabile da `new Date()`
+                   //   'datetime'      – data e ora da stringa/valore elaborabile da `new Date()`
                    //   'date'          – come 'datetime', ma mostra solo la data
                    //                     (date/datetime: formato it-IT, allineamento a destra,
                    //                     data-order impostato per l'ordinamento; null → '—')

@@ -273,7 +273,7 @@ const config = {
         );
       },
       raw: true,
-      // niente banner nei critical css: vengono inlinati nei template html
+      // niente banner nei critical css: vengono aggiunti inline nei template html
       exclude: /\.critical/ // chunk name
     }),
 

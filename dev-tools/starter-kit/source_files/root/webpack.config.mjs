@@ -22,6 +22,8 @@ import { cssRules } from './webpack-config-modules/css-rules.mjs';
 import { createPurgeCSSPlugins } from './webpack-config-modules/purgecss-setup.mjs';
 import { getJsConfigAliases } from './webpack-config-modules/get-jsConfig-aliases.mjs';
 import { svgRules } from './webpack-config-modules/svg-rules.mjs';
+// import { InlineCriticalCssPlugin } from './webpack-config-modules/inline-critical-css.mjs';
+
 
 // --- config ---
 const __filename = fileURLToPath(import.meta.url)
@@ -30,10 +32,10 @@ const __filename = fileURLToPath(import.meta.url)
 // Risolve un percorso a partire dalla root del progetto, che coincide con la dir
 // di questo file solo se il frontend NON è in una sottodirectory (es. ./app):
 // vengono provate entrambe le posizioni, in fallback la prima
-const fromProjectRoot = (relPath) => {
-  const candidates = ['./', '../'].map(p => path.resolve(__dirname, p, relPath));
-  return candidates.find(p => fs.existsSync(p)) ?? candidates[0];
-};
+// const fromProjectRoot = (relPath) => {
+//   const candidates = ['./', '../'].map(p => path.resolve(__dirname, p, relPath));
+//   return candidates.find(p => fs.existsSync(p)) ?? candidates[0];
+// };
 
 const isDevelopment = process.env.NODE_ENV === 'development'
   ,devServerPort = [[port5700]]
@@ -60,11 +62,11 @@ const isDevelopment = process.env.NODE_ENV === 'development'
   // NB: jsconfig.json va tenuto in questa stessa dir (gli alias sono risolti
   // a partire dalla sua posizione)
   ,jsConfigAliases = getJsConfigAliases(path.resolve(__dirname, './jsconfig.json'))
-  ,packageJson = JSON.parse(fs.readFileSync(fromProjectRoot('package.json'), 'utf-8'))
+  ,packageJson = JSON.parse(fs.readFileSync('./package.json', 'utf-8')) //JSON.parse(fs.readFileSync(fromProjectRoot('package.json'), 'utf-8'))
 
   // path del pacchetto minimo (il suo js genera markup con classi proprie e il
   // suo css dichiara custom properties: entrambi vanno visti da PurgeCSS)
-  ,minimo_path = fromProjectRoot('node_modules/@massimo-cassandro/minimo')
+  ,minimo_path = './node_modules/@massimo-cassandro/minimo' // fromProjectRoot('node_modules/@massimo-cassandro/minimo')
 
   ,usePurgeCss = true // false per disattivare PurgeCSS (debug rapido di problemi legati al purge)
   ,purgeCSSOptions = {
@@ -78,7 +80,7 @@ const isDevelopment = process.env.NODE_ENV === 'development'
 // test del cacheGroup `shared` (splitChunks): i css restano SEMPRE FUORI dal
 // chunk condiviso e nel chunk della entry che li importa, così ogni asset css
 // resta autosufficiente (`variables: true` funziona per singolo asset, e i
-// critical css inlinati nei template devono restare autosufficienti). I
+// critical css inline nei template devono restare autosufficienti). I
 // template (twig/altro) linkano solo il css della propria entry (e gli
 // eventuali `.critical.css`), MAI uno shared.css: se i css finissero nel
 // chunk condiviso, quella parte di stili sparirebbe silenziosamente dalla
@@ -172,12 +174,13 @@ const CopyWebpackPluginPatterns = [
 // =>> entries
 // NB: percorsi dalla root del progetto
 const entries = {
-  'xxxxxx': './index.js'
+  'index': './app/index.js',
 
-  // css critici inlinati nei template html: il suffisso `.critical` nel nome
+  // css critici da includere inline nei template html: il suffisso `.critical` nel nome
   // della entry attiva l'istanza PurgeCSS dedicata con purge stretto
   // (vedi purgecss-setup.mjs) e la regola dedicata in css-rules.mjs
-  // ,'xxxxxx.critical': './index-critical.css'
+  'layout.critical': './app/css/layout.critical.css'
+
 };
 
 
@@ -367,6 +370,11 @@ const config = {
       ignoreOrder: true
     }),
 
+    // =>> plugins: InlineCriticalCssPlugin (manifest)
+    // new InlineCriticalCssPlugin({
+    //   match: (href) => href?.includes('.critical'),
+    // }),
+
     // =>> plugins: HtmlWebpackPlugin (manifest)
     new HtmlWebpackPlugin({
       filename: 'manifest.webmanifest',
@@ -442,7 +450,7 @@ const config = {
 
       },
       raw: true,
-      // niente banner nei critical css: vengono inlinati nei template html
+      // niente banner nei critical css: vengono inseriti inline nei template html
       exclude: /\.critical/ // chunk name
     }),
 

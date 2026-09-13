@@ -3,7 +3,7 @@
   Per ulteriori entry critical specifiche di pagina, copiare e rinominare.
 
   Le entry con suffisso `.critical` generano asset destinati a essere
-  INLINATI nei template html: devono restare AUTOSUFFICIENTI e minimi.
+  inseriti inline nei template html: devono restare AUTOSUFFICIENTI e minimi.
   Il suffisso attiva l'istanza PurgeCSS dedicata con purge stretto, in dev
   e in prod (vedi purgeCSSPluginCritical in webpack.config.mjs), e la regola
   dedicata in css-rules.mjs.

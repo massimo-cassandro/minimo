@@ -502,7 +502,7 @@ class SimpleDatatableAdapter extends HTMLElement {
    *                 Se presente e !== undefined sovrascrive sempre l'attributo.
    *                 Passare esplicitamente `null` per ignorare l'attributo e
    *                 ricevere il defaultValue.
-   *   2. Attributo HTML – se il valore inizia con [ o { viene auto-parsato
+   *   2. Attributo HTML – se il valore inizia con [ o { viene auto-elaborato
    *                 da JSON (utile per cols, che può stare nell'attributo).
    *   3. defaultValue – fallback finale.
    *

@@ -5,7 +5,7 @@ import { purgecssVariablesSafelist } from './purgecss-variables-safelist.mjs';
 
 /*
   Istanzia i plugin PurgeCSS del progetto: un passaggio stretto sui css
-  `.critical` (inlinati nei template, devono restare autosufficienti) e un
+  `.critical` (inline nei template, devono restare autosufficienti) e un
   passaggio generale su tutti gli altri asset (il purge è idempotente: il
   secondo passaggio sui critical non rimuove altro).
 
