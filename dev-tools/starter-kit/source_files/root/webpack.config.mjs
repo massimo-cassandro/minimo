@@ -215,7 +215,7 @@ const config = {
     path: output_dir,
     filename: '[name].[contenthash].js',
     publicPath: '/',
-    // publicPath: isDevelopment? '/' : './', // per devServer, nel caso in cui l'output di produzione non sia sulla root
+    // publicPath: isDevelopment? '/' : './', // nel caso in cui l'output di produzione non sia sulla root
     clean: !isDevelopment
   },
 
@@ -370,10 +370,11 @@ const config = {
       ignoreOrder: true
     }),
 
-    // =>> plugins: InlineCriticalCssPlugin (manifest)
-    // new InlineCriticalCssPlugin({
-    //   match: (href) => href?.includes('.critical'),
-    // }),
+    // =>> plugins: InlineCriticalCssPlugin (solo prod)
+    // ...(isDevelopment
+    //   ? []
+    //   : [new InlineCriticalCssPlugin({ match: (href) => href?.includes('.critical') })]
+    // ),
 
     // =>> plugins: HtmlWebpackPlugin (manifest)
     new HtmlWebpackPlugin({

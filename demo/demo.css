@@ -1,5 +1,5 @@
 /* removed from minimo.css since they are managed by postcss-css.jit-props by default */
-@import '@installSourceFiles/app/css/custom-properties.css';
+@import '@src/custom-properties.css';
 @import '@minimo/minimo.css';
 
 body {

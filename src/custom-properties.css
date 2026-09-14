@@ -222,11 +222,23 @@
   --inner-nav-gap: var(--size-lg);
   --inner-nav-margin-block: var(--size-base);
 
+  --jt-bool-false-color: var(--status-danger-color);
+  --jt-bool-icon-size: 1.1em;
+  --jt-bool-true-color: var(--status-success-color);
+  --jt-empty-color: var(--text-muted);
+  --jt-empty-padding-block: var(--size-sm);
   --jt-info-color: var(--text-muted);
   --jt-info-font-size: var(--font-size-sm);
   --jt-info-gap: var(--size-sm);
   --jt-info-outer-padding-block-end: var(--size-xs);
   --jt-search-max-width: 20rem;
+  --jt-sort-btn-line-height: var(--table-cell-line-height);
+  --jt-sort-btn-padding-block: var(--table-cell-padding-block);
+  --jt-sort-btn-padding-inline: var(--table-cell-padding-inline);
+  --jt-sort-icon-gap: .4em;
+  --jt-sort-icon-none-opacity: .4;
+  --jt-sort-icon-size: 1em;
+  --jt-thead-hover-background-color: color-mix(in srgb, var(--table-thead-background-color) 90%, var(--accent));
   --jt-wrapper-margin-block: var(--size-md);
 
   --line-height-base: 1.5;

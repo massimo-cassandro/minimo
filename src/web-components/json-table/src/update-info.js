@@ -1,48 +1,59 @@
 /*! minimo - json-table: info text update */
 
-/** @typedef {import('./defaults.js').JsonTableParams} JsonTableParams */
-/** @typedef {import('./main-builder.js').JsonTableElements} JsonTableElements */
+import { setContent } from './content-utils.js';
+
+/** @typedef {import('../json-table-component.js').JsonTable} JsonTable */
 
 /**
- * Updates the info text (`elements.resultInfo`) using `params.infoText(shown, total)`.
+ * Updates the info text (`elements.resultInfo`) from the current state.
  *
- * The returned value can be a Node (appended as-is), a plain string (set as `textContent`)
- * or an HTML string (sanitized via `Element.setHTML` where supported, `innerHTML` otherwise,
- * consistently with domBuilder).
+ * Content resolution:
+ * - `params.infoText` function → `infoText(start, end, totRec, filteredRec)`
+ * - no rows → `labels.noResults` (search active) or `labels.noRows`
+ * - otherwise the mustache-like template `params.infoText` (string) or `labels.info`, with the
+ *   placeholders `{start}`, `{end}`, `{totRec}`, `{filteredRec}` replaced by the locale-formatted numbers
  *
- * @param {JsonTableElements} elements - Generated elements (see `main-builder.js`)
- * @param {JsonTableParams} params - Resolved params
- * @param {number} shown - Number of rows currently displayed
- * @param {number} total - Total number of rows in the data set
+ * TODO paginazione (step 4): `start`/`end` dovranno riflettere la pagina corrente
+ *
+ * @param {JsonTable} jt - The component instance
  * @returns {void}
  *
  * @example
- * updateInfo(elements, params, 25, 100);
- * // with the default `infoText` → "Visualizzate <strong>25</strong> righe su <strong>100</strong>"
+ * updateInfo(jt);
+ * // with the default `labels.info` and 25 rows → "Stai visualizzando le righe da 1 a 25, su un totale di 25 record trovati"
  */
-export function updateInfo(elements, params, shown, total) {
+export function updateInfo(jt) {
 
+  const { params, elements, state } = jt;
   const target = elements.resultInfo;
+
   if (!target) {
     return;
   }
 
-  const content = params.infoText(shown, total);
+  const shown = state.pageRows.length;
+  const values = {
+    start: shown ? 1 : 0,
+    end: shown,
+    totRec: state.totRec,
+    filteredRec: state.filtered.length
+  };
 
-  if (content instanceof Node) {
-    target.replaceChildren(content);
-    return;
-  }
+  let content;
 
-  const text = String(content ?? '');
+  if (typeof params.infoText === 'function') {
+    content = params.infoText(values.start, values.end, values.totRec, values.filteredRec);
 
-  if (!text.includes('<')) {
-    target.textContent = text;
-
-  } else if (typeof target.setHTML === 'function') {
-    target.setHTML(text);
+  } else if (values.filteredRec === 0) {
+    content = state.searchTerm ? params.labels.noResults : params.labels.noRows;
 
   } else {
-    target.innerHTML = text;
+    const tpl = params.infoText ?? params.labels.info ?? '';
+    content = String(tpl).replace(
+      /\{(start|end|totRec|filteredRec)\}/g,
+      (_, key) => values[/** @type {keyof values} */ (key)].toLocaleString(params.locale)
+    );
   }
+
+  setContent(target, content);
 }

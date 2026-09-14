@@ -197,10 +197,18 @@ Non toccare: il repo originale `/Users/mazz/Sites/eslint-config`; LICENSE (minim
   * `src/components/TODO form-multiselect/`
 
 ## JSON-TABLE
-  * in corso di realizzazione: `src/web-components/json-table/`
-  * `src/web-components/TODO json-table/` resta come materiale sorgente di riferimento (piano/vecchia implementazione), da eliminare a fine lavoro
+  * in corso di realizzazione: `src/web-components/json-table/` — step 2 (cols, data types, rendering righe, tfoot, info, template) completato il 14/9/2026, da revisionare
+  * `src/web-components/TODO json-table/` resta come materiale sorgente di riferimento (piano/vecchia implementazione, `step2.md`), da eliminare a fine lavoro
   * vedi anche CLAUDE.md sezione "Cartella `_wrk` — repo in migrazione"
-
+  * punti aperti dopo lo step 2 (scelte da confermare in revisione):
+    * i parametri piatti dello step 1 (`searchInputClass`, `searchInputTitle/Placeholder/AriaLabel`, `tableWrapperClass`, `tableClass`, `*ExtraClass`) sono stati assorbiti in `classes` e `labels` (default di s-datatable); le classi di allineamento e dei booleani (`textEnd`, `nowrap`, `boolTrue`, ...) e le ARIA label di ordinamento (`labels.sortAsc/Desc/None`) stanno negli stessi oggetti invece che come parametri di primo livello
+    * `template`: array domBuilder con segnaposto `{ slot: 'infoSection'|'resultInfo'|'search'|'table' }` (accettata anche una funzione da `init()`)
+    * `render` di colonna `(row, tr, td)` posizionale; `render` dei `dataTypes` `(value, row, params)`; `undefined` restituito da `render` = rendering di default (per decorare solo la cella)
+    * `parse` di colonna non riportato (duplicato di `render`); `hidden`/`show: false` da valutare
+    * `tfootRender` accetta gli aggregati `'@sum'`, `'@avg'`, `'@min'`, `'@max'`, `'@count'`
+    * `euro`/`currency` usano `Intl` con `style: 'currency'` (parametro `currency`, default `EUR`) al posto del vecchio `<small>€</small>` prefisso
+    * fuso orario degli oggetti data Symfony non gestito in `parseDate`
+    * step 3: ordinamento (`setSortState()` già pronta in `src/table-thead.js`) e ricerca (`state.rows[].searchText`/`sortValues` già calcolati in `src/parse-rows.js`)
 ## VANILLA-COOKIE-CONSENT
   * `src/components/TODO vanilla-cookie-consent/`
 

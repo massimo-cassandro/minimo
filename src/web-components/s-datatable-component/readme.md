@@ -1,6 +1,8 @@
-# `s-datatable` web-component per simple-datatables
+# `s-datatable` web-component per [simple-datatables](https://fiduswriter.github.io/simple-datatables/documentation/)
 
-<https://fiduswriter.github.io/simple-datatables/documentation/>
+
+>**NB: deprecato, utilizzare [json-table](../json-table/readme.md)** 
+
 
 ## Installazione
 

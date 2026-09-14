@@ -3,11 +3,31 @@
 import { defaults } from './src/defaults.js';
 import { resolveParams } from './src/resolve-params.js';
 import { getData } from './src/get-data.js';
+import { buildDataTypes } from './src/data-types.js';
+import { parseCols } from './src/parse-cols.js';
+import { parseRows } from './src/parse-rows.js';
 import { mainBuilder } from './src/main-builder.js';
+import { renderTbody } from './src/table-body.js';
+import { renderTfoot } from './src/table-tfoot.js';
 import { updateInfo } from './src/update-info.js';
+import { domBuilder } from '../../utilities/dom-builder/dom-builder.js';
 
 /** @typedef {import('./src/defaults.js').JsonTableParams} JsonTableParams */
+/** @typedef {import('./src/defaults.js').DataTypeDefinition} DataTypeDefinition */
+/** @typedef {import('./src/parse-cols.js').ParsedCol} ParsedCol */
+/** @typedef {import('./src/parse-rows.js').ParsedRow} ParsedRow */
 /** @typedef {import('./src/main-builder.js').JsonTableElements} JsonTableElements */
+
+/**
+ * Rendering state, rebuilt on every load.
+ * TODO ordinamento, ricerca e paginazione (step 3/4) aggiorneranno `filtered`, `pageRows` e `searchTerm`
+ * @typedef {Object} JsonTableState
+ * @property {number} totRec - Total number of records (unfiltered, see `totRecField`)
+ * @property {ParsedRow[]} rows - All the parsed rows
+ * @property {ParsedRow[]} filtered - Rows after filtering (currently all the rows)
+ * @property {ParsedRow[]} pageRows - Rows of the current page (currently all the filtered rows)
+ * @property {string} searchTerm - Active search term (currently always empty)
+ */
 
 /**
  * Project-wide defaults, set via `JsonTable.setDefaults()`.
@@ -20,9 +40,9 @@ let projectDefaults = {};
 /**
  * `<json-table>` – HTML table generator from JSON data (inline or fetched), light DOM custom element.
  *
- * WORK IN PROGRESS: at this stage only the outer structure is generated (info section, search
- * input, empty table with caption). Columns, rows rendering, sorting, search and pagination
- * are not implemented yet.
+ * WORK IN PROGRESS (step 2): columns (`cols`), data types, rows rendering, `tfoot`, info text and
+ * layout `template` are implemented; the sort buttons are rendered but inactive. Sorting, search
+ * and pagination are not implemented yet.
  *
  * Parameters (see `src/defaults.js` → `JsonTableParams`) can be set as HTML attributes or via
  * `init()`; precedence: `init()` > HTML attribute > `JsonTable.setDefaults()` > built-in default.
@@ -32,13 +52,15 @@ let projectDefaults = {};
  *
  * @example
  * // markup only
- * // <json-table jsonurl="/api/rows.json" caption="Utenti"></json-table>
+ * // <json-table jsonurl="/api/rows.json" caption="Utenti"
+ * //   cols='[{"key":"id","dataType":"id"},{"key":"name","title":"Nome"},{"key":"amount","dataType":"euro"}]'
+ * // ></json-table>
  *
  * @example
  * // script
  * import { JsonTable } from '@massimo-cassandro/minimo/src/web-components/json-table/json-table-component.js';
  *
- * JsonTable.setDefaults({ tableClass: 'table' }); // optional, project-wide
+ * JsonTable.setDefaults({ classes: { table: 'table' } }); // optional, project-wide
  *
  * const el = document.querySelector('json-table');
  * el.addEventListener('jt:ready', e => console.log(e.detail.jsonTable.data));
@@ -46,17 +68,30 @@ let projectDefaults = {};
  *   debug: false,                       // default: false
  *   jsonUrl: '/api/rows.json',          // default: null
  *   jsonDataField: 'data',              // default: 'data'
+ *   totRecField: 'totRec',              // default: 'totRec'
  *   data: null,                         // default: null (takes precedence over jsonUrl when set)
+ *   cols: [                             // default: [] (one column per key of the first row)
+ *     { key: 'id', dataType: 'id' },
+ *     { key: 'name', title: 'Nome', render: (row, tr, td) => `<a href="/users/${row.id}">${row.name}</a>` },
+ *     { key: 'amount', dataType: 'euro', tfootRender: '@sum' },
+ *     { key: 'active', dataType: 'bool' }
+ *   ],
+ *   dataTypes: {},                      // default: {} (custom types, merged with the built-in ones)
  *   caption: 'Utenti',                  // default: null
  *   search: true,                       // default: true
- *   searchInputClass: 'form-control',   // default: 'form-control'
+ *   tfoot: true,                        // default: false
+ *   updateFooterOnPageChange: false,    // default: false
+ *   infoText: null,                     // default: null → labels.info
+ *   template: [{ slot: 'infoSection' }, { slot: 'table' }], // default
+ *   locale: 'it-IT',                    // default: 'it-IT'
+ *   currency: 'EUR',                    // default: 'EUR'
+ *   renderNullAs: '—',                  // default: '—'
+ *   renderZeroAs: null,                 // default: null
+ *   renderNaNAs: '—',                   // default: '—'
+ *   trCallback: null,                   // default: null
  *   tableId: null,                      // default: null
- *   tableWrapperClass: 'table-responsive', // default: 'table-responsive'
- *   tableClass: 'table table-bordered', // default: 'table table-bordered'
- *   mainWrapperExtraClass: null,        // default: null
- *   outerInfoExtraClass: null,          // default: null
- *   infoExtraClass: null,               // default: null
- *   infoText: (shown, total) => `${shown} / ${total}` // default: Italian "Visualizzate N righe su M"
+ *   classes: { table: 'table' },        // merged with the defaults (see JsonTableClasses)
+ *   labels: { noRows: 'Nessun utente' } // merged with the defaults (see JsonTableLabels)
  * });
  */
 export class JsonTable extends HTMLElement {
@@ -71,9 +106,9 @@ export class JsonTable extends HTMLElement {
    *
    * @example
    * JsonTable.setDefaults({
-   *   searchInputClass: 'form-control form-control-sm', // default: 'form-control'
-   *   tableClass: 'table',                              // default: 'table table-bordered'
-   *   infoText: (shown, total) => `${shown} di ${total}`
+   *   classes: { searchInput: 'form-control', table: 'table' }, // merged with the built-in classes
+   *   labels: { searchPlaceholder: 'Cerca…' },                  // merged with the built-in labels
+   *   infoText: (start, end, totRec, filteredRec) => `${filteredRec} di ${totRec} record`
    * });
    */
   static setDefaults(newDefaults = {}) {
@@ -93,7 +128,7 @@ export class JsonTable extends HTMLElement {
    * @returns {JsonTableParams}
    *
    * @example
-   * JsonTable.getDefaults().tableWrapperClass; // → 'table-responsive'
+   * JsonTable.getDefaults().classes.tableWrapper; // → 'table-responsive'
    */
   static getDefaults() {
     return { ...defaults, ...projectDefaults };
@@ -112,11 +147,20 @@ export class JsonTable extends HTMLElement {
     /** incremented on every init()/reload()/destroy(): a pending _load() whose generation is stale gives up */
     this._loadGeneration = 0;
 
-    /** Resolved params, available after the first load. @type {JsonTableParams|null} */
-    this.params = null;
+    /** Resolved params, available after the first load. @type {JsonTableParams} */
+    this.params = /** @type {JsonTableParams} */ ({ ...defaults });
 
     /** Raw rows, available after the first load. @type {Array<Object>|null} */
     this.data = null;
+
+    /** Data types map (built-in + custom), available after the first load. @type {Object<string, DataTypeDefinition>} */
+    this.dataTypes = {};
+
+    /** Parsed visible columns, available after the first load. @type {ParsedCol[]} */
+    this.cols = [];
+
+    /** Rendering state, available after the first load. @type {JsonTableState} */
+    this.state = { totRec: 0, rows: [], filtered: [], pageRows: [], searchTerm: '' };
 
     /** Generated elements, available after the first load. @type {JsonTableElements} */
     this.elements = {};
@@ -179,6 +223,8 @@ export class JsonTable extends HTMLElement {
     this._loadGeneration++;
     this.elements = {};
     this.data = null;
+    this.cols = [];
+    this.state = { totRec: 0, rows: [], filtered: [], pageRows: [], searchTerm: '' };
     this.innerHTML = '';
   }
 
@@ -205,7 +251,7 @@ export class JsonTable extends HTMLElement {
   // ─── Load & build ───────────────────────────────────────────────────────────
 
   /**
-   * Resolves params, retrieves the data and builds the structure.
+   * Resolves params, retrieves the data, parses columns and rows and builds the structure.
    * Guarded against concurrent/stale calls via `_loadStarted` and `_loadGeneration`.
    * @returns {Promise<void>}
    */
@@ -220,14 +266,19 @@ export class JsonTable extends HTMLElement {
     this.params = params;
 
     // loading placeholder (minimo spinner)
-    this.innerHTML = '<div class="spinner"><span class="visually-hidden">Caricamento dati...</span></div>';
+    domBuilder([
+      {
+        className: 'spinner',
+        children: [{ tag: 'span', className: 'visually-hidden', content: params.labels.loading }]
+      }
+    ], this, { emptyParent: true });
 
-    /** @type {Array<Object>|null} */
-    let rows = null;
+    /** @type {import('./src/get-data.js').DataResult|null} */
+    let result = null;
     let failed = false;
 
     try {
-      rows = await getData(params);
+      result = await getData(params);
     } catch (err) {
       failed = true;
       // eslint-disable-next-line no-console
@@ -244,7 +295,7 @@ export class JsonTable extends HTMLElement {
       return;
     }
 
-    if (rows === null) {
+    if (result === null) {
       // no source: silent when created from markup without attributes (init() may follow)
       if (this._initCalledProgrammatically) {
         // eslint-disable-next-line no-console
@@ -254,17 +305,33 @@ export class JsonTable extends HTMLElement {
       return;
     }
 
-    this.data = rows;
-    this.elements = mainBuilder(this, params);
+    this.data = result.rows;
 
-    // TODO `shown` dovrà riflettere righe filtrate/paginate quando ricerca e paginazione saranno implementate
-    updateInfo(this.elements, params, rows.length, rows.length);
+    // columns & rows parsing (configuration errors are reported and stop the rendering)
+    try {
+      this.dataTypes = buildDataTypes(params);
+      this.cols = parseCols(params.cols, this.dataTypes, params, this.data[0]);
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error(err);
+      this.innerHTML = '';
+      return;
+    }
+
+    const rows = parseRows(this.data, this.cols, params);
+    this.state = { totRec: result.totRec, rows, filtered: rows, pageRows: rows, searchTerm: '' };
+
+    this.elements = mainBuilder(this);
+    this._render();
 
     if (params.debug) {
       /* eslint-disable no-console */
-      console.groupCollapsed('[json-table] params, data & elements', this);
+      console.groupCollapsed('[json-table] params, cols, data, state & elements', this);
       console.log('params', params);
-      console.log('data', rows);
+      console.log('dataTypes', this.dataTypes);
+      console.log('cols', this.cols);
+      console.log('data', this.data);
+      console.log('state', this.state);
       console.log('elements', this.elements);
       console.groupEnd();
       /* eslint-enable no-console */
@@ -273,6 +340,17 @@ export class JsonTable extends HTMLElement {
     // dispatched in the next microtask so listeners registered right after init() still catch it
     const event = new CustomEvent('jt:ready', { detail: { jsonTable: this }, bubbles: true });
     Promise.resolve().then(() => this.dispatchEvent(event));
+  }
+
+  /**
+   * Renders the parts depending on the state: body rows, footer and info text.
+   * TODO invocata anche da ordinamento/ricerca/paginazione (step 3/4)
+   * @returns {void}
+   */
+  _render() {
+    renderTbody(this);
+    renderTfoot(this);
+    updateInfo(this);
   }
 
 } // end component
