@@ -11,6 +11,8 @@ import { hBarsTest } from './chart-demos/hbars-demo.js';
 // import { radialBarsTest } from './src/radial-bars-test.js';
 // import { settimanaleMensileTest } from './src/settimanale-mensile-test.js';
 
+import './charts.css';
+
 
 export async function chartsDemo(){
 

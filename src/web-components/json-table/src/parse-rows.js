@@ -37,8 +37,7 @@ function resolveValue(colValue, typeFn, value, row, params) {
 
 /**
  * Precomputes, for every row, the values used by sorting and searching, so that they are
- * calculated once and not on every sort/search operation.
- * TODO ordinamento e ricerca (step 3) utilizzeranno `sortValues` e `searchText`
+ * calculated once and not on every sort/search operation (see `sorting.js` and `search.js`).
  *
  * @param {Array<Object>} rows - Raw data rows
  * @param {ParsedCol[]} cols - Parsed columns (see `parse-cols.js`)

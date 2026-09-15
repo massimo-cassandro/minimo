@@ -24,9 +24,19 @@ declare module '*.svg?inline' {
   export default content;
 }
 
-// Sanitizer API (Element.setHTML / getHTML) — not yet in TypeScript's lib.dom.d.ts.
-// Same augmentation as the root `types/global.d.ts` (used by domBuilder and json-table).
+// Global alias for domBuilder's config-object type, same as the root `types/global.d.ts`
+// (referenced by the JSDoc of several minimo modules imported by the demos).
+type DomBuilderItem = import('../src/utilities/dom-builder/dom-builder.js').DomBuilderItem;
+
+// `<json-table>` tag name map augmentation, same as the root `types/global.d.ts`:
+// `document.querySelector('json-table')` is typed as the component class.
+interface HTMLElementTagNameMap {
+  'json-table': import('../src/web-components/json-table/json-table-component.js').JsonTable;
+}
+
+// Sanitizer API (Element.setHTML / getHTML). Same augmentation as the root `types/global.d.ts`
+// (used by domBuilder and json-table); required members, see the note there.
 interface Element {
-  setHTML?(input: string, options?: { sanitizer?: unknown }): void;
-  getHTML?(options?: { serializableShadowRoots?: boolean; shadowRoots?: ShadowRoot[] }): string;
+  setHTML(input: string, options?: { sanitizer?: unknown }): void;
+  getHTML(options?: { serializableShadowRoots?: boolean; shadowRoots?: ShadowRoot[] }): string;
 }

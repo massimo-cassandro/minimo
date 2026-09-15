@@ -6,12 +6,17 @@ import demoData from './demo-data.js';
 import * as styles from './json-table-demo.module.css';
 
 
-/*
-  WORK IN PROGRESS (step 2): <json-table> renders the outer structure (info section, search
-  input, layout template), columns (`cols`), data types, body rows, tfoot and info text.
-  The sort buttons are rendered but inactive: sorting, search and pagination will follow
-  in the next steps.
-*/
+/** larger data set for the pagination demos: the 30 demo records repeated with unique ids */
+function bigData(times) {
+  const rows = [];
+  for (let i = 0; i < times; i++) {
+    demoData.forEach((row, idx) => {
+      rows.push({ ...row, id: i * demoData.length + idx + 1, text: `${row.text} (${i + 1})` });
+    });
+  }
+  return rows;
+}
+
 
 export function jsonTableDemo(){
 
@@ -30,17 +35,17 @@ export function jsonTableDemo(){
 
   domBuilder([
 
-    'p.text-muted Work in progress (step 2): colonne, tipi di dato, righe, tfoot, testo info e template di layout. I pulsanti di ordinamento sono generati ma non attivi: ordinamento, ricerca e paginazione arriveranno negli step successivi.',
-
     // =>> 1. HTML attributes only (js-free)
     'h2 1. Configurazione solo da attributi HTML (senza JS)',
-    'p Tutto da attributi (via domBuilder <code>attrs</code>): <code>data</code>, <code>cols</code>, <code>labels</code> e <code>tfoot</code> serializzati in JSON. Il render della colonna "Testo" usa la sintassi mustache-like <code>[[key]]</code>, la colonna "Importo" ha <code>tfootRender: "@sum"</code>.',
+    'p Tutto da attributi (via domBuilder <code>attrs</code>): <code>data</code>, <code>cols</code>, <code>labels</code>, <code>tfoot</code> e <code>perpage</code> serializzati. Il render della colonna "Testo" usa la sintassi mustache-like <code>[[key]]</code>, la colonna "Importo" ha <code>tfootRender: "@sum"</code>. Ordinamento e ricerca sono lato client; con <code>perpage="5"</code> la navigazione pagine compare nella barra sotto la tabella, a destra della caption.',
     {
       tag: 'json-table',
       attrs: {
-        caption: 'Tabella configurata solo da attributi HTML (5 record)',
-        data: JSON.stringify(demoData.slice(0, 5)),
+        caption: 'Tabella configurata solo da attributi HTML (12 record, 5 per pagina)',
+        data: JSON.stringify(demoData.slice(0, 12)),
         tfoot: 'true',
+        perpage: '5',
+        initialsort: JSON.stringify({ key: 'euro', dir: 'desc' }),
         cols: JSON.stringify([
           { key: 'id', dataType: 'id' },
           { key: 'text', title: 'Testo (render mustache-like)', render: '<a href="#/json-table?id=[[id]]">[[text]]</a>' },
@@ -54,8 +59,8 @@ export function jsonTableDemo(){
     },
 
     // =>> 2. init() + jsonUrl + cols with functions
-    'h2 2. init() da script + jsonUrl: colonne con funzioni, tipi custom, tfoot',
-    'p Dati via fetch (<code>jsonUrl</code>, servito dal devServer come file statico: funziona solo in sviluppo), <code>debug: true</code> (vedi console). Colonne: <code>rowHeading</code>, <code>render(row, tr, td)</code> che restituisce un array domBuilder, <code>render</code> che decora solo la cella (restituisce <code>undefined</code> → rendering di default), tipo custom <code>km</code> (<code>dataTypes</code> con <code>inheritsFrom</code>), <code>headerClass</code> propagato a <code>cellClass</code>, colonna con <code>condition: false</code>, <code>tfootRender</code> come funzione, aggregato e stringa statica, <code>trCallback</code>, <code>renderZeroAs</code>, <code>infoText</code> da funzione.',
+    'h2 2. init() da script + jsonUrl: colonne con funzioni, tipi custom, tfoot, nessuna paginazione',
+    'p Dati via fetch (<code>jsonUrl</code>, servito dal devServer come file statico: funziona solo in sviluppo), <code>debug: true</code> (vedi console), <code>perPage: 0</code> (tutte le righe, nessuna navigazione). Colonne: <code>rowHeading</code>, <code>render(row, tr, td)</code> che restituisce un array domBuilder, <code>render</code> che decora solo la cella (restituisce <code>undefined</code> → rendering di default), tipo custom <code>km</code> (<code>dataTypes</code> con <code>inheritsFrom</code>), <code>headerClass</code> propagato a <code>cellClass</code>, colonna con <code>condition: false</code>, <code>tfootRender</code> come funzione, aggregato e stringa statica, <code>trCallback</code>, <code>renderZeroAs</code>, <code>infoText</code> da funzione, evento <code>jt:update</code> in console.',
     {
       tag: 'json-table',
       id: 'jt-ajax',
@@ -63,10 +68,15 @@ export function jsonTableDemo(){
         el.addEventListener('jt:ready', e => {
           console.log('[demo] jt:ready', /** @type {CustomEvent} */ (e).detail.jsonTable);
         });
+        el.addEventListener('jt:update', e => {
+          const { reason, jsonTable } = /** @type {CustomEvent} */ (e).detail;
+          console.log(`[demo] jt:update (${reason})`, jsonTable.state);
+        });
 
         /** @type {JsonTable} */ (el).init({
           jsonUrl: '/demo-files/json-table/demo-data.json',
           debug: true,
+          perPage: 0,
           caption: () => `Tabella da jsonUrl (caption da funzione, ${new Date().toLocaleTimeString('it-IT')})`,
           tableId: 'demo-ajax-table',
           tfoot: true,
@@ -117,11 +127,11 @@ export function jsonTableDemo(){
       }
     },
 
-    // =>> 3. custom template + project defaults + reload/destroy
-    'h2 3. Template personalizzato, default di progetto, reload() e destroy()',
-    'p <code>template</code> con slot riordinati (ricerca e info sotto la tabella), <code>data</code> e <code>cols</code> da attributo; il placeholder dell\'input arriva da <code>JsonTable.setDefaults()</code>. I pulsanti testano <code>reload()</code> e <code>destroy()</code> / <code>init()</code>.',
+    // =>> 3. custom template + project defaults + reload/destroy + API
+    'h2 3. Template personalizzato, default di progetto, reload() / destroy() e API di stato',
+    'p <code>template</code> con slot riordinati: ricerca e navigazione pagine sopra la tabella (slot <code>search</code> e <code>pagination</code>), info sotto; la barra sotto la tabella contiene quindi solo la caption. <code>data</code> e <code>cols</code> da attributo, 150 record con <code>perPage: 20</code>, <code>updateFooterOnPageChange: true</code> (subtotali di pagina). Il placeholder dell\'input arriva da <code>JsonTable.setDefaults()</code>. I pulsanti testano <code>reload()</code>, <code>destroy()</code> / <code>init()</code> e i metodi <code>goToPage()</code>, <code>setSort()</code>, <code>setSearch()</code>.',
     {
-      className: 'flex gap-2 mbe-sm',
+      className: 'flex flex-wrap gap-2 mbe-sm',
       children: [
         {
           tag: 'button',
@@ -152,6 +162,27 @@ export function jsonTableDemo(){
         },
         {
           tag: 'button',
+          className: 'btn btn-outline-secondary btn-sm',
+          attrs: { type: 'button' },
+          content: 'goToPage(4)',
+          callback: el => el.addEventListener('click', () => reloadableTable.goToPage(4))
+        },
+        {
+          tag: 'button',
+          className: 'btn btn-outline-secondary btn-sm',
+          attrs: { type: 'button' },
+          content: 'setSort("euro", "desc")',
+          callback: el => el.addEventListener('click', () => reloadableTable.setSort('euro', 'desc'))
+        },
+        {
+          tag: 'button',
+          className: 'btn btn-outline-secondary btn-sm',
+          attrs: { type: 'button' },
+          content: 'setSearch("lorem")',
+          callback: el => el.addEventListener('click', () => reloadableTable.setSearch('lorem'))
+        },
+        {
+          tag: 'button',
           className: 'btn btn-danger btn-sm',
           attrs: { type: 'button' },
           content: 'destroy()',
@@ -171,51 +202,71 @@ export function jsonTableDemo(){
     {
       tag: 'json-table',
       attrs: {
-        data: JSON.stringify(demoData),
-        caption: 'Tabella con template personalizzato',
+        data: JSON.stringify(bigData(5)),
+        caption: 'Tabella con template personalizzato (150 record, 20 per pagina)',
         cols: JSON.stringify([
           { key: 'id', dataType: 'id' },
           { key: 'text', title: 'Testo' },
           { key: 'date', title: 'Data', dataType: 'date' },
-          { key: 'euro', title: 'Importo', dataType: 'euro' }
+          { key: 'euro', title: 'Importo', dataType: 'euro', tfootRender: '@sum' }
         ])
       },
       callback: el => {
         reloadableTable = /** @type {JsonTable} */ (el);
         reloadableTable.init({
+          perPage: 20,
+          tfoot: true,
+          updateFooterOnPageChange: true,
           template: [
-            { slot: 'table' },
             {
-              className: `flex gap-2 mbs-sm ${styles.customInfo}`,
-              children: [{ slot: 'search' }, { slot: 'resultInfo' }]
-            }
+              className: `flex flex-wrap gap-2 mbe-sm ${styles.customInfo}`,
+              children: [{ slot: 'search' }, { slot: 'pagination' }]
+            },
+            { slot: 'table' },
+            { slot: 'resultInfo' }
           ]
         });
       }
     },
 
-    // =>> 4. automatic columns
-    'h2 4. Colonne generate automaticamente',
-    'p Senza <code>cols</code> viene generata una colonna di tipo <code>string</code> per ogni chiave del primo record (titolo = chiave); <code>search="false"</code>.',
+    // =>> 4. server-side
+    'h2 4. Modalità server-side (paginazione, ordinamento e ricerca delegati al server)',
+    'p <code>serverSide: true</code>: ogni cambio pagina, ordinamento o ricerca invia una nuova richiesta a <code>jsonUrl</code> con i parametri <code>page</code>, <code>start</code>, <code>perPage</code>, <code>sort</code>, <code>dir</code>, <code>search</code> (nomi configurabili con <code>serverParams</code>); il JSON restituisce le sole righe della pagina più <code>totRec</code> e <code>filteredRec</code>. L\'endpoint <code>/demo-api/json-table</code> è simulato da un middleware del devServer (circa 1.000 record, ritardo artificiale di 300 ms): funziona solo in sviluppo. Il <code>tfoot</code> non è disponibile in questa modalità (richiesto qui apposta: vedi avviso in console). <code>infoText</code> con i segnaposto <code>{page}</code> e <code>{totPages}</code>.',
     {
       tag: 'json-table',
-      attrs: {
-        caption: 'Colonne da chiavi del primo record',
-        search: 'false',
-        data: JSON.stringify(demoData.slice(0, 3).map(({ id, text, date, euro }) => ({ id, text, date, euro })))
-      }
+      callback: el => /** @type {JsonTable} */ (el).init({
+        jsonUrl: '/demo-api/json-table',
+        serverSide: true,
+        perPage: 15,
+        tfoot: true, // ignored in server-side mode (console warning)
+        caption: 'Tabella server-side',
+        infoText: 'Righe {start}–{end} di {filteredRec} ({totRec} totali) — pagina {page} di {totPages}',
+        initialSort: { key: 'id', dir: 'asc' },
+        cols: [
+          { key: 'id', title: 'ID', dataType: 'id' },
+          { key: 'text', title: 'Testo' },
+          { key: 'sfDatetime', title: 'Data/ora', dataType: 'datetime' },
+          { key: 'number1', title: 'Numero', dataType: 'num' },
+          { key: 'euro', title: 'Importo', dataType: 'euro' },
+          { key: 'bool', title: 'Attivo', dataType: 'bool' }
+        ]
+      })
     },
 
     // =>> 5. errors
     'h2 5. Gestione errori (vedi console)',
-    'p Attributo <code>data</code> con JSON malformato (ignorato: nessuna sorgente dati e nessun errore perché non è stato chiamato <code>init()</code>), <code>jsonUrl</code> inesistente (errore HTTP in console, componente vuoto), <code>cols</code> con <code>dataType</code> sconosciuto (errore di configurazione in console, componente vuoto).',
+    'p Attributo <code>data</code> con JSON malformato (ignorato: nessuna sorgente dati e nessun errore perché non è stato chiamato <code>init()</code>), <code>jsonUrl</code> inesistente (errore HTTP in console, componente vuoto), <code>cols</code> mancante (errore di configurazione in console, componente vuoto), <code>cols</code> con <code>dataType</code> sconosciuto (idem).',
     {
       tag: 'json-table',
       attrs: { data: '[{"id": 1,}' }
     },
     {
       tag: 'json-table',
-      callback: el => /** @type {JsonTable} */ (el).init({ jsonUrl: '/demo-files/json-table/missing.json' })
+      callback: el => /** @type {JsonTable} */ (el).init({ jsonUrl: '/demo-files/json-table/missing.json', cols: [{ key: 'id' }] })
+    },
+    {
+      tag: 'json-table',
+      callback: el => /** @type {JsonTable} */ (el).init({ data: demoData.slice(0, 2) })
     },
     {
       tag: 'json-table',

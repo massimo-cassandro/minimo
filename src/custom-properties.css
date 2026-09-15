@@ -225,12 +225,28 @@
   --jt-bool-false-color: var(--status-danger-color);
   --jt-bool-icon-size: 1.1em;
   --jt-bool-true-color: var(--status-success-color);
+  --jt-busy-opacity: .5;
+  --jt-caption-color: var(--text-muted);
+  --jt-caption-font-size: var(--font-size-sm);
   --jt-empty-color: var(--text-muted);
   --jt-empty-padding-block: var(--size-sm);
   --jt-info-color: var(--text-muted);
   --jt-info-font-size: var(--font-size-sm);
   --jt-info-gap: var(--size-sm);
   --jt-info-outer-padding-block-end: var(--size-xs);
+  --jt-pagination-border-color: var(--table-border-color);
+  --jt-pagination-border-width: 1px;
+  --jt-pagination-btn-min-width: 2.2em;
+  --jt-pagination-btn-padding-block: var(--table-cell-padding-block);
+  --jt-pagination-btn-padding-inline: var(--table-cell-padding-inline);
+  --jt-pagination-current-background-color: var(--table-thead-background-color);
+  --jt-pagination-current-font-weight: var(--font-weight-semibold);
+  --jt-pagination-disabled-opacity: .5;
+  --jt-pagination-font-size: var(--font-size-sm);
+  --jt-pagination-hover-background-color: var(--table-body-tr-hover-bg-color);
+  --jt-pagination-icon-size: 1em;
+  --jt-pagination-line-height: var(--table-cell-line-height);
+  --jt-pagination-radius: var(--radius-xxs);
   --jt-search-max-width: 20rem;
   --jt-sort-btn-line-height: var(--table-cell-line-height);
   --jt-sort-btn-padding-block: var(--table-cell-padding-block);
@@ -238,6 +254,7 @@
   --jt-sort-icon-gap: .4em;
   --jt-sort-icon-none-opacity: .4;
   --jt-sort-icon-size: 1em;
+  --jt-table-footer-padding-block-start: var(--size-xs);
   --jt-thead-hover-background-color: color-mix(in srgb, var(--table-thead-background-color) 90%, var(--accent));
   --jt-wrapper-margin-block: var(--size-md);
 

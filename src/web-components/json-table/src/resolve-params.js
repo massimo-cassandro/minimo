@@ -19,6 +19,8 @@ function isPlainObject(value) {
  *
  * - booleans are auto-parsed when the built-in default is a boolean
  *   (`search`, `search="true"`, `search="1"` → true; `search="false"`, `search="0"` → false)
+ * - numbers are auto-parsed when the built-in default is a number (`perpage="10"` → 10; a
+ *   non-numeric value is reported in the console and treated as a missing attribute)
  * - values starting with `[` or `{` are parsed as JSON (invalid JSON is reported in the
  *   console and treated as a missing attribute)
  * - every other value is returned as a string
@@ -31,6 +33,7 @@ function isPlainObject(value) {
  * // <json-table search="false" cols='[{"key":"id"}]'></json-table>
  * readAttr(el, 'search'); // → false
  * readAttr(el, 'cols');   // → [{ key: 'id' }]
+ * readAttr(el, 'perPage'); // → 10 (from perpage="10")
  * readAttr(el, 'caption'); // → undefined
  */
 export function readAttr(el, name) {
@@ -46,6 +49,16 @@ export function readAttr(el, name) {
     const lower = trimmed.toLowerCase();
     // empty string = attribute present without value → true (standard HTML)
     return lower !== 'false' && lower !== '0';
+  }
+
+  if (typeof defaults[name] === 'number') {
+    const num = Number(trimmed);
+    if (trimmed === '' || Number.isNaN(num)) {
+      // eslint-disable-next-line no-console
+      console.error(`[json-table] attributo \`${name}\`: valore numerico non valido (${attr}), viene usato il default`);
+      return undefined;
+    }
+    return num;
   }
 
   if (trimmed.startsWith('[') || trimmed.startsWith('{')) {
@@ -72,7 +85,7 @@ export function readAttr(el, name) {
  * 3. `projectDefaults` – values set via `JsonTable.setDefaults()`.
  * 4. Built-in default (see `defaults.js`).
  *
- * Object params listed in `mergedParams` (`classes`, `labels`, `dataTypes`) are shallow-merged
+ * Object params listed in `mergedParams` (`classes`, `labels`, `dataTypes`, `serverParams`) are shallow-merged
  * across the sources instead of being replaced, so every source only needs the keys to override.
  *
  * @param {HTMLElement} el - The `<json-table>` element (source of the HTML attributes)

@@ -366,8 +366,7 @@ force_cat "${MINIMO_PKG_DIR}/src/custom-properties.css" "${FRONTEND_INSTALL_PATH
 force_cat "${MINIMO_PKG_DIR}/src/custom-media.css" "${FRONTEND_INSTALL_PATH}/css/custom-media.css"
 
 # entry css principale del progetto: copia diretta di minimo.css, rinominato
-# index.css e collocato sulla root di installazione (non in /src)
-force_cat "${MINIMO_PKG_DIR}/src/minimo.css" "${FRONTEND_INSTALL_PATH}/index.css"
+force_cat "${MINIMO_PKG_DIR}/src/minimo.css" "${FRONTEND_INSTALL_PATH}/css/index.css"
 
 # config di build-tokens: collocato accanto al css generato (custom-properties.css).
 force_cat "${MINIMO_PKG_DIR}/design-tokens/tokens-config-sample.mjs" "${FRONTEND_INSTALL_PATH}/css/tokens-config.mjs"

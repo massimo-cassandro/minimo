@@ -9,6 +9,9 @@ import { domBuilder } from '../../../utilities/dom-builder/dom-builder.js';
  * component (see `CellContent`): a Node is appended as-is, a domBuilder array is built inside
  * the element, a string/number is set as text or, when it contains `<`, as sanitized markup
  * (`Element.setHTML` where supported, `innerHTML` otherwise, consistently with domBuilder).
+ * The empty sanitizer config passed to `setHTML` keeps `class`, `id`, `style` and `data-*`
+ * attributes, which the browser default configuration removes, while unsafe content (scripts,
+ * event handlers, `javascript:` URLs) is always stripped.
  * A function is invoked and its result used. `null`/`undefined` empty the element.
  *
  * @param {HTMLElement} el - Target element (emptied first)
@@ -48,7 +51,7 @@ export function setContent(el, content) {
     el.textContent = text;
 
   } else if (typeof el.setHTML === 'function') {
-    el.setHTML(text);
+    el.setHTML(text, { sanitizer: {} });
 
   } else {
     el.innerHTML = text;
@@ -70,7 +73,10 @@ export function setContent(el, content) {
  * getNestedValue({ name: 'Mario' }, 'owner.name');            // → undefined
  */
 export function getNestedValue(obj, path) {
-  return path.split('.').reduce((acc, key) => (acc == null ? undefined : acc[key]), obj);
+  return path.split('.').reduce(
+    (acc, key) => (acc == null ? undefined : /** @type {Object<string, *>} */ (acc)[key]),
+    /** @type {*} */ (obj)
+  );
 }
 
 

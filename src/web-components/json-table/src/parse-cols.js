@@ -41,7 +41,7 @@ export const colDefaults = {
  * resolves the `type`/`dataType` alias, the `condition` and the `headerClass`/`cellClass`
  * fallbacks, and drops the columns whose `condition` is false.
  *
- * When `cols` is empty, one `string` column per key of `firstRow` is generated (title = key).
+ * `cols` is required: an empty or missing definition throws.
  *
  * Merge order (lowest first): `colDefaults` ← data type `colDefaults` ← column definition.
  * Class resolution: `headerClass` = column `headerClass` ?? column `cellClass` ?? type `headerClass`;
@@ -50,9 +50,8 @@ export const colDefaults = {
  * @param {ColDefinition[]|null|undefined} cols - Columns definition (`params.cols`)
  * @param {Object<string, DataTypeDefinition>} dataTypes - Data types map (see `buildDataTypes`)
  * @param {JsonTableParams} params - Resolved params (passed to `condition` functions)
- * @param {Object|undefined} [firstRow] - First data row, used to generate the columns when `cols` is empty
  * @returns {ParsedCol[]} Visible columns only
- * @throws {Error} On missing `key` or unknown data type
+ * @throws {Error} On missing/empty `cols`, missing `key` or unknown data type
  *
  * @example
  * parseCols([
@@ -62,15 +61,13 @@ export const colDefaults = {
  *   { key: 'notes', condition: false }                     // dropped
  * ], dataTypes, params);
  */
-export function parseCols(cols, dataTypes, params, firstRow) {
+export function parseCols(cols, dataTypes, params) {
 
-  let list = Array.isArray(cols) ? cols : [];
-
-  if (!list.length && firstRow != null && typeof firstRow === 'object') {
-    list = Object.keys(firstRow).map(key => ({ key, title: key }));
+  if (!Array.isArray(cols) || !cols.length) {
+    throw new Error('[json-table] parametro `cols` mancante o vuoto: la definizione delle colonne è obbligatoria');
   }
 
-  return list
+  return cols
     .map((col, idx) => {
 
       if (col == null || typeof col !== 'object') {

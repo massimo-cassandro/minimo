@@ -5,6 +5,8 @@ import xBold from '../../../icons/x-bold.svg?inline';
 import arrowUp from '../../../icons/arrow-up.svg?inline';
 import arrowDown from '../../../icons/arrow-down.svg?inline';
 import arrowsDownUp from '../../../icons/arrows-down-up.svg?inline';
+import caretLeft from '../../../icons/caret-left.svg?inline';
+import caretRight from '../../../icons/caret-right.svg?inline';
 
 /** @typedef {import('./defaults.js').IconDef} IconDef */
 
@@ -18,6 +20,10 @@ export const sortAscArrowIcon = arrowUp;
 export const sortDescArrowIcon = arrowDown;
 /** Default sort button icon, no sort active (minimo `arrows-down-up`) */
 export const sortNoneArrowIcon = arrowsDownUp;
+/** Default previous page button icon (minimo `caret-left`) */
+export const paginationPrevIcon = caretLeft;
+/** Default next page button icon (minimo `caret-right`) */
+export const paginationNextIcon = caretRight;
 
 /**
  * Markup strings already parsed, keyed by the string itself.

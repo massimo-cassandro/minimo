@@ -5,7 +5,6 @@
 // NB: The base tag doesn't seem to work well with hash routes on GitHub pages.
 
 import './demo.css';
-import './demo-files/charts/charts.css';
 
 import { routes } from 'routes.js';
 
@@ -53,24 +52,23 @@ if(routeObj.incl) {
   root.innerHTML = routeObj.incl;
 }
 
-if(routeObj.callback) {
-  routeObj.callback();
-}
-
-
-
-if(!routeObj.fullPage) {
-
-  const title =  (routeObj.title?? titleCase(routeObj.key) )+ (route !== 'home'? ' | Minimo Demo' : '');
-  root.insertAdjacentHTML('afterbegin', `<h1 class="title">${title}</h1>`);
-
-
-  if( route !== 'home') {
-    root.insertAdjacentHTML('beforeend', `<p class="mbs-lg"><a href="${homeLink}">Home</a></p>`);
-  }
-}
-
 root.classList.toggle('container', !routeObj.fullPage);
+
+// demo callbacks may load their chunk asynchronously (dynamic import, see routes.js):
+// title and home link are added once the demo content has been rendered
+Promise.resolve(routeObj.callback? routeObj.callback() : null).then(() => {
+
+  if(!routeObj.fullPage) {
+
+    const title =  (routeObj.title?? titleCase(routeObj.key) )+ (route !== 'home'? ' | Minimo Demo' : '');
+    root.insertAdjacentHTML('afterbegin', `<h1 class="title">${title}</h1>`);
+
+
+    if( route !== 'home') {
+      root.insertAdjacentHTML('beforeend', `<p class="mbs-lg"><a href="${homeLink}">Home</a></p>`);
+    }
+  }
+});
 
 
 

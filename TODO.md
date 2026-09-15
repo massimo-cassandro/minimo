@@ -197,18 +197,24 @@ Non toccare: il repo originale `/Users/mazz/Sites/eslint-config`; LICENSE (minim
   * `src/components/TODO form-multiselect/`
 
 ## JSON-TABLE
-  * in corso di realizzazione: `src/web-components/json-table/` — step 2 (cols, data types, rendering righe, tfoot, info, template) completato il 14/9/2026, da revisionare
-  * `src/web-components/TODO json-table/` resta come materiale sorgente di riferimento (piano/vecchia implementazione, `step2.md`), da eliminare a fine lavoro
+  * in corso di realizzazione: `src/web-components/json-table/` — step 3 (ordinamento, ricerca, paginazione client-side e server-side, caption nella barra sotto la tabella, `cols` obbligatorio, tipi per i consumer) completato il 15/9/2026, da revisionare
+  * `src/web-components/TODO json-table/` resta come materiale sorgente di riferimento (piano/vecchia implementazione, `step2.md`, `step3.md`), da eliminare a fine lavoro
   * vedi anche CLAUDE.md sezione "Cartella `_wrk` — repo in migrazione"
-  * punti aperti dopo lo step 2 (scelte da confermare in revisione):
-    * i parametri piatti dello step 1 (`searchInputClass`, `searchInputTitle/Placeholder/AriaLabel`, `tableWrapperClass`, `tableClass`, `*ExtraClass`) sono stati assorbiti in `classes` e `labels` (default di s-datatable); le classi di allineamento e dei booleani (`textEnd`, `nowrap`, `boolTrue`, ...) e le ARIA label di ordinamento (`labels.sortAsc/Desc/None`) stanno negli stessi oggetti invece che come parametri di primo livello
-    * `template`: array domBuilder con segnaposto `{ slot: 'infoSection'|'resultInfo'|'search'|'table' }` (accettata anche una funzione da `init()`)
-    * `render` di colonna `(row, tr, td)` posizionale; `render` dei `dataTypes` `(value, row, params)`; `undefined` restituito da `render` = rendering di default (per decorare solo la cella)
-    * `parse` di colonna non riportato (duplicato di `render`); `hidden`/`show: false` da valutare
-    * `tfootRender` accetta gli aggregati `'@sum'`, `'@avg'`, `'@min'`, `'@max'`, `'@count'`
-    * `euro`/`currency` usano `Intl` con `style: 'currency'` (parametro `currency`, default `EUR`) al posto del vecchio `<small>€</small>` prefisso
-    * fuso orario degli oggetti data Symfony non gestito in `parseDate`
-    * step 3: ordinamento (`setSortState()` già pronta in `src/table-thead.js`) e ricerca (`state.rows[].searchText`/`sortValues` già calcolati in `src/parse-rows.js`)
+  * scelte dello step 3 da confermare in revisione:
+    * paginazione: `perPage` (default 25, 0 = nessuna paginazione) + `paginationDelta`; modalità `serverSide` con `serverParams` (`page`, `start`, `perPage`, `sort`, `dir`, `search`) e `filteredRecField`, una pagina per richiesta — sostituisce `jsonMaxLength`/`jsonPaginationParams` del piano originale (con chunk = pagina non esiste il problema del cambio set a metà pagina; ordinamento e ricerca devono comunque passare dal server). Eventuale ottimizzazione futura: chunk di più pagine (`fetchSize`) se le richieste risultassero troppe
+    * caption resa come `div` nella barra `tableFooter` sotto la tabella (a sinistra, paginazione a destra) collegata via `aria-labelledby`, non come `<caption>`; slot `caption` e `pagination` nel template per posizioni diverse
+    * `tfoot` disattivato (con avviso) in modalità server-side
+    * `initialSort: { key, dir }`, evento `jt:update` (`detail.reason`: page/sort/search), metodi `goToPage()`/`setSort()`/`setSearch()`
+    * il sanitizer di `Element.setHTML` con configurazione di default rimuove `class`/`id`/`style`/`data-*` (verificato in Chrome 152): json-table e domBuilder ora passano `{ sanitizer: {} }` (baseline di sicurezza mantenuta). Da verificare in Firefox/Safari quando supporteranno l'API
+  * punti ancora aperti:
+    * `refs` (ripristino pagina da cookie di sessione al ritorno da pagine indicate, come in s-datatable) — step 4
+    * `hidden`/`show: false` (campo usato solo per la ricerca, non mostrato): da valutare
+    * `_collapseKey` di s-datatable (raggruppamento visivo valori ripetuti): da decidere
+    * `reload()` azzera ricerca/ordinamento/pagina: valutare se conservarli
+    * fuso orario degli oggetti data Symfony non gestito in `parseDate`; `sfTime`/`sfDatetime` (TODO in `data-types.js`) da definire
+    * demo server-side (`/demo-api/json-table`, middleware del devServer in `demo/webpack-modules/json-table-dev-api.mjs`) e demo `jsonUrl` funzionano solo in sviluppo, non nella build GitHub Pages
+    * `src/utilities/dom-builder-helpers/form-tags.js` (e `TODO table-tag.js`) usano ancora la sintassi JSDoc `function(...)`, non supportata da TypeScript 7: stessa correzione applicata a `dom-builder.js` nello step 3
+
 ## VANILLA-COOKIE-CONSENT
   * `src/components/TODO vanilla-cookie-consent/`
 

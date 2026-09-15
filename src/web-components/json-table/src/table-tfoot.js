@@ -1,6 +1,7 @@
 /*! minimo - json-table: tfoot rendering */
 
 import { domBuilder } from '../../../utilities/dom-builder/dom-builder.js';
+import { classnames } from '../../../utilities/classnames.js';
 import { setContent } from './content-utils.js';
 import { tfootContent } from './cell-content.js';
 
@@ -43,7 +44,7 @@ export function renderTfoot(jt) {
       tag: 'tr',
       children: cols.map(col => ({
         tag: 'td',
-        className: col.cellClass,
+        className: classnames(col.cellClass),
         attrs: { 'data-key': col.key },
         callback: el => {
           const td = /** @type {HTMLTableCellElement} */ (el);

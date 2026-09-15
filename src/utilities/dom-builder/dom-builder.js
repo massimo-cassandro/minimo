@@ -24,7 +24,7 @@ import { parseDomString } from './parseDomString.js';
  *   arrays. Mutually exclusive with `tag`/`content`/`children`: when set (and `tag` is absent), every other
  *   property except `condition` and `callback` is ignored.
  * @property {boolean} [condition=true] - When false, the element (or text node) is skipped. (default: true)
- * @property {(function(HTMLElement|Text): void) | null} [callback] - Callback invoked after the element (or text node) is created.
+ * @property {((el: HTMLElement|Text) => void) | null} [callback] - Callback invoked after the element (or text node) is created.
  * @property {Array<DomBuilderItem|string|Node>} [children] - Configuration array for child elements. Accepts strings (shorthand per `parseDomString`), configuration objects, and/or `Node`s (an `Element`, a `DocumentFragment`, ...) inserted as-is.
  */
 
@@ -285,10 +285,14 @@ export function domBuilder(/** @type {Array<DomBuilderItem|string|Node>} */ stru
               el.textContent = content;
 
             } else if (typeof el.setHTML === 'function') {
-              // markup: sanitize via the native Sanitizer API, stripping <script>, event handler
-              // attributes, javascript: URLs, etc. while still allowing harmless formatting tags
-              // (<strong>, <em>, <a>, ...)
-              el.setHTML(content);
+              /* markup: sanitize via the native Sanitizer API, stripping <script>, event handler
+                 attributes, javascript: URLs, etc. while still allowing harmless formatting tags
+                 (<strong>, <em>, <a>, ...).
+                 The empty sanitizer config keeps every element/attribute not in the built-in unsafe
+                 baseline: without it the browser default configuration also removes `class`, `id`,
+                 `style` and `data-*` attributes (observed in Chrome 152), breaking any markup string
+                 that relies on CSS classes */
+              el.setHTML(content, { sanitizer: {} });
 
             } else {
               // Sanitizer API not supported by this browser: fall back to the historical,

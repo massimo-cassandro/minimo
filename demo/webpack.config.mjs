@@ -26,6 +26,7 @@ import CopyWebpackPlugin from 'copy-webpack-plugin';
 import { cssRules } from './webpack-modules/css-rules.mjs';
 import { getJsConfigAliases } from './webpack-modules/get-jsConfig-aliases.mjs';
 import { svgRules } from './webpack-modules/svg-rules.mjs';
+import { jsonTableDevApi } from './webpack-modules/json-table-dev-api.mjs';
 
 // --- config ---
 const isDevelopment = process.env.NODE_ENV === 'development'
@@ -140,7 +141,12 @@ const config = {
     open: { app: { name: 'Google Chrome' } },
     compress: true,
     hot: true,
-    port: 5701
+    port: 5701,
+    // fake server-side endpoint for the json-table demo (`/demo-api/json-table`)
+    setupMiddlewares: (middlewares, devServer) => {
+      devServer.app.use(jsonTableDevApi);
+      return middlewares;
+    }
   },
 
   // =>> plugins

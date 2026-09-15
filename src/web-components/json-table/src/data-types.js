@@ -145,6 +145,7 @@ export function builtInDataTypes(params) {
     }
   });
 
+  // TODO implementare sfTime / sfDatetime (??)
   /** @type {(withTime: boolean) => DataTypeDefinition} */
   const dateType = withTime => ({
     headerClass: dateClass,
@@ -156,8 +157,8 @@ export function builtInDataTypes(params) {
       }
       const iso = date.toISOString();
       return `<time datetime="${withTime ? iso : iso.substring(0, 10)}">` +
-        date.toLocaleString(p.locale, p.datesLocaleOpts) +
-        (withTime ? ' <small>' + date.toLocaleString(p.locale, p.timesLocaleOpts) + '</small>' : '') +
+        `<span class="${c.nowrap}">` + date.toLocaleString(p.locale, p.datesLocaleOpts) + '</span>' +
+        (withTime ? ' <small>' + date.toLocaleString(p.locale, p.timesLocaleOpts) + '</small>' : '') +
         '</time>';
     },
     sortValue: value => parseDate(value)?.getTime() ?? null,
