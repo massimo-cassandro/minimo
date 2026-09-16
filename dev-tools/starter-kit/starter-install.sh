@@ -49,46 +49,60 @@ PORT_8000="80${PORT_SUFFIX}"
 PORT_5700="57${PORT_SUFFIX}"
 echo -e "${DIM}Porte: ${PORT_8000} (server), ${PORT_5700} (webpack dev server)${NC}"
 
-# Pacchetti opzionali: installati come devDependency solo su conferma
-# esplicita dell'utente (vedi ciclo di domande più sotto). Include sia
-# devDependency "pure" del progetto, sia i peer dependencies opzionali di
-# @massimo-cassandro/minimo (vedi package.json di minimo, campi
-# peerDependencies/peerDependenciesMeta: elenco mantenuto a mano, non letto
-# dinamicamente da minimo — se cambiano va aggiornato manualmente anche qui).
-# In entrambi i casi vengono installati con `npm i -D`: in questo progetto
-# `dependencies` contiene solo @massimo-cassandro/minimo, tutto il resto
-# (tooling di build e librerie usate dai singoli componenti) è devDependency.
-# Ogni voce è "<pacchetto>|<descrizione>" (pacchetto allineato a colonna fissa
-# solo per leggibilità, non richiesto dal parsing).
+# Pacchetti opzionali: installati solo su conferma esplicita dell'utente
+# (vedi ciclo di domande più sotto). Include sia devDependency "pure" del
+# progetto, sia i peer dependencies opzionali di @massimo-cassandro/minimo
+# (vedi package.json di minimo, campi peerDependencies/peerDependenciesMeta:
+# elenco mantenuto a mano, non letto dinamicamente da minimo — se cambiano va
+# aggiornato manualmente anche qui).
+# Ogni voce è "<pacchetto> | <dev> | <descrizione>" (pacchetto e colonna <dev>
+# allineati a colonna fissa solo per leggibilità, non richiesto dal parsing).
+# La colonna <dev> vale "dev" se il pacchetto va installato con `npm i -D`
+# (devDependency), stringa vuota se va installato con `npm i -S` (dependency
+# vera, es. peer dependency di minimo usata a runtime).
 optionalPackages=(
-  "dotenv-webpack                               | gestione variabili d'ambiente (.env) nel bundle webpack"
-  "@principalstudio/html-webpack-inject-preload | injection dei tag <link rel=preload> nell'html generato"
-  "postcss-jit-props                            | include nel CSS compilato solo le custom properties effettivamente usate"
-  "@svgdotjs/svg.js                             | richiesto da charts/ di minimo"
-  "blurhash                                     | richiesto da unsplash-page di minimo (create-blurhash-canvas)"
-  "simple-datatables                            | richiesto da s-datatable-component di minimo"
-  "style-dictionary                             | richiesto da design-tokens/utilities di minimo (build-tokens)"
+  "dotenv-webpack                               | dev | gestione variabili d'ambiente (.env) nel bundle webpack"
+  "@principalstudio/html-webpack-inject-preload | dev | injection dei tag <link rel=preload> nell'html generato"
+  "postcss-jit-props                            | dev | include nel CSS compilato solo le custom properties effettivamente usate"
+  "@svgdotjs/svg.js                             |     | richiesto da charts/ di minimo"
+  "blurhash                                     |     | richiesto da unsplash-page di minimo (create-blurhash-canvas)"
+  "simple-datatables                            |     | richiesto da s-datatable-component di minimo"
+  "style-dictionary                             | dev | richiesto da design-tokens/utilities di minimo (build-tokens)"
 )
+
+# Rimuove spazi iniziali/finali da una stringa (usata per i campi estratti
+# da optionalPackages, allineati a colonna fissa con spazi di padding).
+trim() {
+  echo "$1" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//'
+}
 
 # Chiede conferma per un singolo pacchetto opzionale (default: No).
 ask_optional_pkg() {
   local pkg="$1"
   local desc="$2"
   local reply
-  read "reply?Installare il pacchetto opzionale '$pkg' (${desc})? [y/N]: "
+  echo -e "\n${YELLOW}${pkg}{NC}"
+  echo -e "${DIM}${desc}{NC}"
+  read "reply?Installare questo pacchetto opzionale? [y/N]: "
   [[ "$reply" =~ ^[Yy]$ ]]
 }
 
-selectedOptionalPkgs=()
+selectedOptionalDevPkgs=()
+selectedOptionalDepPkgs=()
 
 if [ "$DEBUG" != "TRUE" ]; then
   echo -e "\n${GREEN}...PACCHETTI OPZIONALI${NC}"
   for entry in "${optionalPackages[@]}"; do
-    pkg="${entry%%|*}"
-    pkg="${pkg%% *}"
-    desc="${entry#*| }"
+    IFS='|' read -r pkg devFlag desc <<< "$entry"
+    pkg="$(trim "$pkg")"
+    devFlag="$(trim "$devFlag")"
+    desc="$(trim "$desc")"
     if ask_optional_pkg "$pkg" "$desc"; then
-      selectedOptionalPkgs+=("$pkg")
+      if [ "$devFlag" = "dev" ]; then
+        selectedOptionalDevPkgs+=("$pkg")
+      else
+        selectedOptionalDepPkgs+=("$pkg")
+      fi
     fi
   done
 fi
@@ -178,16 +192,24 @@ force_cat() {
 # di copia da usare per ogni file: safe_cat_with_ports confronta e backuppa
 # il singolo file (sostituzione porte no-op se non contiene placeholder);
 # force_cat sovrascrive sempre senza controlli (vedi sopra, usata per ./app).
+# Il quinto argomento (opzionale) è una lista di basename (separati da spazio,
+# riferiti al nome del file sorgente, prima di un eventuale rename_fn) da
+# saltare: usato per escludere package-tpl.json, già copiato a parte prima
+# dell'installazione dei pacchetti npm (vedi più sotto).
 install_tree() {
   local src_root="$1"
   local dest_root="$2"
   local rename_fn="$3"
   local copy_fn="${4:-safe_cat_with_ports}"
+  local exclude="$5"
   local file rel dir base new_base dest
   while IFS= read -r file; do
     rel="${file#"$src_root"/}"
     dir="$(dirname "$rel")"
     base="$(basename "$rel")"
+    if [ -n "$exclude" ] && [[ " $exclude " == *" $base "* ]]; then
+      continue
+    fi
     if [ -n "$rename_fn" ]; then
       new_base="$("$rename_fn" "$base")"
     else
@@ -239,6 +261,19 @@ fi
 echo -e "${GREEN}Files will be installed in: '${FRONTEND_INSTALL_PATH}'${NC}"
 
 
+# package.json va creato dal template PRIMA di installare qualunque pacchetto:
+# se non esistesse ancora, i comandi `npm i` più sotto ne genererebbero uno
+# "al volo" privo di scripts/metadati del template, e le dipendenze verrebbero
+# registrate lì; alla successiva install_tree su source_files/root (più sotto)
+# quel package.json risulterebbe diverso dal template e verrebbe spostato in
+# OLD-package.json, perdendo le dipendenze appena installate. Per questo qui
+# si usa safe_cat_with_ports (idempotente, con backup OLD- se il file esiste
+# già con contenuto diverso) e poi si esclude package-tpl.json dalla
+# install_tree sulla root, per non ripetere la copia dopo che npm l'ha
+# già modificato.
+echo -e "\n${GREEN}...package.json${NC}"
+safe_cat_with_ports "${SOURCE_FILES_DIR}/root/package-tpl.json" "package.json"
+
 echo -e "\n${GREEN}...NODE MODULES${NC}"
 
 dependencies=(
@@ -283,8 +318,10 @@ devDependencies=(
 )
 
 # pacchetti opzionali selezionati dall'utente (vedi ciclo di domande a inizio
-# script), aggiunti all'array di installazione già definito sopra
-devDependencies+=("${selectedOptionalPkgs[@]}")
+# script), instradati in devDependencies o dependencies in base alla colonna
+# <dev> di optionalPackages (vedi sopra)
+devDependencies+=("${selectedOptionalDevPkgs[@]}")
+dependencies+=("${selectedOptionalDepPkgs[@]}")
 
 if [ "$DEBUG" = "TRUE" ]; then
   dependencies=( @massimo-cassandro/minimo )
@@ -343,8 +380,10 @@ mkdir -p "$WEBPACK_MODULES_INSTALL_PATH"
 # rename_root_file), quindi aggiungere/spostare/rinominare file lì non
 # richiede modifiche a questo script. Per app/ si usa force_cat (nessun
 # controllo/backup per singolo file, vedi commento su FRONTEND_INSTALL_PATH).
+# package-tpl.json è escluso: già copiato a parte prima dell'installazione
+# dei pacchetti npm (vedi sezione NODE MODULES più sopra).
 echo -e "${DIM}...root${NC}"
-install_tree "${SOURCE_FILES_DIR}/root" "." rename_root_file
+install_tree "${SOURCE_FILES_DIR}/root" "." rename_root_file "" "package-tpl.json"
 echo -e "${DIM}...app${NC}"
 install_tree "${SOURCE_FILES_DIR}/app" "${FRONTEND_INSTALL_PATH}" "" force_cat
 
@@ -377,9 +416,9 @@ force_cat "${MINIMO_PKG_DIR}/design-tokens/tokens-config-sample.mjs" "${FRONTEND
 force_cat "${MINIMO_PKG_DIR}/dev-tools/create-favicons/src/default-params.mjs" "${FRONTEND_INSTALL_PATH}/favicons/create-favicons-cfg.mjs"
 
 
-if [ ${#selectedOptionalPkgs[@]} -gt 0 ]; then
+if [ ${#selectedOptionalDevPkgs[@]} -gt 0 ] || [ ${#selectedOptionalDepPkgs[@]} -gt 0 ]; then
   echo -e "\n${YELLOW}Pacchetti opzionali installati:${NC}"
-  for pkg in "${selectedOptionalPkgs[@]}"; do
+  for pkg in "${selectedOptionalDevPkgs[@]}" "${selectedOptionalDepPkgs[@]}"; do
     echo -e "${YELLOW}  - $pkg${NC}"
   done
   echo -e "${YELLOW}Potrebbe essere necessaria una modifica alla configurazione webpack e/o postcss per utilizzare questi pacchetti.${NC}"
