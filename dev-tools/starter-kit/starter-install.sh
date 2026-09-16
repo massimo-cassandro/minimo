@@ -86,8 +86,8 @@ ask_optional_pkg() {
   local pkg="$1"
   local desc="$2"
   local reply
-  echo -e "\n${YELLOW}${pkg}{NC}"
-  echo -e "${DIM}${desc}{NC}"
+  echo -e "\n${YELLOW}${pkg}${NC}"
+  echo -e "${DIM}${desc}${NC}"
   read "reply?Installare questo pacchetto opzionale? [y/N]: "
   [[ "$reply" =~ ^[Yy]$ ]]
 }
