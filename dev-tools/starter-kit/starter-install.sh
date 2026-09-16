@@ -27,6 +27,11 @@ DIM='\033[2m' # Dim
 NC='\033[0m' # No Color
 
 DEBUG=FALSE
+for arg in "$@"; do
+  case "$arg" in
+    --debug) DEBUG=TRUE ;;
+  esac
+done
 
 # Questo script richiede zsh: se lanciato con sh/bash blocca l'esecuzione
 if [ -z "$ZSH_VERSION" ]; then
