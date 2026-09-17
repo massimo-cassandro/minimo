@@ -62,21 +62,22 @@ echo -e "${DIM}Porte: ${PORT_8000} (server), ${PORT_5700} (webpack dev server)${
 # aggiornato manualmente anche qui).
 # Ogni voce è "<pacchetto> | <dev> | <descrizione>" (pacchetto e colonna <dev>
 # allineati a colonna fissa solo per leggibilità, non richiesto dal parsing).
+# La colonna <pacchetto> può contenere più pacchetti separati da spazio: in tal
+# caso vengono proposti con un'unica domanda e, se confermati, installati tutti
+# (uno per uno) con la stessa modalità indicata dalla colonna <dev>.
 # La colonna <dev> vale "dev" se il pacchetto va installato con `npm i -D`
 # (devDependency), stringa vuota se va installato con `npm i -S` (dependency
 # vera, es. peer dependency di minimo usata a runtime).
 optionalPackages=(
-  "dotenv-webpack                               | dev | gestione variabili d'ambiente (.env) nel bundle webpack"
-  "@principalstudio/html-webpack-inject-preload | dev | injection dei tag <link rel=preload> nell'html generato"
-  "postcss-jit-props                            | dev | include nel CSS compilato solo le custom properties effettivamente usate"
-  "@svgdotjs/svg.js                             |     | richiesto da charts/ di minimo"
-  "blurhash                                     |     | richiesto da unsplash-page di minimo (create-blurhash-canvas)"
-  "simple-datatables                            |     | richiesto da s-datatable-component di minimo"
-  "style-dictionary                             | dev | richiesto da design-tokens/utilities di minimo (build-tokens)"
-  "@cybozu/eslint-config                        | dev | utilizzato da eslint per il check dei file css"
-  "postcss-cli                                  | dev | per css email"
-  "postcss-import                               | dev | per css email"
-  "postcss-nested                               | dev | per css email"
+  "dotenv-webpack                                    | dev | gestione variabili d'ambiente (.env) nel bundle webpack"
+  "@principalstudio/html-webpack-inject-preload      | dev | injection dei tag <link rel=preload> nell'html generato"
+  "postcss-jit-props                                 | dev | include nel CSS compilato solo le custom properties effettivamente usate"
+  "@svgdotjs/svg.js                                  |     | richiesto da charts/"
+  "blurhash                                          |     | richiesto da unsplash-page (create-blurhash-canvas)"
+  "simple-datatables                                 |     | richiesto da s-datatable-component"
+  "style-dictionary                                  | dev | richiesto da design-tokens/utilities (build-tokens)"
+  "@cybozu/eslint-config                             | dev | utilizzato da eslint per il check dei file css"
+  "postcss-cli postcss-import postcss-nested cssnano | dev | per css email"
 )
 
 # Rimuove spazi iniziali/finali da una stringa (usata per i campi estratti
@@ -107,10 +108,11 @@ if [ "$DEBUG" != "TRUE" ]; then
     devFlag="$(trim "$devFlag")"
     desc="$(trim "$desc")"
     if ask_optional_pkg "$pkg" "$desc"; then
+      # ${=pkg}: word splitting di zsh, per le voci con più pacchetti
       if [ "$devFlag" = "dev" ]; then
-        selectedOptionalDevPkgs+=("$pkg")
+        selectedOptionalDevPkgs+=(${=pkg})
       else
-        selectedOptionalDepPkgs+=("$pkg")
+        selectedOptionalDepPkgs+=(${=pkg})
       fi
     fi
   done
@@ -205,6 +207,8 @@ force_cat() {
 # riferiti al nome del file sorgente, prima di un eventuale rename_fn) da
 # saltare: usato per escludere package-tpl.json, già copiato a parte prima
 # dell'installazione dei pacchetti npm (vedi più sotto).
+# I file .DS_Store (macOS) vengono sempre ignorati: sono binari e farebbero
+# fallire il sed di safe_cat_with_ports ("illegal byte sequence").
 install_tree() {
   local src_root="$1"
   local dest_root="$2"
@@ -231,7 +235,7 @@ install_tree() {
       dest="${dest_root}/${dir}/${new_base}"
     fi
     "$copy_fn" "$file" "$dest"
-  done < <(find "$src_root" -type f)
+  done < <(find "$src_root" -type f ! -name .DS_Store)
 }
 
 # Rename applicato ai file di source_files/root/ in fase di copia:

@@ -1,0 +1,63 @@
+{# template base per tutte le email #}
+{% apply inline_css(source('email/css/mail-inline.css')) %}
+ <!DOCTYPE html>
+<html lang="it">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="format-detection" content="telephone=no">
+    <title>{% block title %}{% endblock %}</title>
+    <style type="text/css">
+      {%- include 'email/css/mail-inline.css' -%}
+      {%- include 'email/css/mail-embed.css' -%}
+    </style>
+  </head>
+  <body class="yahoo-fix" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+    {# Wrapper table #}
+    <table width="100%" border="0" cellpadding="0" cellspacing="0" align="center" id="wrapper">
+      <tbody>
+        <tr>
+          <td width="100%">
+            {# logo #}
+            <table class="content header device-width" width="600" border="0" cellpadding="0" cellspacing="0" align="center">
+              <tbody>
+                <tr>
+                  <td class="logo" width="100%">
+                    {% block logo %}
+                      {# immagine allegata inline (cid:), vedi templates/email/imgs #}
+                      <img src="{{ email.image('email/imgs/logo-ict-governance-email.png', 'image/png', 'logo-ict-governance.png') }}" alt="ICT Governance" width="200" height="54" border="0">
+                    {%- endblock %}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+
+            {# content #}
+            <table class="content body device-width" width="600" border="0" cellpadding="0" cellspacing="0" align="center">
+              <tbody>
+                <tr>
+                  <td>
+                    <h1 class="text-center">
+                      {%- block title_h1 %}{{ block('title') }}{% endblock -%}
+                    </h1>
+                    {% block content %}{% endblock %}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+
+            {# footer #}
+            <table class="content footer device-width" width="600" border="0" cellpadding="0" cellspacing="0" align="center">
+              <tbody>
+                <tr>
+                  <td>{% block footer %}Bluvacanze{%- endblock %}</td>
+                </tr>
+              </tbody>
+            </table>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </body>
+</html>
+{% endapply %}

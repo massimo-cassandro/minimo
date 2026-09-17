@@ -1,0 +1,26 @@
+/* @import url(../src/css/custom-properties.css); */
+
+:root {
+
+  --mail-font-size-xs: 13px;
+  --mail-font-size: 16px;
+  --mail-font-size-lg: 18px;
+  --mail-font-size-2lg: 21px;
+  --mail-font-size-3lg: 24px;
+  --mail-font-size-xl: 28px;
+
+  --mail-body-font: helvetica, arial, sans-serif;
+  --mail-body-bg: #efefef;
+  --mail-text-color: #333;
+  --mail-text-color-light: #373737;
+  --mail-gray: #4b4a4a;
+
+  --mail-content-bg: #fff;
+  --mail-spacing: 24px;
+  --mail-spacing-half: 12px; /* niente calc(): non supportato da Outlook */
+
+  --mail-alt-color: #036;
+  --mail-darken-alt-color: #010112;
+  --mail-link-color: #036;
+
+}

@@ -1,0 +1,66 @@
+/* stylelint-disable declaration-no-important */
+@import './_mail-properties.css';
+
+/* NB: niente selettore universale `*`: inline_css inlinerebbe la regola su ogni elemento */
+body, table, td, p, a { text-size-adjust: 100%; }
+
+.content {
+  &.body {
+    a {
+      font-weight: 700;
+      color: var(--mail-alt-color);
+      text-decoration: underline;
+      cursor: pointer;
+
+      &:hover {
+        color: var(--mail-darken-alt-color);
+      }
+    }
+  }
+}
+
+@media only screen and (max-width: 640px)  {
+  body {
+    &[class='yahoo-fix'] {
+      .device-width {
+        width: 440px !important;
+      }
+    }
+  }
+
+  .content {
+    &.columns-wrapper {
+      td.column-spacer {
+        height: 0 !important;
+      }
+
+      td.column-width, td.column-spacer  {
+        display: block !important;
+        width: 100% !important;
+      }
+      .column-content {
+        & td {
+          & h2 {
+            font-size: var(--mail-font-size-3lg) !important;
+          }
+          & .text {
+            font-size: var(--mail-font-size-lg) !important;
+          }
+          & .buttons {
+            font-size: var(--mail-font-size-2lg) !important;
+          }
+        }
+      }
+    }
+  }
+}
+
+@media only screen and (max-width: 479px) {
+  body {
+    &[class='yahoo-fix'] {
+      .device-width {
+        width: 280px !important;
+      }
+    }
+  }
+}
