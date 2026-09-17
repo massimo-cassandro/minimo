@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="it">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>{%- block title -%}{%- endblock %} | Marketing</title>
+    <meta name="robots" content="noindex, nofollow, noarchive">
+    {%- include 'incl/favicons.incl.html.twig'-%}
+    {{- '' -}}
+    <link rel="preload" href="{{ asset('index.js') }}" as="script">
+    <link rel="preload" href="{{ asset('shared.js') }}" as="script">
+    <link rel="preload" href="{{ asset('runtime.js') }}" as="script">
+    {{- '' -}}
+    <link rel="preload" href="{{ asset('index.css') }}" as="style">
+    <link rel="stylesheet" href="{{ asset('index.css') }}" type="text/css" media="all">
+    <style>
+      {%- include '@public_path' ~ asset('layout.critical.css') -%}
+    </style>
+    {%- block head -%}{%- endblock -%}
+  </head>
+  <body>
+
+    <script src="{{ asset('runtime.js') }}"></script>
+    <script src="{{ asset('shared.js') }}"></script>
+    <script src="{{ asset('index.js') }}"></script>
+    {%- block js -%}{%- endblock -%}
+  </body>
+</html>

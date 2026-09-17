@@ -73,6 +73,10 @@ optionalPackages=(
   "blurhash                                     |     | richiesto da unsplash-page di minimo (create-blurhash-canvas)"
   "simple-datatables                            |     | richiesto da s-datatable-component di minimo"
   "style-dictionary                             | dev | richiesto da design-tokens/utilities di minimo (build-tokens)"
+  "@cybozu/eslint-config                        | dev | utilizzato da eslint per il check dei file css"
+  "postcss-cli                                  | dev | per css email"
+  "postcss-import                               | dev | per css email"
+  "postcss-nested                               | dev | per css email"
 )
 
 # Rimuove spazi iniziali/finali da una stringa (usata per i campi estratti

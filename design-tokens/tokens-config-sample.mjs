@@ -147,7 +147,7 @@ const config = {
   ],
 
   // Directory containing the CSS files to scan for unresolved custom properties
-  dirToCheck: '../../src',
+  dirToCheck: '../src',
 
   // Regular expressions for custom property names to exclude from the check.
   // Useful for intentionally private/internal props (e.g. prefixed with --_).

@@ -1,10 +1,6 @@
-{#-
-https://symfony.com/doc/current/controller/error_pages.html#testing-error-pages-during-development
-
-test: https://project.local:8890/_error/500 (or 403, 404... )
--#}
+{#- https://symfony.com/doc/current/controller/error_pages.html#testing-error-pages-during-development -#}
 <!DOCTYPE html>
-<html lang="it" data-err-code="{{ status_code }}" data-err-text="{{ status_text }}">
+<html lang="it" data-err-code="{{ status_code }}" data-err-text="{{ status_text}}">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -12,16 +8,14 @@ test: https://project.local:8890/_error/500 (or 403, 404... )
   <title>Errore {{ status_code }}</title>
   <meta name="robots" content="noindex, nofollow, noarchive">
   {%- include 'incl/favicons.incl.html.twig'-%}
-  <link rel="preload" href="{{ asset('project.css') }}" as="style">
-  <link rel="stylesheet" href="{{ asset('project.css') }}" media="all">
+  <link rel="preload" href="{{ asset('marketing.css') }}" as="style">
+  <link rel="stylesheet" href="{{ asset('marketing.css') }}" media="all">
   <link rel="preload" href="{{ asset('error-pages.css') }}" as="style">
   <link rel="stylesheet" href="{{ asset('error-pages.css') }}" media="all">
   <link rel="preload" href="{{ asset('error-pages.js') }}" as="script">
 
-  <link rel="preload" href="{{ asset('vendors.js') }}" as="script">
+  <link rel="preload" href="{{ asset('shared.js') }}" as="script">
   <link rel="preload" href="{{ asset('runtime.js') }}" as="script">
-  <link rel="preload" href="{{ asset('shared.css') }}" as="style">
-  <link rel="stylesheet" href="{{ asset('shared.css') }}" type="text/css" media="all">
 </head>
 <body>
   <div id="root"></div>

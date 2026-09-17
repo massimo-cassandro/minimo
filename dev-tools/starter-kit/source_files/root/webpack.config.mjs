@@ -39,9 +39,10 @@ const __filename = fileURLToPath(import.meta.url)
 
 const isDevelopment = process.env.NODE_ENV === 'development'
   ,devServerPort = [[port5700]]
-  // ,apiPort = [[port8000]]
+  ,apiPort = [[port8000]] // eslint-disable-line no-unused-vars
   ,useSass = false
   ,inlineCssInDevMode = true
+  // sf: inlineCssInDevMode = false
   ,useSvgo = true
   ,useSvgr = false // svg per react
   ,svgoConfig = useSvgo? (await import('./webpack-config-modules/svgo.config.mjs')).default : null
@@ -58,6 +59,11 @@ const isDevelopment = process.env.NODE_ENV === 'development'
   // resta relativa perché viene confrontata con i path dei moduli
   ,favicons_path = path.resolve(__dirname, './app/favicons/output') // commentare se non usato
   ,favicons_path_regexp = /favicons\/output/ // source pattern per le favicons (regexp o null)
+
+  //sf:
+  //,favicons_path
+  // ,favicons_path_regexp = null
+
 
   // NB: jsconfig.json va tenuto in questa stessa dir (gli alias sono risolti
   // a partire dalla sua posizione)
@@ -91,8 +97,9 @@ const isDevelopment = process.env.NODE_ENV === 'development'
 // limitata tra le pagine. Da rivedere in futuro se la duplicazione dovesse
 // crescere.
 //
-// TODO: se in futuro la duplicazione di css tra le pagine dovesse crescere
-// (componenti importati dal js di più entry), valutare un cacheGroup `styles`
+// TODO: shared.css -> attualmente non generato, ma se in futuro la duplicazione di css tra le pagine dovesse crescere
+// e se si risolve un problema con purgeCSS
+// (componenti importati dal js di più entry), valutare un cacheGroup `shared`
 // dedicato ai css condivisi: andranno escluse le entry `.critical` (devono
 // restare autosufficienti), gestite in safelist.variables le custom properties
 // definite/consumate tra asset diversi (vedi purgecss-variables-safelist.mjs),
@@ -104,8 +111,8 @@ const shared_chunk_paths = (module) => {
   const sep = '[\\\\/]'; // stringa che produce [\\/] nel pattern
   const pathsRegexp = new RegExp([
     'node_modules',
-    'app/js',
     'app/src',
+    'app/src/js',
     'app/src/web-components',
     'app/src/components',
   ].map(p => `${sep}${p.replace(/\//g, sep)}${sep}`).join('|'));
@@ -441,8 +448,8 @@ const config = {
             start_year,
             ...(current_year > start_year? [current_year] : [])
           ].join('-')
-          // ,vers = packageJson.version.split('.').slice(0,-1).join('.')
-          ,vers = packageJson.version
+          ,vers = packageJson.version.split('.').slice(0,-1).join('.')
+          // ,vers = packageJson.version
         ;
 
         const author = packageJson.author?.name ?? (packageJson.author ?? '');

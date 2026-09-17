@@ -25,6 +25,10 @@ const legacyParamNames = {
   use_warning_icon: 'useAltIcon'
 };
 
+// TODO aggiungere metodo setDefaults per cambiare a livello globale i valori di default
+//      senza doverli ripetere ad ogni istanza del modulo
+
+
 const defaults = {
 
   // settings applied to all dialog types; can be overridden per type
