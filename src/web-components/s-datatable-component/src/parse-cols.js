@@ -122,6 +122,8 @@ export function parseCols(col_obj){
       };
 
     } else if( col_obj._renderMode === 'numeric' ||
+      col_obj._renderMode === 'perc_decimal' ||
+      col_obj._renderMode === 'perc' ||
       col_obj._renderMode === 'euro' ||
       col_obj._renderMode === 'euro_currency' ||
       col_obj._renderMode === 'euro_no_dec') {
@@ -142,12 +144,21 @@ export function parseCols(col_obj){
             return '\u2014';
 
           } else {
+
+            if(col_obj._renderMode === 'perc') {
+              value = value / 100;
+            }
+
             cell.attributes['data-order'] = value;
             return Number(value).toLocaleString('it-IT', {
               minimumFractionDigits: digits,
               maximumFractionDigits: digits,
               useGrouping: 'always',
-              style: col_obj._renderMode === 'euro_currency' ? 'currency' : 'decimal',
+              style: col_obj._renderMode === 'euro_currency'
+                ? 'currency'
+                : (col_obj._renderMode === 'perc_decimal' || col_obj._renderMode === 'perc')
+                  ? 'percent'
+                  : 'decimal',
               currency: col_obj._renderMode === 'euro_currency' ? 'EUR' : undefined
             });
           }
