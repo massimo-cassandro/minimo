@@ -104,7 +104,7 @@ export const buildSourceModes = async ({
     // formatPlatform() runs the format function without writing to disk —
     // the composed multi-mode file is written once, at the end, below.
     const [formatted] = await sd.formatPlatform('css');
-    modeBlocks[mode] = formatted.output;
+    modeBlocks[mode] = /** @type {string} */ (formatted.output);
     // customPropsCount is a live binding, updated synchronously by the
     // format function called above (see formats/css.mjs).
     totalCustomProps += customPropsCount;

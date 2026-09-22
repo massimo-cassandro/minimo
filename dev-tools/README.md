@@ -6,6 +6,7 @@ A collection of standalone Node.js CLI utilities to help manage a web project's 
 * [Svg Icons Tools](./svg-icons-tools/README.md) — optimizes SVG icons and combines/converts them into symbols, JSX, or SCSS variables
 * [Create favicons](./create-favicons/README.md) — generates the full favicon set (SVG, PNG, ICO, webmanifest, HTML snippet) from a source image
 * [upd@m](./upd@m/README.md) — updates all `@massimo-cassandro/*` packages installed in `node_modules`
+* [Design Tokens Builder](./design-tokens-builder/README.md) — generates a CSS custom properties file (and optional JSON token files) from design token sources
 * [starter-kit](#starter-kit) — script for installing minimo environment
 
 ## starter-kit

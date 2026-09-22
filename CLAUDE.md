@@ -71,10 +71,11 @@ minimo/
 ├── design-tokens/
 │   ├── _src/                       # sorgenti token (.mjs e .jsonc)
 │   └── tokens/                     # token compilati (JSONC, W3C DTCG format) — generati da build-tokens
-├── design-tokens/utilities/        # script Node.js per build token (Style Dictionary v5)
-│   ├── build-tokens.mjs            # → CLI: buildTokens
-│   └── check-unresolved-custom-props.mjs  # → CLI: checkUnresolvedProps
-├── dev-tools/starter-kit/          # configurazione webpack starter + script d'installazione
+├── dev-tools/
+│   ├── starter-kit/                # configurazione webpack starter + script d'installazione
+│   └── design-tokens-builder/      # script Node.js per build token (Style Dictionary v5)
+│       ├── build-tokens.mjs            # → CLI: buildTokens
+│       └── check-unresolved-custom-props.mjs  # → CLI: checkUnresolvedProps
 ├── demo/                           # ambiente di test dei componenti (webpack, config interna alla dir)
 ├── demo-build/                     # (non ancora presente) build statica della demo per GitHub Pages
 ├── snippets/                       # porzioni di codice slegate dal framework, utili per integrazioni rapide
@@ -118,12 +119,11 @@ Dal `files` di `package.json`:
 - `./index.js`
 - `src/**/*.{js,mjs,css,svg,md}`
 - `types/**/*.d.ts`
-- `design-tokens/README.md`, `design-tokens/tokens-config-sample.mjs`
+- `design-tokens/README.md`
 - `design-tokens/tokens/**/*.{tokens.json,tokens.jsonc}`
 - `design-tokens/_src/**/*.{tokens.json,tokens.jsonc,mjs,js,md}`
-- `design-tokens/utilities/**/*.{mjs,md}`
 - `charts/**/*.{js,mjs,md}`
-- `dev-tools/**/*` (incluso `dev-tools/stylelint-config/`)
+- `dev-tools/**/*` (incluso `dev-tools/stylelint-config/`, `dev-tools/design-tokens-builder/`)
 - `snippets/**/*`
 
 Escluse ovunque le cartelle/file con prefisso `TODO` (`!**/TODO*/**`, `!**/TODO*`).

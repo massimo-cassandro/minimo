@@ -14,7 +14,7 @@
     "index.js",
     "src/**/*.js",
     "charts/**/*.js",
-    "design-tokens/utilities/**/*.mjs"
+    "dev-tools/design-tokens-builder/**/*.mjs"
   ],
   "exclude": ["node_modules", "demo", "demo-build", "_wrk", "archived", "snippets", "charts/TODO charts"]
 }

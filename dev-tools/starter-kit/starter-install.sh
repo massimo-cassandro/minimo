@@ -75,7 +75,7 @@ optionalPackages=(
   "@svgdotjs/svg.js                                  |     | richiesto da charts/"
   "blurhash                                          |     | richiesto da unsplash-page (create-blurhash-canvas)"
   "simple-datatables                                 |     | richiesto da s-datatable-component"
-  "style-dictionary                                  | dev | richiesto da design-tokens/utilities (build-tokens)"
+  "style-dictionary                                  | dev | richiesto da dev-tools/design-tokens-builder (build-tokens)"
   "@cybozu/eslint-config                             | dev | utilizzato da eslint per il check dei file css"
   "postcss-cli postcss-import postcss-nested cssnano | dev | per css email"
 )
@@ -421,7 +421,7 @@ force_cat "${MINIMO_PKG_DIR}/src/custom-media.css" "${FRONTEND_INSTALL_PATH}/css
 force_cat "${MINIMO_PKG_DIR}/src/minimo.css" "${FRONTEND_INSTALL_PATH}/css/index.css"
 
 # config di build-tokens: collocato accanto al css generato (custom-properties.css).
-force_cat "${MINIMO_PKG_DIR}/design-tokens/tokens-config-sample.mjs" "${FRONTEND_INSTALL_PATH}/css/tokens-config.mjs"
+force_cat "${MINIMO_PKG_DIR}/dev-tools/design-tokens-builder/tokens-config-sample.mjs" "${FRONTEND_INSTALL_PATH}/css/tokens-config.mjs"
 
 
 
