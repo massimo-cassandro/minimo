@@ -28,7 +28,9 @@ export const CSS_TRANSFORMS = [
 // Kept minimal on purpose: consuming tools expect original values (e.g. "16px"
 // not "1rem") and alias references ({...}) must be preserved to maintain
 // token links.
-const JSON_TRANSFORMS = [
+// Exported so build-source-modes.mjs can build a matching json platform per
+// sourceModes mode.
+export const JSON_TRANSFORMS = [
   'attribute/cti',
   'name/kebab',
   'color/css-modern',

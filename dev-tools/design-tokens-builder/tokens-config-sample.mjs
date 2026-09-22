@@ -46,8 +46,46 @@ const config = {
 
     // your project tokens
     './project-tokens/*.{js,mjs,jsonc,json}',
-
   ],
+
+  // Optional light/dark (or other) custom properties split — alternative to
+  // `source`. If this key is set (a non-null object), `source` above is
+  // ignored: each key is a mode name with its own array of source patterns
+  // (same rules as `source`: paths, globs, or a mix).
+  //
+  // The generated CSS composes all modes into a single destFile:
+  //   - the base mode's props (see sourceModesBase below) go in a top-level
+  //     `:root { ... }` block, with `color-scheme: <all modes>;` prepended
+  //     (e.g. "light dark")
+  //   - every other mode's props go in
+  //     `@media (prefers-color-scheme: <mode>) { :root { ... } }`, with
+  //     `color-scheme: <mode>;` prepended
+  // customPropsGroups, mergeCustomProps, addLayer, pxToRem etc. all apply
+  // the same way as with a single `source`.
+  //
+  // The JSON output (see JSON TOKENS OUTPUT below) is produced once per
+  // mode, with the mode name appended to each filename, e.g. with
+  // jsonDestFile: 'tokens' -> "tokens-light.jsonc", "tokens-dark.jsonc".
+  //
+  // sample:
+  // sourceModes: {
+  //   light: [
+  //     `${minimo_path}/design-tokens/_src/**/*.tokens.{mjs,jsonc}`,
+  //     `${minimo_path}/src/**/*.tokens.{mjs,jsonc}`,
+  //     './project-tokens/light/*.{js,mjs,jsonc,json}',
+  //   ],
+  //   dark: [
+  //     './project-tokens/dark/*.{js,mjs,jsonc,json}',
+  //   ],
+  // },
+  sourceModes: null,
+
+  // With sourceModes set: the mode whose declarations go in the top-level
+  // `:root { ... }` block, instead of nested inside its own
+  // `@media (prefers-color-scheme: <mode>) { ... }` rule (default: the first
+  // key of sourceModes, e.g. 'light'). Ignored when sourceModes is not set.
+  sourceModesBase: 'light',
+
 
   // If true (default), dimension token values expressed in px are converted
   // to rem in the generated CSS. Values in other units (em, %, vh, dvw, ...)

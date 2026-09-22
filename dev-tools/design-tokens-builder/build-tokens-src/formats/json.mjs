@@ -216,20 +216,25 @@ export const collectConcreteFilePaths = async (sd) => {
 // @param {string|null}                    jsonDestFile       Aggregated file base name, or null
 // @param {'json'|'jsonc'}                 jsonFormat         Output format
 // @param {'keep'|'calc'|'resolve'}        jsonExpression     Expression handling mode
+// @param {string}                         [suffix]           Appended to every destination
+//   filename, before the extension — used by the sourceModes build
+//   (build-source-modes.mjs) to produce one set of files per mode, e.g.
+//   "-light" -> "tokens-light.jsonc" / "size-light.jsonc" (default: '')
 // @returns {object[]}  File descriptors for the Style Dictionary platform
 
 export const buildJsonFiles = (
   concreteFilePaths,
   jsonDestFile,
   jsonFormat = 'json',
-  jsonExpression = 'keep'
+  jsonExpression = 'keep',
+  suffix = ''
 ) => {
   const ext  = jsonFormat === 'jsonc' ? '.jsonc' : '.json';
   const jsonc = jsonFormat === 'jsonc';
 
   if (jsonDestFile) {
     return [{
-      destination: jsonDestFile + ext,
+      destination: jsonDestFile + suffix + ext,
       format: 'json/tokens',
       options: { jsonc, jsonExpression },
     }];
@@ -242,7 +247,7 @@ export const buildJsonFiles = (
   // one silently overwrite the other.
   const pathsByDestName = new Map();
   for (const filePath of concreteFilePaths) {
-    const destName = path.basename(filePath).replace(/\.[^.]+$/, '') + ext;
+    const destName = path.basename(filePath).replace(/\.[^.]+$/, '') + suffix + ext;
     if (!pathsByDestName.has(destName)) pathsByDestName.set(destName, []);
     pathsByDestName.get(destName).push(filePath);
   }
@@ -260,7 +265,7 @@ export const buildJsonFiles = (
   return concreteFilePaths.map((filePath) => {
     const absPath = path.resolve(filePath);
     return {
-      destination: path.basename(filePath).replace(/\.[^.]+$/, '') + ext,
+      destination: path.basename(filePath).replace(/\.[^.]+$/, '') + suffix + ext,
       format: 'json/tokens',
       options: { jsonc, jsonExpression },
       filter: (token) => {

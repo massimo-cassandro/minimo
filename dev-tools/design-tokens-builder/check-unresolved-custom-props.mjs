@@ -25,6 +25,7 @@ import StyleDictionary from 'style-dictionary';
 import './build-tokens-src/transforms.mjs';
 import { CSS_TRANSFORMS } from './build-tokens-src/platforms.mjs';
 import { resolveSourcePaths } from './build-tokens-src/resolve-source-paths.mjs';
+import { findMediaModeBlocks } from './build-tokens-src/merge-css.mjs';
 
 // const __filename = fileURLToPath(import.meta.url);
 // const __dirname  = dirname(__filename);
@@ -90,25 +91,48 @@ async function run() {
     const definitionRegex = /--([a-z0-9-]+)(?=\s*:)/g;
 
     // defined_props keeps file/line info too, so unused properties (section 6)
-    // can be reported with a link back to their definition.
-    /** @type {{file: string, line: number, prop: string}[]} */
+    // can be reported with a link back to their definition. With sourceModes
+    // (see build-tokens-src/config.mjs), the same prop name can legitimately
+    // appear once per mode with a different value — `mode` disambiguates
+    // which one a given entry is, so section 5 resolves each to the correct
+    // per-mode source file instead of mixing them up (see findMediaModeBlocks
+    // in build-tokens-src/merge-css.mjs).
+    /** @type {{file: string, line: number, prop: string, mode: string|null}[]} */
     const defined_props = [];
 
     const cssContent = fs.readFileSync(custom_prop_file_path, 'utf-8');
     const custom_prop_relpath = path.relative(configDir, custom_prop_file_path);
+
+    // sourceModesBase mirrors the default-resolution logic in
+    // build-tokens-src/config.mjs: the configured sourceModesBase if it's
+    // actually a key of sourceModes, otherwise the first key.
+    const sourceModeNames = config.sourceModes ? Object.keys(config.sourceModes) : [];
+    const sourceModesBase = sourceModeNames.includes(config.sourceModesBase)
+      ? config.sourceModesBase
+      : sourceModeNames[0];
+    const mediaModeBlocks = config.sourceModes ? findMediaModeBlocks(cssContent) : [];
+
+    /** @param {number} index @returns {string|null} */
+    const modeAtIndex = (index) => {
+      if (!config.sourceModes) return null;
+      const block = mediaModeBlocks.find(b => index > b.start && index < b.end);
+      return block ? block.mode : sourceModesBase;
+    };
+
     [...cssContent.matchAll(definitionRegex)].forEach(m => {
       const line = cssContent.substring(0, m.index).split('\n').length;
-      defined_props.push({ file: custom_prop_relpath, line, prop: `--${m[1]}` });
+      defined_props.push({ file: custom_prop_relpath, line, prop: `--${m[1]}`, mode: modeAtIndex(m.index) });
     });
 
-    // Also include any extra CSS files declared in extraCustomPropsFiles
+    // Also include any extra CSS files declared in extraCustomPropsFiles.
+    // These are plain (non-sourceModes) files, so mode is always null.
     for (const extraFile of (config.extraCustomPropsFiles ?? [])) {
       const extraFilePath = path.resolve(configDir, extraFile);
       const extraContent  = fs.readFileSync(extraFilePath, 'utf-8');
       const extraRelpath  = path.relative(configDir, extraFilePath);
       [...extraContent.matchAll(definitionRegex)].forEach(m => {
         const line = extraContent.substring(0, m.index).split('\n').length;
-        defined_props.push({ file: extraRelpath, line, prop: `--${m[1]}` });
+        defined_props.push({ file: extraRelpath, line, prop: `--${m[1]}`, mode: null });
       });
     }
 
@@ -161,27 +185,56 @@ async function run() {
     // CSS (or an extraCustomPropsFiles entry) — e.g. manual additions kept
     // across rebuilds via the mergeCustomProps option — have no token source
     // and are reported by name only.
+    //
+    // With sourceModes, resolution runs once PER MODE, keyed by mode name in
+    // sourceFileByPropByMode: the same prop name can be defined by a
+    // different source file in each mode (see the `dead: {...}` example in
+    // both a light and dark token file), so a single flattened name -> file
+    // map would silently point some entries at the wrong mode's file.
+    // sourceFileByProp (mode: null) covers the non-sourceModes case and
+    // extraCustomPropsFiles entries.
     // ---------------------------------------------------------------------------
     /** @type {Map<string, string>} */
     const sourceFileByProp = new Map();
+    /** @type {Map<string, Map<string, string>>} */
+    const sourceFileByPropByMode = new Map();
 
-    if (checkUnused && Array.isArray(config.source) && config.source.length) {
+    /** @param {string[]} sourcePatterns @returns {Promise<Map<string,string>>} */
+    const resolveSourceFileMap = async (sourcePatterns) => {
+      /** @type {Map<string, string>} */
+      const map = new Map();
+      const resolvedPaths = resolveSourcePaths(sourcePatterns, configDir);
+      if (!resolvedPaths.length) return map;
       try {
-        const tokenSourcePaths = resolveSourcePaths(config.source, configDir);
         const sd = new StyleDictionary({
-          source: tokenSourcePaths,
+          source: resolvedPaths,
           log: { verbosity: 'silent' },
           platforms: { css: { transforms: CSS_TRANSFORMS } },
         });
         const dictionary = await sd.getPlatformTokens('css');
-
         for (const token of dictionary.allTokens) {
-          if (token.filePath) sourceFileByProp.set(`--${token.name}`, token.filePath);
+          if (token.filePath) map.set(`--${token.name}`, token.filePath);
         }
       } catch {
         // Non-fatal: unused properties will be reported by name only.
       }
+      return map;
+    };
+
+    if (checkUnused && config.sourceModes) {
+      for (const [mode, modeSource] of Object.entries(config.sourceModes)) {
+        sourceFileByPropByMode.set(mode, await resolveSourceFileMap(modeSource));
+      }
+    } else if (checkUnused && Array.isArray(config.source) && config.source.length) {
+      const map = await resolveSourceFileMap(config.source);
+      for (const [prop, filePath] of map) sourceFileByProp.set(prop, filePath);
     }
+
+    /** @param {{prop: string, mode: string|null}} item @returns {string|undefined} */
+    const resolveSourceFilePath = (item) =>
+      item.mode
+        ? sourceFileByPropByMode.get(item.mode)?.get(item.prop)
+        : sourceFileByProp.get(item.prop);
 
     // ---------------------------------------------------------------------------
     // 6. Build the list of unused custom properties (defined but never
@@ -194,7 +247,7 @@ async function run() {
         .filter(item => !used_props_set.has(item.prop))
         .filter(item => {
           if (!ignoreUnusedInNodeModules) return true;
-          const sourceFilePath = sourceFileByProp.get(item.prop);
+          const sourceFilePath = resolveSourceFilePath(item);
           if (!sourceFilePath) return true;
           return !/(^|[\\/])node_modules([\\/]|$)/.test(sourceFilePath);
         })
@@ -232,7 +285,7 @@ async function run() {
         '## Unused custom properties\n\n'
         + unused_props
           .map(item => {
-            const sourceFilePath = sourceFileByProp.get(item.prop);
+            const sourceFilePath = resolveSourceFilePath(item);
             if (!sourceFilePath) return `* \`${item.prop}\``;
 
             const relSource = path.relative(configDir, sourceFilePath);

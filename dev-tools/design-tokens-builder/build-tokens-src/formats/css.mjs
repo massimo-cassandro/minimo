@@ -252,11 +252,14 @@ StyleDictionary.registerFormat({
 
     // Build a name → declaration-tail map from the declarations generated
     // above, then merge with any pre-existing custom properties loaded via
-    // loadExistingCustomProps() (see ../merge-css.mjs). Pre-existing values
-    // (including trailing comments) take priority when both exist;
-    // pre-existing-only properties are kept.
+    // loadExistingCustomProps() / loadExistingCustomPropsScoped() (see
+    // ../merge-css.mjs). Pre-existing values (including trailing comments)
+    // take priority when both exist; pre-existing-only properties are kept.
+    // options.mode (sourceModes build only, see ../build-source-modes.mjs)
+    // scopes the merge to that mode, so same-named props with different
+    // values across modes are never mixed up.
     const generatedProps = parseCustomProps(lines.join('\n'));
-    const finalProps = mergeCustomProps(generatedProps);
+    const finalProps = mergeCustomProps(generatedProps, options.mode ?? null);
 
     // Final output is always sorted alphabetically ascending by property
     // name, regardless of merge — this also keeps pre-existing-only
@@ -295,6 +298,15 @@ StyleDictionary.registerFormat({
     // first hyphen-separated segment (e.g. all `btn-*` together), to visually
     // group related custom properties in the generated file.
     const outLines = [];
+
+    // options.colorScheme (sourceModes build only, see ../build-source-modes.mjs):
+    // prepends a `color-scheme: <value>;` declaration, e.g. "light dark" for
+    // the base mode's block, or the mode's own name (e.g. "dark") for a
+    // block nested inside its @media (prefers-color-scheme: <mode>) rule.
+    if (options.colorScheme) {
+      outLines.push(`  color-scheme: ${options.colorScheme};`, '');
+    }
+
     let prevPrefix = null;
     const appendBlock = (props) => {
       for (const [name, tail] of props) {

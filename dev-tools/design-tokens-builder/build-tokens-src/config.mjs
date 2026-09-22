@@ -110,5 +110,39 @@ export const customPropsGroups = Array.isArray(buildConfig.customPropsGroups)
 // path.join() — it may corrupt the pattern syntax. Use template literals:
 //   OK:  `${minimo_path}/**/*.{json,mjs}`
 //   NO:  path.join(minimo_path, '/**/*.{json,mjs}')
+//
+// sourceModes: alternative to `source`, for a light/dark (or other) custom
+// properties split — see build-tokens-src/build-source-modes.mjs. When set
+// (buildConfig.sourceModes is a non-null object), `source` is ignored and
+// each mode's own array of source patterns is resolved the same way.
 // ---------------------------------------------------------------------------
-export const source = resolveSourcePaths(buildConfig.source, configDir);
+const sourceModesRaw = buildConfig.sourceModes ?? null;
+
+export const sourceModes = sourceModesRaw
+  ? Object.fromEntries(
+    Object.entries(sourceModesRaw).map(([mode, modeSource]) => [
+      mode,
+      resolveSourcePaths(modeSource, configDir),
+    ])
+  )
+  : null;
+
+// sourceModesBase: the mode whose declarations are written to the top-level
+// `:root { ... }` block (the others are nested under
+// `@media (prefers-color-scheme: <mode>) { ... }`). Default: the first key
+// of sourceModes (insertion order), e.g. 'light'. Ignored when sourceModes
+// is not set.
+export const sourceModesBase = sourceModes
+  ? (Object.prototype.hasOwnProperty.call(sourceModes, buildConfig.sourceModesBase)
+    ? buildConfig.sourceModesBase
+    : Object.keys(sourceModes)[0])
+  : null;
+
+if (sourceModes && buildConfig.sourceModesBase && sourceModesBase !== buildConfig.sourceModesBase) {
+  // eslint-disable-next-line no-console
+  console.warn(
+    `[build-tokens] config: sourceModesBase "${buildConfig.sourceModesBase}" is not a key of sourceModes — falling back to "${sourceModesBase}"`
+  );
+}
+
+export const source = sourceModes ? null : resolveSourcePaths(buildConfig.source, configDir);

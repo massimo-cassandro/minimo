@@ -22,10 +22,6 @@ const config = {
     './_src/**/*.tokens.mjs',
     '../src/**/*.tokens.mjs',
 
-    // to use in your project, delete the previous entries and uncomment the following ones
-    // 'path/to/node_modules/@massimo-cassandro/minimo/design-tokens/_src/**/*.tokens.mjs',
-    // 'path/to/node_modules/@massimo-cassandro/minimo/src/**/*.tokens.mjs',
-    // 'path/to/your/project/tokens/*.{jsonc,json,mjs}'
   ],
 
   // If true (default), dimension token values expressed in px are converted
