@@ -66,6 +66,10 @@ The `source` array accepts any combination of:
 - `.json` / `.jsonc` — parsed directly as token data
 - `.mjs` / `.js` — imported as ES modules; must export a W3C DTCG-compliant object as `default`
 
+**Legacy token syntax (auto-detected, `.json` only):** `.json` source files written in the older, non-DTCG Style Dictionary syntax (`value`/`type` instead of `$value`/`$type`, references as `{group.token.value}` instead of `{group.token}` — e.g. a file exported from [Open Props](https://open-props.style/)) are converted to DTCG v5 syntax automatically at parse time, node by node. Files already using `$value`/`$type` are left untouched, so no config flag or file list is needed — mixing legacy and DTCG sources in the same `source` array just works. `.jsonc` is not covered (reserved for hand-authored DTCG sources, parsed by Style Dictionary's own loader) and these `.json` files are parsed with plain `JSON.parse` (no comments, no trailing commas). See `build-tokens-src/legacy-tokens-parser.mjs`.
+
+Known limitation: a legacy node that is at the same time a token (own `value`/`type`) *and* a group with further nested children (e.g. Open Props' `other.ease.out`, which has its own value plus `out.1` ... `out.5`) can't be represented in DTCG v5 — a node with `$value` is always a leaf, Style Dictionary doesn't descend into its children. Only the node's own value is converted; the nested children are silently lost.
+
 
 #### Token file format (JS example)
 

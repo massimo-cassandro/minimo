@@ -37,6 +37,10 @@
       {
         "filePath": "node_modules/open-props",
         "group": "Default"
+      },
+      {
+        "filePath": "node_modules/open-props/open-props.style-dictionary-tokens.json",
+        "group": "Default"
       }
     ],
 

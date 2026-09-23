@@ -26,6 +26,9 @@ import './build-tokens-src/transforms.mjs';
 import { CSS_TRANSFORMS } from './build-tokens-src/platforms.mjs';
 import { resolveSourcePaths } from './build-tokens-src/resolve-source-paths.mjs';
 import { findMediaModeBlocks } from './build-tokens-src/merge-css.mjs';
+import { LEGACY_TOKENS_PARSER_NAME, registerLegacyTokensParser } from './build-tokens-src/legacy-tokens-parser.mjs';
+
+registerLegacyTokensParser();
 
 // const __filename = fileURLToPath(import.meta.url);
 // const __dirname  = dirname(__filename);
@@ -208,6 +211,7 @@ async function run() {
       try {
         const sd = new StyleDictionary({
           source: resolvedPaths,
+          parsers: [LEGACY_TOKENS_PARSER_NAME],
           log: { verbosity: 'silent' },
           platforms: { css: { transforms: CSS_TRANSFORMS } },
         });

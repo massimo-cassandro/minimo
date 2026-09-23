@@ -13,7 +13,8 @@
 
 
 // minimo package path in node_modules
-const minimo_path = '../../node_modules/@massimo-cassandro/minimo';
+const node_modules_path = '../../node_modules',
+  minimo_path = `${node_modules_path}/@massimo-cassandro/minimo`;
 
 const config = {
 
@@ -33,6 +34,19 @@ const config = {
   // Source token files — accept paths, globs, or a mix of both.
   // Supported formats: .json, .jsonc, .mjs (must export a DTCG-compliant default object)
   //
+  // Legacy (non-DTCG) .json files — e.g. exported from Open Props — are
+  // auto-detected and converted to DTCG v5 syntax at parse time, so they can
+  // be freely mixed with regular DTCG sources (see README.md). Not covered:
+  // .jsonc, reserved for hand-authored DTCG sources. These .json files are
+  // parsed with plain JSON.parse (no comments, no trailing commas).
+  //
+  // LIMITATION: a legacy node that is at the same time a token (own
+  // value/type) AND a group with further nested children (e.g. Open Props'
+  // other.ease.out, which has its own value plus out.1 ... out.5) cannot be
+  // represented in DTCG v5 — a node with $value is always a leaf, Style
+  // Dictionary does not descend into its children. In that case only the
+  // node's own value is converted; the nested children are silently lost.
+  //
   // WARNING: do not use path.join() to build glob patterns — it may corrupt
   // the pattern syntax. Use template literals instead:
   //   OK:  `${minimo_path}/**/*.{json,mjs}`
@@ -42,7 +56,7 @@ const config = {
     `${minimo_path}/src/**/*.tokens.{mjs,jsonc}`, // components tokens
 
     // optional extra token source (in this example, openProps, https://open-props.style/)
-    // '../../node_modules/open-props/open-props.style-dictionary-tokens.json',
+    // `${node_modules_path}/open-props/open-props.style-dictionary-tokens.json`,
 
     // your project tokens
     './project-tokens/*.{js,mjs,jsonc,json}',

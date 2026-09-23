@@ -44,6 +44,12 @@ import {
 // ── 2. Custom transforms ─────────────────────────────────────────────────────
 import './build-tokens-src/transforms.mjs';
 
+// ── 2b. Legacy token syntax bridge ───────────────────────────────────────────
+// Converts legacy (non-DTCG, e.g. Open Props) .json/.jsonc source files to
+// DTCG v5 syntax at parse time — see build-tokens-src/legacy-tokens-parser.mjs.
+import { LEGACY_TOKENS_PARSER_NAME, registerLegacyTokensParser } from './build-tokens-src/legacy-tokens-parser.mjs';
+registerLegacyTokensParser();
+
 // ── 3. CSS format ─────────────────────────────────────────────────────────────
 // customPropsCount is updated by the format at render time
 // loadExistingCustomProps supports the mergeCustomProps option (see below)
@@ -127,12 +133,18 @@ if (sourceModes) {
   const singleSource = /** @type {string[]} */ (source);
 
   if (jsonBuildPath && !jsonDestFile) {
-    const sdInit = new StyleDictionary({ source: singleSource, log: { verbosity: 'silent' }, platforms: {} });
+    const sdInit = new StyleDictionary({
+      source: singleSource,
+      parsers: [LEGACY_TOKENS_PARSER_NAME],
+      log: { verbosity: 'silent' },
+      platforms: {},
+    });
     concreteFilePaths = await collectConcreteFilePaths(sdInit);
   }
 
   const sd = new StyleDictionary({
     source: singleSource,
+    parsers: [LEGACY_TOKENS_PARSER_NAME],
     log: { verbosity: 'verbose' },
     platforms: buildPlatforms({
       buildPath,

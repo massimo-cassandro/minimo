@@ -29,6 +29,7 @@ import { CSS_TRANSFORMS, JSON_TRANSFORMS } from './platforms.mjs';
 import { customPropsCount } from './formats/css.mjs';
 import { buildJsonFiles, collectConcreteFilePaths } from './formats/json.mjs';
 import { loadExistingCustomPropsScoped } from './merge-css.mjs';
+import { LEGACY_TOKENS_PARSER_NAME } from './legacy-tokens-parser.mjs';
 
 /**
  * @param {object}                 opts
@@ -81,6 +82,7 @@ export const buildSourceModes = async ({
   for (const mode of modeNames) {
     const sd = new StyleDictionary({
       source: sourceModes[mode],
+      parsers: [LEGACY_TOKENS_PARSER_NAME],
       log: { verbosity: 'verbose' },
       platforms: {
         css: {
@@ -115,6 +117,7 @@ export const buildSourceModes = async ({
 
       const jsonSd = new StyleDictionary({
         source: sourceModes[mode],
+        parsers: [LEGACY_TOKENS_PARSER_NAME],
         log: { verbosity: 'silent' },
         platforms: {
           json: {

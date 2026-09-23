@@ -12,3 +12,4 @@
 * 1.32.0 (09 set 2026) - starter-kit upd
 * 1.33.0 (12 set 2026) - Stylelint config dev tool
 * 1.34.0 (22 set 2026) - light-dark tokens builder
+* 1.35.0 (23 set 2026) - Non-DTCG Design Token parsing
