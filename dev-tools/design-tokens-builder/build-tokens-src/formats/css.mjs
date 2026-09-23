@@ -189,8 +189,11 @@ StyleDictionary.registerFormat({
       return a.name.localeCompare(b.name, 'en', { numeric: true, sensitivity: 'base' });
     };
 
+    // Tokens loaded via `include` (sourceModes: base-mode tokens made
+    // available to other modes) stay in tokenByPath, so references to them
+    // resolve to var(--name), but are not declared in this mode's block.
     const lines = dictionary.allTokens
-      .slice()
+      .filter((token) => token.isSource !== false)
       // .sort((a, b) => a.name.localeCompare(b.name, 'en', {numeric: true, sensitivity: 'base'}))
       .sort((a, b) => sortFunction(a,b))
       .flatMap((token) => {
@@ -246,6 +249,15 @@ StyleDictionary.registerFormat({
         } else {
           value = String(token.$value ?? token.value);
         }
+
+        // Multi-line values (e.g. Open Props' linear() easings) are collapsed
+        // to a single line: declarations are parsed one line at a time (see
+        // parseCustomProps in ../merge-css.mjs), so a multi-line value would
+        // be truncated to its first line.
+        value = String(value)
+          .replace(/\s*\n\s*/g, ' ')
+          .replace(/\(\s+/g, '(')
+          .replace(/\s+\)/g, ')');
 
         return [`  --${token.name}: ${value};${commentSuffix}`];
       });

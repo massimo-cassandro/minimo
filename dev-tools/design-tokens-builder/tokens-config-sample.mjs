@@ -77,6 +77,13 @@ const config = {
   // customPropsGroups, mergeCustomProps, addLayer, pxToRem etc. all apply
   // the same way as with a single `source`.
   //
+  // Cross-mode references: tokens of a non-base mode can reference tokens
+  // defined in the base mode (e.g. a dark token using {color.1} defined in
+  // light); it resolves to var(--color-1). The reverse (or between two
+  // non-base modes) is not supported and fails with a "reference not
+  // defined" error, since the target would be undefined outside its own
+  // @media block.
+  //
   // The JSON output (see JSON TOKENS OUTPUT below) is produced once per
   // mode, with the mode name appended to each filename, e.g. with
   // jsonDestFile: 'tokens' -> "tokens-light.jsonc", "tokens-dark.jsonc".

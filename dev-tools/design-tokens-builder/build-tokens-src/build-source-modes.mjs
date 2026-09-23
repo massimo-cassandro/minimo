@@ -80,7 +80,16 @@ export const buildSourceModes = async ({
   const jsonFilesByMode = {};
 
   for (const mode of modeNames) {
+    // Non-base modes may reference base-mode tokens (always defined, since
+    // the base block is the unconditional top-level `:root`). The base
+    // sources are passed as `include`: available for reference resolution
+    // but flagged isSource: false, and skipped by the css/json formats.
+    // Base-mode-only on purpose: a reference to a token that exists only in
+    // another `@media` block would build fine but be undefined at runtime.
+    const include = mode === baseMode ? [] : sourceModes[baseMode];
+
     const sd = new StyleDictionary({
+      include,
       source: sourceModes[mode],
       parsers: [LEGACY_TOKENS_PARSER_NAME],
       log: { verbosity: 'verbose' },
@@ -116,6 +125,7 @@ export const buildSourceModes = async ({
       const files = buildJsonFiles(concreteFilePaths, jsonDestFile, jsonFormat, jsonExpression, `-${mode}`);
 
       const jsonSd = new StyleDictionary({
+        include,
         source: sourceModes[mode],
         parsers: [LEGACY_TOKENS_PARSER_NAME],
         log: { verbosity: 'silent' },

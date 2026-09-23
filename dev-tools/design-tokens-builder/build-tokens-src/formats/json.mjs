@@ -136,6 +136,10 @@ StyleDictionary.registerFormat({
     const tokenMap = (expressionMode === 'resolve') ? makeTokenMap(dictionary) : null;
 
     for (const token of dictionary.allTokens) {
+      // Tokens loaded via `include` (sourceModes: base-mode tokens made
+      // available to other modes for reference resolution) are not output.
+      if (token.isSource === false) continue;
+
       // Rebuild the nested tree from the token path
       let node = root;
       for (let i = 0; i < token.path.length - 1; i++) {
@@ -205,7 +209,7 @@ export const collectConcreteFilePaths = async (sd) => {
   await sd.hasInitialized;
   const paths = new Set();
   for (const token of sd.allTokens) {
-    if (token.filePath) paths.add(token.filePath);
+    if (token.filePath && token.isSource !== false) paths.add(token.filePath);
   }
   return [...paths].sort();
 };

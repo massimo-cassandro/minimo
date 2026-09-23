@@ -202,14 +202,17 @@ async function run() {
     /** @type {Map<string, Map<string, string>>} */
     const sourceFileByPropByMode = new Map();
 
-    /** @param {string[]} sourcePatterns @returns {Promise<Map<string,string>>} */
-    const resolveSourceFileMap = async (sourcePatterns) => {
+    // includePatterns: base-mode sources, passed as `include` for non-base
+    // modes so cross-mode references resolve (same as build-source-modes.mjs).
+    /** @param {string[]} sourcePatterns @param {string[]} [includePatterns] @returns {Promise<Map<string,string>>} */
+    const resolveSourceFileMap = async (sourcePatterns, includePatterns = []) => {
       /** @type {Map<string, string>} */
       const map = new Map();
       const resolvedPaths = resolveSourcePaths(sourcePatterns, configDir);
       if (!resolvedPaths.length) return map;
       try {
         const sd = new StyleDictionary({
+          include: resolveSourcePaths(includePatterns, configDir),
           source: resolvedPaths,
           parsers: [LEGACY_TOKENS_PARSER_NAME],
           log: { verbosity: 'silent' },
@@ -217,7 +220,7 @@ async function run() {
         });
         const dictionary = await sd.getPlatformTokens('css');
         for (const token of dictionary.allTokens) {
-          if (token.filePath) map.set(`--${token.name}`, token.filePath);
+          if (token.filePath && token.isSource !== false) map.set(`--${token.name}`, token.filePath);
         }
       } catch {
         // Non-fatal: unused properties will be reported by name only.
@@ -227,7 +230,8 @@ async function run() {
 
     if (checkUnused && config.sourceModes) {
       for (const [mode, modeSource] of Object.entries(config.sourceModes)) {
-        sourceFileByPropByMode.set(mode, await resolveSourceFileMap(modeSource));
+        const includePatterns = mode === sourceModesBase ? [] : config.sourceModes[sourceModesBase];
+        sourceFileByPropByMode.set(mode, await resolveSourceFileMap(modeSource, includePatterns));
       }
     } else if (checkUnused && Array.isArray(config.source) && config.source.length) {
       const map = await resolveSourceFileMap(config.source);
