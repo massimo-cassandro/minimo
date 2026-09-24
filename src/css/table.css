@@ -11,17 +11,12 @@
 /* TODO opzione per attivare/disattuvare alternate color */
 .table {
 
-  --_alternate-row-bg: var(--table-body-tr-alt-bg-color);
-  --_hover-row-bg: var(--table-body-tr-hover-bg-color);
-  --_border-color: var(--table-border-color);
-  --_border: 1px solid var(--_border-color);
-
   width: 100%;
   margin: 1rem 0;
   border-collapse: collapse;
 
   tr {
-    border-bottom: var(--_border);
+    border-bottom: 1px solid var(--table-border-color);
   }
 
   thead {
@@ -34,7 +29,7 @@
   tfoot {
     background-color: var(--table-tfoot-background-color);
     tr:first-child {
-      border-block-start: var(--table-tfoot-border-width) solid var(--_border-color);
+      border-block-start: var(--table-tfoot-border-width) solid var(--table-border-color);
     }
     th, td {
       font-weight: var(--table-tfoot-font-weight);
@@ -43,12 +38,12 @@
 
   tbody {
     tr:nth-child(even) {
-      background-color: var(--_alternate-row-bg);
+      background-color: var(--table-body-tr-alt-bg-color);
     }
 
     @media (hover: hover) {
       tr:hover {
-        background-color: var(--_hover-row-bg);
+        background-color: var(--table-body-tr-hover-bg-color);
       }
     }
   }
@@ -66,11 +61,11 @@
   }
 
   &.table-bordered {
-    border: var(--_border);
+    border: 1px solid var(--table-border-color);
 
     th, td {
       &:not(:first-child) {
-        border-inline-start: var(--_border);
+        border-inline-start: 1px solid var(--table-border-color);
       }
     }
   }
@@ -80,9 +75,9 @@
 /*
 @media (prefers-color-scheme: dark) {
 .table {
-  --_border-color: var(--_stone-8);
-  --_alternate-row-bg: color-mix(in srgb, var(--_stone-12) 60%, transparent);
-  --_hover-row-bg: color-mix(in srgb, var(--_blue-12) 60%, transparent);
+  --table-border-color: var(--_stone-8);
+  --table-body-tr-alt-bg-color: color-mix(in srgb, var(--_stone-12) 60%, transparent);
+  --table-body-tr-hover-bg-color: color-mix(in srgb, var(--_blue-12) 60%, transparent);
 }
 }
 */
