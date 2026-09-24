@@ -44,7 +44,7 @@ import { LEGACY_TOKENS_PARSER_NAME } from './legacy-tokens-parser.mjs';
  * @param {{name:string,prefixes:string[]}[]} opts.customPropsGroups
  * @param {boolean}                opts.pxToRem
  * @param {string|null}            opts.addLayer
- * @param {boolean}                opts.mergeCustomProps
+ * @param {boolean|(string|RegExp)[]} opts.mergeCustomProps  true = merge all sources, array = only the matching token source files
  * @returns {Promise<{cssDestPath: string, totalCustomProps: number, jsonFilesByMode: Record<string, object[]>}>}
  */
 export const buildSourceModes = async ({
@@ -66,7 +66,7 @@ export const buildSourceModes = async ({
   // Read the pre-existing destFile (if any) BEFORE any Style Dictionary
   // instance runs, since the first one to write would overwrite it.
   if (mergeCustomProps) {
-    loadExistingCustomPropsScoped(path.join(buildPath, destFile), baseMode);
+    loadExistingCustomPropsScoped(path.join(buildPath, destFile), baseMode, mergeCustomProps);
   }
 
   const cssTransforms = pxToRem

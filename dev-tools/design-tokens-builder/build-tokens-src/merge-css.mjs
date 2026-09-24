@@ -10,6 +10,12 @@
 //      mergeCustomProps(generatedMap) while building the output, right before
 //      serialising the final CSS text.
 //
+// `mergeCustomProps` may also be an array of strings/RegExps: in that case
+// only the generated properties whose token source file matches one of the
+// entries are merged (pre-existing value wins); the others are overwritten by
+// the generated value. Pre-existing properties that are no longer generated
+// (no token, hence no source file) are always kept. See matchesSource().
+//
 // Usage (sourceModes build, see build-source-modes.mjs):
 //   1. Call loadExistingCustomPropsScoped(absDestPath, baseMode) BEFORE any
 //      of the per-mode Style Dictionary instances run.
@@ -36,7 +42,11 @@ export const parseCustomProps = (cssText) => {
   /** @type {Record<string,string>} */
   const map = {};
   for (const match of cssText.matchAll(CUSTOM_PROP_RE)) {
-    map[match[1]] = match[2].trim();
+    let tail = match[2].trim();
+    // A multi-line comment is cut at the end of the line (only single-line
+    // declarations are parsed): close it, or the resulting CSS would be invalid
+    if (tail.lastIndexOf('/*') > tail.lastIndexOf('*/')) tail += ' */';
+    map[match[1]] = tail;
   }
   return map;
 };
@@ -124,6 +134,32 @@ const splitModeScopes = (cssText) => {
   return scopes;
 };
 
+// `true` = merge every source; an array = merge only the properties generated
+// by the token source files matching one of its entries. Set by the
+// loadExistingCustomProps*() functions.
+/** @type {true|(string|RegExp)[]} */
+let mergeSources = true;
+
+/**
+ * Whether a token source file matches one of the `mergeCustomProps` array
+ * entries: a string matches if it is contained in the file path (path
+ * separators normalised to `/`), a RegExp if it tests true against it.
+ * @param {(string|RegExp)[]} sources
+ * @param {string|undefined} filePath token source file path
+ * @returns {boolean}
+ */
+const matchesSource = (sources, filePath) => {
+  if (!filePath) return false;
+  const normalized = filePath.replace(/\\/g, '/');
+  return sources.some((entry) => {
+    if (entry instanceof RegExp) {
+      entry.lastIndex = 0;
+      return entry.test(normalized);
+    }
+    return normalized.includes(entry.replace(/\\/g, '/'));
+  });
+};
+
 // null = merge disabled, or destination file not found yet (first build)
 /** @type {Record<string,string>|null} */
 let existingCustomProps = null;
@@ -137,9 +173,12 @@ let scopedExistingCustomProps = null;
  * Reads the CSS destination file (if it exists) and stores a name → value
  * map of its current custom properties for later merging.
  * @param {string} absDestPath absolute path of the CSS file to read
+ * @param {true|(string|RegExp)[]} [sources] `true` merges every source, an
+ *   array only the token source files matching one of its entries (default: true)
  * @returns {Record<string,string>|null}
  */
-export const loadExistingCustomProps = (absDestPath) => {
+export const loadExistingCustomProps = (absDestPath, sources = true) => {
+  mergeSources = sources;
   existingCustomProps = existsSync(absDestPath)
     ? parseCustomProps(readFileSync(absDestPath, 'utf8'))
     : null;
@@ -154,9 +193,12 @@ export const loadExistingCustomProps = (absDestPath) => {
  * @param {string} baseMode mode whose declarations live in the top-level,
  *   non-nested `:root { ... }` block (no default — always passed explicitly
  *   by build-source-modes.mjs, from the resolved sourceModesBase)
+ * @param {true|(string|RegExp)[]} [sources] `true` merges every source, an
+ *   array only the token source files matching one of its entries (default: true)
  * @returns {Record<string, Record<string,string>>|null}
  */
-export const loadExistingCustomPropsScoped = (absDestPath, baseMode) => {
+export const loadExistingCustomPropsScoped = (absDestPath, baseMode, sources = true) => {
+  mergeSources = sources;
   if (!existsSync(absDestPath)) {
     scopedExistingCustomProps = null;
     return scopedExistingCustomProps;
@@ -177,16 +219,26 @@ export const loadExistingCustomPropsScoped = (absDestPath, baseMode) => {
  * Merges freshly generated custom properties with the ones previously loaded
  * via loadExistingCustomProps() / loadExistingCustomPropsScoped(). Pre-existing
  * values take priority; custom properties found only in the pre-existing file
- * (no longer generated) are kept as well.
+ * (no longer generated) are kept as well. When the merge is limited to some
+ * token source files (array option), a generated property whose source file
+ * does not match is not overridden by its pre-existing value.
  * @param {Record<string,string>} generated name → value map produced by this build
  * @param {string|null} [mode] when set (sourceModes build), looks up the
  *   pre-existing props scoped to this mode instead of the flat/global map (default: null)
+ * @param {Record<string,string>} [sourceFileMap] property name → token source
+ *   file path, used only when the merge is limited to some sources (default: {})
  * @returns {Record<string,string>}
  */
-export const mergeCustomProps = (generated, mode = null) => {
-  if (mode !== null) {
-    const existing = scopedExistingCustomProps?.[mode];
-    return existing ? { ...generated, ...existing } : generated;
+export const mergeCustomProps = (generated, mode = null, sourceFileMap = {}) => {
+  const existing = mode !== null ? scopedExistingCustomProps?.[mode] : existingCustomProps;
+  if (!existing) return generated;
+  if (mergeSources === true) return { ...generated, ...existing };
+
+  const merged = { ...generated };
+  for (const [name, tail] of Object.entries(existing)) {
+    if (!(name in generated) || matchesSource(mergeSources, sourceFileMap[name])) {
+      merged[name] = tail;
+    }
   }
-  return existingCustomProps ? { ...generated, ...existingCustomProps } : generated;
+  return merged;
 };

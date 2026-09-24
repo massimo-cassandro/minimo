@@ -116,7 +116,7 @@ if (sourceModes) {
   // pre-existing values take priority — right before serialising the final
   // CSS output. See merge-css.mjs.
   if (mergeCustomProps) {
-    loadExistingCustomProps(path.join(buildPath, destFile));
+    loadExistingCustomProps(path.join(buildPath, destFile), mergeCustomProps);
   }
 
   // Collect concrete source file paths (multi-file JSON mode only). Source

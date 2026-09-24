@@ -192,6 +192,18 @@ StyleDictionary.registerFormat({
     // Tokens loaded via `include` (sourceModes: base-mode tokens made
     // available to other modes) stay in tokenByPath, so references to them
     // resolve to var(--name), but are not declared in this mode's block.
+    // property name → token source file, used by mergeCustomProps when the
+    // merge is limited to some source files (a token may generate several
+    // properties, e.g. typography)
+    /** @type {Record<string,string>} */
+    const sourceFileMap = {};
+    const trackSource = (token, tokenLines) => {
+      for (const name of Object.keys(parseCustomProps(tokenLines.join('\n')))) {
+        sourceFileMap[name] = token.filePath;
+      }
+      return tokenLines;
+    };
+
     const lines = dictionary.allTokens
       .filter((token) => token.isSource !== false)
       // .sort((a, b) => a.name.localeCompare(b.name, 'en', {numeric: true, sensitivity: 'base'}))
@@ -207,7 +219,7 @@ StyleDictionary.registerFormat({
             .split('\n')
             .map((line) => `${line}${commentSuffix}`)
             .join('\n');
-          return [typographyLines];
+          return trackSource(token, [typographyLines]);
         }
 
         let value;
@@ -259,7 +271,7 @@ StyleDictionary.registerFormat({
           .replace(/\(\s+/g, '(')
           .replace(/\s+\)/g, ')');
 
-        return [`  --${token.name}: ${value};${commentSuffix}`];
+        return trackSource(token, [`  --${token.name}: ${value};${commentSuffix}`]);
       });
 
     // Build a name → declaration-tail map from the declarations generated
@@ -271,7 +283,7 @@ StyleDictionary.registerFormat({
     // scopes the merge to that mode, so same-named props with different
     // values across modes are never mixed up.
     const generatedProps = parseCustomProps(lines.join('\n'));
-    const finalProps = mergeCustomProps(generatedProps, options.mode ?? null);
+    const finalProps = mergeCustomProps(generatedProps, options.mode ?? null, sourceFileMap);
 
     // Final output is always sorted alphabetically ascending by property
     // name, regardless of merge — this also keeps pre-existing-only

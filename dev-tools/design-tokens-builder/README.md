@@ -163,7 +163,7 @@ When set, each mode has its own `source` array, and the generated CSS composes a
 
 Tokens of a non-base mode can reference tokens defined in the base mode (e.g. a dark token using `{color.1}` defined in light, output as `var(--color-1)`). References to a non-base mode's tokens (from the base mode or from another non-base mode) fail with a "reference not defined" error, since the target would be undefined outside its own `@media` block.
 
-`customPropsGroups`, `mergeCustomProps`, `addLayer`, `pxToRem` etc. all apply the same way as with a single `source`. The JSON output (when `jsonBuildPath` is set) is produced once per mode, with the mode name appended to each filename (e.g. `tokens-light.jsonc` / `tokens-dark.jsonc`).
+`customPropsGroups`, `mergeCustomProps`, `addLayer`, `pxToRem` etc. all apply the same way as with a single `source` (`mergeCustomProps` set to an array of strings/RegExps matches the token files of every mode). The JSON output (when `jsonBuildPath` is set) is produced once per mode, with the mode name appended to each filename (e.g. `tokens-light.jsonc` / `tokens-dark.jsonc`).
 
 ---
 
