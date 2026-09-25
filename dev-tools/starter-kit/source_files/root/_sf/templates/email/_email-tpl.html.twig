@@ -1,6 +1,6 @@
 {# template base per tutte le email #}
 {% apply inline_css(source('email/css/mail-inline.css')) %}
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="it">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
@@ -8,24 +8,23 @@
     <meta name="format-detection" content="telephone=no">
     <title>{% block title %}{% endblock %}</title>
     <style type="text/css">
-      {%- include 'email/css/mail-inline.css' -%}
-      {%- include 'email/css/mail-embed.css' -%}
+      {{- source('email/css/mail-embed.css') -}}
     </style>
   </head>
   <body class="yahoo-fix" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
     {# Wrapper table #}
-    <table width="100%" border="0" cellpadding="0" cellspacing="0" align="center" id="wrapper">
+    <table width="100%" role="presentation" border="0" cellpadding="0" cellspacing="0" align="center" id="wrapper">
       <tbody>
         <tr>
           <td width="100%">
             {# logo #}
-            <table class="content header device-width" width="600" border="0" cellpadding="0" cellspacing="0" align="center">
+            <table class="content header device-width" width="600" role="presentation" border="0" cellpadding="0" cellspacing="0" align="center">
               <tbody>
                 <tr>
                   <td class="logo" width="100%">
                     {% block logo %}
                       {# immagine allegata inline (cid:), vedi templates/email/imgs #}
-                      <img src="{{ email.image('email/imgs/logo-ict-governance-email.png', 'image/png', 'logo-ict-governance.png') }}" alt="ICT Governance" width="200" height="54" border="0">
+                      <img src="{{ email.image('email/imgs/logo-xxxx.png', 'image/png', 'logo-xxx.png') }}" alt="xxx" width="200" height="54" border="0">
                     {%- endblock %}
                   </td>
                 </tr>
@@ -33,7 +32,7 @@
             </table>
 
             {# content #}
-            <table class="content body device-width" width="600" border="0" cellpadding="0" cellspacing="0" align="center">
+            <table class="content body device-width" width="600" role="presentation" border="0" cellpadding="0" cellspacing="0" align="center">
               <tbody>
                 <tr>
                   <td>
@@ -47,10 +46,10 @@
             </table>
 
             {# footer #}
-            <table class="content footer device-width" width="600" border="0" cellpadding="0" cellspacing="0" align="center">
+            <table class="content footer device-width" width="600" role="presentation" border="0" cellpadding="0" cellspacing="0" align="center">
               <tbody>
                 <tr>
-                  <td>{% block footer %}Bluvacanze{%- endblock %}</td>
+                  <td>{% block footer %}xxx{%- endblock %}</td>
                 </tr>
               </tbody>
             </table>

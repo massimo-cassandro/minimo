@@ -1,4 +1,4 @@
-// config postcss per le CSS delle email (npm run "css email")
+// config postcss per le CSS delle email (npm run "postcss email")
 // NB: in ESM perché postcss-nested >= 8 è ESM-only
 //
 // https://github.com/csstools/postcss-plugins/tree/main/plugins/postcss-custom-properties#readme

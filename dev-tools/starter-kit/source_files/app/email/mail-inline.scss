@@ -1,0 +1,203 @@
+/* stylelint-disable max-nesting-depth */
+/* stylelint-disable selector-max-compound-selectors */
+/* stylelint-disable selector-max-id */
+/* stylelint-disable property-no-unknown */
+@use './mail-properties' as *;
+
+body {
+  width: 100%;
+  padding: 0;
+  margin: 0;
+  font-family: $mail-body-font;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 1.5;
+  color: $mail-text-color;
+  background-color: $mail-body-bg;
+  -webkit-font-smoothing: antialiased;
+
+  .device-width {
+    width: 600px;
+    padding: 0;
+  }
+
+  /* .full-width {
+    width: 100%;
+    padding: 0;
+  } */
+}
+
+/*
+div.outerWrapper {
+	background-color: $mail-content-bg;
+	//border-radius:20px;
+	overflow: hidden;
+	margin: 0 auto;
+}
+*/
+
+table {
+  border-collapse: collapse;
+}
+
+p {
+  mso-table-lspace: 0;
+  mso-table-rspace: 0;
+  margin-top: $mail-spacing * .5;
+  margin-bottom: $mail-spacing * .5;
+}
+
+#wrapper{
+  width: 100%;
+  margin: 0 auto;
+  border: none;
+
+  /* &.full-page{
+    width: 95%;
+  } */
+
+  > tbody > tr > td {
+    width: 100%;
+    padding-top: 10px;
+    padding-bottom: 20px;
+    background-color: $mail-body-bg;
+    border: none;
+  }
+}
+
+.content {
+  margin: 0 auto;
+
+  &.header {
+    > tbody > tr > td {
+      padding: 10px;
+      text-align: center;
+      background-color: $mail-body-bg;
+
+      > img {
+        display: inline-block;
+        max-width: 100%;
+        height: auto;
+      }
+    }
+    .logo {
+      padding-top: 10px;
+      padding-bottom: 10px;
+    }
+  }
+
+  &.body {
+    > tbody > tr > td {
+
+      padding-top: 20px;
+      padding-right: 30px;
+      padding-bottom: 20px;
+      padding-left: 30px;
+      font-size: $mail-font-size-lg;
+      vertical-align: top;
+      color: $mail-text-color;
+      background-color: $mail-content-bg;
+
+
+      a {
+        font-weight: 700;
+        color: $mail-alt-color;
+        text-decoration: underline;
+        cursor: pointer;
+      }
+
+      h1 {
+        margin-top: 0;
+        margin-bottom: $mail-spacing;
+        font-size: $mail-font-size-xl;
+        font-weight: 700;
+      }
+
+      h2 {
+        margin-top: $mail-spacing;
+        margin-bottom: 12px;
+        font-size: $mail-font-size-2lg;
+        font-weight: 700;
+
+      }
+
+      img {
+        max-width: 100%;
+        height: auto;
+      }
+
+    }
+  }
+
+
+  &.footer {
+    > tbody > tr > td {
+      padding-top: 10px;
+      padding-bottom: 10px;
+      font-size: 80%;
+      color: $mail-text-color-light;
+      text-align: center;
+      background-color: $mail-body-bg;
+    }
+  }
+}
+
+
+.text-center {
+  text-align: center;
+}
+.text-right {
+  text-align: right;
+}
+.text-left {
+  text-align: left;
+}
+.small, small {
+  font-size: $mail-font-size-xs;
+}
+.text-monospace {
+  font-family: $mail-font-monospace;
+}
+.text-muted {
+  color: #666;
+}
+
+
+em, i {
+  font-style: italic;
+}
+strong, b {
+  font-weight: 700;
+}
+
+/* body content table */
+.table {
+  width: 100%;
+  margin: 12px 0 24px;
+  border-collapse: collapse;
+
+  th, td {
+    padding: 6px 10px;
+    font-size: $mail-font-size-lg;
+    vertical-align: top;
+    text-align: left;
+    border-bottom: 1px solid $mail-gray;
+  }
+  th {
+    font-weight: 600;
+  }
+
+  thead {
+    th {
+      border-bottom-width: 2px;
+    }
+  }
+}
+
+/* dopo .table, altrimenti il suo margin sovrascrive queste utility */
+.margin-top {
+  margin-top: $mail-spacing;
+}
+.margin-bottom {
+  margin-bottom: $mail-spacing;
+}

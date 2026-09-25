@@ -1,22 +1,21 @@
 /* stylelint-disable declaration-no-important */
 @import './_mail-properties.css';
 
-/* NB: niente selettore universale `*`: inline_css inlinerebbe la regola su ogni elemento */
-body, table, td, p, a { text-size-adjust: 100%; }
+/* NB: niente selettore universale `*`: inline_css lo inlinerebbe su ogni elemento */
+body,
+table,
+td,
+p,
+a {
+  text-size-adjust: 100%;
+}
 
-.content {
-  &.body {
-    a {
-      font-weight: 700;
-      color: var(--mail-alt-color);
-      text-decoration: underline;
-      cursor: pointer;
-
-      &:hover {
-        color: var(--mail-darken-alt-color);
-      }
-    }
-  }
+/*
+  gli stili base dei link sono già in mail-inline;
+  qui serve !important perché lo style inline batte l'hover
+*/
+.content.body a:hover {
+  color: var(--mail-darken-alt-color) !important;
 }
 
 @media only screen and (max-width: 640px)  {

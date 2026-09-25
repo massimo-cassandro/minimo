@@ -77,7 +77,8 @@ optionalPackages=(
   "simple-datatables                                 |     | richiesto da s-datatable-component"
   "style-dictionary                                  | dev | richiesto da dev-tools/design-tokens-builder (build-tokens)"
   "@cybozu/eslint-config                             | dev | utilizzato da eslint per il check dei file css"
-  "postcss-cli postcss-import postcss-nested cssnano | dev | per css email"
+  "sass                                              | dev | per email (scss)"
+  "postcss postcss-cli postcss-import postcss-nested postcss-custom-properties autoprefixer cssnano | dev | per email (postcss)"
 )
 
 # Rimuove spazi iniziali/finali da una stringa (usata per i campi estratti

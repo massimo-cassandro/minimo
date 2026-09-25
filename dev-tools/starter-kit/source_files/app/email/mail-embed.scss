@@ -1,0 +1,68 @@
+/* stylelint-disable declaration-no-important */
+/* stylelint-disable property-no-vendor-prefix */
+@use './mail-properties' as *;
+
+/* NB: niente selettore universale `*`: inline_css lo inlinerebbe su ogni elemento */
+body,
+table,
+td,
+p,
+a {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+/*
+  gli stili base dei link sono già in mail-inline;
+  qui serve !important perché lo style inline batte l'hover
+*/
+.content.body a:hover {
+  color: $mail-darken-alt-color !important;
+}
+
+@media only screen and (max-width: 640px)  {
+  body {
+    &[class='yahoo-fix'] {
+      .device-width {
+        width: 440px !important;
+      }
+    }
+  }
+
+  .content {
+    &.columns-wrapper {
+      td.column-spacer {
+        height: 0 !important;
+      }
+
+      td.column-width, td.column-spacer  {
+        display: block !important;
+        width: 100% !important;
+      }
+      .column-content {
+        & td {
+          & h2 {
+            font-size: $mail-font-size-3lg !important;
+          }
+          & .text {
+            font-size: $mail-font-size-lg !important;
+          }
+          & .buttons {
+            font-size: $mail-font-size-2lg !important;
+          }
+        }
+      }
+    }
+  }
+}
+
+@media only screen and (max-width: 479px) {
+  body {
+    &[class='yahoo-fix'] {
+      .device-width {
+        width: 280px !important;
+      }
+    }
+  }
+}
+

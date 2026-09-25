@@ -22,6 +22,8 @@
     "progetto sf webpack DEV": "rm -rf ./public/_dev && NODE_ENV=development webpack serve --config ./webpack.config.mjs # http://192.168.1.135:[[port5700]",
     "symfony server": "symfony serve --port=[[port8000]] --listen-ip=0.0.0.0 # http://192.168.1.135:[[port8000]] # -d (deamon): rimane aperto anche dopo la chiusura del terminale, terminare con `symfony server:stop`",
     "webpack PROD": "npm run 'UPD-version' && NODE_ENV=production webpack --config ./webpack.config.mjs --stats minimal",
+    "email sass": "npx sass ./app/email:./templates/email/css --no-source-map --style=compressed --watch",
+    "postcss email": "postcss ./app/email/[!_]*.css --dir ./templates/email/css --no-map --verbose --config ./app/email --watch",
     "eslint-check": "npx eslint app/",
     "stylelint-check": "npx stylelint 'app/**/*.css'",
     "create-favicons INIT": "npx create-favicons init",
