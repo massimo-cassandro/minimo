@@ -15,8 +15,9 @@ import { globSync } from 'glob';
   opera sugli asset css già finalizzati (dopo questo purge e dopo la
   minificazione), quindi vede anche gli usi di var() nei blocchi
   `purgecss start/end ignore`, che PurgeCSS mantiene.
-  Il chunk `shared` deve comunque contenere solo js (il css estratto resta nel
-  chunk dell'entry che lo importa).
+  Il purge lavora sul singolo asset css: i @keyframes definiti in un asset
+  (es. `shared.css`) ma usati solo in un altro vengono rimossi (vedi
+  `safelist.keyframes` / `keyframes: false`).
 */
 
 /**

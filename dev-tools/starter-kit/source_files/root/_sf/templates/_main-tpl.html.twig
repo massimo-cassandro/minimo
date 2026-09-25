@@ -12,7 +12,10 @@
     <link rel="preload" href="{{ asset('shared.js') }}" as="script">
     <link rel="preload" href="{{ asset('runtime.js') }}" as="script">
     {{- '' -}}
+    <link rel="preload" href="{{ asset('shared.css') }}" as="style">
     <link rel="preload" href="{{ asset('index.css') }}" as="style">
+    {# shared.css va linkato PRIMA del css della entry (ordine della cascata) #}
+    <link rel="stylesheet" href="{{ asset('shared.css') }}" type="text/css" media="all">
     <link rel="stylesheet" href="{{ asset('index.css') }}" type="text/css" media="all">
     <style>
       {%- include '@public_path' ~ asset('layout.critical.css') -%}

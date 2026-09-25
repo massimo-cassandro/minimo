@@ -116,30 +116,31 @@ const { CustomPropsPurgeCssPlugin } = runCustomPropsPlugin
   ? await import('./webpack-config-modules/custom-props-purgecss-plugin.mjs')
   : {};
 
-// test del cacheGroup `shared` (splitChunks): i css restano SEMPRE FUORI dal
-// chunk condiviso e nel chunk della entry che li importa, così ogni asset css
-// resta autosufficiente (il plugin delle custom properties inietta le
-// definizioni negli asset css dei `sets`, e i critical css inline nei
-// template devono restare autosufficienti). I
-// template (twig/altro) linkano solo il css della propria entry (e gli
-// eventuali `.critical.css`), MAI uno shared.css: se i css finissero nel
-// chunk condiviso, quella parte di stili sparirebbe silenziosamente dalla
-// pagina.
+// cacheGroup `shared` (splitChunks): raccoglie in `shared.js` / `shared.css` i
+// moduli js e css provenienti da node_modules e dalle directory condivise del
+// progetto (vedi `pathsRegexp` sotto), così non vengono duplicati in ogni entry.
 //
-// NB: non è la soluzione migliore, perché rinuncia alla deduplicazione dei
-// css tra entry — ma è la più pratica al momento vista la duplicazione ancora
-// limitata tra le pagine. Da rivedere in futuro se la duplicazione dovesse
-// crescere.
+// Dalla v3 anche i css finiscono nello `shared.css` (in v2 restavano sempre nel
+// css della entry, duplicati, per due limiti di PurgeCSS che operava sul singolo
+// asset con `variables: true`): le custom properties sono ora gestite dal plugin
+// CustomPropsPurgeCssPlugin, che lavora sugli asset finali e le cui definizioni
+// vengono iniettate nello `shared.css` (vedi `sets` nei `plugins`).
 //
-// TODO: shared.css -> attualmente non generato, ma se in futuro la duplicazione di css tra le pagine dovesse crescere
-// e se si risolve un problema con purgeCSS
-// (componenti importati dal js di più entry), valutare un cacheGroup `shared`
-// dedicato ai css condivisi: andranno escluse le entry `.critical` (devono
-// restare autosufficienti), aggiungere il css condiviso ai `sets` del plugin
-// delle custom properties (vedi `CustomPropsPurgeCssPlugin` nei `plugins`),
-// e i template dovranno linkare esplicitamente lo shared.css generato
+// - le entry `.critical` sono escluse dal chunk condiviso (`chunks` sotto):
+//   il loro css è inline nei template e deve restare autosufficiente
+// - `enforce: true` garantisce che `shared.js` e `shared.css` siano sempre
+//   generati (senza, splitChunks non crea il chunk se i moduli sono sotto la
+//   soglia `minSize`, e il link nel template punterebbe a un file inesistente)
+// - i template (twig/altro) devono linkare (preload + link) sia `shared.css` che il
+//   css della propria entry, con `shared.css` PRIMA del css della entry per
+//   rispettare l'ordine della cascata (vedi _sf/templates/_main-tpl.html.twig)
+//
+// NB: PurgeCSS elabora ogni asset css singolarmente, quindi i @keyframes
+// definiti nello `shared.css` ma usati solo in un altro asset (es. un css di
+// progetto che usa una animation di minimo) verrebbero rimossi: in tal caso
+// aggiungerli a `safelist.keyframes` o impostare `keyframes: false` in
+// `purgeCSSOptions`
 const shared_chunk_paths = (module) => {
-  if (module.type === 'css/mini-extract') return false;
 
   // path delle directory da utilizzare nel chunk `shared`
   const sep = '[\\\\/]'; // stringa che produce [\\/] nel pattern
@@ -308,10 +309,11 @@ const config = {
 
         shared: {
           // vedi shared_chunk_paths sopra per la logica completa del test
-          // (path match + esclusione sempre dei css)
           test: shared_chunk_paths,
           name: 'shared',
-          chunks: 'all'
+          enforce: true,
+          // le entry `.critical` restano autosufficienti (css inline nei template)
+          chunks: (chunk) => !/\.critical/.test(chunk.name)
         }
       }
     },
@@ -593,11 +595,11 @@ const config = {
         sets: [
           // il critical css è inline nei template: deve restare autosufficiente
           { sources: ['layout.critical.*.css'] },
-          { sources: ['index.*.css'] },
 
-          // esempio di set con target condiviso: un solo css con le definizioni
-          // per più asset (le definizioni non sono duplicate negli altri)
-          // { sources: ['index.*.css', 'admin.*.css'], target: 'index.*.css' },
+          // shared.css è linkato in tutte le pagine: contiene le definizioni
+          // per tutti i css delle entry (le definizioni non sono duplicate
+          // negli altri asset). Ogni css delle entry va elencato qui
+          { sources: ['shared.*.css', 'index.*.css'], target: 'shared.*.css' },
         ],
 
         // css usati fuori dagli asset purgati (shadow DOM dei web components,
