@@ -1,4 +1,5 @@
 // webpack-modules/purgecss-variables-safelist.mjs
+// v.2
 import fs from 'fs';
 import { globSync } from 'glob';
 

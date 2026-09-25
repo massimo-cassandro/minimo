@@ -1,4 +1,4 @@
-// v.3
+// v.2
 /**
  * Funzione per definire le regole per SVG
  * @returns {import('webpack').RuleSetRule[]}

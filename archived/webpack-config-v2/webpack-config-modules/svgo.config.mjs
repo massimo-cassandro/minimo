@@ -1,5 +1,5 @@
 // svgo.config.js
-// v.3
+// v.2
 import addViewBox from 'svgo-add-viewbox';
 
 // https://svgo.dev/docs/plugins/

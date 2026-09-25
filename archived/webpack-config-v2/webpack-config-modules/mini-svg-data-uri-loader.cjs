@@ -1,5 +1,5 @@
 // ./loaders/mini-svg-data-uri-loader.cjs
-// v.3
+// v.2
 // Questo file USA la libreria 'mini-svg-data-uri', ma è un wrapper specifico per Webpack.
 
 /* eslint-env node */

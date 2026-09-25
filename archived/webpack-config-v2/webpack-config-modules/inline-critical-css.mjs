@@ -1,5 +1,5 @@
 /* plugins/inline-critical-css.mjs */
-// v.3
+// v.2
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 
 export class InlineCriticalCssPlugin {

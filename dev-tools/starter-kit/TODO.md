@@ -35,7 +35,7 @@ danni, perché il timone resta sempre nel config del progetto.
 | Modulo | Stato | Problemi |
 |---|---|---|
 | `get-jsConfig-aliases.mjs` | ✅ autonomo | riceve il path del jsconfig dal config |
-| `purgecss-variables-safelist.mjs` | ✅ autonomo | tutti i glob/seeds arrivano dal config |
+| `custom-props-purgecss-plugin.mjs` | ✅ autonomo | (v3) master, sets, glob e seeds arrivano dal config; sostituisce `purgecss-variables-safelist.mjs` |
 | `svgo.config.mjs` | ✅ autonomo | nessun riferimento al progetto |
 | `mini-svg-data-uri-loader.cjs` | ✅ autonomo | loader puro |
 | `svg-rules.mjs` | ⚠️ quasi | parametrico, ma da riverificare rispetto al contratto (default, JSDoc) |
@@ -71,7 +71,7 @@ Le factory dei moduli ricevono ciò che serve da qui. Il config diventa:
   altri tool (stylelint, editor/IDE, CLI postcss) oltre che a postcss-loader.
 
 ### 3. Sezione PurgeCSS → `webpack-modules/purgecss-plugins.mjs`
-Factory (es. `purgecssPlugins({ contentGlobs, safelist, variablesSafelistOptions, debug })`)
+Factory (es. `purgecssPlugins({ contentGlobs, safelist, debug })`)
 che incapsula: opzioni comuni, safelist base (deep `m_`, greedy `&`), le due istanze
 (critical + generale) e il mini-plugin di log `purgedStats`.
 Restituisce l'array di plugin pronto per lo spread nel config.

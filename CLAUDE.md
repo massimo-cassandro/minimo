@@ -222,6 +222,8 @@ A questo scopo ogni cartella componente/web-component ha un proprio file `<nome-
 
 [postcss-jit-props](https://github.com/GoogleChromeLabs/postcss-jit-props) potrebbe essere integrato come PostCSS plugin per includere automaticamente solo le custom properties effettivamente usate nel CSS compilato. **Da valutare**: il repository non viene aggiornato da molto tempo, quindi la manutenzione futura è incerta.
 
+**Aggiornamento (config webpack v3):** lo starter-kit include ora un plugin webpack dedicato, `dev-tools/starter-kit/source_files/root/webpack-config-modules/custom-props-purgecss-plugin.mjs`, che opera sugli asset CSS finali (dopo la minificazione) e inietta solo le custom properties usate, partendo dal file master `custom-properties.css`. Attivabile con il flag `useCustomPropsPlugin` in `webpack.config.mjs`; vedi `dev-tools/starter-kit/webpack-config-upg.md`.
+
 ### PurgeCSS
 
 L'opzione preferibile sarebbe strutturare meglio l'integrazione con **PurgeCSS**, ma in progetti con backend Symfony e template Twig produce spesso risultati errati (classi usate rimosse). Il problema potrebbe non essere legato a PurgeCSS in sé, ma al fatto che `domBuilder` genera classi dinamicamente a runtime: PurgeCSS analizza i sorgenti staticamente e non riesce a rilevare le classi costruite via stringa in JS. Anche i template Twig con classi costruite per concatenazione o tramite variabili Symfony sfuggono all'analisi statica. Se si volesse testare PurgeCSS seriamente, la strada più pulita è una **safelist esplicita** per le classi generate dinamicamente (da `domBuilder` e dai template). Da investigare prima di escludere PurgeCSS come soluzione.

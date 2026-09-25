@@ -1,4 +1,4 @@
-// v.3
+// v.2
 // import path from 'path';
 // import { fileURLToPath } from 'url';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';

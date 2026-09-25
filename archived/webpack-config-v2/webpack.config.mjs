@@ -1,5 +1,5 @@
 // webpack.config.mjs __project_name__
-// v.3
+// v.2
 import path from 'path';
 import { fileURLToPath } from 'url';
 import webpack from 'webpack';
@@ -42,11 +42,6 @@ const isDevelopment = process.env.NODE_ENV === 'development'
   ,devServerPort = [[port5700]]
   ,apiPort = [[port8000]] // eslint-disable-line no-unused-vars
   ,useSass = false
-
-  // css in dev: true = iniettato con style-loader (veloce, nessun asset css);
-  // false = estratto in asset con MiniCssExtractPlugin (come in produzione).
-  // NB: con `purgeCssInDev: true` (vedi sotto) viene comunque forzato a false,
-  // perché il purge e il plugin delle custom properties lavorano sugli asset css
   ,inlineCssInDevMode = true
   // sf: inlineCssInDevMode = false
   ,useSvgo = true
@@ -82,45 +77,17 @@ const isDevelopment = process.env.NODE_ENV === 'development'
 
   ,usePurgeCss = true // false per disattivare PurgeCSS (debug rapido di problemi legati al purge)
   ,purgeCSSOptions = {
+    variables: false, // rimuove le custom properties non usate (sostituisce jit-props)
     keyframes: true, // rimuove i @keyframes non referenziati
     debug: false // true per loggare i selettori rimossi da PurgeCSS a fine build
   }
-
-  // plugin per l'estrazione ottimizzata delle custom properties (vedi
-  // webpack-config-modules/custom-props-purgecss-plugin.mjs): dopo la
-  // minificazione inietta nei css compilati SOLO le definizioni di custom
-  // properties effettivamente usate, prese dal file master. I css del progetto
-  // contengono quindi solo usi `var(--nome)`, mai definizioni (custom-properties.css
-  // NON va importato nelle entry css). Se false il plugin non viene nemmeno
-  // caricato e la gestione delle custom properties resta a carico del progetto
-  ,useCustomPropsPlugin = true
-  // file master con TUTTE le definizioni di custom properties disponibili
-  // (copiato da minimo da starter-install.sh, generato da `npm run 'build tokens'`)
-  ,customPropsFile = path.resolve(__dirname, './app/css/custom-properties.css')
-
-  // PurgeCSS e plugin custom properties lavorano sugli asset css finali:
-  // in dev, con `false`, sono entrambi disattivati (build più veloce, css
-  // iniettato con style-loader; se `useCustomPropsPlugin` è true le definizioni
-  // vengono aggiunte per intero alle entry, vedi `entries`).
-  // Con `true` (a scopo di test) sono attivi come in produzione (secondo i
-  // rispettivi flag `usePurgeCss` / `useCustomPropsPlugin`) e `inlineCssInDevMode`
-  // viene forzato a false
-  ,purgeCssInDev = false
-  ,inlineCssInDev = inlineCssInDevMode && !purgeCssInDev // valore effettivo passato a cssRules
-  ,runPurgeCss = usePurgeCss && (!isDevelopment || purgeCssInDev)
-  ,runCustomPropsPlugin = useCustomPropsPlugin && (!isDevelopment || purgeCssInDev)
   // ,manifest_shared_seed = {}
 ;
 
-const { CustomPropsPurgeCssPlugin } = runCustomPropsPlugin
-  ? await import('./webpack-config-modules/custom-props-purgecss-plugin.mjs')
-  : {};
-
 // test del cacheGroup `shared` (splitChunks): i css restano SEMPRE FUORI dal
 // chunk condiviso e nel chunk della entry che li importa, così ogni asset css
-// resta autosufficiente (il plugin delle custom properties inietta le
-// definizioni negli asset css dei `sets`, e i critical css inline nei
-// template devono restare autosufficienti). I
+// resta autosufficiente (`variables: true` funziona per singolo asset, e i
+// critical css inline nei template devono restare autosufficienti). I
 // template (twig/altro) linkano solo il css della propria entry (e gli
 // eventuali `.critical.css`), MAI uno shared.css: se i css finissero nel
 // chunk condiviso, quella parte di stili sparirebbe silenziosamente dalla
@@ -135,8 +102,8 @@ const { CustomPropsPurgeCssPlugin } = runCustomPropsPlugin
 // e se si risolve un problema con purgeCSS
 // (componenti importati dal js di più entry), valutare un cacheGroup `shared`
 // dedicato ai css condivisi: andranno escluse le entry `.critical` (devono
-// restare autosufficienti), aggiungere il css condiviso ai `sets` del plugin
-// delle custom properties (vedi `CustomPropsPurgeCssPlugin` nei `plugins`),
+// restare autosufficienti), gestite in safelist.variables le custom properties
+// definite/consumate tra asset diversi (vedi purgecss-variables-safelist.mjs),
 // e i template dovranno linkare esplicitamente lo shared.css generato
 const shared_chunk_paths = (module) => {
   if (module.type === 'css/mini-extract') return false;
@@ -214,7 +181,7 @@ const CopyWebpackPluginPatterns = [
 
 // =>> entries
 // NB: percorsi dalla root del progetto
-const projectEntries = {
+const entries = {
   'index': './app/index.js',
 
   // css critici da includere inline nei template html: il suffisso `.critical` nel nome
@@ -223,18 +190,6 @@ const projectEntries = {
   'layout.critical': './app/css/layout.critical.css'
 
 };
-
-// dev senza plugin custom properties (`purgeCssInDev: false`, css iniettato con
-// style-loader, quindi nessun asset css in cui il plugin possa inserire le
-// definizioni): il file master con TUTTE le custom properties viene aggiunto come
-// primo modulo di ogni entry (escluse le `.critical`). Non serve nessuna
-// modifica ai template
-const entries = (useCustomPropsPlugin && isDevelopment && !purgeCssInDev)
-  ? Object.fromEntries(Object.entries(projectEntries).map(([name, entry]) => [
-    name,
-    /\.critical/.test(name) ? entry : [customPropsFile, ...[entry].flat()]
-  ]))
-  : projectEntries;
 
 
 const config = {
@@ -286,11 +241,10 @@ const config = {
   optimization: {
     minimize: !isDevelopment,
     // di default true solo se minimize:true (quindi false in dev): esplicito qui perché
-    // PurgeCSSPlugin e il plugin delle custom properties modificano gli asset css
-    // dopo il calcolo dell'hash "veloce" — senza questo, in dev con `purgeCssInDev`
-    // il contenthash non riflette le loro modifiche e il browser può servire dalla
-    // cache una versione stale pur avendo rigenerato la build
-    realContentHash: !isDevelopment || purgeCssInDev,
+    // PurgeCSSPlugin modifica gli asset css dopo il calcolo dell'hash "veloce" — senza
+    // questo, in dev il contenthash non riflette le modifiche di PurgeCSS e il browser
+    // può servire dalla cache una versione stale pur avendo rigenerato la build
+    // realContentHash: true,
     minimizer: [
       new CssMinimizerPlugin(),
       new TerserPlugin({
@@ -509,19 +463,18 @@ const config = {
       exclude: /\.critical/ // chunk name
     }),
 
-    // =>> plugins: PurgeCSSPlugin (solo classi/keyframes, le custom properties sono
-    // gestite dal plugin successivo)
+    // =>> plugins: PurgeCSSPlugin (per ultimo, attivo anche in dev)
     // https://github.com/FullHuman/purgecss/tree/main/packages/purgecss-webpack-plugin
     // https://purgecss.com/configuration.html
     // istanze e opzioni in webpack-config-modules/purgecss-setup.mjs (qui solo flag/dati progetto)
     // `usePurgeCss: false` disattiva il purge per intero (utile per isolare rapidamente
-    // eventuali problemi legati ad esso); `purgeCSSOptions` (keyframes/debug,
+    // eventuali problemi legati ad esso); `purgeCSSOptions` (variables/keyframes/debug,
     // vedi sopra) si applica solo quando è attivo
-    // NB: in dev il purge è attivo solo con `purgeCssInDev: true` (vedi sopra). In
-    // watch mode i template twig NON sono osservati da webpack: dopo aver
-    // aggiunto una classe solo in un twig occorre rilanciare la build (o toccare
-    // un file js/css) per aggiornare il purge
-    ...(runPurgeCss
+    // NB: il purge è attivo anche in dev, per far emergere subito eventuali
+    // rimozioni errate. In watch mode i template twig NON sono osservati da
+    // webpack: dopo aver aggiunto una classe solo in un twig occorre rilanciare
+    // la build (o toccare un file js/css) per aggiornare il purge
+    ...(usePurgeCss
       ? createPurgeCSSPlugins({
 
         // SOLO file che generano markup o classi (twig, php, js);
@@ -567,55 +520,31 @@ const config = {
           ]
         },
 
+        // elenco generato: usi di var() nei blocchi `purgecss ignore` e nei css
+        // shadow-DOM/`?raw`, override cross-asset (seeds), con chiusura transitiva
+        // delle dipendenze (vedi webpack-config-modules/purgecss-variables-safelist.mjs)
+        variablesSafelist: {
+          declarationGlobs: [
+            path.resolve(__dirname, './app/index.css'), // entry css di default (vedi starter-install.sh)
+            path.resolve(__dirname, './app/index-critical.css'),
+            path.resolve(__dirname, './app/src/**/*.css'),
+            path.resolve(__dirname, './app/error-pages/**/*.css'),
+            `${minimo_path}/src/**/*.css`,
+          ],
+          shadowGlobs: [
+            path.resolve(__dirname, './app/src/web-components/**/*.css'),
+            `${minimo_path}/src/web-components/**/*.css`,
+          ],
+          seeds: [
+            // override di .login-group (login.css) consumati dai buttons minimo (css globale)
+            /^--btn-secondary-/
+          ]
+        },
+
         // fontFace resta false (default): i font sono referenziati solo tramite
         // var(--font-family) e purgecss non risolve le custom properties nei valori
         ...purgeCSSOptions
       })
-      : []),
-
-    // =>> plugins: CustomPropsPurgeCssPlugin (dopo PurgeCSS e dopo la minificazione)
-    // estrazione ottimizzata delle custom properties: vedi il commento in testa a
-    // webpack-config-modules/custom-props-purgecss-plugin.mjs e i flag
-    // `useCustomPropsPlugin` / `purgeCssInDev` sopra
-    ...(runCustomPropsPlugin
-      ? [new CustomPropsPurgeCssPlugin({
-
-        // file master con tutte le definizioni disponibili
-        definitionsFile: customPropsFile,
-
-        // set di asset css elaborati in modo indipendente: `sources` sono i nomi
-        // degli asset compilati (con l'hash nel nome: usare `*`, oppure una
-        // RegExp), `target` l'asset in cui iniettare le definizioni (se omesso
-        // è il primo asset del set; se non corrisponde ad alcun asset e non ha
-        // `*` viene emesso come nuovo asset, che va poi linkato nei template).
-        // NB: `*` corrisponde a qualsiasi carattere: 'layout.*.css' corrisponde
-        // anche a 'layout.critical.<hash>.css'
-        sets: [
-          // il critical css è inline nei template: deve restare autosufficiente
-          { sources: ['layout.critical.*.css'] },
-          { sources: ['index.*.css'] },
-
-          // esempio di set con target condiviso: un solo css con le definizioni
-          // per più asset (le definizioni non sono duplicate negli altri)
-          // { sources: ['index.*.css', 'admin.*.css'], target: 'index.*.css' },
-        ],
-
-        // css usati fuori dagli asset purgati (shadow DOM dei web components,
-        // import `?raw`): tutti i loro usi di var() contano per tutti i set
-        extraUsageGlobs: [
-          path.resolve(__dirname, './app/src/web-components/**/*.css'),
-          `${minimo_path}/src/web-components/**/*.css`,
-        ],
-
-        // props da includere comunque in tutti i set (nomi esatti o RegExp),
-        // es. override consumati da un altro asset
-        // seeds: [/^--btn-secondary-/],
-
-        // selettore dei blocchi `:root` del master (default: ':root')
-        // selector: ':where(html)',
-
-        minify: !isDevelopment
-      })]
       : [])
   ], // end plugins
 
@@ -764,7 +693,7 @@ const config = {
       },
 
       // =>> rules: css / scss
-      ...cssRules({isDevelopment: isDevelopment, useSass: useSass, inlineCssInDevMode: inlineCssInDev, postcssConfig_path: postcssConfig_path})
+      ...cssRules({isDevelopment: isDevelopment, useSass: useSass, inlineCssInDevMode: inlineCssInDevMode, postcssConfig_path: postcssConfig_path})
     ] // end rules
   }, // end module
 

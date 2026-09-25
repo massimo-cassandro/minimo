@@ -1,5 +1,5 @@
 // webpack-modules/postcss.config.mjs
-// v.3
+// v.2
 import path from 'path';
 import { fileURLToPath } from 'url';
 import globalData from '@csstools/postcss-global-data';
@@ -11,10 +11,9 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // NB: le custom properties NON sono gestite qui (postcss-jit-props rimosso):
-// i css del progetto contengono solo usi `var(--nome)` e le definizioni
-// (solo quelle usate) sono iniettate a fine build dal plugin
-// custom-props-purgecss-plugin.mjs, che parte dal file master
-// custom-properties.css (vedi `useCustomPropsPlugin` in webpack.config.mjs)
+// ogni entry css importa direttamente custom-properties.css e le props
+// non utilizzate vengono rimosse in build da PurgeCSS (`variables: true`,
+// vedi webpack.config.mjs)
 
 // NB: la minificazione è gestita da CssMinimizerPlugin (webpack.config.mjs):
 // cssnano NON va aggiunto qui, oltre a duplicare la minificazione
@@ -27,8 +26,8 @@ export default (loaderContext) => {
   const plugins = [
     // rende disponibili le @custom-media a tutti i file css
     // (il contenuto iniettato viene rimosso a fine elaborazione;
-    // NON aggiungere qui custom-properties.css: le definizioni sono
-    // gestite dal plugin delle custom properties, vedi sopra)
+    // NON aggiungere qui custom-properties.css: duplicherebbe le props
+    // in ogni asset e interferirebbe con il purge, vedi sopra)
     globalData({
       files: [
         path.resolve(__dirname, '../app/css/custom-media.css'),
