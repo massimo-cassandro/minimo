@@ -6,6 +6,7 @@ import globalData from '@csstools/postcss-global-data';
 import customMedia from 'postcss-custom-media';
 import autoprefixer from 'autoprefixer';
 // import jitProps from 'postcss-jit-props';
+// import OpenProps from 'open-props';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -36,6 +37,7 @@ export default (loaderContext) => {
     }),
 
     // jitProps({
+    //   ...OpenProps,
     //   files: [
     //     path.resolve(__dirname, '../app/css/custom-properties.css'),
     //   ]

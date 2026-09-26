@@ -408,7 +408,8 @@ const config = {
 
     // =>> plugins: WebpackManifestPlugin
     // new WebpackManifestPlugin({
-    //   fileName: path.join(output_dir, 'manifest.json'), // sf: fileName: 'manifest.json', // scrive in output.path
+    //   fileName: path.join(output_dir, 'manifest.json'),
+    // sf: fileName: 'manifest.json', // scrive in output.path
     //   // basePath: item.source_dirname
     //   // removeKeyHash: /(^(_assets\/(?!(fonts\/))))|((\?as_asset)$)/,
     //   removeKeyHash: true, // /([a-f0-9]{32}\.?)/gi, // /(\?as_asset)$/,
@@ -529,12 +530,9 @@ const config = {
         // SOLO file che generano markup o classi (twig, php, js);
         // i file di stile vengono comunque scartati dal plugin
         contentGlobs: [
-          // progetti symfony: template twig e classi generate lato php
-          // (percorsi relativi alla root del progetto: adattare il `../` se
-          // webpack.config.mjs NON è in una sottodirectory)
-          // path.resolve(__dirname, './templates/**/*.twig'),
-          // path.resolve(__dirname, './app/**/*.php'),
-          path.resolve(__dirname, './app/index.js'), // entry js di default (vedi starter-install.sh)
+          path.resolve(__dirname, './templates/**/*.twig'),
+          path.resolve(__dirname, './app/**/*.php'),
+          path.resolve(__dirname, './app/index.js'), // entry js di default
           path.resolve(__dirname, './app/src/**/*.{js,mjs,jsx}'),
           path.resolve(__dirname, './app/src/**/*.ejs'), // template html di webpack
           path.resolve(__dirname, './app/error-pages/**/*.js'),
@@ -636,7 +634,7 @@ const config = {
         test: /\.jsx?$/,
         oneOf: [
           {
-            resourceQuery: /as_lib/, // utilizzo come libreria
+            resourceQuery: /as_(?:lib|asset)/, // utilizzo come libreria / asset
             type: 'asset/resource',
             generator: {
               filename: 'libs/[name].[contenthash][ext]'

@@ -16,7 +16,7 @@
 
       "@app/*": ["app/*"],
 
-      "@minimo/*": ["./node_modules/@massimo-cassandro/minimo/src/*"],
+      "@minimoSrc/*": ["./node_modules/@massimo-cassandro/minimo/src/*"],
       "@minimoCharts/*": ["./node_modules/@massimo-cassandro/minimo/charts/*"]
     }
   },

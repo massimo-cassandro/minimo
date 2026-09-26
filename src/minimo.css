@@ -5,53 +5,53 @@
 /* @import '@css/custom-media.css'; */ /* managed by postcss */
 /* @import '@css/custom-properties.css' layer('base'); */ /* managed by postcss-jit-props */
 
-@import '@minimo/css/reset.css';
-@import '@minimo/css/layout-base.css';
-@import '@minimo/css/container.css';
+@import '@minimoSrc/css/reset.css';
+@import '@minimoSrc/css/layout-base.css';
+@import '@minimoSrc/css/container.css';
 
-@import '@minimo/css/forms/forms.css';
-@import '@minimo/css/forms/fieldset.css';
-@import '@minimo/css/forms/form-collections.css';
-@import '@minimo/css/forms/form-group.css';
-@import '@minimo/css/forms/input-group.css';
-@import '@minimo/css/forms/form-disabled-readonly.css';
-@import '@minimo/css/forms/validation.css';
-@import '@minimo/css/forms/form-utilities.css';
-@import '@minimo/css/forms/switch.css';
+@import '@minimoSrc/css/forms/forms.css';
+@import '@minimoSrc/css/forms/fieldset.css';
+@import '@minimoSrc/css/forms/form-collections.css';
+@import '@minimoSrc/css/forms/form-group.css';
+@import '@minimoSrc/css/forms/input-group.css';
+@import '@minimoSrc/css/forms/form-disabled-readonly.css';
+@import '@minimoSrc/css/forms/validation.css';
+@import '@minimoSrc/css/forms/form-utilities.css';
+@import '@minimoSrc/css/forms/switch.css';
 
-@import '@minimo/css/buttons/buttons.css';
-@import '@minimo/css/buttons/buttons-primary.css';
-@import '@minimo/css/buttons/buttons-secondary.css';
-@import '@minimo/css/buttons/status-buttons.css';
-@import '@minimo/css/buttons/btn-close.css';
+@import '@minimoSrc/css/buttons/buttons.css';
+@import '@minimoSrc/css/buttons/buttons-primary.css';
+@import '@minimoSrc/css/buttons/buttons-secondary.css';
+@import '@minimoSrc/css/buttons/status-buttons.css';
+@import '@minimoSrc/css/buttons/btn-close.css';
 
-@import '@minimo/css/badge.css';
-@import '@minimo/css/text.css';
-@import '@minimo/css/links.css';
-@import '@minimo/css/headings.css';
-@import '@minimo/css/alerts.css';
-@import '@minimo/css/icons.css';
-@import '@minimo/css/svg.css';
-@import '@minimo/css/table.css';
-@import '@minimo/css/flex.css';
-@import '@minimo/css/grid.css';
-@import '@minimo/css/details.css';
+@import '@minimoSrc/css/badge.css';
+@import '@minimoSrc/css/text.css';
+@import '@minimoSrc/css/links.css';
+@import '@minimoSrc/css/headings.css';
+@import '@minimoSrc/css/alerts.css';
+@import '@minimoSrc/css/icons.css';
+@import '@minimoSrc/css/svg.css';
+@import '@minimoSrc/css/table.css';
+@import '@minimoSrc/css/flex.css';
+@import '@minimoSrc/css/grid.css';
+@import '@minimoSrc/css/details.css';
 
-@import '@minimo/css/sizes.css';
-@import '@minimo/css/display.css';
-@import '@minimo/css/margin-padding.css';
-/* @import '@minimo/css/margin-padding-media.css';  responsive version */
+@import '@minimoSrc/css/sizes.css';
+@import '@minimoSrc/css/display.css';
+@import '@minimoSrc/css/margin-padding.css';
+/* @import '@minimoSrc/css/margin-padding-media.css';  responsive version */
 /* alternative boostrap naming
-@import '@minimo/css/margin-padding-bootstrap.css';
-@import '@minimo/css/margin-padding-bootsrap-media.css';
+@import '@minimoSrc/css/margin-padding-bootstrap.css';
+@import '@minimoSrc/css/margin-padding-bootsrap-media.css';
 */
-@import '@minimo/css/overflow.css';
-@import '@minimo/css/position.css';
-@import '@minimo/css/visibility.css';
+@import '@minimoSrc/css/overflow.css';
+@import '@minimoSrc/css/position.css';
+@import '@minimoSrc/css/visibility.css';
 
 
 /* spinner: include the css of the choosen spinner only */
-@import '@minimo/components/spinner/spinner-circle-basic.css';
+@import '@minimoSrc/components/spinner/spinner-circle-basic.css';
 
 
 /* @import '@css/layout.css'; */
