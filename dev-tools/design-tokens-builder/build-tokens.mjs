@@ -14,6 +14,7 @@
 //   build-tokens-src/platforms.mjs      <- builds the platforms object (css + optional json)
 //   build-tokens-src/build-source-modes.mjs  <- alternative build path used when sourceModes is set
 //   build-tokens-src/merge-css.mjs      <- supports the mergeCustomProps option (flat and per-mode)
+//   build-tokens-src/source-prefixes.mjs <- supports `{ src, prefix }` entries in source/sourceModes
 
 import StyleDictionary from 'style-dictionary';
 import * as path from 'node:path';
@@ -35,6 +36,7 @@ import {
   source,
   sourceModes,
   sourceModesBase,
+  prefixedSources,
   mergeCustomProps,
   customPropsGroups,
   pxToRem,
@@ -49,6 +51,13 @@ import './build-tokens-src/transforms.mjs';
 // DTCG v5 syntax at parse time — see build-tokens-src/legacy-tokens-parser.mjs.
 import { LEGACY_TOKENS_PARSER_NAME, registerLegacyTokensParser } from './build-tokens-src/legacy-tokens-parser.mjs';
 registerLegacyTokensParser();
+
+// ── 2c. Per-source custom property prefixes ──────────────────────────────────
+// Expands the `{ src, prefix }` entries of source/sourceModes into the file ->
+// prefix map read by the name/kebab-prefixed transform (needs the legacy
+// parser above, to load legacy .json sources) — see source-prefixes.mjs.
+import { registerSourcePrefixes } from './build-tokens-src/source-prefixes.mjs';
+await registerSourcePrefixes(prefixedSources);
 
 // ── 3. CSS format ─────────────────────────────────────────────────────────────
 // customPropsCount is updated by the format at render time

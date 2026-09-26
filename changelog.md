@@ -14,3 +14,4 @@
 * 1.34.0 (22 set 2026) - light-dark tokens builder
 * 1.35.0 (23 set 2026) - Non-DTCG Design Token parsing
 * 1.36.0 (24 set 2026) - Design tokens builder: fix and merge props improvements
+* 1.37.0 (26 set 2026) - build tokens improvements (optional custom-props prefix)

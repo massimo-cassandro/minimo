@@ -3,6 +3,7 @@
 // Imported once by build-tokens.mjs before buildAllPlatforms() is called.
 
 import StyleDictionary from 'style-dictionary';
+import { getSourcePrefix } from './source-prefixes.mjs';
 
 const BASE_FONT_SIZE = 16;
 
@@ -211,4 +212,23 @@ StyleDictionary.registerTransform({
   transitive: true,
   filter: (token) => token.$type === 'typography' || token.type === 'typography',
   transform: (token) => token.$value ?? token.value,
+});
+
+// ---------------------------------------------------------------------------
+// 7. Kebab-case name with per-source prefix
+// Same as the built-in name/kebab, but prepends the prefix registered for the
+// token's source file (`{ src, prefix }` entries of `source`/`sourceModes`, see
+// source-prefixes.mjs), e.g. Open Props' gray.0 with prefix 'op' -> op-gray-0.
+// Only the name changes: the token path is untouched, so {references} keep
+// resolving and are rendered as var(--<prefixed-name>). Files without a
+// prefix get exactly the built-in name/kebab result.
+// ---------------------------------------------------------------------------
+StyleDictionary.registerTransform({
+  name: 'name/kebab-prefixed',
+  type: 'name',
+  transform: (token, options) => {
+    const kebab = StyleDictionary.hooks.transforms['name/kebab'].transform;
+    const prefix = getSourcePrefix(token.filePath);
+    return kebab(prefix ? { ...token, path: [prefix, ...token.path] } : token, options);
+  },
 });

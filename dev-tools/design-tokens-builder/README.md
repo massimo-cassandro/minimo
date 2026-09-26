@@ -61,6 +61,7 @@ npx buildTokens --config ./path/to/tokens-config.mjs
 The `source` array accepts any combination of:
 - Concrete file paths: `'./tokens/colors.jsonc'`
 - Glob patterns: `'./tokens/**/*.{json,jsonc,mjs}'`
+- `{ src, prefix }` objects, to add a prefix to the custom properties of those files (see [Source prefixes](#source-prefixes))
 
 **Supported formats:**
 - `.json` / `.jsonc` — parsed directly as token data
@@ -69,6 +70,27 @@ The `source` array accepts any combination of:
 **Legacy token syntax (auto-detected, `.json` only):** `.json` source files written in the older, non-DTCG Style Dictionary syntax (`value`/`type` instead of `$value`/`$type`, references as `{group.token.value}` instead of `{group.token}` — e.g. a file exported from [Open Props](https://open-props.style/)) are converted to DTCG v5 syntax automatically at parse time, node by node. Files already using `$value`/`$type` are left untouched, so no config flag or file list is needed — mixing legacy and DTCG sources in the same `source` array just works. `.jsonc` is not covered (reserved for hand-authored DTCG sources, parsed by Style Dictionary's own loader) and these `.json` files are parsed with plain `JSON.parse` (no comments, no trailing commas). See `build-tokens-src/legacy-tokens-parser.mjs`.
 
 Known limitation: a legacy node that is at the same time a token (own `value`/`type`) *and* a group with further nested children (e.g. Open Props' `other.ease.out`, which has its own value plus `out.1` ... `out.5`) can't be represented in DTCG v5 — a node with `$value` is always a leaf, Style Dictionary doesn't descend into its children. Only the node's own value is converted; the nested children are silently lost.
+
+#### Source prefixes
+
+An entry of `source` (or of a `sourceModes` mode) can be an object `{ src, prefix }` instead of a string: every custom property generated from the files matched by `src` (a path, a glob or an array of them) is rendered with the given prefix. Useful to avoid name collisions with third-party token sets, or to make their origin explicit:
+
+```js
+source: [
+  './my-tokens/*.mjs',
+  { src: `${node_modules_path}/open-props/open-props.style-dictionary-tokens.json`, prefix: 'op' },
+],
+```
+
+With this config Open Props' `gray.0` becomes `--op-gray-0`. `prefix` accepts `'op'`, `'op-'` or `'--op-'` (all equivalent).
+
+- Only the custom property **name** changes, not the token path: `{references}` keep working, and a token of another source referencing `{gray.0}` is rendered as `var(--op-gray-0)`.
+- The JSON output (`jsonBuildPath`) is **not** prefixed: it keeps the original token tree.
+- `customPropsGroups` match the prefixed name, so a group can use `prefixes: ['op']`.
+- Giving two different prefixes to the same file fails the build with an error.
+- `check-unresolved-custom-props.mjs` understands the same syntax. Note that `extraCustomPropsFiles` entries are plain CSS files and are never prefixed.
+
+See `build-tokens-src/source-prefixes.mjs`.
 
 
 #### Token file format (JS example)

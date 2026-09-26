@@ -11,9 +11,10 @@ import { buildJsonFiles } from './formats/json.mjs';
 // Transforms applied to the CSS platform.
 // Exported so other scripts (e.g. check-unresolved-custom-props.mjs) can
 // build a Style Dictionary instance with matching transformed token names.
+// name/kebab-prefixed = name/kebab + per-source prefix (see source-prefixes.mjs).
 export const CSS_TRANSFORMS = [
   'attribute/cti',
-  'name/kebab',
+  'name/kebab-prefixed',
   'time/seconds',
   'asset/url',
   'size/pxToRem-smart',
@@ -27,7 +28,8 @@ export const CSS_TRANSFORMS = [
 // Transforms applied to the JSON platform.
 // Kept minimal on purpose: consuming tools expect original values (e.g. "16px"
 // not "1rem") and alias references ({...}) must be preserved to maintain
-// token links.
+// token links. Source prefixes are not applied here (plain name/kebab): the
+// JSON output keeps the original token tree.
 // Exported so build-source-modes.mjs can build a matching json platform per
 // sourceModes mode.
 export const JSON_TRANSFORMS = [

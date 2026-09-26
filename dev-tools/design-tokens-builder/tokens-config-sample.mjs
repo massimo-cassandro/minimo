@@ -51,12 +51,21 @@ const config = {
   // the pattern syntax. Use template literals instead:
   //   OK:  `${minimo_path}/**/*.{json,mjs}`
   //   NO:  path.join(minimo_path, '/**/*.{json,mjs}')
+  //
+  // An entry can also be an object `{ src, prefix }` (src: string or array of
+  // strings/globs), to render the custom properties of those files with a
+  // prefix: e.g. { src: '...open-props...json', prefix: 'op' } turns Open
+  // Props' gray.0 into --op-gray-0. Only the property name changes:
+  // {references} to those tokens are rendered as var(--op-gray-0), and the JSON
+  // output stays unprefixed. 'op', 'op-' and '--op-' are equivalent. The same
+  // syntax works inside sourceModes. Two different prefixes for the same file
+  // make the build fail.
   source: [
     `${minimo_path}/design-tokens/_src/**/*.tokens.{mjs,jsonc}`, // main tokens
     `${minimo_path}/src/**/*.tokens.{mjs,jsonc}`, // components tokens
 
     // optional extra token source (in this example, openProps, https://open-props.style/)
-    // `${node_modules_path}/open-props/open-props.style-dictionary-tokens.json`,
+    // { src: `${node_modules_path}/open-props/open-props.style-dictionary-tokens.json`, prefix: 'op' },
 
     // your project tokens
     './project-tokens/*.{js,mjs,jsonc,json}',

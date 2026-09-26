@@ -10,7 +10,7 @@
 
 import * as path from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { resolveSourcePaths } from './resolve-source-paths.mjs';
+import { splitSourceEntries } from './source-prefixes.mjs';
 
 // ---------------------------------------------------------------------------
 // Read the --config flag
@@ -126,14 +126,33 @@ export const customPropsGroups = Array.isArray(buildConfig.customPropsGroups)
 // properties split — see build-tokens-src/build-source-modes.mjs. When set
 // (buildConfig.sourceModes is a non-null object), `source` is ignored and
 // each mode's own array of source patterns is resolved the same way.
+//
+// Entries of `source` / of each mode can also be `{ src, prefix }` objects,
+// to render the custom properties of those files with a prefix (see
+// source-prefixes.mjs). They are flattened here into plain patterns for
+// Style Dictionary; the prefixed ones are also collected in
+// `prefixedSources`, to be registered by build-tokens.mjs.
 // ---------------------------------------------------------------------------
 const sourceModesRaw = buildConfig.sourceModes ?? null;
+
+/** @type {import('./source-prefixes.mjs').PrefixedSource[]} */
+export const prefixedSources = [];
+
+/**
+ * @param {Parameters<typeof splitSourceEntries>[0]} entries
+ * @returns {string[]}
+ */
+const parseSourceEntries = (entries) => {
+  const { patterns, prefixed } = splitSourceEntries(entries, configDir);
+  prefixedSources.push(...prefixed);
+  return patterns;
+};
 
 export const sourceModes = sourceModesRaw
   ? Object.fromEntries(
     Object.entries(sourceModesRaw).map(([mode, modeSource]) => [
       mode,
-      resolveSourcePaths(modeSource, configDir),
+      parseSourceEntries(modeSource),
     ])
   )
   : null;
@@ -156,4 +175,4 @@ if (sourceModes && buildConfig.sourceModesBase && sourceModesBase !== buildConfi
   );
 }
 
-export const source = sourceModes ? null : resolveSourcePaths(buildConfig.source, configDir);
+export const source = sourceModes ? null : parseSourceEntries(buildConfig.source);

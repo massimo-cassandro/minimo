@@ -24,7 +24,7 @@ import { styleText } from 'node:util';
 import StyleDictionary from 'style-dictionary';
 import './build-tokens-src/transforms.mjs';
 import { CSS_TRANSFORMS } from './build-tokens-src/platforms.mjs';
-import { resolveSourcePaths } from './build-tokens-src/resolve-source-paths.mjs';
+import { splitSourceEntries, registerSourcePrefixes } from './build-tokens-src/source-prefixes.mjs';
 import { findMediaModeBlocks } from './build-tokens-src/merge-css.mjs';
 import { LEGACY_TOKENS_PARSER_NAME, registerLegacyTokensParser } from './build-tokens-src/legacy-tokens-parser.mjs';
 
@@ -202,17 +202,22 @@ async function run() {
     /** @type {Map<string, Map<string, string>>} */
     const sourceFileByPropByMode = new Map();
 
-    // includePatterns: base-mode sources, passed as `include` for non-base
+    // includeEntries: base-mode sources, passed as `include` for non-base
     // modes so cross-mode references resolve (same as build-source-modes.mjs).
-    /** @param {string[]} sourcePatterns @param {string[]} [includePatterns] @returns {Promise<Map<string,string>>} */
-    const resolveSourceFileMap = async (sourcePatterns, includePatterns = []) => {
+    /** @param {Parameters<typeof splitSourceEntries>[0]} sourceEntries @param {Parameters<typeof splitSourceEntries>[0]} [includeEntries] @returns {Promise<Map<string,string>>} */
+    // Entries can be strings or `{ src, prefix }` objects (see
+    // build-tokens-src/source-prefixes.mjs): the prefixes are registered
+    // before the transform pipeline runs, so token names match the CSS.
+    const resolveSourceFileMap = async (sourceEntries, includeEntries = []) => {
       /** @type {Map<string, string>} */
       const map = new Map();
-      const resolvedPaths = resolveSourcePaths(sourcePatterns, configDir);
+      const { patterns: resolvedPaths, prefixed } = splitSourceEntries(sourceEntries, configDir);
+      const { patterns: includePaths, prefixed: includePrefixed } = splitSourceEntries(includeEntries, configDir);
       if (!resolvedPaths.length) return map;
       try {
+        await registerSourcePrefixes([...prefixed, ...includePrefixed]);
         const sd = new StyleDictionary({
-          include: resolveSourcePaths(includePatterns, configDir),
+          include: includePaths,
           source: resolvedPaths,
           parsers: [LEGACY_TOKENS_PARSER_NAME],
           log: { verbosity: 'silent' },
@@ -230,8 +235,8 @@ async function run() {
 
     if (checkUnused && config.sourceModes) {
       for (const [mode, modeSource] of Object.entries(config.sourceModes)) {
-        const includePatterns = mode === sourceModesBase ? [] : config.sourceModes[sourceModesBase];
-        sourceFileByPropByMode.set(mode, await resolveSourceFileMap(modeSource, includePatterns));
+        const includeEntries = mode === sourceModesBase ? [] : config.sourceModes[sourceModesBase];
+        sourceFileByPropByMode.set(mode, await resolveSourceFileMap(modeSource, includeEntries));
       }
     } else if (checkUnused && Array.isArray(config.source) && config.source.length) {
       const map = await resolveSourceFileMap(config.source);
