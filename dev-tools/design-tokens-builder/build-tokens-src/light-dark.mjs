@@ -4,7 +4,9 @@
 // and a `dark` mode, custom properties present in BOTH — matched by name —
 // are written once, as `--name: light-dark(<light-value>, <dark-value>);`,
 // instead of being split across the base mode's top-level `:root { ... }`
-// block and a `@media (prefers-color-scheme: dark) { ... }` block.
+// block and a `@media (prefers-color-scheme: dark) { ... }` block. If the two
+// values are identical, light-dark() would be redundant: the bare value is
+// written instead, e.g. `--name: <value>;`.
 //
 // Only `light` and `dark` are affected:
 //   - a third mode (e.g. a custom `high-contrast` key in sourceModes) is left
@@ -74,7 +76,12 @@ export const applyLightDarkFunc = ({ modeFinalProps, modeNames, baseMode, select
     // Prefers the light-side trailing comment (e.g. a token $description);
     // falls back to the dark-side one if light has none.
     const comment = light.comment || dark.comment;
-    sharedProps[name] = `light-dark(${light.value}, ${dark.value});${comment ? ` ${comment}` : ''}`;
+    // Equal light/dark values: light-dark(x, x) would be redundant — use the
+    // bare value directly instead.
+    const value = light.value === dark.value
+      ? light.value
+      : `light-dark(${light.value}, ${dark.value})`;
+    sharedProps[name] = `${value};${comment ? ` ${comment}` : ''}`;
   }
 
   const stripCommon = (props) => {

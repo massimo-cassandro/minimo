@@ -77,6 +77,7 @@ export default {
     '@stylistic/block-closing-brace-newline-after': null,
     '@stylistic/block-opening-brace-space-before': null,
     '@stylistic/declaration-block-semicolon-newline-before': 'never-multi-line',
+    '@stylistic/declaration-colon-newline-after': null,
     '@stylistic/function-max-empty-lines': 2,
     '@stylistic/function-parentheses-space-inside': 'never-single-line',
     '@stylistic/max-empty-lines': 2,
@@ -93,7 +94,7 @@ export default {
     '@stylistic/value-list-comma-newline-after': 'always-multi-line',
     '@stylistic/value-list-comma-newline-before': 'never-multi-line',
     '@stylistic/value-list-comma-space-after': null,
-    '@stylistic/value-list-max-empty-lines': 3
+    '@stylistic/value-list-max-empty-lines': 3,
   },
   overrides: [
     {

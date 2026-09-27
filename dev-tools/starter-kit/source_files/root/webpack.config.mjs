@@ -138,7 +138,7 @@ const { CustomPropsPurgeCssPlugin } = runCustomPropsPlugin
 // NB: PurgeCSS elabora ogni asset css singolarmente, quindi i @keyframes
 // definiti nello `shared.css` ma usati solo in un altro asset (es. un css di
 // progetto che usa una animation di minimo) verrebbero rimossi: in tal caso
-// aggiungerli a `safelist.keyframes` o impostare `keyframes: false` in
+// aggiungerli a 'safelist.keyframes' o impostare `keyframes: false` in
 // `purgeCSSOptions`
 const shared_chunk_paths = (module) => {
 
@@ -146,7 +146,6 @@ const shared_chunk_paths = (module) => {
   const sep = '[\\\\/]'; // stringa che produce [\\/] nel pattern
   const pathsRegexp = new RegExp([
     'node_modules',
-    'app/src',
     'app/src/js',
     'app/src/web-components',
     'app/src/components',
@@ -411,8 +410,7 @@ const config = {
     //   fileName: path.join(output_dir, 'manifest.json'),
     // sf: fileName: 'manifest.json', // scrive in output.path
     //   // basePath: item.source_dirname
-    //   // removeKeyHash: /(^(_assets\/(?!(fonts\/))))|((\?as_asset)$)/,
-    //   removeKeyHash: true, // /([a-f0-9]{32}\.?)/gi, // /(\?as_asset)$/,
+    //   // removeKeyHash: /\?.*$/, // /([a-f0-9]{32}\.?)/gi, // /(\?as_asset)$/,
     //   // rimuove i font dal manifest. Non necessari, rendono il file inutilmente grande
     //   filter: isDevelopment? undefined : (FileDescriptor) => {
     //     return /fonts/.test(FileDescriptor.path)? false : true;
@@ -426,6 +424,15 @@ const config = {
       chunkFilename: '[id].[contenthash].css',
       ignoreOrder: true
     }),
+
+    // =>> plugins: MiniCssExtractPlugin
+    // contenthash solo se non si usa Dev Server
+    new MiniCssExtractPlugin({
+      filename: process.env.WEBPACK_SERVE ? '[name].css' : '[name].[contenthash].css',
+      chunkFilename: process.env.WEBPACK_SERVE ? '[id].css' : '[id].[contenthash].css',
+      ignoreOrder: true
+    }),
+
 
     // =>> plugins: InlineCriticalCssPlugin (solo prod)
     // ...(isDevelopment

@@ -8,6 +8,10 @@ Le versioni precedenti sono conservate in `archived/webpack-config-v2/` del repo
 
 ---
 
+## Fix da verificare sempre
+* WebpackManifestPlugin: impostare `removeKeyHash: /\?.*$/, // /([a-f0-9]{32}\.?)/gi, // /(\?as_asset)$/,`, sostituendo eventuali impostazione `removeKeyHash: true` se presente
+
+
 ## Da v2 a v3
 
 Novità della v3: le definizioni delle custom properties non sono più gestite da PurgeCSS (`variables`) né da postcss-jit-props, ma da un plugin webpack dedicato, `custom-props-purgecss-plugin.mjs`, che opera sugli asset CSS finali (dopo la minificazione) e inietta solo le custom properties effettivamente usate (dipendenze transitive incluse), partendo dal file master `app/css/custom-properties.css`. Il plugin è attivabile con un flag, indipendente da `usePurgeCss`.
