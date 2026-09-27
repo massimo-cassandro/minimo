@@ -52,6 +52,7 @@ export const JSON_TRANSFORMS = [
  * @param {{name: string, prefixes: string[]}[]} opts.customPropsGroups  Named groups of name prefixes, moved to the top of the CSS output in list order.
  * @param {boolean}         opts.pxToRem             If false, skips the px→rem transform on the CSS platform. Default: true.
  * @param {string|null}     opts.addLayer            Wraps the generated custom properties inside `@layer <addLayer> { ... }`. null = no layer.
+ * @param {string}          opts.selector            CSS selector wrapping the generated block (default: ':root').
  * @returns {Record<string, PlatformConfig>} platforms object ready for Style Dictionary config
  */
 export const buildPlatforms = ({
@@ -65,6 +66,7 @@ export const buildPlatforms = ({
   customPropsGroups = [],
   pxToRem = true,
   addLayer = null,
+  selector = ':root',
 }) => {
   const cssTransforms = pxToRem
     ? CSS_TRANSFORMS
@@ -82,6 +84,7 @@ export const buildPlatforms = ({
           options: {
             outputReferences: true,
             showFileHeader: true,
+            selector,
             customPropsGroups,
             addLayer,
           },

@@ -103,6 +103,26 @@ export const mergeCustomProps = (() => {
 // Set to null, undefined or false (default) to emit no layer.
 export const addLayer = buildConfig.addLayer ? String(buildConfig.addLayer).trim() : null;
 
+// customPropsSelector: CSS selector wrapping the generated custom properties
+// block(s) (see formats/css.mjs buildCssBlock()), instead of the default
+// `:root`. Applies uniformly to a single-source build and to a sourceModes
+// build (the base mode's top-level block and every other mode's block
+// nested under its own `@media (prefers-color-scheme: <mode>)` rule all use
+// the same selector). Falsy or blank values fall back to ':root'.
+export const customPropsSelector = typeof buildConfig.customPropsSelector === 'string'
+  && buildConfig.customPropsSelector.trim()
+  ? buildConfig.customPropsSelector.trim()
+  : ':root';
+
+// useLightDarkFunc: with sourceModes set (see below) and defining both a
+// `light` and a `dark` key, custom properties present in both are written
+// once as `--name: light-dark(<light>, <dark>);` instead of being split
+// across the base mode's block and a
+// `@media (prefers-color-scheme: dark) { ... }` rule (see light-dark.mjs).
+// Ignored when sourceModes is not set, or does not define both a light and a
+// dark mode. Default: true.
+export const useLightDarkFunc = buildConfig.useLightDarkFunc !== false;
+
 // customPropsGroups: custom properties whose first hyphen-separated name
 // segment matches one of a group's prefixes are pulled out, labelled with
 // that group's name and moved to the beginning of the generated CSS file, in

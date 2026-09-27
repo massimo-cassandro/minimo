@@ -68,7 +68,7 @@ const config = {
     // { src: `${node_modules_path}/open-props/open-props.style-dictionary-tokens.json`, prefix: 'op' },
 
     // your project tokens
-    './project-tokens/*.{js,mjs,jsonc,json}',
+    {src: './project-tokens/*.{js,mjs,jsonc,json}', prefix: 'my-project'}
   ],
 
   // Optional light/dark (or other) custom properties split — alternative to
@@ -110,12 +110,54 @@ const config = {
   // },
   sourceModes: null,
 
+  // With sourceModes set, and only if it defines both a `light` and a `dark`
+  // key: custom properties present in BOTH — matched by name — are written
+  // once as `--name: light-dark(<light-value>, <dark-value>);`, instead of
+  // being split across the base mode's top-level block and a
+  // `@media (prefers-color-scheme: dark) { ... }` rule.
+  //
+  // Unaffected:
+  //   - any other key in sourceModes besides light/dark (e.g. a third,
+  //     custom mode) — always stays on its own
+  //     `@media (prefers-color-scheme: <mode>) { ... }` rule
+  //   - a property present in only one of `light`/`dark` — stays in its own
+  //     mode's block (still behind `@media`, unless that mode happens to be
+  //     sourceModesBase)
+  //
+  // Whenever this option is active (sourceModes has both a light and a dark
+  // key), the base mode's `color-scheme` declaration is always normalised to
+  // read "light dark [...any other mode]", with light before dark — matching
+  // light-dark()'s own (light-value, dark-value) argument order — regardless
+  // of the order sourceModes keys were declared in, or of which of the two
+  // is configured as sourceModesBase below.
+  //
+  // Interaction with mergeCustomProps: no special handling needed — the
+  // per-mode merge with pre-existing custom properties always runs first;
+  // this option then reconciles whatever value ends up in each mode
+  // (freshly generated or preserved from a pre-existing file) into
+  // light-dark(), matched by name. This also means that re-running a build
+  // with this option newly turned on, over a destFile previously generated
+  // with it off (classic `@media (prefers-color-scheme: dark)` split) and
+  // mergeCustomProps: true, converts the preserved values into light-dark()
+  // calls too — as with any mergeCustomProps case, a resulting mismatch is
+  // left for you to fix.
+  //
+  // Default: true. Ignored when sourceModes is not set (null/undefined).
+  useLightDarkFunc: true,
+
   // With sourceModes set: the mode whose declarations go in the top-level
   // `:root { ... }` block, instead of nested inside its own
   // `@media (prefers-color-scheme: <mode>) { ... }` rule (default: the first
   // key of sourceModes, e.g. 'light'). Ignored when sourceModes is not set.
   sourceModesBase: 'light',
 
+  // CSS selector wrapping the generated custom properties block(s), instead
+  // of the default `:root`. Applies uniformly whether using a single
+  // `source` or `sourceModes` (the base mode's top-level block and every
+  // other mode's block nested under its own
+  // `@media (prefers-color-scheme: <mode>)` rule all use this same
+  // selector). Falsy or blank values fall back to ':root'.
+  customPropsSelector: ':where(html)',
 
   // If true (default), dimension token values expressed in px are converted
   // to rem in the generated CSS. Values in other units (em, %, vh, dvw, ...)
@@ -141,7 +183,7 @@ const config = {
   // Comments at the end of a custom property line are preserved; full-line
   // comments are lost, and a multi-line comment is cut at the end of its first
   // line (and closed, to keep the CSS valid).
-  mergeCustomProps: false,
+  mergeCustomProps: true,
 
   // Wraps the generated custom properties inside a CSS `@layer` at-rule,
   // e.g. addLayer: 'project' -> `@layer project { :root { ... } }`.
@@ -155,7 +197,7 @@ const config = {
   customPropsGroups: [
     {
       name: 'COLORS',
-      prefixes: ['accent', 'primary', 'secondary', 'neutral'],
+      prefixes: ['accent', 'primary', 'secondary', 'neutral', 'color'],
     },
     {
       name: 'LAYOUT',

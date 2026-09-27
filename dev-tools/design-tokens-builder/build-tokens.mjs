@@ -41,6 +41,8 @@ import {
   customPropsGroups,
   pxToRem,
   addLayer,
+  useLightDarkFunc,
+  customPropsSelector,
 } from './build-tokens-src/config.mjs';
 
 // ── 2. Custom transforms ─────────────────────────────────────────────────────
@@ -114,6 +116,8 @@ if (sourceModes) {
     pxToRem,
     addLayer,
     mergeCustomProps,
+    useLightDarkFunc,
+    customPropsSelector,
   });
 
 } else {
@@ -166,6 +170,7 @@ if (sourceModes) {
       customPropsGroups,
       pxToRem,
       addLayer,
+      selector: customPropsSelector,
     }),
   });
 

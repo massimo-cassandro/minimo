@@ -4,17 +4,24 @@
 // light/dark custom-properties split.
 //
 // For each mode, a separate StyleDictionary instance is built from that
-// mode's own `source` array. The generated `:root { ... }` CSS blocks are
-// then composed into a single destFile:
-//   - the base mode's block stays as a plain `:root { ... }` rule, with a
-//     `color-scheme: <all modes joined>;` declaration prepended
-//     (e.g. "light dark")
+// mode's own `source` array. The generated `<selector> { ... }` CSS blocks
+// (selector: customPropsSelector, default ':root' — see config.mjs) are then
+// composed into a single destFile:
+//   - the base mode's block stays as a plain `<selector> { ... }` rule, with
+//     a `color-scheme: <all modes joined>;` declaration prepended (e.g.
+//     "light dark")
 //   - every other mode's block is wrapped in
-//     `@media (prefers-color-scheme: <mode>) { :root { ... } }`, with a
+//     `@media (prefers-color-scheme: <mode>) { <selector> { ... } }`, with a
 //     `color-scheme: <mode>;` declaration prepended
 // customPropsGroups, mergeCustomProps and pxToRem apply per mode, exactly as
 // in the single-source build. addLayer (if set) wraps the whole composed
 // result in a single `@layer`, rather than one per mode.
+//
+// When sourceModes defines both a `light` and a `dark` key and
+// useLightDarkFunc is true (default), custom properties shared by both are
+// reconciled into a single `light-dark()` declaration instead of being split
+// across the base block and a `@media (prefers-color-scheme: dark)` rule —
+// see light-dark.mjs.
 //
 // JSON tokens (if jsonBuildPath is set) are produced per mode: one set of
 // files per mode, with `-<mode>` appended to each filename (see
@@ -26,15 +33,16 @@ import StyleDictionary from 'style-dictionary';
 import * as path from 'node:path';
 import { mkdir, writeFile } from 'node:fs/promises';
 import { CSS_TRANSFORMS, JSON_TRANSFORMS } from './platforms.mjs';
-import { customPropsCount } from './formats/css.mjs';
+import { customPropsCount, lastFinalProps } from './formats/css.mjs';
 import { buildJsonFiles, collectConcreteFilePaths } from './formats/json.mjs';
 import { loadExistingCustomPropsScoped } from './merge-css.mjs';
 import { LEGACY_TOKENS_PARSER_NAME } from './legacy-tokens-parser.mjs';
+import { applyLightDarkFunc } from './light-dark.mjs';
 
 /**
  * @param {object}                 opts
  * @param {Record<string,string[]>} opts.sourceModes    Resolved source paths per mode (see config.mjs)
- * @param {string}                 opts.baseMode        Mode whose block stays a top-level `:root { ... }` rule
+ * @param {string}                 opts.baseMode        Mode whose block stays a top-level `<selector> { ... }` rule
  * @param {string}                 opts.buildPath        Absolute path for CSS output directory
  * @param {string}                 opts.destFile         CSS output filename
  * @param {string|null}            opts.jsonBuildPath    Absolute path for JSON output (null = disabled)
@@ -45,6 +53,8 @@ import { LEGACY_TOKENS_PARSER_NAME } from './legacy-tokens-parser.mjs';
  * @param {boolean}                opts.pxToRem
  * @param {string|null}            opts.addLayer
  * @param {boolean|(string|RegExp)[]} opts.mergeCustomProps  true = merge all sources, array = only the matching token source files
+ * @param {boolean}                opts.useLightDarkFunc  reconcile shared `light`/`dark` properties into `light-dark()` calls (default: true — see config.mjs and light-dark.mjs). Ignored unless sourceModes defines both a `light` and a `dark` key.
+ * @param {string}                 opts.customPropsSelector  CSS selector wrapping the generated block(s) (default: ':root' — see config.mjs)
  * @returns {Promise<{cssDestPath: string, totalCustomProps: number, jsonFilesByMode: Record<string, object[]>}>}
  */
 export const buildSourceModes = async ({
@@ -60,13 +70,15 @@ export const buildSourceModes = async ({
   pxToRem,
   addLayer,
   mergeCustomProps,
+  useLightDarkFunc,
+  customPropsSelector,
 }) => {
   const modeNames = Object.keys(sourceModes);
 
   // Read the pre-existing destFile (if any) BEFORE any Style Dictionary
   // instance runs, since the first one to write would overwrite it.
   if (mergeCustomProps) {
-    loadExistingCustomPropsScoped(path.join(buildPath, destFile), baseMode, mergeCustomProps);
+    loadExistingCustomPropsScoped(path.join(buildPath, destFile), baseMode, mergeCustomProps, customPropsSelector);
   }
 
   const cssTransforms = pxToRem
@@ -75,13 +87,22 @@ export const buildSourceModes = async ({
 
   /** @type {Record<string,string>} */
   const modeBlocks = {};
-  let totalCustomProps = 0;
+  // Per-mode custom-prop count and structured (name -> tail) props map,
+  // captured right after each per-mode format call (customPropsCount and
+  // lastFinalProps are live bindings, updated synchronously by the format
+  // function — see formats/css.mjs). Kept per mode (rather than summed on
+  // the fly) so applyLightDarkFunc() can later overwrite just the entries it
+  // actually touches (light, dark, and the base mode).
+  /** @type {Record<string,number>} */
+  const modeCounts = {};
+  /** @type {Record<string, Record<string,string>>} */
+  const modeFinalProps = {};
   /** @type {Record<string, object[]>} */
   const jsonFilesByMode = {};
 
   for (const mode of modeNames) {
     // Non-base modes may reference base-mode tokens (always defined, since
-    // the base block is the unconditional top-level `:root`). The base
+    // the base block is the unconditional top-level `<selector>`). The base
     // sources are passed as `include`: available for reference resolution
     // but flagged isSource: false, and skipped by the css/json formats.
     // Base-mode-only on purpose: a reference to a token that exists only in
@@ -102,6 +123,7 @@ export const buildSourceModes = async ({
               format: 'css/variables-sorted',
               options: {
                 outputReferences: true,
+                selector: customPropsSelector,
                 customPropsGroups,
                 mode,
                 colorScheme: mode === baseMode ? modeNames.join(' ') : mode,
@@ -116,9 +138,10 @@ export const buildSourceModes = async ({
     // the composed multi-mode file is written once, at the end, below.
     const [formatted] = await sd.formatPlatform('css');
     modeBlocks[mode] = /** @type {string} */ (formatted.output);
-    // customPropsCount is a live binding, updated synchronously by the
-    // format function called above (see formats/css.mjs).
-    totalCustomProps += customPropsCount;
+    // customPropsCount / lastFinalProps are live bindings, updated
+    // synchronously by the format function called above (see formats/css.mjs).
+    modeCounts[mode] = customPropsCount;
+    modeFinalProps[mode] = lastFinalProps;
 
     if (jsonBuildPath) {
       const concreteFilePaths = jsonDestFile ? [] : await collectConcreteFilePaths(sd);
@@ -141,6 +164,26 @@ export const buildSourceModes = async ({
       jsonFilesByMode[mode] = files;
     }
   }
+
+  // ── light-dark() reconciliation (light/dark modes only) ──────────────────
+  // Rebuilds just the `light`, `dark` and base-mode blocks from the adjusted
+  // props maps — see light-dark.mjs. No-op (returns null) unless sourceModes
+  // defines both a `light` and a `dark` key.
+  if (useLightDarkFunc) {
+    const reconciled = applyLightDarkFunc({
+      modeFinalProps,
+      modeNames,
+      baseMode,
+      selector: customPropsSelector,
+      customPropsGroups,
+    });
+    if (reconciled) {
+      Object.assign(modeBlocks, reconciled.blocks);
+      Object.assign(modeCounts, reconciled.counts);
+    }
+  }
+
+  const totalCustomProps = Object.values(modeCounts).reduce((sum, n) => sum + n, 0);
 
   // ── Compose the final CSS ────────────────────────────────────────────────
   const otherModes = modeNames.filter((mode) => mode !== baseMode);

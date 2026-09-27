@@ -67,6 +67,12 @@ const matchBraces = (text, openIndex) => {
   return -1;
 };
 
+// Escapes a string for literal use inside a RegExp — needed because
+// customPropsSelector (see config.mjs) can contain regex-special characters,
+// e.g. ':where(html)'.
+/** @param {string} str */
+const escapeRegExp = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
 // Finds every @media (prefers-color-scheme: <mode>) { ... } block in a
 // previously generated sourceModes CSS destFile, with absolute character
 // offsets into cssText. Used to split the file into per-mode scopes (see
@@ -93,22 +99,25 @@ export const findMediaModeBlocks = (cssText) => {
 
 // Splits a previously generated sourceModes CSS destFile into per-mode
 // scopes (see build-source-modes.mjs for the shape of the generated file):
-//   - the base scope is the top-level `:root { ... }` block, i.e. the one
-//     NOT nested inside a `@media (prefers-color-scheme: ...)` rule
-//   - every other scope is the `:root { ... }` block nested inside its own
-//     `@media (prefers-color-scheme: <mode>) { ... }` rule
+//   - the base scope is the top-level `<selector> { ... }` block, i.e. the
+//     one NOT nested inside a `@media (prefers-color-scheme: ...)` rule
+//   - every other scope is the `<selector> { ... }` block nested inside its
+//     own `@media (prefers-color-scheme: <mode>) { ... }` rule
 // @param {string} cssText
+// @param {string} [selector] the customPropsSelector the file was generated
+//   with (default: ':root' — see config.mjs)
 // @returns {Record<string,string>} mode → CSS body text (base mode keyed as '__base__')
-const splitModeScopes = (cssText) => {
+const splitModeScopes = (cssText, selector = ':root') => {
   /** @type {Record<string,string>} */
   const scopes = {};
+  const selectorRe = new RegExp(`${escapeRegExp(selector)}\\s*\\{`);
 
   // 1. Every @media (prefers-color-scheme: <mode>) { ... } block, and the
-  // :root { ... } body nested inside each one.
+  // <selector> { ... } body nested inside each one.
   const mediaBlocks = findMediaModeBlocks(cssText);
   for (const { mode, start, end } of mediaBlocks) {
     const body = cssText.slice(start + 1, end);
-    const rootMatch = /:root\s*\{/.exec(body);
+    const rootMatch = selectorRe.exec(body);
     if (rootMatch) {
       const rootOpen = rootMatch.index + rootMatch[0].length - 1;
       const rootClose = matchBraces(body, rootOpen);
@@ -118,9 +127,9 @@ const splitModeScopes = (cssText) => {
     }
   }
 
-  // 2. The base :root { ... } block: the first one not nested inside any of
-  // the media blocks found above.
-  const ROOT_RE = /:root\s*\{/g;
+  // 2. The base <selector> { ... } block: the first one not nested inside
+  // any of the media blocks found above.
+  const ROOT_RE = new RegExp(`${escapeRegExp(selector)}\\s*\\{`, 'g');
   for (const match of cssText.matchAll(ROOT_RE)) {
     const openIdx = match.index + match[0].length - 1;
     const insideMedia = mediaBlocks.some((b) => openIdx > b.start && openIdx < b.end);
@@ -188,22 +197,24 @@ export const loadExistingCustomProps = (absDestPath, sources = true) => {
 /**
  * sourceModes equivalent of loadExistingCustomProps(): reads the CSS
  * destination file (if it exists) and stores a per-mode name → value map,
- * scoped to each mode's own `:root { ... }` block (see splitModeScopes()).
+ * scoped to each mode's own `<selector> { ... }` block (see splitModeScopes()).
  * @param {string} absDestPath absolute path of the CSS file to read
  * @param {string} baseMode mode whose declarations live in the top-level,
- *   non-nested `:root { ... }` block (no default — always passed explicitly
+ *   non-nested `<selector> { ... }` block (no default — always passed explicitly
  *   by build-source-modes.mjs, from the resolved sourceModesBase)
  * @param {true|(string|RegExp)[]} [sources] `true` merges every source, an
  *   array only the token source files matching one of its entries (default: true)
+ * @param {string} [selector] the customPropsSelector the pre-existing file was
+ *   generated with (default: ':root' — see config.mjs)
  * @returns {Record<string, Record<string,string>>|null}
  */
-export const loadExistingCustomPropsScoped = (absDestPath, baseMode, sources = true) => {
+export const loadExistingCustomPropsScoped = (absDestPath, baseMode, sources = true, selector = ':root') => {
   mergeSources = sources;
   if (!existsSync(absDestPath)) {
     scopedExistingCustomProps = null;
     return scopedExistingCustomProps;
   }
-  const scopes = splitModeScopes(readFileSync(absDestPath, 'utf8'));
+  const scopes = splitModeScopes(readFileSync(absDestPath, 'utf8'), selector);
   scopedExistingCustomProps = {};
   if (scopes.__base__ !== undefined) {
     scopedExistingCustomProps[baseMode] = parseCustomProps(scopes.__base__);

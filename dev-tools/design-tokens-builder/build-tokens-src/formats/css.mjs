@@ -155,217 +155,278 @@ const buildGroupTitle = (name) => {
 // Exported counter — read by build-tokens.mjs for the final log line
 export let customPropsCount = 0;
 
+// Exported live binding holding the name → declaration-tail map last computed
+// by computeFinalProps() (see below), i.e. the structured result of the most
+// recent 'css/variables-sorted' format call. Read by
+// build-tokens-src/build-source-modes.mjs right after each per-mode
+// sd.formatPlatform('css') call (synchronous, same pattern as
+// customPropsCount) — needed by build-tokens-src/light-dark.mjs to reconcile
+// shared light/dark properties into light-dark() calls, working on the
+// structured props instead of the rendered CSS text.
+export let lastFinalProps = {};
+
+/**
+ * Computes the final `name -> declaration-tail` map for a token dictionary:
+ * resolves each token's CSS value (including the complex-type builders above),
+ * then merges in any pre-existing custom properties via mergeCustomProps()
+ * (see ../merge-css.mjs and the `mergeCustomProps` config option).
+ * @param {object} dictionary  Style Dictionary's resolved token dictionary (format() `dictionary` arg)
+ * @param {object} options     format() `options` arg — only `outputReferences` and `mode` are read here
+ * @returns {Record<string,string>} name → declaration tail (value + terminating `;` + optional trailing comment)
+ */
+export const computeFinalProps = (dictionary, options) => {
+  const tokenByPath = {};
+  for (const token of dictionary.allTokens) {
+    tokenByPath[token.path.join('.')] = token;
+  }
+
+  const resolveRefs = makeResolveRefs(tokenByPath);
+
+  const sequenceList = [
+    'xxs', 'xs', 'sm', 'base', 'md', 'lg', 'xl', 'xxl', 'xxxl', '2xl', '3xl',
+    'xlight', 'light', 'regular', 'medium', 'semibold', 'bold', 'xbold'
+  ];
+
+  const sortFunction = (a, b) => {
+    const idxA = sequenceList.indexOf(a.name);
+    const idxB = sequenceList.indexOf(b.name);
+
+    // Entrambi nella lista → ordine arbitrario
+    if (idxA !== -1 && idxB !== -1) return idxA - idxB;
+
+    // Solo A nella lista → A viene prima
+    if (idxA !== -1) return -1;
+
+    // Solo B nella lista → B viene prima
+    if (idxB !== -1) return 1;
+
+    // Nessuno nella lista → ordine alfabetico
+    return a.name.localeCompare(b.name, 'en', { numeric: true, sensitivity: 'base' });
+  };
+
+  // Tokens loaded via `include` (sourceModes: base-mode tokens made
+  // available to other modes) stay in tokenByPath, so references to them
+  // resolve to var(--name), but are not declared in this mode's block.
+  // property name → token source file, used by mergeCustomProps when the
+  // merge is limited to some source files (a token may generate several
+  // properties, e.g. typography)
+  /** @type {Record<string,string>} */
+  const sourceFileMap = {};
+  const trackSource = (token, tokenLines) => {
+    for (const name of Object.keys(parseCustomProps(tokenLines.join('\n')))) {
+      sourceFileMap[name] = token.filePath;
+    }
+    return tokenLines;
+  };
+
+  const lines = dictionary.allTokens
+    .filter((token) => token.isSource !== false)
+    // .sort((a, b) => a.name.localeCompare(b.name, 'en', {numeric: true, sensitivity: 'base'}))
+    .sort((a, b) => sortFunction(a,b))
+    .flatMap((token) => {
+      const type = token.$type ?? token.type;
+      const orig = token.original?.$value ?? token.original?.value;
+      const description = token.$description ?? token.description ?? token.comment;
+      const commentSuffix = buildDescriptionComment(description);
+
+      if (type === 'typography') {
+        const typographyLines = buildTypography(token.name, orig ?? {}, resolveRefs)
+          .split('\n')
+          .map((line) => `${line}${commentSuffix}`)
+          .join('\n');
+        return trackSource(token, [typographyLines]);
+      }
+
+      let value;
+
+      if (type === 'shadow' && options.outputReferences) {
+        value = (typeof orig === 'string' && orig.startsWith('{'))
+          ? resolveRefs(orig) : buildShadow(orig, resolveRefs);
+
+      } else if (type === 'gradient' && options.outputReferences) {
+        value = (typeof orig === 'string' && orig.startsWith('{'))
+          ? resolveRefs(orig) : buildGradient(orig, resolveRefs);
+
+      } else if ((type === 'border' || type === 'outline') && options.outputReferences) {
+        value = (typeof orig === 'string' && orig.startsWith('{'))
+          ? resolveRefs(orig) : buildBorderLike(orig, resolveRefs);
+
+      } else if (type === 'transition' && options.outputReferences) {
+        value = (typeof orig === 'string' && orig.startsWith('{'))
+          ? resolveRefs(orig) : buildTransition(orig, resolveRefs);
+
+      } else if (type === 'animation' && options.outputReferences) {
+        value = (typeof orig === 'string' && orig.startsWith('{'))
+          ? resolveRefs(orig) : buildAnimation(orig, resolveRefs);
+
+      } else if (options.outputReferences && typeof orig === 'string' && orig.includes('{')) {
+        // Covers both plain aliases and CSS functions containing {references}
+        // e.g. color-mix(in srgb, {btn.secondary.background.color} 60%, #000)
+        // {references} are replaced with var(--name); arithmetic gets calc().
+        const resolved = resolveRefs(orig);
+        // Strip var(...) and CSS function calls (word chars + hyphens followed by '(')
+        // before checking for arithmetic operators, so that hyphens in names like
+        // "color-mix" or "linear-gradient" don't trigger a spurious calc() wrap.
+        const stripped = resolved
+          .replace(/var\([^)]+\)/g, '0')
+          .replace(/[\w-]+\(/g, '(');
+        const isCalcNeeded = /[+\-*/]/.test(stripped);
+        value = isCalcNeeded ? `calc(${resolved})` : resolved;
+
+      } else {
+        value = String(token.$value ?? token.value);
+      }
+
+      // Multi-line values (e.g. Open Props' linear() easings) are collapsed
+      // to a single line: declarations are parsed one line at a time (see
+      // parseCustomProps in ../merge-css.mjs), so a multi-line value would
+      // be truncated to its first line.
+      value = String(value)
+        .replace(/\s*\n\s*/g, ' ')
+        .replace(/\(\s+/g, '(')
+        .replace(/\s+\)/g, ')');
+
+      return trackSource(token, [`  --${token.name}: ${value};${commentSuffix}`]);
+    });
+
+  // Build a name → declaration-tail map from the declarations generated
+  // above, then merge with any pre-existing custom properties loaded via
+  // loadExistingCustomProps() / loadExistingCustomPropsScoped() (see
+  // ../merge-css.mjs). Pre-existing values (including trailing comments)
+  // take priority when both exist; pre-existing-only properties are kept.
+  // options.mode (sourceModes build only, see ../build-source-modes.mjs)
+  // scopes the merge to that mode, so same-named props with different
+  // values across modes are never mixed up.
+  const generatedProps = parseCustomProps(lines.join('\n'));
+  return mergeCustomProps(generatedProps, options.mode ?? null, sourceFileMap);
+};
+
+/**
+ * Builds the final CSS block text (`<selector> { ... }`) from an already
+ * computed name → declaration-tail map (see computeFinalProps() above):
+ * sorts properties alphabetically, pulls out customPropsGroups, prepends an
+ * optional `color-scheme` declaration, and optionally wraps the result in
+ * `@layer <addLayer> { ... }`.
+ *
+ * Extracted as its own function (rather than inline in the format() call
+ * below) so build-tokens-src/light-dark.mjs can re-run it on an adjusted
+ * props map — e.g. after moving properties shared by `light` and `dark` into
+ * a single `light-dark()` declaration — and get back a properly sorted and
+ * grouped block, instead of appending raw text after the fact.
+ * @param {object} opts
+ * @param {Record<string,string>} opts.finalProps  name → declaration tail, as returned by computeFinalProps()
+ * @param {string} [opts.selector] CSS selector wrapping the block (default: (default: ':root'))
+ * @param {string} [opts.colorScheme] optional value for a `color-scheme: <value>;` declaration prepended to the block
+ * @param {{name:string,prefixes:string[]}[]} [opts.customPropsGroups] named groups of name prefixes, moved to the top of the block in list order (default: [])
+ * @param {string|null} [opts.addLayer] wraps the block in `@layer <addLayer> { ... }` (default: null — no layer)
+ * @returns {string}
+ * @example
+ * buildCssBlock({
+ *   finalProps: { 'accent-color': '#123;' },
+ *   selector: ':root', // default: ':root'
+ *   colorScheme: 'light dark', // default: undefined — no color-scheme line
+ *   customPropsGroups: [], // default: []
+ *   addLayer: null, // default: null
+ * });
+ */
+export const buildCssBlock = ({
+  finalProps,
+  selector = ':root',
+  colorScheme,
+  customPropsGroups = [],
+  addLayer = null,
+}) => {
+  // Final output is always sorted alphabetically ascending by property
+  // name, regardless of merge — this also keeps pre-existing-only
+  // properties from merge-css.mjs in order instead of trailing at the end.
+  const sortedProps = Object.entries(finalProps)
+    .sort(([a], [b]) => a.localeCompare(b, 'en', { numeric: true, sensitivity: 'base' }));
+
+  // customPropsGroups: properties whose first hyphen-separated name segment
+  // matches one of a group's prefixes are pulled out, labelled with that
+  // group's name and placed, in group-list order, at the beginning of the
+  // output file. A property matches the first group (in list order) whose
+  // prefixes include it.
+  const groupedProps = customPropsGroups.map(() => []);
+  const restProps = [];
+  for (const entry of sortedProps) {
+    const prefix = entry[0].split('-')[0];
+    const groupIndex = customPropsGroups.findIndex((g) => g.prefixes?.includes(prefix));
+    if (groupIndex !== -1) {
+      groupedProps[groupIndex].push(entry);
+    } else {
+      restProps.push(entry);
+    }
+  }
+  groupedProps.forEach((props, i) => {
+    const prefixes = customPropsGroups[i].prefixes;
+    props.sort(([a], [b]) => {
+      const idxA = prefixes.indexOf(a.split('-')[0]);
+      const idxB = prefixes.indexOf(b.split('-')[0]);
+      if (idxA !== idxB) return idxA - idxB;
+      return a.localeCompare(b, 'en', { numeric: true, sensitivity: 'base' });
+    });
+  });
+
+  // A blank line is inserted between blocks of properties sharing the same
+  // first hyphen-separated segment (e.g. all `btn-*` together), to visually
+  // group related custom properties in the generated file.
+  const outLines = [];
+
+  if (colorScheme) {
+    outLines.push(`  color-scheme: ${colorScheme};`, '');
+  }
+
+  let prevPrefix = null;
+  const appendBlock = (props) => {
+    for (const [name, tail] of props) {
+      const prefix = name.split('-')[0];
+      if (prevPrefix !== null && prefix !== prevPrefix) {
+        outLines.push('');
+      }
+      outLines.push(`  --${name}: ${tail}`);
+      prevPrefix = prefix;
+    }
+  };
+
+  const hasGroups = groupedProps.some((props) => props.length);
+  let isFirstBlock = true;
+  groupedProps.forEach((props, i) => {
+    if (!props.length) return;
+    if (!isFirstBlock) outLines.push('');
+    isFirstBlock = false;
+    outLines.push(buildGroupTitle(customPropsGroups[i].name));
+    appendBlock(props);
+    prevPrefix = null;
+  });
+  if (hasGroups && restProps.length) {
+    outLines.push('', '  /* ---------------------- */', '');
+    prevPrefix = null;
+  }
+  appendBlock(restProps);
+
+  const block = `${selector} {\n${outLines.join('\n')}\n}\n`;
+
+  // addLayer: wraps the whole block inside `@layer <name> { ... }`.
+  // Indentation is left to stylelint's fix step (run right after the build).
+  return addLayer
+    ? `@layer ${addLayer} {\n\n${block}}\n`
+    : block;
+};
+
 StyleDictionary.registerFormat({
   name: 'css/variables-sorted',
   format: ({ dictionary, options }) => {
-    const selector = options.selector ?? ':root';
+    const finalProps = computeFinalProps(dictionary, options);
+    lastFinalProps = finalProps;
+    customPropsCount = Object.keys(finalProps).length;
 
-    const tokenByPath = {};
-    for (const token of dictionary.allTokens) {
-      tokenByPath[token.path.join('.')] = token;
-    }
-
-    const resolveRefs = makeResolveRefs(tokenByPath);
-
-    const sequenceList = [
-      'xxs', 'xs', 'sm', 'base', 'md', 'lg', 'xl', 'xxl', 'xxxl', '2xl', '3xl',
-      'xlight', 'light', 'regular', 'medium', 'semibold', 'bold', 'xbold'
-    ];
-
-    const sortFunction = (a, b) => {
-      const idxA = sequenceList.indexOf(a.name);
-      const idxB = sequenceList.indexOf(b.name);
-
-      // Entrambi nella lista → ordine arbitrario
-      if (idxA !== -1 && idxB !== -1) return idxA - idxB;
-
-      // Solo A nella lista → A viene prima
-      if (idxA !== -1) return -1;
-
-      // Solo B nella lista → B viene prima
-      if (idxB !== -1) return 1;
-
-      // Nessuno nella lista → ordine alfabetico
-      return a.name.localeCompare(b.name, 'en', { numeric: true, sensitivity: 'base' });
-    };
-
-    // Tokens loaded via `include` (sourceModes: base-mode tokens made
-    // available to other modes) stay in tokenByPath, so references to them
-    // resolve to var(--name), but are not declared in this mode's block.
-    // property name → token source file, used by mergeCustomProps when the
-    // merge is limited to some source files (a token may generate several
-    // properties, e.g. typography)
-    /** @type {Record<string,string>} */
-    const sourceFileMap = {};
-    const trackSource = (token, tokenLines) => {
-      for (const name of Object.keys(parseCustomProps(tokenLines.join('\n')))) {
-        sourceFileMap[name] = token.filePath;
-      }
-      return tokenLines;
-    };
-
-    const lines = dictionary.allTokens
-      .filter((token) => token.isSource !== false)
-      // .sort((a, b) => a.name.localeCompare(b.name, 'en', {numeric: true, sensitivity: 'base'}))
-      .sort((a, b) => sortFunction(a,b))
-      .flatMap((token) => {
-        const type = token.$type ?? token.type;
-        const orig = token.original?.$value ?? token.original?.value;
-        const description = token.$description ?? token.description ?? token.comment;
-        const commentSuffix = buildDescriptionComment(description);
-
-        if (type === 'typography') {
-          const typographyLines = buildTypography(token.name, orig ?? {}, resolveRefs)
-            .split('\n')
-            .map((line) => `${line}${commentSuffix}`)
-            .join('\n');
-          return trackSource(token, [typographyLines]);
-        }
-
-        let value;
-
-        if (type === 'shadow' && options.outputReferences) {
-          value = (typeof orig === 'string' && orig.startsWith('{'))
-            ? resolveRefs(orig) : buildShadow(orig, resolveRefs);
-
-        } else if (type === 'gradient' && options.outputReferences) {
-          value = (typeof orig === 'string' && orig.startsWith('{'))
-            ? resolveRefs(orig) : buildGradient(orig, resolveRefs);
-
-        } else if ((type === 'border' || type === 'outline') && options.outputReferences) {
-          value = (typeof orig === 'string' && orig.startsWith('{'))
-            ? resolveRefs(orig) : buildBorderLike(orig, resolveRefs);
-
-        } else if (type === 'transition' && options.outputReferences) {
-          value = (typeof orig === 'string' && orig.startsWith('{'))
-            ? resolveRefs(orig) : buildTransition(orig, resolveRefs);
-
-        } else if (type === 'animation' && options.outputReferences) {
-          value = (typeof orig === 'string' && orig.startsWith('{'))
-            ? resolveRefs(orig) : buildAnimation(orig, resolveRefs);
-
-        } else if (options.outputReferences && typeof orig === 'string' && orig.includes('{')) {
-          // Covers both plain aliases and CSS functions containing {references}
-          // e.g. color-mix(in srgb, {btn.secondary.background.color} 60%, #000)
-          // {references} are replaced with var(--name); arithmetic gets calc().
-          const resolved = resolveRefs(orig);
-          // Strip var(...) and CSS function calls (word chars + hyphens followed by '(')
-          // before checking for arithmetic operators, so that hyphens in names like
-          // "color-mix" or "linear-gradient" don't trigger a spurious calc() wrap.
-          const stripped = resolved
-            .replace(/var\([^)]+\)/g, '0')
-            .replace(/[\w-]+\(/g, '(');
-          const isCalcNeeded = /[+\-*/]/.test(stripped);
-          value = isCalcNeeded ? `calc(${resolved})` : resolved;
-
-        } else {
-          value = String(token.$value ?? token.value);
-        }
-
-        // Multi-line values (e.g. Open Props' linear() easings) are collapsed
-        // to a single line: declarations are parsed one line at a time (see
-        // parseCustomProps in ../merge-css.mjs), so a multi-line value would
-        // be truncated to its first line.
-        value = String(value)
-          .replace(/\s*\n\s*/g, ' ')
-          .replace(/\(\s+/g, '(')
-          .replace(/\s+\)/g, ')');
-
-        return trackSource(token, [`  --${token.name}: ${value};${commentSuffix}`]);
-      });
-
-    // Build a name → declaration-tail map from the declarations generated
-    // above, then merge with any pre-existing custom properties loaded via
-    // loadExistingCustomProps() / loadExistingCustomPropsScoped() (see
-    // ../merge-css.mjs). Pre-existing values (including trailing comments)
-    // take priority when both exist; pre-existing-only properties are kept.
-    // options.mode (sourceModes build only, see ../build-source-modes.mjs)
-    // scopes the merge to that mode, so same-named props with different
-    // values across modes are never mixed up.
-    const generatedProps = parseCustomProps(lines.join('\n'));
-    const finalProps = mergeCustomProps(generatedProps, options.mode ?? null, sourceFileMap);
-
-    // Final output is always sorted alphabetically ascending by property
-    // name, regardless of merge — this also keeps pre-existing-only
-    // properties from merge-css.mjs in order instead of trailing at the end.
-    const sortedProps = Object.entries(finalProps)
-      .sort(([a], [b]) => a.localeCompare(b, 'en', { numeric: true, sensitivity: 'base' }));
-
-    // customPropsGroups: properties whose first hyphen-separated name segment
-    // matches one of a group's prefixes are pulled out, labelled with that
-    // group's name and placed, in group-list order, at the beginning of the
-    // output file. A property matches the first group (in list order) whose
-    // prefixes include it.
-    const customPropsGroups = options.customPropsGroups ?? [];
-    const groupedProps = customPropsGroups.map(() => []);
-    const restProps = [];
-    for (const entry of sortedProps) {
-      const prefix = entry[0].split('-')[0];
-      const groupIndex = customPropsGroups.findIndex((g) => g.prefixes?.includes(prefix));
-      if (groupIndex !== -1) {
-        groupedProps[groupIndex].push(entry);
-      } else {
-        restProps.push(entry);
-      }
-    }
-    groupedProps.forEach((props, i) => {
-      const prefixes = customPropsGroups[i].prefixes;
-      props.sort(([a], [b]) => {
-        const idxA = prefixes.indexOf(a.split('-')[0]);
-        const idxB = prefixes.indexOf(b.split('-')[0]);
-        if (idxA !== idxB) return idxA - idxB;
-        return a.localeCompare(b, 'en', { numeric: true, sensitivity: 'base' });
-      });
+    return buildCssBlock({
+      finalProps,
+      selector: options.selector,
+      colorScheme: options.colorScheme,
+      customPropsGroups: options.customPropsGroups,
+      addLayer: options.addLayer,
     });
-
-    // A blank line is inserted between blocks of properties sharing the same
-    // first hyphen-separated segment (e.g. all `btn-*` together), to visually
-    // group related custom properties in the generated file.
-    const outLines = [];
-
-    // options.colorScheme (sourceModes build only, see ../build-source-modes.mjs):
-    // prepends a `color-scheme: <value>;` declaration, e.g. "light dark" for
-    // the base mode's block, or the mode's own name (e.g. "dark") for a
-    // block nested inside its @media (prefers-color-scheme: <mode>) rule.
-    if (options.colorScheme) {
-      outLines.push(`  color-scheme: ${options.colorScheme};`, '');
-    }
-
-    let prevPrefix = null;
-    const appendBlock = (props) => {
-      for (const [name, tail] of props) {
-        const prefix = name.split('-')[0];
-        if (prevPrefix !== null && prefix !== prevPrefix) {
-          outLines.push('');
-        }
-        outLines.push(`  --${name}: ${tail}`);
-        prevPrefix = prefix;
-      }
-    };
-
-    const hasGroups = groupedProps.some((props) => props.length);
-    let isFirstBlock = true;
-    groupedProps.forEach((props, i) => {
-      if (!props.length) return;
-      if (!isFirstBlock) outLines.push('');
-      isFirstBlock = false;
-      outLines.push(buildGroupTitle(customPropsGroups[i].name));
-      appendBlock(props);
-      prevPrefix = null;
-    });
-    if (hasGroups && restProps.length) {
-      outLines.push('', '  /* ---------------------- */', '');
-      prevPrefix = null;
-    }
-    appendBlock(restProps);
-
-    customPropsCount = sortedProps.length;
-    const block = `${selector} {\n${outLines.join('\n')}\n}\n`;
-
-    // addLayer: wraps the whole block inside `@layer <name> { ... }`.
-    // Indentation is left to stylelint's fix step (run right after the build).
-    return options.addLayer
-      ? `@layer ${options.addLayer} {\n\n${block}}\n`
-      : block;
   },
 });
