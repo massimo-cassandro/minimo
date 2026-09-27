@@ -186,7 +186,11 @@ export const buildSourceModes = async ({
   const totalCustomProps = Object.values(modeCounts).reduce((sum, n) => sum + n, 0);
 
   // ── Compose the final CSS ────────────────────────────────────────────────
-  const otherModes = modeNames.filter((mode) => mode !== baseMode);
+  // A mode left with zero custom properties — typically a `light`/`dark`
+  // mode fully absorbed by applyLightDarkFunc() into the base mode's
+  // light-dark() declarations — gets no `@media` block at all, rather than
+  // an empty (but harmless) one.
+  const otherModes = modeNames.filter((mode) => mode !== baseMode && modeCounts[mode] > 0);
 
   let composed = modeBlocks[baseMode];
   for (const mode of otherModes) {
