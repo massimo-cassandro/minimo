@@ -83,14 +83,17 @@ import { buildSourceModes } from './build-tokens-src/build-source-modes.mjs';
 // untouched. Files are written flat in jsonBuildPath (no subdirectories), so
 // only its top level is scanned. Runs regardless of sourceModes.
 if (jsonBuildPath) {
+  // Local const: narrowing of the imported `jsonBuildPath` binding is lost
+  // inside the .map() callback below.
+  const jsonDir = jsonBuildPath;
   const { readdir, rm, mkdir } = await import('fs/promises');
-  const existingEntries = await readdir(jsonBuildPath, { withFileTypes: true }).catch(() => []);
+  const existingEntries = await readdir(jsonDir, { withFileTypes: true }).catch(() => []);
   await Promise.all(
     existingEntries
       .filter((entry) => entry.isFile() && /\.jsonc?$/.test(entry.name))
-      .map((entry) => rm(path.join(jsonBuildPath, entry.name)))
+      .map((entry) => rm(path.join(jsonDir, entry.name)))
   );
-  await mkdir(jsonBuildPath, { recursive: true });
+  await mkdir(jsonDir, { recursive: true });
 }
 
 // ── 7. Build ──────────────────────────────────────────────────────────────────

@@ -25,6 +25,12 @@
 // the parser is a safe no-op for files that don't need conversion — no
 // config flag or file list is required, detection is fully automatic.
 //
+// "Hybrid" nodes (a token with its own value that is also a group with
+// nested children, e.g. Open Props' other.ease.out) can't be represented in
+// DTCG v5, where a node with $value is a leaf. The own value is moved to a
+// child token named `default` (or `base` if `default` is already a child
+// name; the build fails if both are taken) — see collectHybridNodes().
+//
 // Limitation: `.json` files handled by this parser are parsed with plain
 // JSON.parse (no comments, no trailing commas), unlike Style Dictionary's
 // own built-in loader (which uses JSON5 for .json/.jsonc/.json5). This keeps
@@ -39,56 +45,125 @@ export const LEGACY_TOKENS_PARSER_NAME = 'minimo/legacy-tokens';
 // Matches "{some.token.path.value}" -> captures "some.token.path"
 const LEGACY_REF = /\{([^}]+)\.value\}/g;
 
-/** @param {unknown} value @returns {unknown} */
-const convertLegacyRefs = (value) => {
+// Name of the child token that receives the own value of a "hybrid" node
+// (see collectHybridNodes()); FALLBACK_LEAF is used when a child with the
+// preferred name already exists.
+const PREFERRED_LEAF = 'default';
+const FALLBACK_LEAF = 'base';
+
+/** @param {unknown} node @returns {node is Record<string, unknown>} */
+const isPlainObject = (node) => node !== null && typeof node === 'object' && !Array.isArray(node);
+
+// True if the node is (or contains, at any depth) a token, legacy or DTCG.
+/** @param {unknown} node @returns {boolean} */
+const hasTokenDescendant = (node) => isPlainObject(node)
+  && (Object.hasOwn(node, 'value') || Object.hasOwn(node, '$value')
+    || Object.values(node).some(hasTokenDescendant));
+
+/*
+ * A "hybrid" legacy node is a token (own `value`) that is also a group, i.e.
+ * has children that are tokens or groups of tokens (e.g. Open Props'
+ * other.ease.out, with its own value plus out.1 ... out.5). The own value is
+ * moved to a child token: `default`, or `base` if `default` is already a
+ * child name. If both are taken the build fails. Returns a map
+ * dot.path -> chosen child name, used to convert the node itself and to
+ * rewrite references pointing to it (references are only rewritten within
+ * the same file: a reference from another file to a hybrid node must use the
+ * child name explicitly).
+ */
+/**
+ * @param {unknown} node
+ * @param {string[]} path
+ * @param {string} filePath
+ * @param {Map<string,string>} [hybrids]
+ * @returns {Map<string,string>}
+ */
+const collectHybridNodes = (node, path, filePath, hybrids = new Map()) => {
+  if (!isPlainObject(node) || Object.hasOwn(node, '$value')) return hybrids;
+
+  if (Object.hasOwn(node, 'value')
+    && Object.entries(node).some(([key, child]) => key !== 'value' && hasTokenDescendant(child))) {
+    const leaf = [PREFERRED_LEAF, FALLBACK_LEAF].find((name) => !Object.hasOwn(node, name));
+    if (!leaf) {
+      throw new Error(
+        `[build-tokens] legacy tokens: node "${path.join('.')}" in ${filePath} has its own value and children, `
+        + `but both "${PREFERRED_LEAF}" and "${FALLBACK_LEAF}" child names are already taken`
+      );
+    }
+    hybrids.set(path.join('.'), leaf);
+  }
+
+  for (const [key, child] of Object.entries(node)) {
+    collectHybridNodes(child, [...path, key], filePath, hybrids);
+  }
+  return hybrids;
+};
+
+/**
+ * @param {unknown} value
+ * @param {Map<string,string>} hybrids
+ * @returns {unknown}
+ */
+const convertLegacyRefs = (value, hybrids) => {
   if (typeof value === 'string') {
-    return value.replace(LEGACY_REF, '{$1}');
+    return value.replace(LEGACY_REF, (_, ref) => (
+      hybrids.has(ref) ? `{${ref}.${hybrids.get(ref)}}` : `{${ref}}`
+    ));
   }
   if (Array.isArray(value)) {
-    return value.map(convertLegacyRefs);
+    return value.map((v) => convertLegacyRefs(v, hybrids));
   }
   if (value !== null && typeof value === 'object') {
     return Object.fromEntries(
-      Object.entries(value).map(([key, v]) => [key, convertLegacyRefs(v)])
+      Object.entries(value).map(([key, v]) => [key, convertLegacyRefs(v, hybrids)])
     );
   }
   return value;
 };
 
-/** @param {unknown} node @returns {node is Record<string, unknown>} */
-const isPlainObject = (node) => node !== null && typeof node === 'object' && !Array.isArray(node);
-
-/** @param {unknown} node @returns {unknown} */
-const convertLegacyNode = (node) => {
+/**
+ * @param {unknown} node
+ * @param {string[]} path
+ * @param {Map<string,string>} hybrids
+ * @returns {unknown}
+ */
+const convertLegacyNode = (node, path, hybrids) => {
   if (!isPlainObject(node)) return node;
 
   // Already DTCG v5 syntax: leave untouched.
   if (Object.hasOwn(node, '$value')) return node;
 
   if (Object.hasOwn(node, 'value')) {
-    // Legacy token leaf. Some legacy files (e.g. Open Props) also attach
-    // sibling numbered/named children to a node that carries its own
-    // `value`/`type` (a group that is also a default token) — those
-    // children are converted too, even though Style Dictionary itself
-    // cannot represent "group + own $value" ambiguity natively.
     const { value, type, comment, description, ...rest } = node;
-    const convertedRest = Object.fromEntries(
-      Object.entries(rest).map(([key, child]) => [key, convertLegacyNode(child)])
-    );
     const desc = comment ?? description;
-
-    return {
-      ...convertedRest,
-      $value: convertLegacyRefs(value),
+    const token = {
+      $value: convertLegacyRefs(value, hybrids),
       ...(type !== undefined ? { $type: type } : {}),
       ...(desc !== undefined ? { $description: desc } : {}),
+    };
+
+    const hybridLeaf = hybrids.get(path.join('.'));
+    if (hybridLeaf === undefined) return token;
+
+    // Hybrid node: becomes a group, its own value moves to a child token.
+    return {
+      ...Object.fromEntries(
+        Object.entries(rest).map(([key, child]) => [key, convertLegacyNode(child, [...path, key], hybrids)])
+      ),
+      [hybridLeaf]: token,
     };
   }
 
   // Group node: recurse into children.
   return Object.fromEntries(
-    Object.entries(node).map(([key, child]) => [key, convertLegacyNode(child)])
+    Object.entries(node).map(([key, child]) => [key, convertLegacyNode(child, [...path, key], hybrids)])
   );
+};
+
+/** @param {string} contents @param {string} filePath @returns {unknown} */
+const parseLegacyFile = (contents, filePath) => {
+  const tree = JSON.parse(contents);
+  return convertLegacyNode(tree, [], collectHybridNodes(tree, [], filePath));
 };
 
 // Registers the parser globally on the StyleDictionary class. To actually
@@ -100,6 +175,6 @@ export const registerLegacyTokensParser = () => {
   StyleDictionary.registerParser({
     name: LEGACY_TOKENS_PARSER_NAME,
     pattern: /\.json$/,
-    parser: ({ contents }) => convertLegacyNode(JSON.parse(contents)),
+    parser: ({ contents, filePath }) => parseLegacyFile(contents, filePath ?? ''),
   });
 };

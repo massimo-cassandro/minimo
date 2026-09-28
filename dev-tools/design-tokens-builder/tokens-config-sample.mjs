@@ -40,12 +40,14 @@ const config = {
   // .jsonc, reserved for hand-authored DTCG sources. These .json files are
   // parsed with plain JSON.parse (no comments, no trailing commas).
   //
-  // LIMITATION: a legacy node that is at the same time a token (own
-  // value/type) AND a group with further nested children (e.g. Open Props'
-  // other.ease.out, which has its own value plus out.1 ... out.5) cannot be
-  // represented in DTCG v5 — a node with $value is always a leaf, Style
-  // Dictionary does not descend into its children. In that case only the
-  // node's own value is converted; the nested children are silently lost.
+  // A legacy node that is at the same time a token (own value/type) AND a
+  // group with nested children (e.g. Open Props' other.ease.out, which has
+  // its own value plus out.1 ... out.5) cannot be represented in DTCG v5 —
+  // a node with $value is always a leaf. Its own value is moved to a child
+  // token named `default` (other.ease.out.default, i.e. --other-ease-out-default),
+  // or `base` if a `default` child already exists; if both exist the build
+  // fails. References to such a node from the same file are rewritten
+  // accordingly; from other files they must use the child name explicitly.
   //
   // WARNING: do not use path.join() to build glob patterns — it may corrupt
   // the pattern syntax. Use template literals instead:

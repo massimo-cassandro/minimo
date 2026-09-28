@@ -58,7 +58,6 @@ async function run() {
 
     // Path of the generated CSS file containing all custom property definitions
     const custom_prop_file_path = path.resolve(configDir, path.join(config.buildPath, config.destFile));
-    const custom_prop_filename  = path.basename(custom_prop_file_path);
 
     // Directory to scan for CSS files
     const checkdir = path.resolve(configDir, config.dirToCheck);
@@ -69,7 +68,7 @@ async function run() {
 
     // Collect all .css files in the scan directory, excluding any file under a
     // directory whose name starts with "TODO" (work-in-progress folders).
-    // The token file itself (custom_prop_filename) is intentionally included:
+    // The token file itself (custom_prop_file_path) is intentionally included:
     // custom properties are often composed from other custom properties
     // (e.g. `--malert-box-shadow: ... var(--malert-box-shadow-color) ...`)
     // and those internal var() references must count as usage, otherwise the
