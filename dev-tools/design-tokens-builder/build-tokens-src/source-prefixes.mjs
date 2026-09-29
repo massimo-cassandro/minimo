@@ -18,11 +18,18 @@
 // (token.filePath), while `src` may contain glob patterns: registerSourcePrefixes()
 // expands them (through Style Dictionary itself, so the result matches
 // token.filePath exactly) into a file path -> prefix map.
+//
+// The same entry object can also carry a `transform` map (renaming/moving
+// token nodes within the file's tree, e.g. { primary: 'primary.100' }) — see
+// source-transforms.mjs / token-rename-parser.mjs. splitSourceEntries() below
+// extracts both `prefix` and `transform` from the same `{ src, ... }` shape,
+// since they share the same source-matching syntax.
 
 import StyleDictionary from 'style-dictionary';
 import { LEGACY_TOKENS_PARSER_NAME } from './legacy-tokens-parser.mjs';
 import { resolveSourcePaths } from './resolve-source-paths.mjs';
 import { collectConcreteFilePaths } from './formats/json.mjs';
+import { normalizeTransformMap } from './source-transforms.mjs';
 
 /**
  * @typedef {object} PrefixedSource
@@ -48,19 +55,28 @@ export const normalizePrefix = (prefix) => {
 };
 
 /**
+ * @typedef {object} TransformedSource
+ * @property {string[]} src               Source paths/globs, already resolved
+ * @property {Record<string,string>} transform  Validated rename map (see source-transforms.mjs)
+ */
+
+/**
  * Splits a `source` (or `sourceModes[mode]`) array, whose entries can be
- * strings or `{ src, prefix }` objects, into the flat list of patterns to pass
- * to Style Dictionary and the list of the prefixed entries. Patterns are
- * resolved relative to baseDir (see resolveSourcePaths).
- * @param {(string|{src: string|string[], prefix?: string})[]} entries
+ * strings or `{ src, prefix, transform }` objects, into the flat list of
+ * patterns to pass to Style Dictionary, the list of the prefixed entries and
+ * the list of the transformed (renamed) entries. Patterns are resolved
+ * relative to baseDir (see resolveSourcePaths).
+ * @param {(string|{src: string|string[], prefix?: string, transform?: Record<string,string>})[]} entries
  * @param {string} baseDir
- * @returns {{patterns: string[], prefixed: PrefixedSource[]}}
+ * @returns {{patterns: string[], prefixed: PrefixedSource[], transformed: TransformedSource[]}}
  */
 export const splitSourceEntries = (entries, baseDir) => {
   /** @type {string[]} */
   const patterns = [];
   /** @type {PrefixedSource[]} */
   const prefixed = [];
+  /** @type {TransformedSource[]} */
+  const transformed = [];
 
   for (const entry of entries ?? []) {
     if (typeof entry === 'string') {
@@ -73,7 +89,7 @@ export const splitSourceEntries = (entries, baseDir) => {
     if (!isObjectEntry) {
       throw new Error(
         `[build-tokens] config: invalid source entry ${JSON.stringify(entry)} `
-        + '(expected a string or an object { src, prefix })'
+        + '(expected a string or an object { src, prefix, transform })'
       );
     }
 
@@ -83,9 +99,13 @@ export const splitSourceEntries = (entries, baseDir) => {
     if (entry.prefix !== undefined && entry.prefix !== null && entry.prefix !== '') {
       prefixed.push({ src, prefix: normalizePrefix(entry.prefix) });
     }
+
+    if (entry.transform !== undefined && entry.transform !== null) {
+      transformed.push({ src, transform: normalizeTransformMap(entry.transform) });
+    }
   }
 
-  return { patterns, prefixed };
+  return { patterns, prefixed, transformed };
 };
 
 /**

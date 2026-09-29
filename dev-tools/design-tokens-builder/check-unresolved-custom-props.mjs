@@ -25,10 +25,18 @@ import StyleDictionary from 'style-dictionary';
 import './build-tokens-src/transforms.mjs';
 import { CSS_TRANSFORMS } from './build-tokens-src/platforms.mjs';
 import { splitSourceEntries, registerSourcePrefixes } from './build-tokens-src/source-prefixes.mjs';
+import { registerSourceTransforms, transformedFilesPattern, hasRegisteredTransforms } from './build-tokens-src/source-transforms.mjs';
+import {
+  TOKEN_RENAME_PARSER_NAME,
+  registerTokenRenameParser,
+  TOKEN_RENAME_PREPROCESSOR_NAME,
+  registerTokenRenamePreprocessor,
+} from './build-tokens-src/token-rename-parser.mjs';
 import { findMediaModeBlocks } from './build-tokens-src/merge-css.mjs';
 import { LEGACY_TOKENS_PARSER_NAME, registerLegacyTokensParser } from './build-tokens-src/legacy-tokens-parser.mjs';
 
 registerLegacyTokensParser();
+registerTokenRenamePreprocessor();
 
 // const __filename = fileURLToPath(import.meta.url);
 // const __dirname  = dirname(__filename);
@@ -204,21 +212,29 @@ async function run() {
     // includeEntries: base-mode sources, passed as `include` for non-base
     // modes so cross-mode references resolve (same as build-source-modes.mjs).
     /** @param {Parameters<typeof splitSourceEntries>[0]} sourceEntries @param {Parameters<typeof splitSourceEntries>[0]} [includeEntries] @returns {Promise<Map<string,string>>} */
-    // Entries can be strings or `{ src, prefix }` objects (see
-    // build-tokens-src/source-prefixes.mjs): the prefixes are registered
-    // before the transform pipeline runs, so token names match the CSS.
+    // Entries can be strings or `{ src, prefix, transform }` objects (see
+    // build-tokens-src/source-prefixes.mjs): both are registered before the
+    // transform pipeline runs, so token names match the generated CSS.
     const resolveSourceFileMap = async (sourceEntries, includeEntries = []) => {
       /** @type {Map<string, string>} */
       const map = new Map();
-      const { patterns: resolvedPaths, prefixed } = splitSourceEntries(sourceEntries, configDir);
-      const { patterns: includePaths, prefixed: includePrefixed } = splitSourceEntries(includeEntries, configDir);
+      const { patterns: resolvedPaths, prefixed, transformed } = splitSourceEntries(sourceEntries, configDir);
+      const { patterns: includePaths, prefixed: includePrefixed, transformed: includeTransformed } = splitSourceEntries(includeEntries, configDir);
       if (!resolvedPaths.length) return map;
       try {
         await registerSourcePrefixes([...prefixed, ...includePrefixed]);
+
+        await registerSourceTransforms([...transformed, ...includeTransformed]);
+        const tokenRenamePattern = transformedFilesPattern();
+        if (tokenRenamePattern) registerTokenRenameParser(tokenRenamePattern);
+        const parserNames = [LEGACY_TOKENS_PARSER_NAME, ...(hasRegisteredTransforms() ? [TOKEN_RENAME_PARSER_NAME] : [])];
+        const preprocessorNames = hasRegisteredTransforms() ? [TOKEN_RENAME_PREPROCESSOR_NAME] : [];
+
         const sd = new StyleDictionary({
           include: includePaths,
           source: resolvedPaths,
-          parsers: [LEGACY_TOKENS_PARSER_NAME],
+          parsers: parserNames,
+          preprocessors: preprocessorNames,
           log: { verbosity: 'silent' },
           platforms: { css: { transforms: CSS_TRANSFORMS } },
         });

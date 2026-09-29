@@ -54,14 +54,56 @@ const config = {
   //   OK:  `${minimo_path}/**/*.{json,mjs}`
   //   NO:  path.join(minimo_path, '/**/*.{json,mjs}')
   //
-  // An entry can also be an object `{ src, prefix }` (src: string or array of
-  // strings/globs), to render the custom properties of those files with a
-  // prefix: e.g. { src: '...open-props...json', prefix: 'op' } turns Open
-  // Props' gray.0 into --op-gray-0. Only the property name changes:
-  // {references} to those tokens are rendered as var(--op-gray-0), and the JSON
-  // output stays unprefixed. 'op', 'op-' and '--op-' are equivalent. The same
-  // syntax works inside sourceModes. Two different prefixes for the same file
-  // make the build fail.
+  // An entry can also be an object `{ src, prefix, transform }` (src: string
+  // or array of strings/globs).
+  //
+  // `prefix`: renders the custom properties of those files with a prefix,
+  // e.g. { src: '...open-props...json', prefix: 'op' } turns Open Props'
+  // gray.0 into --op-gray-0. Only the property name changes: {references} to
+  // those tokens are rendered as var(--op-gray-0), and the JSON output stays
+  // unprefixed. 'op', 'op-' and '--op-' are equivalent. Two different
+  // prefixes for the same file make the build fail.
+  //
+  // `transform`: moves/renames token nodes within those files' own tree —
+  // e.g. { primary: 'primary.100' } takes whatever is defined at dot-path
+  // `primary` and moves it to `primary.100`, BEFORE Style Dictionary resolves
+  // {references} or builds the CSS/JSON output (unlike `prefix`, which is a
+  // purely cosmetic CSS name change applied after the fact — see
+  // build-tokens-src/source-transforms.mjs). Typical use case: a preexisting
+  // project (e.g. driven by Figma/Penpot) names its own base color `primary`,
+  // while minimo's own tokens reference `{primary.100}` — instead of
+  // renaming the property by hand after every build, or hunting down every
+  // minimo reference to change it, `transform` fixes the token's own path
+  // once, here.
+  //   - Both sides of the map use Style Dictionary's own DOT-PATH notation
+  //     ('primary.100'), NOT the hyphen-joined custom-property notation
+  //     ('primary-100'): token name segments in this project can themselves
+  //     contain hyphens (e.g. btn-close), so a hyphen can't reliably tell a
+  //     path separator from a literal part of a segment name — a dot can,
+  //     since it's already reserved by Style Dictionary as the {reference}
+  //     path separator.
+  //   - {References} to the OLD path — in the same file or a completely
+  //     different one — are rewritten automatically, tree-wide, to the NEW
+  //     path once all sources are merged: e.g. every {primary} in the whole
+  //     build becomes {primary.100}, whether minimo's own tokens already
+  //     wrote {primary.100} directly (no-op) or something else in the
+  //     project still says {primary}.
+  //   - WARNING: this rewrite is by design file-independent (a bare
+  //     {reference} doesn't know which file it "belongs" to) — so if the
+  //     SAME source key (e.g. "primary") is given a DIFFERENT destination in
+  //     two different files' `transform` maps, each rename itself still
+  //     works fine, but {primary} becomes ambiguous: which destination should
+  //     it be rewritten to? In that case the automatic rewrite is skipped
+  //     for that key (a warning is logged), and every {primary} reference
+  //     must be fixed by hand to point at the right one of the two new
+  //     paths.
+  //   - A source key not found in the file only logs a warning, it does not
+  //     fail the build.
+  //   - Applies to both the CSS and the JSON output (see JSON TOKENS OUTPUT
+  //     below), since both are rebuilt from the token's path, by then already
+  //     renamed.
+  //
+  // Both options work the same way inside sourceModes.
   source: [
     `${minimo_path}/design-tokens/_src/**/*.tokens.{mjs,jsonc}`, // main tokens
     `${minimo_path}/src/**/*.tokens.{mjs,jsonc}`, // components tokens
@@ -69,8 +111,13 @@ const config = {
     // optional extra token source (in this example, openProps, https://open-props.style/)
     // { src: `${node_modules_path}/open-props/open-props.style-dictionary-tokens.json`, prefix: 'op' },
 
-    // your project tokens
-    {src: './project-tokens/*.{js,mjs,jsonc,json}', prefix: 'my-project'}
+    // your project tokens — e.g. remaps a Figma/Penpot-exported `primary`
+    // color to minimo's own `primary.100` naming
+    {
+      src: './project-tokens/*.{js,mjs,jsonc,json}',
+      prefix: 'my-project',
+      transform: { primary: 'primary.100' },
+    }
   ],
 
   // Optional light/dark (or other) custom properties split — alternative to

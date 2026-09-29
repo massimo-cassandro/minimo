@@ -150,24 +150,30 @@ export const customPropsGroups = Array.isArray(buildConfig.customPropsGroups)
 // (buildConfig.sourceModes is a non-null object), `source` is ignored and
 // each mode's own array of source patterns is resolved the same way.
 //
-// Entries of `source` / of each mode can also be `{ src, prefix }` objects,
-// to render the custom properties of those files with a prefix (see
-// source-prefixes.mjs). They are flattened here into plain patterns for
-// Style Dictionary; the prefixed ones are also collected in
-// `prefixedSources`, to be registered by build-tokens.mjs.
+// Entries of `source` / of each mode can also be `{ src, prefix, transform }`
+// objects, to render the custom properties of those files with a prefix
+// (see source-prefixes.mjs) and/or to rename token nodes within those files
+// (see source-transforms.mjs). They are flattened here into plain patterns
+// for Style Dictionary; the prefixed/transformed ones are also collected in
+// `prefixedSources`/`transformedSources`, to be registered by
+// build-tokens.mjs.
 // ---------------------------------------------------------------------------
 const sourceModesRaw = buildConfig.sourceModes ?? null;
 
 /** @type {import('./source-prefixes.mjs').PrefixedSource[]} */
 export const prefixedSources = [];
 
+/** @type {import('./source-prefixes.mjs').TransformedSource[]} */
+export const transformedSources = [];
+
 /**
  * @param {Parameters<typeof splitSourceEntries>[0]} entries
  * @returns {string[]}
  */
 const parseSourceEntries = (entries) => {
-  const { patterns, prefixed } = splitSourceEntries(entries, configDir);
+  const { patterns, prefixed, transformed } = splitSourceEntries(entries, configDir);
   prefixedSources.push(...prefixed);
+  transformedSources.push(...transformed);
   return patterns;
 };
 

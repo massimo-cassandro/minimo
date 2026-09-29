@@ -16,3 +16,4 @@
 * 1.36.0 (24 set 2026) - Design tokens builder: fix and merge props improvements
 * 1.37.0 (26 set 2026) - build tokens improvements (optional custom-props prefix)
 * 1.38.0 (27 set 2026) - Build Tokens: use oflight-dark function
+* 1.39.0 (29 set 2026) - token builder: token renaming

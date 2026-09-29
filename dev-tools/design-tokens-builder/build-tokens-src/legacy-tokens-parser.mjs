@@ -160,8 +160,11 @@ const convertLegacyNode = (node, path, hybrids) => {
   );
 };
 
+// Exported for reuse by token-rename-parser.mjs, which needs the same
+// legacy-or-DTCG .json loading (hybrid-node handling included) for the
+// subset of files that also have a `transform` rename map registered.
 /** @param {string} contents @param {string} filePath @returns {unknown} */
-const parseLegacyFile = (contents, filePath) => {
+export const parseLegacyFile = (contents, filePath) => {
   const tree = JSON.parse(contents);
   return convertLegacyNode(tree, [], collectHybridNodes(tree, [], filePath));
 };

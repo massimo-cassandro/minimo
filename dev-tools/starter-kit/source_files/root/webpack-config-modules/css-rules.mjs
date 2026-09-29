@@ -59,6 +59,15 @@ export function cssRules({
       sideEffects: true,
       oneOf: [
 
+        {
+          // `import url from './file.css?as_url'`: the file is emitted as is and its URL is returned
+          resourceQuery: /as_url/,
+          type: 'asset/resource',
+          generator: {
+            filename: 'css/[name].[contenthash][ext]'
+          }
+        },
+
         // raw content per web-components
         {
           resourceQuery: /raw/,

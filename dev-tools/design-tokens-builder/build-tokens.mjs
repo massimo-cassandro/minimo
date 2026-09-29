@@ -15,6 +15,8 @@
 //   build-tokens-src/build-source-modes.mjs  <- alternative build path used when sourceModes is set
 //   build-tokens-src/merge-css.mjs      <- supports the mergeCustomProps option (flat and per-mode)
 //   build-tokens-src/source-prefixes.mjs <- supports `{ src, prefix }` entries in source/sourceModes
+//   build-tokens-src/source-transforms.mjs <- supports `{ src, transform }` entries in source/sourceModes
+//   build-tokens-src/token-rename-parser.mjs <- parser applying the `transform` rename maps
 
 import StyleDictionary from 'style-dictionary';
 import * as path from 'node:path';
@@ -37,6 +39,7 @@ import {
   sourceModes,
   sourceModesBase,
   prefixedSources,
+  transformedSources,
   mergeCustomProps,
   customPropsGroups,
   pxToRem,
@@ -60,6 +63,29 @@ registerLegacyTokensParser();
 // parser above, to load legacy .json sources) — see source-prefixes.mjs.
 import { registerSourcePrefixes } from './build-tokens-src/source-prefixes.mjs';
 await registerSourcePrefixes(prefixedSources);
+
+// ── 2d. Per-source token rename maps ─────────────────────────────────────────
+// Expands the `{ src, transform }` entries of source/sourceModes into the
+// file -> rename-map read by the token-rename parser, and registers that
+// parser (only if at least one file actually has a transform) — see
+// source-transforms.mjs / token-rename-parser.mjs. `parserNames` is reused
+// below and passed down to buildSourceModes() so every Style Dictionary
+// instance opts in consistently.
+import { registerSourceTransforms, transformedFilesPattern, hasRegisteredTransforms } from './build-tokens-src/source-transforms.mjs';
+import {
+  TOKEN_RENAME_PARSER_NAME,
+  registerTokenRenameParser,
+  TOKEN_RENAME_PREPROCESSOR_NAME,
+  registerTokenRenamePreprocessor,
+} from './build-tokens-src/token-rename-parser.mjs';
+await registerSourceTransforms(transformedSources);
+const tokenRenamePattern = transformedFilesPattern();
+if (tokenRenamePattern) registerTokenRenameParser(tokenRenamePattern);
+registerTokenRenamePreprocessor();
+const parserNames = [LEGACY_TOKENS_PARSER_NAME, ...(hasRegisteredTransforms() ? [TOKEN_RENAME_PARSER_NAME] : [])];
+// Rewrites {references} to any renamed token's OLD path, tree-wide, once all
+// files are merged (see registerTokenRenamePreprocessor() above).
+const preprocessorNames = hasRegisteredTransforms() ? [TOKEN_RENAME_PREPROCESSOR_NAME] : [];
 
 // ── 3. CSS format ─────────────────────────────────────────────────────────────
 // customPropsCount is updated by the format at render time
@@ -121,6 +147,8 @@ if (sourceModes) {
     mergeCustomProps,
     useLightDarkFunc,
     customPropsSelector,
+    parserNames,
+    preprocessorNames,
   });
 
 } else {
@@ -151,7 +179,8 @@ if (sourceModes) {
   if (jsonBuildPath && !jsonDestFile) {
     const sdInit = new StyleDictionary({
       source: singleSource,
-      parsers: [LEGACY_TOKENS_PARSER_NAME],
+      parsers: parserNames,
+      preprocessors: preprocessorNames,
       log: { verbosity: 'silent' },
       platforms: {},
     });
@@ -160,7 +189,8 @@ if (sourceModes) {
 
   const sd = new StyleDictionary({
     source: singleSource,
-    parsers: [LEGACY_TOKENS_PARSER_NAME],
+    parsers: parserNames,
+    preprocessors: preprocessorNames,
     log: { verbosity: 'verbose' },
     platforms: buildPlatforms({
       buildPath,

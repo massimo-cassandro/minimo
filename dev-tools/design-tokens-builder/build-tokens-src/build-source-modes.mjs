@@ -36,7 +36,6 @@ import { CSS_TRANSFORMS, JSON_TRANSFORMS } from './platforms.mjs';
 import { customPropsCount, lastFinalProps } from './formats/css.mjs';
 import { buildJsonFiles, collectConcreteFilePaths } from './formats/json.mjs';
 import { loadExistingCustomPropsScoped } from './merge-css.mjs';
-import { LEGACY_TOKENS_PARSER_NAME } from './legacy-tokens-parser.mjs';
 import { applyLightDarkFunc } from './light-dark.mjs';
 
 /**
@@ -55,6 +54,8 @@ import { applyLightDarkFunc } from './light-dark.mjs';
  * @param {boolean|(string|RegExp)[]} opts.mergeCustomProps  true = merge all sources, array = only the matching token source files
  * @param {boolean}                opts.useLightDarkFunc  reconcile shared `light`/`dark` properties into `light-dark()` calls (default: true — see config.mjs and light-dark.mjs). Ignored unless sourceModes defines both a `light` and a `dark` key.
  * @param {string}                 opts.customPropsSelector  CSS selector wrapping the generated block(s) (default: ':root' — see config.mjs)
+ * @param {string[]}               opts.parserNames  Style Dictionary parser names to opt every instance into (legacy bridge, plus the token-rename parser when at least one source has a `transform` — see build-tokens.mjs)
+ * @param {string[]}               opts.preprocessorNames  Style Dictionary preprocessor names to opt every instance into (the token-rename reference rewriter, when at least one source has a `transform` — see build-tokens.mjs)
  * @returns {Promise<{cssDestPath: string, totalCustomProps: number, jsonFilesByMode: Record<string, object[]>}>}
  */
 export const buildSourceModes = async ({
@@ -72,6 +73,8 @@ export const buildSourceModes = async ({
   mergeCustomProps,
   useLightDarkFunc,
   customPropsSelector,
+  parserNames,
+  preprocessorNames,
 }) => {
   const modeNames = Object.keys(sourceModes);
 
@@ -112,7 +115,8 @@ export const buildSourceModes = async ({
     const sd = new StyleDictionary({
       include,
       source: sourceModes[mode],
-      parsers: [LEGACY_TOKENS_PARSER_NAME],
+      parsers: parserNames,
+      preprocessors: preprocessorNames,
       log: { verbosity: 'verbose' },
       platforms: {
         css: {
@@ -150,7 +154,8 @@ export const buildSourceModes = async ({
       const jsonSd = new StyleDictionary({
         include,
         source: sourceModes[mode],
-        parsers: [LEGACY_TOKENS_PARSER_NAME],
+        parsers: parserNames,
+        preprocessors: preprocessorNames,
         log: { verbosity: 'silent' },
         platforms: {
           json: {

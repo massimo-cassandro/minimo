@@ -8,7 +8,7 @@ Le versioni precedenti sono conservate in `archived/webpack-config-v2/` del repo
 
 ---
 
-## Fix da verificare sempre
+## Fix e upg da verificare e applicare a tutte le versioni
 * WebpackManifestPlugin: impostare `removeKeyHash: /\?.*$/, // /([a-f0-9]{32}\.?)/gi, // /(\?as_asset)$/,`, sostituendo eventuali impostazione `removeKeyHash: true` se presente
 
 

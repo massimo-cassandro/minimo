@@ -4,6 +4,16 @@
 
 A set of Node.js scripts for managing CSS design tokens in a project. Built on top of [Style Dictionary v5](https://styledictionary.com/).
 
+### Purpose
+
+The purpose of this builder is to merge minimo's own design tokens with the tokens used in a project — typically coming from Figma or Penpot — and produce the custom properties used during development.
+
+The goal is to keep the project's token naming as close as possible to minimo's own, so that minimo's components can be customized without any further intervention.
+
+The best strategy is to name variables in Figma/Penpot after minimo's own names from the start, so that overriding a value stays a transparent, automatic process.
+
+In a preexisting project, though, some names may not match (e.g. the project's base color is named `primary`, while minimo's equivalent is `primary.100`). Rather than fixing the generated custom properties by hand after every build, a source entry can carry a `transform` option (see [Source token renaming](#source-token-renaming-transform) below) that remaps token names to minimo's own naming before they are even handed to Style Dictionary.
+
 ### Scripts
 
 | Script | Purpose |
@@ -61,7 +71,7 @@ npx buildTokens --config ./path/to/tokens-config.mjs
 The `source` array accepts any combination of:
 - Concrete file paths: `'./tokens/colors.jsonc'`
 - Glob patterns: `'./tokens/**/*.{json,jsonc,mjs}'`
-- `{ src, prefix }` objects, to add a prefix to the custom properties of those files (see [Source prefixes](#source-prefixes))
+- `{ src, prefix, transform }` objects, to add a prefix to the custom properties of those files (see [Source prefixes](#source-prefixes)) and/or to rename token nodes within those files (see [Source token renaming](#source-token-renaming-transform))
 
 **Supported formats:**
 - `.json` / `.jsonc` — parsed directly as token data
@@ -91,6 +101,31 @@ With this config Open Props' `gray.0` becomes `--op-gray-0`. `prefix` accepts `'
 - `check-unresolved-custom-props.mjs` understands the same syntax. Note that `extraCustomPropsFiles` entries are plain CSS files and are never prefixed.
 
 See `build-tokens-src/source-prefixes.mjs`.
+
+#### Source token renaming (`transform`)
+
+An entry of `source` (or of a `sourceModes` mode) can also carry a `transform` object: a token found at a given dot-path in those files is moved to another dot-path, **before** Style Dictionary resolves `{references}` or builds the CSS/JSON output — unlike `prefix` above, which is a purely cosmetic CSS name change applied after the fact.
+
+Typical use case: a preexisting project (e.g. driven by Figma/Penpot) names its own base color `primary`, while minimo's own tokens reference `{primary.100}`. Instead of renaming the generated custom property by hand after every build, or hunting down every minimo reference to change it, `transform` fixes the token's own path once, in config:
+
+```js
+source: [
+  './my-tokens/*.mjs',
+  { src: './project-tokens/*.jsonc', transform: { primary: 'primary.100' } },
+],
+```
+
+With this config, whatever is defined at dot-path `primary` in the matched files is moved to `primary.100` — so it becomes `--primary-100` in the generated CSS, and every existing minimo reference to `{primary.100}` resolves correctly.
+
+- **Notation:** both sides of the map use Style Dictionary's own dot-path notation (`'primary.100'`), not the hyphen-joined custom-property notation (`'primary-100'`). Token name segments in this project can themselves contain hyphens (e.g. `btn-close`), so a hyphen can't reliably tell a path separator from a literal part of a segment name — a dot can, since it's already reserved by Style Dictionary as the `{reference}` path separator.
+- **References are rewritten automatically:** once every source file is merged, any `{reference}` to the token's *old* path — in the same file or a completely different one — is rewritten tree-wide to the *new* path (e.g. every `{primary}` in the build becomes `{primary.100}`). This is safe because Style Dictionary resolves `{references}` against the single merged token tree by absolute path: if `primary` existed exactly once, every `{primary}` anywhere unambiguously pointed at that one node.
+  - **Exception:** if the *same* source key (e.g. `primary`) is given a *different* destination in two different files' `transform` maps, each rename still works on its own, but the bare reference `{primary}` becomes ambiguous — which destination should it point to? In that case the automatic rewrite is skipped for that key (a warning is logged), and every `{primary}` reference must be fixed by hand to point at the correct one of the two new paths.
+- A source key not found in the file only logs a warning; it does not fail the build.
+- Applies to **both** the CSS and the JSON output (see [JSON output](#json-output) below), since both are rebuilt from the token's path, by then already renamed — no separate handling is needed.
+- Two entries giving different destinations for the same source key in the same file fail the build with an error.
+- `check-unresolved-custom-props.mjs` understands the same syntax.
+
+See `build-tokens-src/source-transforms.mjs` and `build-tokens-src/token-rename-parser.mjs`.
 
 
 #### Token file format (JS example)
