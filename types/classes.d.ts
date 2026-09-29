@@ -78,6 +78,7 @@ export type MinimoClass =
   | 'grid'
   | 'grid-2'
   | 'grid-3'
+  | 'grid-4'
   | 'grid-5'
   | 'grid-6'
   | 'grid-8'

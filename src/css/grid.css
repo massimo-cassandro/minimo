@@ -28,12 +28,15 @@
   @media (--media-large-viewport-up) {
     --_cols: 4;
 
-    /* versione a 3, 5, 6, 8 colonne */
+    /* versione a 3, 4, 5, 6, 8 colonne */
     &.grid-2 {
       --_cols: 2;
     }
     &.grid-3 {
       --_cols: 3;
+    }
+    &.grid-4 {
+      --_cols: 4;
     }
     &.grid-5 {
       --_cols: 5;
