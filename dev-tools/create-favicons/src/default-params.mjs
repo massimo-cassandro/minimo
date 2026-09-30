@@ -43,7 +43,7 @@ export const default_params = {
   // nome del file snippet, compresa l'estensione
   // se questo parametro è null e anche `snippet_target_file` lo è, lo snippet non viene generato
   // se il linguaggio è ejs il nome è sempre 'favicons.incl.ejs' e snippet_name viene ignorato
-  snippet_name: 'favicon.html',
+  snippet_name: 'favicons.html',
 
   // path (relativo a questo file) in cui salvare lo snippet
   // se null, viene utilizzato lo stesso percorso indicato in `output_dir`

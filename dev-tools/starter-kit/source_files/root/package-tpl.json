@@ -38,6 +38,9 @@
     "npm-outdated": "npm outdated",
     "npm-upd": "npm update --save"
   },
+  "allowScripts": {
+    "@parcel/watcher": false
+  },
   "devDependencies": {},
   "dependencies": {}
 }
