@@ -1,6 +1,6 @@
 {
   "name": "@massimo-cassandro/minimo",
-  "version": "1.39.1",
+  "version": "1.39.2",
   "description": "Light css framework & utilities",
   "type": "module",
   "main": "./index.js",
@@ -35,7 +35,6 @@
   "scripts": {
     "UPD-version": "npx update-version  # --config=./dev-utilities.config.mjs",
     "npm-publish": "npm publish",
-    "upd@m": "npx upd@m",
     "build-tokens": "node ./dev-tools/design-tokens-builder/build-tokens.mjs --config ./design-tokens/tokens-config.mjs",
     "build-margin-padding-css": "node ./scripts/build-margin-padding-css.mjs",
     "generate:types": "node ./scripts/generate-class-types.mjs",
@@ -46,6 +45,7 @@
     "checkJS": "npx tsc --noEmit -p jsconfig.json",
     "checkJS ./src": "npx tsc --noEmit --allowJs --checkJs --target ES2023 --module ESNext --allowSyntheticDefaultImports --moduleResolution bundler declarations.d.ts types/global.d.ts src/**/*.js",
     "npm outdated": "echo '*** ROOT ***' && npm outdated --omit=peer && echo '*** DEMO ***' && npm --prefix ./demo outdated && echo '*** END ***'",
+    "upd@m": "npx upd@m",
     "npm upd": "echo '*** ROOT ***' && npm update && echo '*** DEMO ***' && npm --prefix ./demo update && echo '*** END ***'"
   },
   "license": "MIT",
@@ -92,7 +92,7 @@
     }
   },
   "devDependencies": {
-    "@massimo-cassandro/eslint-config": "^3.0.16",
+    "@massimo-cassandro/eslint-config": "^3.0.18",
     "@types/node": "^26.2.0",
     "jsdom": "^30.0.1",
     "style-dictionary": "^5.5.1"
