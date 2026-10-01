@@ -34,7 +34,7 @@ twig:
     file_name_pattern: '*.twig'
 
     form_themes:
-        - '_tpl/incl/bs5-form-layout.html.twig'
+        - '_incl/minimo-form-layout.html.twig'
     paths:
         '%kernel.project_dir%/public/%env(ASSETS_DIR)%': assets_path
         '%kernel.project_dir%/public': public_path

@@ -357,14 +357,20 @@ echo -e "\n${GREEN}...creating default folders${NC}"
 mkdir -p \
   "_private" \
   "${FRONTEND_INSTALL_PATH}" \
+  "${FRONTEND_INSTALL_PATH}/api" \
   "${FRONTEND_INSTALL_PATH}/assets" \
-  "${FRONTEND_INSTALL_PATH}/src" \
   "${FRONTEND_INSTALL_PATH}/css" \
-  "${FRONTEND_INSTALL_PATH}/tpl" \
+  "${FRONTEND_INSTALL_PATH}/email" \
+  "${FRONTEND_INSTALL_PATH}/error-pages" \
+  "${FRONTEND_INSTALL_PATH}/favicons" \
   "${FRONTEND_INSTALL_PATH}/icons" \
   "${FRONTEND_INSTALL_PATH}/imgs" \
-  "${FRONTEND_INSTALL_PATH}/favicons" \
-  "${FRONTEND_INSTALL_PATH}/error-pages"
+  "${FRONTEND_INSTALL_PATH}/src" \
+  "${FRONTEND_INSTALL_PATH}/src/components" \
+  "${FRONTEND_INSTALL_PATH}/src/js" \
+  "${FRONTEND_INSTALL_PATH}/src/pages" \
+  "${FRONTEND_INSTALL_PATH}/src/web-components" \
+  "${FRONTEND_INSTALL_PATH}/tpl"
 
 
 
@@ -423,11 +429,6 @@ force_cat "${MINIMO_PKG_DIR}/src/minimo.css" "${FRONTEND_INSTALL_PATH}/css/index
 
 # config di build-tokens: collocato accanto al css generato (custom-properties.css).
 force_cat "${MINIMO_PKG_DIR}/dev-tools/design-tokens-builder/tokens-config-sample.mjs" "${FRONTEND_INSTALL_PATH}/css/tokens-config.mjs"
-
-
-
-# favicons: config di default per `npx create-favicons`
-force_cat "${MINIMO_PKG_DIR}/dev-tools/create-favicons/src/default-params.mjs" "${FRONTEND_INSTALL_PATH}/favicons/create-favicons-cfg.mjs"
 
 
 if [ ${#selectedOptionalDevPkgs[@]} -gt 0 ] || [ ${#selectedOptionalDepPkgs[@]} -gt 0 ]; then
