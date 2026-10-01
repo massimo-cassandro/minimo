@@ -4,8 +4,20 @@
 			"path": "."
 		},
 		{
+      "name": "src",
+			"path": "./src"
+		},
+		{
       "name": "starter-kit",
 			"path": "./dev-tools/starter-kit"
+		},
+		{
+      "name": "dev-tools",
+			"path": "./dev-tools"
+		},
+		{
+      "name": "demo",
+			"path": "./demo"
 		}
   ],
   "settings": {
