@@ -1,5 +1,5 @@
 // webpack-config-modules/custom-props-purgecss-plugin.mjs
-// v.3
+// v.3.1
 import fs from 'fs';
 import postcss from 'postcss';
 import { globSync } from 'glob';
@@ -11,7 +11,10 @@ import { globSync } from 'glob';
   custom properties disponibili. I css compilati da webpack contengono invece
   solo *usi* (`var(--nome)`), mai definizioni. Dopo la minificazione degli
   asset, il plugin:
-  1. scansiona i css di ogni "set" per trovare le custom properties usate;
+  1. scansiona i css di ogni "set" per trovare le custom properties usate, e
+     anche i js dei chunk che contengono quei css (i css importati con `?raw`,
+     es. shadow DOM dei web components, sono stringhe nel bundle js: vengono
+     così rilevati solo per i componenti realmente importati);
   2. risolve le dipendenze transitive (`--a: calc(var(--b) * 2)` => anche
      `--b`, fino al fixed point, fallback `var(--x, var(--y))` inclusi);
   3. estrae dal master le sole definizioni necessarie, PRESERVANDO l'ordine
@@ -137,8 +140,9 @@ export class CustomPropsPurgeCssPlugin {
    * @param {string} [options.selector=':root'] - Selettore con cui sostituire i blocchi
    *   `:root` del master (es. `':where(html)'`); gli altri selettori (temi, ecc.) restano invariati (default: ':root')
    * @param {string[]} [options.extraUsageGlobs=[]] - Glob di file css i cui usi di var()
-   *   contano come usati in TUTTI i set: css caricati fuori dagli asset (shadow DOM dei
-   *   web components, import `?raw`) (default: [])
+   *   contano come usati in TUTTI i set: serve solo per css caricati fuori dal bundle
+   *   (i css `?raw` sono già rilevati nei js dei chunk del set). Un glob troppo largo
+   *   porta nel css anche le props di componenti non importati (default: [])
    * @param {(string|RegExp)[]} [options.seeds=[]] - Props da includere comunque in tutti i
    *   set (nomi esatti o pattern risolti sui nomi dichiarati nel master), es. override
    *   consumati da un altro asset (default: [])
@@ -248,9 +252,29 @@ export class CustomPropsPurgeCssPlugin {
               continue;
             }
 
-            // props usate nei css del set
+            /*
+              asset da scansire: i css del set + i js dei chunk che li contengono
+              (e dei chunk da essi raggiunti). I css importati con `?raw` (shadow DOM
+              dei web components) sono stringhe nel bundle js: vengono quindi
+              rilevati solo per i componenti realmente importati
+            */
+            const scanned = new Set(sourceNames);
+            for (const chunk of compilation.chunks) {
+              if (![...chunk.files].some(file => sourceNames.includes(file))) {
+                continue;
+              }
+              for (const referenced of chunk.getAllReferencedChunks()) {
+                for (const file of referenced.files) {
+                  if (/\.m?js$/i.test(file)) {
+                    scanned.add(file);
+                  }
+                }
+              }
+            }
+
+            // props usate negli asset scansionati
             const used = new Set(commonUsages);
-            for (const name of sourceNames) {
+            for (const name of scanned) {
               varRefs(compilation.getAsset(name).source.source().toString()).forEach(ref => used.add(ref));
             }
 

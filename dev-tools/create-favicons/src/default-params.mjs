@@ -15,7 +15,7 @@ export const default_params = {
 
   // directory output (percorso relativo alla dir di lavoro)
   // se la dir non esiste, viene creata
-  output_dir: './output',
+  output_dir: './output', // symfony -> '../../public',
 
 
   // WEBMANIFEST
@@ -43,12 +43,12 @@ export const default_params = {
   // nome del file snippet, compresa l'estensione
   // se questo parametro è null e anche `snippet_target_file` lo è, lo snippet non viene generato
   // se il linguaggio è ejs il nome è sempre 'favicons.incl.ejs' e snippet_name viene ignorato
-  snippet_name: 'favicons.html',
+  snippet_name: 'favicons.html', // symfony -> 'favicons.incl.html.twig',
 
   // path (relativo a questo file) in cui salvare lo snippet
   // se null, viene utilizzato lo stesso percorso indicato in `output_dir`
   // se la dir non esiste, viene creata
-  snippet_path: null,
+  snippet_path: null, // symfony -> '../../templates/_incl',
 
   // path del file in cui scrivere le righe dello snippet
   // questa impostazione è alternativa alle due precedenti e, se presente, queste
@@ -62,7 +62,7 @@ export const default_params = {
 
   // linguaggio da utilizzare per la sintassi dello snippet html
   // html, pug, ejs
-  snippet_language: 'ejs',
+  snippet_language: 'ejs', // symfony: 'html',
 
   // template per la costruzione dello snippet.
   // si tratta di una stringa (anche su più righe) in cui deve essere presente
@@ -78,7 +78,7 @@ export const default_params = {
 
   // se true aggiunge allo snippet una query string per ovviare ad eventuali
   // problemi di caching del browser
-  add_cache_buster: false,
+  add_cache_buster: false, // symfony: true,
 
   //****************************************************************************
 

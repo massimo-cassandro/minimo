@@ -1,0 +1,17 @@
+{% extends '_main-tpl.html.twig' %}
+
+{% block title %}xxxx{% endblock %}
+{% block head %}
+
+<link rel="preload" href="{{ asset('__page__.css') }}" as="style">
+<link rel="stylesheet" href="{{ asset('__page__.css') }}" media="all">
+<link rel="preload" href="{{ asset('__page__.js') }}" as="script">
+{% endblock %}
+{% block js %}
+<script src="{{ asset('__page__.js') }}"></script>
+{% endblock %}
+
+{% block body %}
+  home
+  <div id="root"><div class="spinner"></div></div>
+{% endblock %}

@@ -8,6 +8,10 @@
   <title>Errore {{ status_code }}</title>
   <meta name="robots" content="noindex, nofollow, noarchive">
   {%- include '_incl/favicons.incl.html.twig'-%}
+  {#- shared.css, shared.js e runtime.js servono solo con `useSharedChunk: true` in webpack.config.mjs:
+      con `false` rimuovere tutte le righe che li referenziano -#}
+  <link rel="preload" href="{{ asset('shared.css') }}" as="style">
+  <link rel="stylesheet" href="{{ asset('shared.css') }}" media="all">
   <link rel="preload" href="{{ asset('index.css') }}" as="style">
   <link rel="stylesheet" href="{{ asset('index.css') }}" media="all">
   <link rel="preload" href="{{ asset('error-pages.css') }}" as="style">

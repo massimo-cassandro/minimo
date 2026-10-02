@@ -50,14 +50,12 @@ Non servono nuovi pacchetti npm: il plugin usa `postcss` e `glob`, già presenti
    }
    ```
 
-3. **Aggiungere** i nuovi flag e le costanti derivate (dopo `purgeCSSOptions`):
+3. **Aggiungere** i nuovi flag e la costante derivata (dopo `purgeCSSOptions`):
 
    ```js
    ,useCustomPropsPlugin = true // false: il plugin non viene caricato, le custom properties restano a carico del progetto
    ,customPropsFile = path.resolve(__dirname, './app/css/custom-properties.css')
    ,purgeCssInDev = false // true (solo per test): purge e plugin attivi anche in dev
-   ,inlineCssInDev = inlineCssInDevMode && !purgeCssInDev
-   ,runPurgeCss = usePurgeCss && (!isDevelopment || purgeCssInDev)
    ,runCustomPropsPlugin = useCustomPropsPlugin && (!isDevelopment || purgeCssInDev)
    ```
 
@@ -81,7 +79,7 @@ Non servono nuovi pacchetti npm: il plugin usa `postcss` e `glob`, già presenti
    ```
 
 6. **`optimization`**: sostituire il commento `// realContentHash: true,` con `realContentHash: !isDevelopment || purgeCssInDev,`.
-7. **PurgeCSS**: la condizione `...(usePurgeCss ? createPurgeCSSPlugins({...}) : [])` diventa `...(runPurgeCss ? ... : [])`, e nella chiamata a `createPurgeCSSPlugins` va **rimosso** il blocco `variablesSafelist: { declarationGlobs, shadowGlobs, seeds }`. I glob `shadowGlobs` e `seeds` si spostano nel plugin (punto seguente, come `extraUsageGlobs` e `seeds`).
+7. **PurgeCSS**: la condizione `...(usePurgeCss ? createPurgeCSSPlugins({...}) : [])` diventa `...(usePurgeCss && (!isDevelopment || purgeCssInDev) ? ... : [])`, e nella chiamata a `createPurgeCSSPlugins` va **rimosso** il blocco `variablesSafelist: { declarationGlobs, shadowGlobs, seeds }`. I glob `shadowGlobs` e `seeds` si spostano nel plugin (punto seguente, come `extraUsageGlobs` e `seeds`).
 8. **Chunk `shared` anche per i css** (in v2 i css restavano nel css di ogni entry, duplicati). Nel commento e nella funzione `shared_chunk_paths` **rimuovere** la riga `if (module.type === 'css/mini-extract') return false;` (e il vecchio commento/`TODO` che spiegava perché i css restavano fuori dallo `shared`), e nel cacheGroup `shared` (`optimization.splitChunks.cacheGroups`) sostituire `chunks: 'all'` con:
 
    ```js
@@ -113,7 +111,7 @@ Non servono nuovi pacchetti npm: il plugin usa `postcss` e `glob`, già presenti
    ```
 
    I `sets` vanno adattati alle entry del progetto: `sources` è l'elenco dei nomi degli asset CSS compilati (con l'hash nel nome, si usa `*`, oppure una RegExp) e `target` (opzionale) l'asset in cui iniettare le definizioni; se omesso è il primo asset del set. Ogni entry con un proprio css deve comparire in un set, altrimenti l'uso di custom properties in quel css non viene rilevato e le definizioni corrispondenti mancano.
-10. **`cssRules`**: passare `inlineCssInDevMode: inlineCssInDev` (non più `inlineCssInDevMode`).
+10. **`cssRules`**: passare `inlineCssInDevMode: inlineCssInDevMode && !purgeCssInDev` (non più `inlineCssInDevMode`).
 11. Aggiornare, se presenti, i commenti che citano `variables: true`, `safelist.variables` o `purgecss-variables-safelist.mjs`.
 
 ### 3. Template
@@ -149,3 +147,99 @@ Con `HtmlWebpackPlugin` (`inject`) `shared.css` è inserito automaticamente. Se 
 3. In `build/` esiste `shared.<hash>.css` (con le definizioni delle custom properties), le pagine lo linkano prima del css della entry senza 404, i css delle entry non duplicano gli stili condivisi e la entry `.critical` resta autosufficiente.
 4. `NODE_ENV=development` (con `webpack serve`): le pagine mostrano stili e colori corretti; il master viene caricato per intero come primo modulo delle entry.
 5. Se qualche componente perde stili solo in produzione, provare `useCustomPropsPlugin = false` per isolare il problema.
+
+
+## Da v3 a v3.1
+
+Novità della v3.1: il chunk `shared` diventa opzionale (`useSharedChunk`), i `sets` del plugin custom properties sono derivati da `projectEntries` e usano regexp al posto dei wildcard, e il plugin rileva le custom properties dei css `?raw` (web components) nei js dei chunk, per cui `extraUsageGlobs` non serve più per i web components.
+
+Riepilogo delle modifiche:
+
+| Cosa | Dove |
+|---|---|
+| Flag `useSharedChunk` (chunk `shared` opzionale), `mainEntry`, `standaloneEntries` | `webpack.config.mjs` |
+| `sets` derivati da `projectEntries`, con regexp (`cssAssetRegexp`) al posto dei wildcard | `webpack.config.mjs` |
+| Scansione dei js dei chunk per i css `?raw`; `extraUsageGlobs: []` | `custom-props-purgecss-plugin.mjs`, `webpack.config.mjs` |
+| Riferimenti a `shared.*` / `runtime.js` commentati come opzionali | `_sf/templates/_main-tpl.html.twig`, pagina di errore e template del progetto |
+| `MiniCssExtractPlugin` presente una sola volta; entry `error-pages`; commenti `NB symfony` | `webpack.config.mjs` |
+
+### 1. Moduli in `webpack-config-modules/`
+
+- **Sostituire** `custom-props-purgecss-plugin.mjs` con la versione v3.1 (`// v.3.1`). Gli altri moduli non cambiano.
+
+### 2. Modifiche a `webpack.config.mjs`
+
+1. Riga 2: `// v.3` → `// v.3.1`.
+2. **Aggiungere** i flag tra le costanti di configurazione (dopo `customPropsFile`):
+
+   ```js
+   ,useSharedChunk = true // false: nessun chunk shared né runtime, per progetti con una sola pagina (più al massimo una pagina di errore)
+   ,mainEntry = 'index' // entry sempre caricata: con useSharedChunk false riceve le definizioni delle custom properties
+   ,standaloneEntries = [] // con useSharedChunk false: entry non `.critical` che non caricano il css di mainEntry (set proprio)
+   ```
+
+3. **`optimization`**: rendere condizionali `runtimeChunk: 'single'` e `splitChunks.cacheGroups.shared`:
+
+   ```js
+   optimization: {
+     // ...
+     ...(useSharedChunk
+       ? {
+         runtimeChunk: 'single',
+         splitChunks: { cacheGroups: { shared: { /* come in v3 */ } } }
+       }
+       : {})
+   },
+   ```
+
+4. **Sets del plugin**: prima di `const config`, definire l'helper `cssAssetRegexp` e i set `customPropsSets`, derivati da `projectEntries` (aggiungendo una entry non serve modificare altro):
+
+   ```js
+   // corrisponde a `nome.css` (dev con WEBPACK_SERVE) e `nome.<hash>.css`, NON a `nome.critical.<hash>.css`
+   const cssAssetRegexp = (entryName) =>
+     new RegExp(`^${entryName.replace(/[.+?^${}()|[\]\\]/g, '\\$&')}(\\.[^./]+)?\\.css$`);
+
+   const cssEntries = Object.keys(projectEntries).filter(name => !/\.critical/.test(name))
+     ,criticalEntries = Object.keys(projectEntries).filter(name => /\.critical/.test(name))
+     ,customPropsSets = [
+       // i critical css sono inline nei template: restano autosufficienti
+       ...criticalEntries.map(name => ({ sources: [cssAssetRegexp(name)] })),
+       ...(useSharedChunk
+         // shared.css è linkato in tutte le pagine e contiene le definizioni per tutti i css delle entry
+         ? [{
+           sources: [cssAssetRegexp('shared'), ...cssEntries.map(cssAssetRegexp)],
+           target: cssAssetRegexp('shared')
+         }]
+         // senza shared: definizioni solo nel css di `mainEntry`; le entry che non lo caricano hanno un set proprio
+         : [
+           {
+             sources: cssEntries.filter(name => !standaloneEntries.includes(name)).map(cssAssetRegexp),
+             target: cssAssetRegexp(mainEntry)
+           },
+           ...standaloneEntries.map(name => ({ sources: [cssAssetRegexp(name)] }))
+         ]
+       )
+     ];
+   ```
+
+   Nel plugin sostituire i `sets` con `sets: customPropsSets`. Si usano RegExp e non i wildcard `*`: `'index.*.css'` non corrisponde a `index.css` (dev con `WEBPACK_SERVE`) e corrisponde invece a `index.critical.<hash>.css`.
+5. **`extraUsageGlobs`**: sostituire i glob dei web components con `extraUsageGlobs: []` (i glob precedenti possono restare commentati). `minimo_path` resta, perché è usato anche nei `contentGlobs` di PurgeCSS.
+
+6. **`MiniCssExtractPlugin`**: nell'array `plugins` deve comparire **una sola volta**. Se il config ne contiene due, eliminare quello con `filename: '[name].[contenthash].css'` e tenere quello con la logica `process.env.WEBPACK_SERVE ? '[name].css' : '[name].[contenthash].css'` (e il corrispondente `chunkFilename`).
+7. **Entry `error-pages`**: nel template di base `projectEntries` include `'error-pages': './app/error-pages/error-pages.js'` (pagina di errore, che carica anche il css di `index`). Nei progetti con pagina di errore va aggiunta; non serve altro per i `sets`, perché derivano da `projectEntries`.
+8. **Commenti `NB symfony`** (facoltativo, solo leggibilità): le indicazioni per Symfony (`sf:`, `SYMFONY:`) sono state uniformate in commenti `NB symfony` che dicono cosa commentare, decommentare o rimuovere (import di `HtmlWebpackPlugin` / `HtmlWebpackInjectPreload`, `apiPort`, `output_dir`, `WebpackManifestPlugin`, plugin html). `apiPort` nel template è ora commentato. Nessuna modifica di comportamento.
+
+### 3. Template
+
+Con `useSharedChunk = false` i template **non** devono referenziare `shared.css`, `shared.js` e `runtime.js` (preload, link e script): nei template di esempio (`_main-tpl.html.twig` e pagina di errore) un commento Twig indica le righe da rimuovere. Le definizioni delle custom properties sono nel css di `mainEntry`, che deve essere linkato in ogni pagina; le entry elencate in `standaloneEntries` hanno invece le proprie definizioni nel loro css. Con `useSharedChunk = true` i template restano invariati.
+
+### 4. Cambiamenti di comportamento
+
+- **Scansione dei js:** per ogni set il plugin analizza, oltre ai css, i js dei chunk che li contengono (e dei chunk da essi raggiunti). I css importati con `?raw` (shadow DOM dei web components) sono stringhe nel bundle: le loro props entrano nel css solo per i componenti realmente importati. `extraUsageGlobs` va quindi lasciato vuoto salvo css caricati fuori dal bundle: un glob largo (es. `src/web-components/**/*.css` di minimo) porta nel css anche le props di componenti non importati. Una entry solo js, senza css nei `sources`, non viene scansionata.
+- Anche gli usi di `var(--…)` presenti nei js (es. stili generati a runtime) contano come usati.
+
+### 5. Verifica dopo l'aggiornamento
+
+1. `NODE_ENV=production npx webpack --config ./webpack.config.mjs --stats minimal`: nessun errore o warning del plugin.
+2. Nel css con le definizioni non compaiono props di web components non importati (es. `--jt-*`, `--sdt-*`); per un componente importato con `?raw` le sue props sono presenti.
+3. Con `useSharedChunk = false`: in `build/` non esistono `shared.*` né `runtime.*` e le definizioni sono nel solo css di `mainEntry`.

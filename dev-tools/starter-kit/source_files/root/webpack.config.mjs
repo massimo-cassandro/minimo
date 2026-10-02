@@ -1,5 +1,5 @@
 // webpack.config.mjs __project_name__
-// v.3
+// v.3.1
 import path from 'path';
 import { fileURLToPath } from 'url';
 import webpack from 'webpack';
@@ -8,14 +8,17 @@ import * as process from 'process'; // Rende 'process' disponibile nel contesto 
 // import { styleText } from 'node:util';
 // import { createRequire } from 'node:module';
 
+// NB symfony -> commentare HtmlWebpackPlugin e HtmlWebpackInjectPreload
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 import HtmlWebpackInjectPreload from '@principalstudio/html-webpack-inject-preload';
+
 import TerserPlugin from 'terser-webpack-plugin';
 import CssMinimizerPlugin from 'css-minimizer-webpack-plugin';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import CopyWebpackPlugin from 'copy-webpack-plugin';
 // import Dotenv from 'dotenv-webpack';
 import RemoveEmptyScriptsPlugin from 'webpack-remove-empty-scripts';
+// NB: symfony -> decommentare WebpackManifestPlugin
 // import { WebpackManifestPlugin } from 'webpack-manifest-plugin';
 // import HtmlWebpackInjectAttributesPlugin from 'html-webpack-inject-attributes-plugin';
 
@@ -40,7 +43,8 @@ const __filename = fileURLToPath(import.meta.url)
 
 const isDevelopment = process.env.NODE_ENV === 'development'
   ,devServerPort = [[port5700]]
-  ,apiPort = [[port8000]] // eslint-disable-line no-unused-vars
+  // NB symfony
+  // ,apiPort = [[port8000]]
   ,useSass = false
 
   // css in dev: true = iniettato con style-loader (veloce, nessun asset css);
@@ -57,7 +61,8 @@ const isDevelopment = process.env.NODE_ENV === 'development'
   // dir di output: relativa a QUESTO file ('../build' se il frontend è in una
   // sottodirectory, './build' se webpack.config.mjs è nella root del progetto)
   ,output_dir = path.resolve(__dirname, './build')
-  // ,output_dir = isDevelopment? '_dev' : 'build' // symfony
+  // NB symfony
+  // ,output_dir = isDevelopment? '_dev' : 'build'
 
   // dir delle favicons generate da `npx create-favicons` (vedi package.json):
   // il path assoluto serve a CopyWebpackPlugin/HtmlWebpackPlugin (i path
@@ -66,8 +71,8 @@ const isDevelopment = process.env.NODE_ENV === 'development'
   ,favicons_path = path.resolve(__dirname, './app/favicons/output') // commentare se non usato
   ,favicons_path_regexp = /favicons\/output/ // source pattern per le favicons (regexp o null)
 
-  //sf:
-  //,favicons_path
+  // NB symfony
+  // // ,favicons_path = path.resolve(__dirname, './app/favicons/output') // commentare se non usato
   // ,favicons_path_regexp = null
 
 
@@ -98,6 +103,29 @@ const isDevelopment = process.env.NODE_ENV === 'development'
   // (copiato da minimo da starter-install.sh, generato da `npm run 'build tokens'`)
   ,customPropsFile = path.resolve(__dirname, './app/css/custom-properties.css')
 
+  /*
+    chunk `shared` (splitChunks + runtimeChunk 'single'): true = js e css comuni
+    in `shared.js` / `shared.css` + `runtime.js` (vedi `shared_chunk_paths`);
+    false = nessun chunk condiviso, utile nei progetti con una sola pagina (più al
+    massimo una pagina di errore): la entry principale (`mainEntry`) è sempre
+    caricata e contiene da sola tutto il js/css comune e le definizioni delle
+    custom properties per tutti i css.
+    NB: con `false` i template NON devono più linkare shared.js, shared.css e
+    runtime.js (vedi _sf/templates/_main-tpl.html.twig e la pagina di errore)
+  */
+  ,useSharedChunk = true
+  /*
+    entry principale, sempre caricata: con `useSharedChunk: false` riceve le
+    definizioni delle custom properties per tutti i css delle altre entry
+  */
+  ,mainEntry = 'index'
+  /*
+    solo con `useSharedChunk: false`: entry NON `.critical` che non caricano il css
+    di `mainEntry`. Restano fuori dal set principale del plugin custom properties
+    e ricevono un set proprio, con le proprie definizioni (default: [])
+  */
+  ,standaloneEntries = []
+
   // PurgeCSS e plugin custom properties lavorano sugli asset css finali:
   // in dev, con `false`, sono entrambi disattivati (build più veloce, css
   // iniettato con style-loader; se `useCustomPropsPlugin` è true le definizioni
@@ -106,8 +134,6 @@ const isDevelopment = process.env.NODE_ENV === 'development'
   // rispettivi flag `usePurgeCss` / `useCustomPropsPlugin`) e `inlineCssInDevMode`
   // viene forzato a false
   ,purgeCssInDev = false
-  ,inlineCssInDev = inlineCssInDevMode && !purgeCssInDev // valore effettivo passato a cssRules
-  ,runPurgeCss = usePurgeCss && (!isDevelopment || purgeCssInDev)
   ,runCustomPropsPlugin = useCustomPropsPlugin && (!isDevelopment || purgeCssInDev)
   // ,manifest_shared_seed = {}
 ;
@@ -116,6 +142,7 @@ const { CustomPropsPurgeCssPlugin } = runCustomPropsPlugin
   ? await import('./webpack-config-modules/custom-props-purgecss-plugin.mjs')
   : {};
 
+// (solo con `useSharedChunk: true`, vedi sopra)
 // cacheGroup `shared` (splitChunks): raccoglie in `shared.js` / `shared.css` i
 // moduli js e css provenienti da node_modules e dalle directory condivise del
 // progetto (vedi `pathsRegexp` sotto), così non vengono duplicati in ogni entry.
@@ -217,6 +244,8 @@ const CopyWebpackPluginPatterns = [
 const projectEntries = {
   'index': './app/index.js',
 
+  'error-pages': './app/error-pages/error-pages.js',
+
   // css critici da includere inline nei template html: il suffisso `.critical` nel nome
   // della entry attiva l'istanza PurgeCSS dedicata con purge stretto
   // (vedi purgecss-setup.mjs) e la regola dedicata in css-rules.mjs
@@ -236,6 +265,41 @@ const entries = (useCustomPropsPlugin && isDevelopment && !purgeCssInDev)
   ]))
   : projectEntries;
 
+
+// regexp per gli asset css compilati di una entry: corrisponde a `nome.css` (dev con
+// WEBPACK_SERVE, senza hash) e a `nome.<hash>.css`, ma NON a `nome.critical.<hash>.css`
+// (il wildcard `*` di una stringa, invece, non corrisponde a `nome.css` e corrisponde
+// anche a `nome.critical.<hash>.css`)
+const cssAssetRegexp = (entryName) =>
+  new RegExp(`^${entryName.replace(/[.+?^${}()|[\]\\]/g, '\\$&')}(\\.[^./]+)?\\.css$`);
+
+// set del CustomPropsPurgeCssPlugin (vedi `sets` nei `plugins`). L'elenco delle entry
+// css è derivato da `projectEntries`: aggiungere una entry lì è sufficiente
+const cssEntries = Object.keys(projectEntries).filter(name => !/\.critical/.test(name))
+  ,criticalEntries = Object.keys(projectEntries).filter(name => /\.critical/.test(name))
+  ,customPropsSets = [
+
+    // i critical css sono inline nei template: restano autosufficienti
+    ...criticalEntries.map(name => ({ sources: [cssAssetRegexp(name)] })),
+
+    ...(useSharedChunk
+      // shared.css è linkato in tutte le pagine: contiene le definizioni per tutti i
+      // css delle entry (le definizioni non sono duplicate negli altri asset)
+      ? [{
+        sources: [cssAssetRegexp('shared'), ...cssEntries.map(cssAssetRegexp)],
+        target: cssAssetRegexp('shared')
+      }]
+      // senza shared: le definizioni sono iniettate solo nel css di `mainEntry`
+      // (sempre caricato); le entry che non lo caricano hanno un set proprio
+      : [
+        {
+          sources: cssEntries.filter(name => !standaloneEntries.includes(name)).map(cssAssetRegexp),
+          target: cssAssetRegexp(mainEntry)
+        },
+        ...standaloneEntries.map(name => ({ sources: [cssAssetRegexp(name)] }))
+      ]
+    )
+  ];
 
 const config = {
   mode: isDevelopment ? 'development' : 'production',
@@ -272,7 +336,7 @@ const config = {
     clean: !isDevelopment
   },
 
-  /* SYMFONY:
+  /* NB symfony
   output: {
     path: path.resolve(__dirname, `./public/${output_dir}` ),
     // filename: '[name].js',
@@ -302,20 +366,25 @@ const config = {
         extractComments: false
       })
     ],
-    runtimeChunk: 'single', // true
-    splitChunks: {
-      cacheGroups: {
+    // chunk `shared` e runtime: solo con `useSharedChunk: true`
+    ...(useSharedChunk
+      ? {
+        runtimeChunk: 'single', // true
+        splitChunks: {
+          cacheGroups: {
 
-        shared: {
-          // vedi shared_chunk_paths sopra per la logica completa del test
-          test: shared_chunk_paths,
-          name: 'shared',
-          enforce: true,
-          // le entry `.critical` restano autosufficienti (css inline nei template)
-          chunks: (chunk) => !/\.critical/.test(chunk.name)
-        }
+            shared: {
+              // vedi shared_chunk_paths sopra per la logica completa del test
+              test: shared_chunk_paths,
+              name: 'shared',
+              enforce: true,
+              // le entry `.critical` restano autosufficienti (css inline nei template)
+              chunks: (chunk) => !/\.critical/.test(chunk.name)
+            }
+          }
+        },
       }
-    },
+      : {})
   },
 
   // =>> performance
@@ -339,6 +408,7 @@ const config = {
     client: { overlay: true, },
   },
 
+  // NB symfony
   // =>> devServer (con symfony)
   // reverse proxy davanti a `symfony serve` (porta 8102, vedi package.json):
   // il browser va aperto su questo dev server (non su :8102). Le richieste per
@@ -405,10 +475,10 @@ const config = {
         : []
     ),
 
+    // NB symfony (decommentare)
     // =>> plugins: WebpackManifestPlugin
     // new WebpackManifestPlugin({
-    //   fileName: path.join(output_dir, 'manifest.json'),
-    // sf: fileName: 'manifest.json', // scrive in output.path
+    //   fileName: path.join(output_dir, 'manifest.json'), // NB: symfony -> fileName: 'manifest.json', // scrive in output.path
     //   // basePath: item.source_dirname
     //   // removeKeyHash: /\?.*$/, // /([a-f0-9]{32}\.?)/gi, // /(\?as_asset)$/,
     //   // rimuove i font dal manifest. Non necessari, rendono il file inutilmente grande
@@ -417,13 +487,6 @@ const config = {
     //   },
     //   sort: isDevelopment? undefined : (a, b) => a.name.localeCompare(b.name)
     // }),
-
-    // =>> plugins: MiniCssExtractPlugin
-    new MiniCssExtractPlugin({
-      filename: '[name].[contenthash].css',
-      chunkFilename: '[id].[contenthash].css',
-      ignoreOrder: true
-    }),
 
     // =>> plugins: MiniCssExtractPlugin
     // contenthash solo se non si usa Dev Server
@@ -440,6 +503,7 @@ const config = {
     //   : [new InlineCriticalCssPlugin({ match: (href) => href?.includes('.critical') })]
     // ),
 
+    // NB symfony (rimuovere)
     // =>> plugins: HtmlWebpackPlugin (manifest)
     new HtmlWebpackPlugin({
       filename: 'manifest.webmanifest',
@@ -448,6 +512,7 @@ const config = {
       minify: false //!isDevelopment
     }),
 
+    // NB symfony (rimuovere)
     // =>> plugins: HtmlWebpackPlugin
     new HtmlWebpackPlugin({
       filename: 'index.html',
@@ -458,6 +523,7 @@ const config = {
       // base: isDevelopment ? '/' : '/xxxxx/',
     }),
 
+    // NB symfony (rimuovere)
     // =>> plugins: HtmlWebpackInjectAttributesPlugin
     // new HtmlWebpackInjectAttributesPlugin({
     //   // La funzione riceve un oggetto con gli attributi del tag corrente
@@ -471,6 +537,8 @@ const config = {
     //   }
     // }),
 
+
+    // NB symfony (rimuovere)
     // =>> plugins: HtmlWebpackInjectPreload
     // https://github.com/principalstudio/html-webpack-inject-preload
     ...(isDevelopment
@@ -531,7 +599,7 @@ const config = {
     // watch mode i template twig NON sono osservati da webpack: dopo aver
     // aggiunto una classe solo in un twig occorre rilanciare la build (o toccare
     // un file js/css) per aggiornare il purge
-    ...(runPurgeCss
+    ...(usePurgeCss && (!isDevelopment || purgeCssInDev)
       ? createPurgeCSSPlugins({
 
         // SOLO file che generano markup o classi (twig, php, js);
@@ -591,27 +659,25 @@ const config = {
         definitionsFile: customPropsFile,
 
         // set di asset css elaborati in modo indipendente: `sources` sono i nomi
-        // degli asset compilati (con l'hash nel nome: usare `*`, oppure una
-        // RegExp), `target` l'asset in cui iniettare le definizioni (se omesso
-        // è il primo asset del set; se non corrisponde ad alcun asset e non ha
-        // `*` viene emesso come nuovo asset, che va poi linkato nei template).
-        // NB: `*` corrisponde a qualsiasi carattere: 'layout.*.css' corrisponde
-        // anche a 'layout.critical.<hash>.css'
-        sets: [
-          // il critical css è inline nei template: deve restare autosufficiente
-          { sources: ['layout.critical.*.css'] },
+        // degli asset compilati (con l'hash nel nome: usare una RegExp, vedi
+        // `cssAssetRegexp`), `target` l'asset in cui iniettare le definizioni (se
+        // omesso è il primo asset del set; se non corrisponde ad alcun asset e non
+        // è una stringa senza `*` non viene emesso nulla).
+        // NB: evitare i wildcard `*`: 'index.*.css' non corrisponde a 'index.css'
+        // (dev con WEBPACK_SERVE) e corrisponde invece a 'index.critical.<hash>.css'.
+        // I set sono costruiti in `customPropsSets` (sopra) a partire da
+        // `projectEntries`, in base a `useSharedChunk`: aggiungendo una entry
+        // non serve modificare nulla qui
+        sets: customPropsSets,
 
-          // shared.css è linkato in tutte le pagine: contiene le definizioni
-          // per tutti i css delle entry (le definizioni non sono duplicate
-          // negli altri asset). Ogni css delle entry va elencato qui
-          { sources: ['shared.*.css', 'index.*.css'], target: 'shared.*.css' },
-        ],
-
-        // css usati fuori dagli asset purgati (shadow DOM dei web components,
-        // import `?raw`): tutti i loro usi di var() contano per tutti i set
+        // css usati fuori dal bundle: tutti i loro usi di var() contano per tutti i
+        // set. I css importati con `?raw` (shadow DOM dei web components) sono
+        // rilevati automaticamente nei js dei chunk, solo per i componenti
+        // realmente importati: un glob largo qui porterebbe nel css anche le
+        // props di componenti non importati
         extraUsageGlobs: [
-          path.resolve(__dirname, './app/src/web-components/**/*.css'),
-          `${minimo_path}/src/web-components/**/*.css`,
+          // path.resolve(__dirname, './app/src/web-components/**/*.css'),
+          // `${minimo_path}/src/web-components/**/*.css`,
         ],
 
         // props da includere comunque in tutti i set (nomi esatti o RegExp),
@@ -708,7 +774,12 @@ const config = {
       },
 
       // =>> rules: svg
-      ...svgRules({useSvgo: useSvgo, svgoConfig: svgoConfig, useSvgr: useSvgr, favicons_path_regexp: favicons_path_regexp?? null }),
+      ...svgRules({
+        useSvgo: useSvgo,
+        svgoConfig: svgoConfig,
+        useSvgr: useSvgr,
+        favicons_path_regexp: favicons_path_regexp?? null
+      }),
 
       // =>> rules: Images / pdf
       {
@@ -771,7 +842,12 @@ const config = {
       },
 
       // =>> rules: css / scss
-      ...cssRules({isDevelopment: isDevelopment, useSass: useSass, inlineCssInDevMode: inlineCssInDev, postcssConfig_path: postcssConfig_path})
+      ...cssRules({
+        isDevelopment: isDevelopment,
+        useSass: useSass,
+        inlineCssInDevMode: inlineCssInDevMode && !purgeCssInDev,
+        postcssConfig_path: postcssConfig_path
+      })
     ] // end rules
   }, // end module
 
