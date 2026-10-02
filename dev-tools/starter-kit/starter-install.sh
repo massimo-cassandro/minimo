@@ -198,8 +198,10 @@ force_cat() {
 # sotto-cartelle così com'è in source_files: aggiungere, spostare o rinominare
 # file lì non richiede modifiche a questo script.
 # Il terzo argomento (opzionale) è il nome di una funzione di rename invocata
-# su ogni singolo basename, per i casi in cui il nome del file sorgente non
-# coincide con quello di destinazione (vedi rename_root_file).
+# solo sui file posti direttamente nella root di src_root (non su quelli nelle
+# sotto-cartelle, i cui nomi restano invariati: es. _sf/templates/_main-tpl.html.twig,
+# referenziato così da home.html.twig), per i casi in cui il nome del file
+# sorgente non coincide con quello di destinazione (vedi rename_root_file).
 # Il quarto argomento (opzionale, default: safe_cat_with_ports) è la funzione
 # di copia da usare per ogni file: safe_cat_with_ports confronta e backuppa
 # il singolo file (sostituzione porte no-op se non contiene placeholder);
@@ -224,7 +226,7 @@ install_tree() {
     if [ -n "$exclude" ] && [[ " $exclude " == *" $base "* ]]; then
       continue
     fi
-    if [ -n "$rename_fn" ]; then
+    if [ -n "$rename_fn" ] && [ "$dir" = "." ]; then
       new_base="$("$rename_fn" "$base")"
     else
       new_base="$base"
@@ -239,7 +241,8 @@ install_tree() {
   done < <(find "$src_root" -type f ! -name .DS_Store)
 }
 
-# Rename applicato ai file di source_files/root/ in fase di copia:
+# Rename applicato ai soli file posti direttamente in source_files/root/ (non alle
+# sotto-cartelle) in fase di copia:
 # - prefisso singolo underscore -> dotfile (es. _gitignore -> .gitignore);
 #   il doppio underscore (__project__.code-workspace) non viene toccato,
 #   il nome resta invariato

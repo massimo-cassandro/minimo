@@ -18,9 +18,10 @@ import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import CopyWebpackPlugin from 'copy-webpack-plugin';
 // import Dotenv from 'dotenv-webpack';
 import RemoveEmptyScriptsPlugin from 'webpack-remove-empty-scripts';
+// import HtmlWebpackInjectAttributesPlugin from 'html-webpack-inject-attributes-plugin';
+
 // NB: symfony -> decommentare WebpackManifestPlugin
 // import { WebpackManifestPlugin } from 'webpack-manifest-plugin';
-// import HtmlWebpackInjectAttributesPlugin from 'html-webpack-inject-attributes-plugin';
 
 import { cssRules } from './webpack-config-modules/css-rules.mjs';
 import { createPurgeCSSPlugins } from './webpack-config-modules/purgecss-setup.mjs';
@@ -52,7 +53,9 @@ const isDevelopment = process.env.NODE_ENV === 'development'
   // NB: con `purgeCssInDev: true` (vedi sotto) viene comunque forzato a false,
   // perché il purge e il plugin delle custom properties lavorano sugli asset css
   ,inlineCssInDevMode = true
-  // sf: inlineCssInDevMode = false
+  // NB symfony
+  // ,inlineCssInDevMode = false
+
   ,useSvgo = true
   ,useSvgr = false // svg per react
   ,svgoConfig = useSvgo? (await import('./webpack-config-modules/svgo.config.mjs')).default : null
