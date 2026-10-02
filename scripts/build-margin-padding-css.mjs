@@ -2,23 +2,31 @@
 /* eslint-disable no-console */
 
 // build-margin-padding-css.mjs
-// Generates 4 files from a single `classes` map:
-//   - margin-padding.css                 minimo naming,    no breakpoints
-//   - margin-padding-media.css           minimo naming,    one @media block per breakpoint
-//   - margin-padding-bootstrap.css       Bootstrap naming, no breakpoints
-//   - margin-padding-bootstrap-media.css Bootstrap naming, one @media block per breakpoint
+// Generates 2 files from a single `classes` map:
+//   - margin-padding.css        no breakpoints
+//   - margin-padding-media.css  one @media block per breakpoint
+// By default the classes use the minimo naming. With the `--bs` flag the same
+// files (same names) are generated using the Bootstrap naming instead.
 // es: `.mbs { margin-block-start: var(--size-base) !important; }`
 // es (bootstrap naming): `.mt { margin-block-start: var(--size-base) !important; }`
 //
+// usage: `node scripts/build-margin-padding-css.mjs [--bs]`
+//
 // Each file is the cross product of `classes` x `sizes` (optionally x `media`).
 // Only the class prefixes differ between the minimo/Bootstrap variants: the
-// size scale and breakpoints are the same (minimo's own scale is used even in
-// the Bootstrap-named files, since Bootstrap's numeric 0-5/auto scale has no
+// size scale and breakpoints are the same (minimo's own scale is used even with
+// the Bootstrap naming, since Bootstrap's numeric 0-5/auto scale has no
 // equivalent here).
 
 // TODO potrebbe essere sostituito da future funzionalità native del CSS?
 
+// TODO il naming delle classi bootstrap (--bs) è sbagliato: Bootstrap non usa
+// i suffissi sm, xl ecc. per queste classi ma i numeri 1, 2, 3... (es. `.mt-3`).
+// Va creata una mappa di conversione dalla scala `sizes` a quella numerica di
+// Bootstrap. Da fare in futuro.
+
 import * as path from 'node:path';
+import process from 'node:process';
 import { fileURLToPath } from 'node:url';
 import { styleText } from 'node:util';
 import { writeFile } from 'node:fs/promises';
@@ -28,10 +36,10 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const addLayer = false; // true to add `@layer` rule
 
+const buildBootstrap = process.argv.includes('--bs'); // use Bootstrap class naming (same target files)
+
 const target_file            = '../src/css/margin-padding.css',
-  target_file_media           = '../src/css/margin-padding-media.css',
-  target_bs_file              = '../src/css/margin-padding-bootstrap.css',
-  target_bs_file_media        = '../src/css/margin-padding-bootstrap-media.css';
+  target_file_media           = '../src/css/margin-padding-media.css';
 
 const stylelintConfigPath = path.resolve(__dirname, '../stylelint.config.mjs');
 
@@ -217,32 +225,26 @@ function buildMediaCss(entries, header) {
 
 // ── build ─────────────────────────────────────────────────────────────────
 
+const entries = buildBootstrap ? bsEntries : minimoEntries;
+const namingNotes = buildBootstrap
+  ? [
+    'Bootstrap-style class names (m/mt/mb/mx/ms/me/p/pt/pb/px/ps/pe...) generated with `--bs`.',
+  ]
+  : [];
+
 const files = [
   {
     dest: path.resolve(__dirname, target_file),
-    content: buildPlainCss(minimoEntries, fileHeader([
+    content: buildPlainCss(entries, fileHeader([
+      ...namingNotes,
       `Responsive variants live in \`${path.basename(target_file_media)}\`.`,
     ])),
   },
   {
     dest: path.resolve(__dirname, target_file_media),
-    content: buildMediaCss(minimoEntries, fileHeader([
+    content: buildMediaCss(entries, fileHeader([
+      ...namingNotes,
       `Responsive companion of \`${path.basename(target_file)}\`, one @media block per breakpoint.`,
-    ])),
-  },
-  {
-    dest: path.resolve(__dirname, target_bs_file),
-    content: buildPlainCss(bsEntries, fileHeader([
-      `Same rules as \`${path.basename(target_file)}\`, but using Bootstrap-style class names`,
-      '(m/mt/mb/mx/ms/me/p/pt/pb/px/ps/pe...) to ease the transition to \'minimo\'.',
-      `Responsive variants live in \`${path.basename(target_bs_file_media)}\`.`,
-    ])),
-  },
-  {
-    dest: path.resolve(__dirname, target_bs_file_media),
-    content: buildMediaCss(bsEntries, fileHeader([
-      `Same rules as \`${path.basename(target_file_media)}\`, but using Bootstrap-style class names`,
-      '(m/mt/mb/mx/ms/me/p/pt/pb/px/ps/pe...) to ease the transition to \'minimo\'.',
     ])),
   },
 ];
@@ -271,6 +273,6 @@ for (const { dest } of files) {
   console.log(styleText(['yellow'], `[build-margin-padding-css] dest file : ${short(dest)}`));
 }
 console.log(styleText(['green'],
-  `[build-margin-padding-css] ${plainRulesCount} plain rules + ${mediaRulesCount} responsive rules per naming variant`
+  `[build-margin-padding-css] ${plainRulesCount} plain rules + ${mediaRulesCount} responsive rules (${buildBootstrap ? 'Bootstrap' : 'minimo'} naming)`
 ));
 console.log(styleText(['green'], '**** DONE ****'));

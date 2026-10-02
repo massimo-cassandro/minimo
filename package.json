@@ -1,6 +1,6 @@
 {
   "name": "@massimo-cassandro/minimo",
-  "version": "1.39.2",
+  "version": "1.40.0",
   "description": "Light css framework & utilities",
   "type": "module",
   "main": "./index.js",
@@ -22,6 +22,7 @@
   "bin": {
     "buildTokens": "dev-tools/design-tokens-builder/build-tokens.mjs",
     "checkUnresolvedProps": "dev-tools/design-tokens-builder/check-unresolved-custom-props.mjs",
+    "findOrphanCssClasses": "dev-tools/find-orphan-css-classes/find-orphan-css-classes.mjs",
     "update-version": "dev-tools/update-version/index.mjs",
     "upd@m": "dev-tools/upd@m/index.mjs",
     "svgIconsTools": "dev-tools/svg-icons-tools/index.mjs",

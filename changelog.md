@@ -17,3 +17,4 @@
 * 1.37.0 (26 set 2026) - build tokens improvements (optional custom-props prefix)
 * 1.38.0 (27 set 2026) - Build Tokens: use oflight-dark function
 * 1.39.0 (29 set 2026) - token builder: token renaming
+* 1.40.0 (02 ott 2026) - orphan classes finder

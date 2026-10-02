@@ -41,6 +41,10 @@
       {
         "filePath": "node_modules/open-props/open-props.style-dictionary-tokens.json",
         "group": "Default"
+      },
+      {
+        "filePath": "node_modules/@massimo-cassandro/minimo/src/css",
+        "group": "Default"
       }
     ],
 

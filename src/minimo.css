@@ -41,10 +41,7 @@
 @import '@minimoSrc/css/display.css';
 @import '@minimoSrc/css/margin-padding.css';
 /* @import '@minimoSrc/css/margin-padding-media.css';  responsive version */
-/* alternative boostrap naming
-@import '@minimoSrc/css/margin-padding-bootstrap.css';
-@import '@minimoSrc/css/margin-padding-bootsrap-media.css';
-*/
+
 @import '@minimoSrc/css/overflow.css';
 @import '@minimoSrc/css/position.css';
 @import '@minimoSrc/css/visibility.css';
