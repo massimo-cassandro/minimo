@@ -212,6 +212,9 @@ force_cat() {
 # dell'installazione dei pacchetti npm (vedi più sotto).
 # I file .DS_Store (macOS) vengono sempre ignorati: sono binari e farebbero
 # fallire il sed di safe_cat_with_ports ("illegal byte sequence").
+# I file .gitkeep non vengono copiati, ma la cartella che li contiene viene
+# comunque creata nella destinazione (servono solo a mantenere la cartella nel
+# repo di minimo).
 install_tree() {
   local src_root="$1"
   local dest_root="$2"
@@ -223,6 +226,10 @@ install_tree() {
     rel="${file#"$src_root"/}"
     dir="$(dirname "$rel")"
     base="$(basename "$rel")"
+    if [ "$base" = ".gitkeep" ]; then
+      [ "$dir" = "." ] || mkdir -p "${dest_root}/${dir}"
+      continue
+    fi
     if [ -n "$exclude" ] && [[ " $exclude " == *" $base "* ]]; then
       continue
     fi
