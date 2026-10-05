@@ -41,6 +41,8 @@ const PARTICLE_CASING_MAP = new Map(PARTICELLE.map(term => [term.toLowerCase(), 
  * Improves a text string by fixing punctuation spacing, multiple spaces,
  * typographic quotes, non-breaking spaces after Italian particles/articles,
  * and optionally enforcing the exact casing of custom words.
+ * Particles are forced to their listed casing, except at the start of the text
+ * where their first letter is capitalized.
  *
  * @param {string} str - input string to process
  * @param {string[]} [custom_words] - list of words whose exact casing must be preserved (e.g. `['iPhone', 'macOS']`) (default: [])
@@ -75,8 +77,14 @@ export function betterText(str, custom_words = []) {
       return match.replace(/ +/g, '\u00A0');
     });
 
-    // enforce exact casing of every particle in a single pass
-    str = str.replace(PARTICLE_CASING_REGEX, match => PARTICLE_CASING_MAP.get(match.toLowerCase()) ?? match);
+    // enforce exact casing of every particle in a single pass;
+    // a particle at the very start of the text (optionally after an opening quote) is capitalized
+    str = str.replace(PARTICLE_CASING_REGEX, (match, _p1, offset, whole) => {
+      const exact = PARTICLE_CASING_MAP.get(match.toLowerCase()) ?? match;
+      return /^[“‘]?$/.test(whole.slice(0, offset))
+        ? exact.charAt(0).toUpperCase() + exact.slice(1)
+        : exact;
+    });
 
     if(custom_words.length) {
       custom_words.forEach(item => {

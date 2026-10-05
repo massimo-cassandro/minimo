@@ -487,9 +487,10 @@ const config = {
     //   fileName: path.join(output_dir, 'manifest.json'), // NB: symfony -> fileName: 'manifest.json', // scrive in output.path
     //   // basePath: item.source_dirname
     //   // removeKeyHash: /\?.*$/, // /([a-f0-9]{32}\.?)/gi, // /(\?as_asset)$/,
-    //   // rimuove i font dal manifest. Non necessari, rendono il file inutilmente grande
+    //   // rimuove dal manifest i font non woff2 (non necessari, rendono il file inutilmente grande);
+    //   // i woff2 restano per consentire il preload con asset() nei template sf
     //   filter: isDevelopment? undefined : (FileDescriptor) => {
-    //     return /fonts/.test(FileDescriptor.path)? false : true;
+    //     return !/fonts/.test(FileDescriptor.path) || /\.woff2$/.test(FileDescriptor.path);
     //   },
     //   sort: isDevelopment? undefined : (a, b) => a.name.localeCompare(b.name)
     // }),
