@@ -7,91 +7,143 @@ const places = [
   // EUROPA
   'Europa',
 
-  // Italia
-  'Italia',
+  'Italia', 'Roma',
   // città
-  'Roma', 'Milano', 'Napoli', 'Torino', 'Palermo', 'Bologna', 'Firenze', 'Venezia',
+  'Milano', 'Napoli', 'Torino', 'Palermo', 'Bologna', 'Firenze', 'Venezia', 'Genova', 'Bari', 'Catania',
+  'Verona', 'Padova', 'Trieste', 'Pisa', 'Siena', 'Cagliari', 'Parma', 'Modena', 'Bergamo', 'Brescia',
+  'Trento', 'Bolzano', 'Aosta', 'Perugia', 'Assisi', 'Ancona', 'Rimini', 'Ravenna', 'Lucca', 'Matera',
+  'Taranto', 'Siracusa', 'Messina', 'Lecce', 'Cuneo',
+  // regioni
+  'Sicilia', 'Sardegna', 'Toscana', 'Lombardia', 'Piemonte', 'Veneto', 'Puglia', 'Calabria', 'Umbria',
+  'Lazio', 'Campania', 'Liguria', 'Abruzzo', 'Friuli-Venezia Giulia', 'Trentino-Alto Adige',
+  'Emilia-Romagna', 'Basilicata', 'Molise', 'Valle d’Aosta',
   // fiumi
   'Po', 'Adige', 'Tevere', 'Arno',
   // monti
   'Monte Bianco', 'Monte Rosa', 'Cervino', 'Etna', 'Vesuvio', 'Gran Sasso',
   // località
-  'Costiera Amalfitana', 'Cinque Terre', 'Pompei', 'Dolomiti', 'Val d’Orcia', 'Capri', 'Lago di Como',
+  'Costiera Amalfitana', 'Cinque Terre', 'Pompei', 'Dolomiti', 'Val d’Orcia', 'Capri', 'Isola di Capri',
+  'Lago di Como', 'Salento',
 
-  // Francia
-  'Francia',
+  'Francia', 'Parigi',
   // città
-  'Parigi', 'Marsiglia', 'Lione', 'Tolosa', 'Nizza', 'Nantes', 'Strasburgo',
+  'Marsiglia', 'Lione', 'Tolosa', 'Nizza', 'Nantes', 'Strasburgo', 'Bordeaux', 'Lilla', 'Cannes', 'Avignone',
   // fiumi
   'Senna', 'Loira', 'Rodano', 'Garonna',
   // monti
   'Barre des Écrins', 'Pic du Midi de Bigorre',
   // località
   'Mont Saint-Michel', 'Costa Azzurra', 'Valle della Loira', 'Chamonix', 'Versailles', 'Camargue',
+  'Corsica', 'Normandia', 'Bretagna', 'Provenza', 'Alsazia',
 
-  // Germania
-  'Germania',
+  'Germania', 'Berlino',
   // città
-  'Berlino', 'Monaco di Baviera', 'Francoforte sul Meno', 'Amburgo', 'Colonia', 'Stoccarda',
+  'Monaco di Baviera', 'Francoforte sul Meno', 'Amburgo', 'Colonia', 'Stoccarda', 'Dresda', 'Lipsia',
+  'Norimberga', 'Düsseldorf', 'Hannover', 'Brema', 'Heidelberg',
   // fiumi
   'Reno', 'Danubio', 'Elba', 'Meno', 'Weser',
   // monti
   'Zugspitze', 'Watzmann', 'Feldberg',
   // località
   'Castello di Neuschwanstein', 'Foresta Nera', 'Valle del Reno', 'Isola di Rügen', 'Rothenburg ob der Tauber',
+  'Baviera',
 
-  // Spagna
-  'Spagna',
+  'Spagna', 'Madrid',
   // città
-  'Madrid', 'Barcellona', 'Valencia', 'Siviglia', 'Saragozza', 'Malaga',
+  'Barcellona', 'Valencia', 'Siviglia', 'Saragozza', 'Malaga', 'Bilbao', 'Granada', 'San Sebastián',
+  'Santiago de Compostela', 'Toledo', 'Cordova',
   // fiumi
   'Tago', 'Ebro', 'Duero', 'Guadalquivir', 'Guadiana',
   // monti
   'Mulhacén', 'Pico Aneto', 'Teide',
   // località
   'Alhambra di Granada', 'Sagrada Família', 'Caminito del Rey', 'Ibiza', 'Ronda', 'Costa del Sol',
+  'Maiorca', 'Minorca', 'Tenerife', 'Lanzarote', 'Fuerteventura', 'Gran Canaria', 'Isole Canarie',
+  'Isole Baleari', 'Catalogna', 'Andalusia',
 
-  // Regno Unito
-  'Regno Unito',
+  'Gran Bretagna', 'Regno Unito', 'Londra',
   // città
-  'Londra', 'Birmingham', 'Manchester', 'Glasgow', 'Edimburgo', 'Liverpool',
+  'Birmingham', 'Manchester', 'Glasgow', 'Edimburgo', 'Liverpool', 'Cardiff', 'Belfast', 'Oxford',
+  'Cambridge', 'Bristol', 'Leeds',
   // fiumi
   'Tamigi', 'Severn', 'Trent', 'Clyde',
   // monti
   'Ben Nevis', 'Scafell Pike', 'Snowdon',
   // località
   'Stonehenge', 'Loch Ness', 'Giant\'s Causeway', 'Cotswolds', 'Highlands scozzesi', 'Windsor',
+  'Isola di Skye', 'Inghilterra', 'Scozia', 'Galles', 'Irlanda del Nord',
 
-  // Grecia
-  'Grecia',
+  'Grecia', 'Atene',
   // città
-  'Atene', 'Salonicco', 'Patrasso', 'Candia', 'Larissa',
+  'Salonicco', 'Patrasso', 'Candia', 'Larissa',
   // fiumi
   'Aliakmon', 'Achelous', 'Peneus',
   // monti
   'Monte Olimpo', 'Monte Parnasso', 'Monte Athos',
   // località
-  'Meteora', 'Santorini', 'Mykonos', 'Delfi', 'Olimpia', 'Cnosso',
+  'Meteora', 'Santorini', 'Mykonos', 'Delfi', 'Olimpia', 'Cnosso', 'Santorini Caldera', 'Creta', 'Rodi', 'Corfù',
 
-  // Svizzera
-  'Svizzera',
+  'Svizzera', 'Berna',
   // città
-  'Zurigo', 'Ginevra', 'Berna', 'Basilea', 'Losanna', 'Lucerna',
+  'Zurigo', 'Ginevra', 'Basilea', 'Losanna', 'Lucerna', 'Lugano',
   // fiumi
   'Aare', 'Ticino',
   // monti
   'Dufourspitze', 'Eiger', 'Jungfrau',
   // località
-  'Zermatt', 'St. Moritz', 'Grindelwald', 'Cascate del Reno', 'Interlaken',
+  'Zermatt', 'St. Moritz', 'Grindelwald', 'Cascate del Reno', 'Interlaken', 'Davos', 'Alpi Svizzere',
+
+  'Portogallo', 'Lisbona', 'Oporto', 'Madeira', 'Azzorre', 'Sintra', 'Algarve',
+  'Paesi Bassi', 'Amsterdam', 'Rotterdam', 'L’Aia', 'Utrecht',
+  'Belgio', 'Bruxelles', 'Anversa', 'Bruges',
+  'Austria', 'Vienna', 'Salisburgo', 'Innsbruck', 'Graz', 'Hallstatt',
+  'Polonia', 'Varsavia', 'Cracovia', 'Danzica', 'Breslavia',
+  'Svezia', 'Stoccolma', 'Göteborg', 'Malmö',
+  'Norvegia', 'Oslo', 'Bergen', 'Tromsø', 'Fiordi Norvegesi',
+  'Danimarca', 'Copenaghen',
+  'Finlandia', 'Helsinki',
+  'Irlanda', 'Dublino', 'Galway',
+  'Repubblica Ceca', 'Praga', 'Brno',
+  'Ungheria', 'Budapest',
+  'Romania', 'Bucarest', 'Transilvania',
+  'Croazia', 'Zagabria', 'Spalato', 'Dubrovnik', 'Zara', 'Plitvice Lakes',
+  'Turchia', 'Ankara', 'Istanbul', 'Smirne', 'Antalya', 'Cappadocia',
+  'Ucraina', 'Kiev', 'Kyiv', 'Odessa', 'Leopoli',
+  'Islanda', 'Reykjavik',
+  'Lussemburgo', 'Liechtenstein', 'Principato di Monaco',
+  'Malta', 'La Valletta',
+  'Cipro', 'Nicosia',
+  'Estonia', 'Tallinn',
+  'Lettonia', 'Riga',
+  'Lituania', 'Vilnius',
+  'Bielorussia', 'Minsk',
+  'Moldavia', 'Chisinau',
+  'Serbia', 'Belgrado',
+  'Bosnia ed Erzegovina', 'Sarajevo',
+  'Montenegro', 'Podgorica',
+  'Albania', 'Tirana',
+  'Macedonia del Nord', 'Skopje',
+  'Kosovo', 'Pristina',
+  'Slovenia', 'Lubiana', 'Bled',
+  'Slovacchia', 'Bratislava',
+  'Bulgaria', 'Sofia',
+  'San Marino', 'Città del Vaticano', 'Andorra',
+  'Russia', 'Mosca', 'San Pietroburgo',
+  'Georgia', 'Tbilisi',
+  'Armenia', 'Erevan',
+  'Azerbaigian', 'Baku',
 
 
   // AMERICA DEL NORD
   'America del Nord',
 
-  // Stati Uniti
-  'Stati Uniti',
+  'Stati Uniti', 'Washington',
   // città
   'New York', 'Los Angeles', 'Chicago', 'Houston', 'Phoenix', 'Miami', 'San Francisco', 'Las Vegas',
+  'Boston', 'Seattle', 'San Diego', 'Dallas', 'Atlanta', 'New Orleans', 'Filadelfia', 'Denver',
+  'Orlando', 'Detroit', 'Honolulu',
+  // stati
+  'Alaska', 'Hawaii', 'Texas', 'Florida', 'California', 'Nevada', 'Arizona',
   // fiumi
   'Mississippi', 'Missouri', 'Colorado', 'Rio Grande', 'Hudson',
   // monti
@@ -99,10 +151,11 @@ const places = [
   // località
   'Grand Canyon', 'Parco di Yellowstone', 'Yosemite', 'Monument Valley', 'Cascate del Niagara', 'Key West',
 
-  // Canada
-  'Canada',
+  'Canada', 'Ottawa',
   // città
-  'Toronto', 'Montreal', 'Vancouver', 'Calgary', 'Ottawa', 'Edmonton', 'Québec',
+  'Toronto', 'Montreal', 'Vancouver', 'Calgary', 'Edmonton', 'Québec',
+  // province
+  'Nuova Scozia', 'Terranova', 'Manitoba', 'Saskatchewan', 'Ontario',
   // fiumi
   'San Lorenzo', 'Mackenzie', 'Yukon', 'Fraser',
   // monti
@@ -110,10 +163,9 @@ const places = [
   // località
   'Parco Nazionale di Banff', 'Lago Louise', 'Whistler', 'Capilano Suspension Bridge',
 
-  // Messico
-  'Messico',
+  'Messico', 'Città del Messico',
   // città
-  'Città del Messico', 'Guadalajara', 'Monterrey', 'Puebla', 'Tijuana', 'Cancún',
+  'Guadalajara', 'Monterrey', 'Puebla', 'Tijuana', 'Cancún',
   // fiumi
   'Usumacinta', 'Grijalva',
   // monti
@@ -121,14 +173,23 @@ const places = [
   // località
   'Chichén Itzá', 'Teotihuacan', 'Tulum', 'Cabo San Lucas', 'Oaxaca',
 
+  // altri paesi dell'America del Nord, Centrale e Caraibi
+  'Cuba', 'L’Avana', 'Varadero',
+  'Giamaica', 'Kingston',
+  'Costa Rica', 'San José', 'Monteverde Cloud Forest',
+  'Panama', 'Città di Panama', 'San Blas Islands',
+  'Repubblica Dominicana', 'Santo Domingo', 'Punta Cana', 'Bayahibe',
+  'Guatemala', 'Honduras', 'El Salvador', 'Nicaragua', 'Belize',
+  'Haiti', 'Porto Rico', 'Bahamas', 'Nassau', 'Barbados', 'Trinidad e Tobago', 'Martinica', 'Guadalupa',
+  'Bermuda', 'Bermuda Beaches',
+
 
   // AMERICA DEL SUD
   'America del Sud',
 
-  // Brasile
-  'Brasile',
+  'Brasile', 'Brasilia',
   // città
-  'San Paolo', 'Rio de Janeiro', 'Brasilia', 'Salvador', 'Fortaleza', 'Belo Horizonte',
+  'San Paolo', 'Rio de Janeiro', 'Salvador', 'Fortaleza', 'Belo Horizonte',
   // fiumi
   'Rio delle Amazzoni', 'Paraná', 'São Francisco', 'Tocantins',
   // monti
@@ -136,10 +197,9 @@ const places = [
   // località
   'Cristo Redentore', 'Cascate dell\'Iguazú', 'Foresta Amazzonica', 'Lençóis Maranhenses', 'Fernando de Noronha',
 
-  // Argentina
-  'Argentina',
+  'Argentina', 'Buenos Aires',
   // città
-  'Buenos Aires', 'Córdoba', 'Rosario', 'Mendoza', 'La Plata', 'San Carlos de Bariloche',
+  'Córdoba', 'Rosario', 'Mendoza', 'La Plata', 'San Carlos de Bariloche',
   // fiumi
   'Uruguay', 'Río de la Plata', 'Rio Negro',
   // monti
@@ -147,10 +207,9 @@ const places = [
   // località
   'Ghiacciaio Perito Moreno', 'Patagonia', 'Ushuaia', 'Quebrada de Humahuaca',
 
-  // Perù
-  'Perù',
+  'Perù', 'Lima',
   // città
-  'Lima', 'Arequipa', 'Trujillo', 'Chiclayo', 'Cusco', 'Iquitos',
+  'Arequipa', 'Trujillo', 'Chiclayo', 'Cusco', 'Iquitos', 'Cuzco',
   // fiumi
   'Ucayali', 'Marañón',
   // monti
@@ -158,47 +217,53 @@ const places = [
   // località
   'Machu Picchu', 'Valle Sacra degli Inca', 'Lago Titicaca', 'Linee di Nazca', 'Vinicunca',
 
+  // altri paesi dell'America del Sud
+  'Cile', 'Santiago del Cile', 'Valparaíso', 'Isola di Pasqua', 'Torres del Paine', 'Atacama Desert',
+  'Colombia', 'Bogotà', 'Medellín', 'Cartagena Old Town',
+  'Ecuador', 'Quito', 'Guayaquil', 'Galapagos Islands',
+  'Uruguay', 'Montevideo',
+  'Bolivia', 'La Paz', 'Cochabamba', 'Sucre', 'Salar de Uyuni',
+  'Venezuela', 'Caracas',
+  'Paraguay', 'Asunción',
+  'Guyana', 'Suriname',
+
 
   // ASIA
   'Asia',
 
-  // Giappone
-  'Giappone',
+  'Giappone', 'Tokyo',
   // città
-  'Tokyo', 'Yokohama', 'Osaka', 'Nagoya', 'Sapporo', 'Kyoto', 'Fukuoka',
+  'Yokohama', 'Osaka', 'Nagoya', 'Sapporo', 'Kyoto', 'Fukuoka', 'Hiroshima', 'Nagasaki',
   // fiumi
   'Shinano', 'Tone', 'Ishikari',
   // monti
   'Monte Fuji', 'Monte Kita', 'Monte Hotaka',
   // località
-  'Fushimi Inari-taisha', 'Miyajima', 'Nara', 'Takayama', 'Shirakawa-go',
+  'Fushimi Inari-taisha', 'Miyajima', 'Nara', 'Takayama', 'Shirakawa-go', 'Okinawa', 'Hokkaido',
 
-  // Cina
-  'Cina',
+  'Cina', 'Pechino',
   // città
-  'Pechino', 'Shanghai', 'Guangzhou', 'Shenzhen', 'Chengdu', 'Chongqing', 'Xi\'an',
+  'Shanghai', 'Guangzhou', 'Shenzhen', 'Chengdu', 'Chongqing', 'Xi\'an', 'Hong Kong', 'Macao', 'Lhasa',
   // fiumi
   'Fiume Azzurro', 'Fiume Giallo', 'Fiume delle Perle',
   // monti
   'Huangshan', 'Monte Tai', 'K2',
   // località
-  'Grande Muraglia Cinese', 'Città Proibita', 'Esercito di Terracotta', 'Guilin', 'Zhangjiajie',
+  'Grande Muraglia Cinese', 'Città Proibita', 'Esercito di Terracotta', 'Guilin', 'Zhangjiajie', 'Tibet',
 
-  // India
-  'India',
+  'India', 'Nuova Delhi',
   // città
-  'Mumbai', 'Nuova Delhi', 'Bangalore', 'Hyderabad', 'Ahmedabad', 'Calcutta', 'Jaipur',
+  'Mumbai', 'Bangalore', 'Hyderabad', 'Ahmedabad', 'Calcutta', 'Jaipur', 'Delhi', 'Chennai',
   // fiumi
   'Gange', 'Indo', 'Brahmaputra', 'Godavari',
   // monti
   'Kangchenjunga', 'Nanda Devi', 'Kamet',
   // località
-  'Taj Mahal', 'Varanasi', 'Backwaters del Kerala', 'Khajuraho',
+  'Taj Mahal', 'Taj Mahal', 'Varanasi', 'Backwaters del Kerala', 'Khajuraho', 'Kerala', 'Goa',
 
-  // Nepal
-  'Nepal',
+  'Nepal', 'Kathmandu',
   // città
-  'Kathmandu', 'Pokhara', 'Lalitpur', 'Biratnagar',
+  'Pokhara', 'Lalitpur', 'Biratnagar',
   // fiumi
   'Kosi', 'Gandaki', 'Karnali',
   // monti
@@ -206,14 +271,48 @@ const places = [
   // località
   'Piazza Durbar', 'Campo Base dell\'Everest', 'Lago Phewa', 'Parco di Chitwan',
 
+  // altri paesi asiatici
+  'Corea del Sud', 'Seoul', 'Busan', 'Jeju Island',
+  'Thailandia', 'Bangkok', 'Phuket', 'Chiang Mai',
+  'Vietnam', 'Hanoi', 'Ho Chi Minh', 'Halong Bay',
+  'Indonesia', 'Giacarta', 'Bali', 'Borobudur',
+  'Filippine', 'Manila',
+  'Malaysia', 'Kuala Lumpur',
+  'Singapour', 'Singapore',
+  'Emirati Arabi Uniti', 'Abu Dhabi', 'Dubai',
+  'Arabia Saudita', 'Riad',
+  'Israele', 'Gerusalemme',
+  'Giordania', 'Amman', 'Petra',
+  'Kazakistan', 'Astana',
+  'Uzbekistan', 'Tashkent', 'Samarcanda',
+  'Mongolia', 'Ulan Bator',
+  'Corea del Nord', 'Pyongyang',
+  'Taiwan', 'Taipei',
+  'Cambogia', 'Phnom Penh', 'Angkor Wat',
+  'Laos', 'Vientiane',
+  'Myanmar', 'Bagan',
+  'Sri Lanka', 'Colombo',
+  'Bangladesh', 'Dacca',
+  'Pakistan', 'Islamabad', 'Karachi',
+  'Afghanistan', 'Kabul',
+  'Bhutan', 'Thimphu',
+  'Maldive', 'Maldivian Atolls',
+  'Brunei',
+  'Iran', 'Teheran',
+  'Iraq', 'Baghdad',
+  'Siria', 'Damasco',
+  'Libano', 'Beirut',
+  'Kuwait', 'Qatar', 'Doha',
+  'Oman', 'Mascate',
+  'Bahrein', 'Yemen',
+
 
   // AFRICA
   'Africa',
 
-  // Egitto
-  'Egitto',
+  'Egitto', 'Il Cairo',
   // città
-  'Il Cairo', 'Alessandria', 'Giza', 'Sharm el-Sheikh', 'Luxor', 'Aswan',
+  'Alessandria', 'Giza', 'Sharm el-Sheikh', 'Luxor', 'Aswan',
   // fiumi
   'Nilo',
   // monti
@@ -221,10 +320,9 @@ const places = [
   // località
   'Piramidi di Giza', 'Valle dei Re', 'Tempio di Abu Simbel', 'Karnak',
 
-  // Tanzania
-  'Tanzania',
+  'Tanzania', 'Dodoma',
   // città
-  'Dar es Salaam', 'Dodoma', 'Mwanza', 'Arusha', 'Zanzibar City',
+  'Dar es Salaam', 'Mwanza', 'Arusha', 'Zanzibar City',
   // fiumi
   'Rufiji', 'Ruvuma', 'Pangani',
   // monti
@@ -232,10 +330,9 @@ const places = [
   // località
   'Parco del Serengeti', 'Cratere di Ngorongoro', 'Zanzibar',
 
-  // Sudafrica
-  'Sudafrica',
+  'Sudafrica', 'Pretoria',
   // città
-  'Città del Capo', 'Johannesburg', 'Durban', 'Pretoria', 'Gqeberha',
+  'Città del Capo', 'Johannesburg', 'Durban', 'Gqeberha',
   // fiumi
   'Orange', 'Limpopo', 'Vaal',
   // monti
@@ -243,115 +340,78 @@ const places = [
   // località
   'Parco Nazionale Kruger', 'Capo di Buona Speranza', 'Garden Route', 'Robben Island',
 
+  // altri paesi africani
+  'Marocco', 'Rabat', 'Marrakech', 'Casablanca', 'Fes', 'Tangeri', 'Chefchaouen',
+  'Tunisia', 'Tunisi',
+  'Kenya', 'Nairobi',
+  'Senegal', 'Dakar',
+  'Madagascar', 'Antananarivo',
+  'Mauritius', 'Port Louis', 'Le Morne Brabant',
+  'Etiopia', 'Addis Abeba',
+  'Algeria', 'Algeri',
+  'Libia', 'Tripoli',
+  'Nigeria', 'Abuja', 'Lagos',
+  'Ghana', 'Accra',
+  'Costa d’Avorio', 'Camerun',
+  'Uganda', 'Kampala',
+  'Ruanda', 'Kigali',
+  'Mozambico', 'Maputo',
+  'Zimbabwe', 'Harare', 'Victoria Falls',
+  'Zambia', 'Lusaka',
+  'Namibia', 'Windhoek',
+  'Botswana', 'Gaborone', 'Okavango Delta',
+  'Angola', 'Luanda',
+  'Sudan', 'Khartum',
+  'Seychelles', 'Praslin Island',
+  'Capo Verde',
+  'Congo', 'Kinshasa',
+  'Somalia', 'Mogadiscio',
+  'Eritrea', 'Asmara',
+  'Gambia', 'Niger', 'Ciad', 'Mauritania', 'Malawi', 'Lesotho', 'Eswatini', 'Gabon', 'Togo', 'Benin',
+  'Burkina Faso', 'Sierra Leone', 'Liberia', 'Guinea', 'Gibuti',
+
 
   // OCEANIA
   'Oceania',
 
-  // Australia
-  'Australia',
+  'Australia', 'Canberra',
   // città
-  'Sydney', 'Melbourne', 'Brisbane', 'Perth', 'Adelaide', 'Canberra',
+  'Sydney', 'Melbourne', 'Brisbane', 'Perth', 'Adelaide', 'Hobart', 'Gold Coast', 'Cairns', 'Darwin',
   // fiumi
   'Murray', 'Darling', 'Murrumbidgee',
   // monti
   'Monte Kosciuszko', 'Mawson Peak',
   // località
-  'Grande Barriera Corallina', 'Uluru', 'Opera House di Sydney', 'Twelve Apostles',
+  'Grande Barriera Corallina', 'Uluru', 'Opera House di Sydney', 'Twelve Apostles', 'Whitsunday Islands',
+  'Tasmania',
 
-  // Nuova Zelanda
-  'Nuova Zelanda',
+  'Nuova Zelanda', 'Wellington',
   // città
-  'Auckland', 'Wellington', 'Christchurch', 'Hamilton', 'Dunedin', 'Queenstown',
+  'Auckland', 'Christchurch', 'Hamilton', 'Dunedin', 'Queenstown',
   // fiumi
   'Waikato', 'Clutha', 'Whanganui',
   // monti
   'Aoraki / Monte Cook', 'Monte Aspiring', 'Monte Ruapehu',
   // località
-  'Milford Sound', 'Hobbiton Movie Set', 'Rotorua', 'Waitomo Glowworm Caves',
+  'Milford Sound', 'Hobbiton Movie Set', 'Rotorua', 'Waitomo Glowworm Caves', 'Aoraki / Mount Cook Area',
+  'Matamata',
+
+  // altri paesi dell'Oceania
+  'Fiji', 'Suva',
+  'Polinesia Francese', 'Papeete', 'Tahiti', 'Bora Bora',
+  'Papua Nuova Guinea', 'Port Moresby',
+  'Samoa', 'Tonga', 'Vanuatu', 'Nuova Caledonia', 'Isole Cook', 'Isole Salomone',
 
 
   // --------------------
-
-  // other countries
-  // EUROPA
-  'Portogallo', 'Lisbona',
-  'Paesi Bassi', 'Amsterdam',
-  'Belgio', 'Bruxelles',
-  'Austria', 'Vienna',
-  'Polonia', 'Varsavia',
-  'Svezia', 'Stoccolma',
-  'Norvegia', 'Oslo',
-  'Danimarca', 'Copenaghen',
-  'Finlandia', 'Helsinki',
-  'Irlanda', 'Dublino',
-  'Repubblica Ceca', 'Praga',
-  'Ungheria', 'Budapest',
-  'Romania', 'Bucarest',
-  'Croazia', 'Zagabria',
-  'Turchia', 'Ankara',
-  'Ucraina', 'Kiev',
-
-  // ASIA
-  'Corea del Sud', 'Seoul',
-  'Thailandia', 'Bangkok',
-  'Vietnam', 'Hanoi',
-  'Indonesia', 'Giacarta',
-  'Filippine', 'Manila',
-  'Malaysia', 'Kuala Lumpur',
-  'Singapour', 'Singapore',
-  'Emirati Arabi Uniti', 'Abu Dhabi', 'Dubai',
-  'Arabia Saudita', 'Riad',
-  'Israele', 'Gerusalemme',
-  'Giordania', 'Amman',
-
-  // AFRICA
-  'Marocco', 'Rabat',
-  'Tunisia', 'Tunisi',
-  'Kenya', 'Nairobi',
-  'Senegal', 'Dakar',
-  'Madagascar', 'Antananarivo',
-  'Mauritius', 'Port Louis',
-  'Etiopia', 'Addis Abeba',
-
-  // AMERICA DEL NORD E CARAIBI
-  'Cuba', 'L’Avana',
-  'Giamaica', 'Kingston',
-  'Costa Rica', 'San José',
-  'Panama', 'Città di Panama',
-  'Repubblica Dominicana', 'Santo Domingo',
-
-  // AMERICA DEL SUD
-  'Cile', 'Santiago del Cile',
-  'Colombia', 'Bogotà',
-  'Ecuador', 'Quito',
-  'Uruguay', 'Montevideo',
-  'Bolivia', 'La Paz',
-
-  // OCEANIA
-  'Fiji', 'Suva',
-  'Polinesia Francese', 'Papeete',
-
-  // -------------------------
-  // turistic places
-  // Europa
-  'Alpi Svizzere', 'Plitvice Lakes', 'Isola di Skye', 'Algarve', 'Santorini Caldera',
-  'Isola di Capri', 'Costa del Sol', 'Hallstatt', 'Bled', 'Fiordi Norvegesi',
-
-  // Asia e Medio Oriente
-  'Petra', 'Taj Mahal Complex', 'Bagan', 'Halong Bay', 'Bali',
-  'Cappadocia', 'Borobudur', 'Angkor Wat', 'Jeju Island', 'Maldivian Atolls',
-
-  // America del Nord e Caraibi
-  'Punta Cana', 'Varadero', 'Bermuda Beaches', 'Monteverde Cloud Forest', 'San Blas Islands',
-
-  // America del Sud
-  'Salar de Uyuni', 'Galapagos Islands', 'Torres del Paine', 'Cartagena Old Town', 'Atacama Desert',
-
-  // Africa
-  'Chefchaouen', 'Okavango Delta', 'Praslin Island', 'Le Morne Brabant', 'Victoria Falls',
-
-  // Oceania
-  'Bora Bora', 'Aoraki / Mount Cook Area', 'Whitsunday Islands', 'Matamata'
+  // places not tied to a single country (seas, oceans, regions, polar areas)
+  'Mar Mediterraneo', 'Mediterraneo', 'Mar Adriatico', 'Mar Tirreno', 'Mar Ionio', 'Mar Ligure',
+  'Mar Nero', 'Mar Baltico', 'Mare del Nord', 'Mar Rosso', 'Mar Morto', 'Mar dei Caraibi', 'Caraibi',
+  'Oceano Atlantico', 'Oceano Pacifico', 'Oceano Indiano',
+  'Artide', 'Polo Nord', 'Antartide', 'Polo Sud',
+  'Groenlandia', 'Lapponia', 'Siberia',
+  'Sahara', 'Kalahari', 'Namib',
+  'Ande', 'Amazzonia', 'Terra del Fuoco'
 ];
 
 
