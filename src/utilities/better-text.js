@@ -1,6 +1,7 @@
 // @ts-check
 /*! minimo - Better Text */
 
+
 // Italian particles/articles (plus a few English and topographic terms) whose casing is
 // enforced and after which spaces are turned into non-breaking spaces. Hoisted to module
 // scope with the regexes/lookup built from it below, since none of this depends on the
@@ -29,7 +30,7 @@ const PARTICELLE = [
 ];
 
 // matches a particle followed by one-or-more spaces, to be turned into non-breaking spaces
-const NBSP_AFTER_PARTICLE_REGEX = new RegExp('\\b(' + PARTICELLE.join('|') + ')\\b +', 'gmi');
+export const NBSP_AFTER_PARTICLE_REGEX =new RegExp('\\b(' + PARTICELLE.join('|') + ')\\b +', 'gmi');
 
 // matches any particle regardless of case, to enforce its exact casing in a single pass
 const PARTICLE_CASING_REGEX = new RegExp('\\b(' + PARTICELLE.join('|') + ')\\b', 'gmi');
@@ -59,6 +60,10 @@ export function betterText(str, custom_words = []) {
     str = str.replace(/ +(,|;|\.|:|!|\?)/g, '$1');
     str = str.replace(/(,|;|\.|:|!|\?)(?!$) +/g, '$1 ');
 
+    // add the missing space after , ; ! ? when directly followed by a letter or a quote;
+    // digits are skipped on purpose (decimals like 1,5), as are . and : (abbreviations, times, URLs)
+    str = str.replace(/([,;!?])(?=[\p{L}"'“‘])/gu, '$1 ');
+
     // collapse multiple spaces and tabs (including non-breaking spaces)
     str = str.replace(/[ \t\u00A0]+/g, ' ');
 
@@ -85,6 +90,12 @@ export function betterText(str, custom_words = []) {
         ? exact.charAt(0).toUpperCase() + exact.slice(1)
         : exact;
     });
+
+    // capitalize the first letter after ! ? and ellipsis (... or …), optionally after an opening quote;
+    // runs after the particle casing so that a capital is not undone for particles like "e" or "di"
+    str = str.replace(/([!?]|\.{3}|…) +([“‘]?)(\p{Ll})/gu, (_match, punct, quote, letter) =>
+      `${punct} ${quote}${letter.toUpperCase()}`
+    );
 
     if(custom_words.length) {
       custom_words.forEach(item => {
