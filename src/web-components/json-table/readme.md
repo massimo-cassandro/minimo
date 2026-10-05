@@ -11,10 +11,11 @@ può quindi essere stilizzato direttamente dal CSS del progetto in cui è utiliz
 È sufficiente importare il file del componente (registra il custom element):
 
 ```javascript
-import '@massimo-cassandro/minimo/src/web-components/json-table/json-table-component.js';
+// solo registrazione del tag
+import '@massimo-cassandro/minimo/json-table';
 
 // oppure, se necessario eseguire metodi della classe (es. `setDefaults`):
-import { JsonTable } from '@massimo-cassandro/minimo/src/web-components/json-table/json-table-component.js';
+import { JsonTable } from '@massimo-cassandro/minimo/json-table';
 ```
 
 Il CSS (`json-table-component.module.css`) è importato dal componente stesso; le custom
@@ -52,6 +53,7 @@ const other = document.createElement('json-table');
     { "key": "active", "title": "Attivo", "dataType": "bool" }
   ]'
   tfoot="true"
+  serverSide="true"
 ></json-table>
 
 <!-- dati inline (JSON serializzato) al posto di jsonurl -->

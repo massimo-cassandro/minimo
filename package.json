@@ -1,12 +1,13 @@
 {
   "name": "@massimo-cassandro/minimo",
-  "version": "1.41.3",
+  "version": "1.41.4",
   "description": "Light css framework & utilities",
   "type": "module",
   "main": "./index.js",
   "exports": {
     ".": "./index.js",
     "./charts": "./charts/index.js",
+    "./json-table": "./src/web-components/json-table/json-table-component.js",
     "./stylelint-config": "./dev-tools/stylelint-config/index.js",
     "./css/*": "./src/css/*.css",
     "./tokens/*": "./design-tokens/tokens/*",
@@ -53,6 +54,7 @@
   "author": "Massimo Cassandro",
   "sideEffects": [
     "**/s-datatable-component/**/*",
+    "**/json-table/**/*",
     "**/*.css"
   ],
   "engines": {

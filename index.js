@@ -37,3 +37,4 @@ export { snackbar } from './src/components/snackbar/snackbar.js';
 export { unsplashPage } from './src/components/unsplash-page/unsplash-page.js';
 
 // web components
+export { JsonTable } from './src/web-components/json-table/json-table-component.js';
