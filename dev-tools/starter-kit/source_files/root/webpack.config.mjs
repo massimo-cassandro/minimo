@@ -8,7 +8,7 @@ import * as process from 'process'; // Rende 'process' disponibile nel contesto 
 // import { styleText } from 'node:util';
 // import { createRequire } from 'node:module';
 
-// NB symfony -> commentare HtmlWebpackPlugin e HtmlWebpackInjectPreload
+// SETUP symfony -> commentare HtmlWebpackPlugin e HtmlWebpackInjectPreload
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 import HtmlWebpackInjectPreload from '@principalstudio/html-webpack-inject-preload';
 
@@ -44,7 +44,7 @@ const __filename = fileURLToPath(import.meta.url)
 
 const isDevelopment = process.env.NODE_ENV === 'development'
   ,devServerPort = [[port5700]]
-  // NB symfony
+  // SETUP symfony
   // ,apiPort = [[port8000]]
   ,useSass = false
 
@@ -53,7 +53,7 @@ const isDevelopment = process.env.NODE_ENV === 'development'
   // NB: con `purgeCssInDev: true` (vedi sotto) viene comunque forzato a false,
   // perché il purge e il plugin delle custom properties lavorano sugli asset css
   ,inlineCssInDevMode = true
-  // NB symfony
+  // SETUP symfony
   // ,inlineCssInDevMode = false
 
   ,useSvgo = true
@@ -64,7 +64,7 @@ const isDevelopment = process.env.NODE_ENV === 'development'
   // dir di output: relativa a QUESTO file ('../build' se il frontend è in una
   // sottodirectory, './build' se webpack.config.mjs è nella root del progetto)
   ,output_dir = path.resolve(__dirname, './build')
-  // NB symfony
+  // SETUP symfony
   // ,output_dir = isDevelopment? '_dev' : 'build'
 
   // dir delle favicons generate da `npx create-favicons` (vedi package.json):
@@ -74,7 +74,7 @@ const isDevelopment = process.env.NODE_ENV === 'development'
   ,favicons_path = path.resolve(__dirname, './app/favicons/output') // commentare se non usato
   ,favicons_path_regexp = /favicons\/output/ // source pattern per le favicons (regexp o null)
 
-  // NB symfony
+  // SETUP symfony
   // // ,favicons_path = path.resolve(__dirname, './app/favicons/output') // commentare se non usato
   // ,favicons_path_regexp = null
 
@@ -339,7 +339,7 @@ const config = {
     clean: !isDevelopment
   },
 
-  /* NB symfony
+  /* SETUP symfony
   output: {
     path: path.resolve(__dirname, `./public/${output_dir}` ),
     // filename: '[name].js',
@@ -411,7 +411,7 @@ const config = {
     client: { overlay: true, },
   },
 
-  // NB symfony
+  // SETUP symfony
   // =>> devServer (con symfony)
   // reverse proxy davanti a `symfony serve` (porta 8102, vedi package.json):
   // il browser va aperto su questo dev server (non su :8102). Le richieste per
@@ -431,7 +431,10 @@ const config = {
   //   // di servire una versione stale in cache su reload manuale
   //   headers: { 'Cache-Control': 'no-store' },
   //   hot: true,
-  //   open: { app: { name: 'Google Chrome' } }, // apertura automatica del browser all'avvio
+  //   open: {
+  //     app: { name: 'Google Chrome' }, // apertura automatica del browser all'avvio
+  //     // target: ['page1', 'page2'], // pafine da aprire all'avvio
+  //   },
   //   static: false, // niente static serving proprio: tutto il resto passa dal proxy verso Symfony
   //   devMiddleware: { writeToDisk: true, },
   //   client: { overlay: true, },
@@ -478,7 +481,7 @@ const config = {
         : []
     ),
 
-    // NB symfony (decommentare)
+    // SETUP symfony (decommentare)
     // =>> plugins: WebpackManifestPlugin
     // new WebpackManifestPlugin({
     //   fileName: path.join(output_dir, 'manifest.json'), // NB: symfony -> fileName: 'manifest.json', // scrive in output.path
@@ -506,7 +509,7 @@ const config = {
     //   : [new InlineCriticalCssPlugin({ match: (href) => href?.includes('.critical') })]
     // ),
 
-    // NB symfony (rimuovere)
+    // SETUP symfony (rimuovere)
     // =>> plugins: HtmlWebpackPlugin (manifest)
     new HtmlWebpackPlugin({
       filename: 'manifest.webmanifest',
@@ -515,7 +518,7 @@ const config = {
       minify: false //!isDevelopment
     }),
 
-    // NB symfony (rimuovere)
+    // SETUP symfony (rimuovere)
     // =>> plugins: HtmlWebpackPlugin
     new HtmlWebpackPlugin({
       filename: 'index.html',
@@ -526,7 +529,7 @@ const config = {
       // base: isDevelopment ? '/' : '/xxxxx/',
     }),
 
-    // NB symfony (rimuovere)
+    // SETUP symfony (rimuovere)
     // =>> plugins: HtmlWebpackInjectAttributesPlugin
     // new HtmlWebpackInjectAttributesPlugin({
     //   // La funzione riceve un oggetto con gli attributi del tag corrente
@@ -541,7 +544,7 @@ const config = {
     // }),
 
 
-    // NB symfony (rimuovere)
+    // SETUP symfony (rimuovere)
     // =>> plugins: HtmlWebpackInjectPreload
     // https://github.com/principalstudio/html-webpack-inject-preload
     ...(isDevelopment
@@ -586,8 +589,8 @@ const config = {
 
       },
       raw: true,
-      // niente banner nei critical css: vengono inseriti inline nei template html
-      exclude: /\.critical/ // chunk name
+      // niente banner nei critical css ( vengono inseriti inline nei template html), nelle immagini e nei font
+      exclude: /\.critical|\.(svg|png|jpe?g|gif|webp|avif|ico|woff2?|eot|ttf|otf)$/i
     }),
 
     // =>> plugins: PurgeCSSPlugin (solo classi/keyframes, le custom properties sono

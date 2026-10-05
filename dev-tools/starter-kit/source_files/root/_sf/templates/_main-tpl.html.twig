@@ -7,6 +7,9 @@
     <title>{%- block title -%}{%- endblock %} | xxxxx</title>
     <meta name="robots" content="noindex, nofollow, noarchive">
     {%- include '_incl/favicons.incl.html.twig'-%}
+
+    <link rel="preload" href="{{ asset('fonts/xxxxx.woff2') }}" as="font" type="font/woff2" crossorigin>
+
     {{- '' -}}
     {#- shared.js, runtime.js e shared.css servono solo con `useSharedChunk: true` in webpack.config.mjs:
         con `false` rimuovere tutte le righe che li referenziano (qui sotto e a fine body) -#}

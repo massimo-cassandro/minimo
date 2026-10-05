@@ -32,11 +32,12 @@ custom propeties:
 
 /* stylelint-disable declaration-no-important */
 
-html, body {
-  height: 100%;
-  padding: 0;
-  margin: 0;
-
+html.uspg {
+  &, & body {
+    height: 100%;
+    padding: 0;
+    margin: 0;
+  }
 }
 
 *, *::before, *::after {

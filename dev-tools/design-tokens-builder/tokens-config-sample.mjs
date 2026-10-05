@@ -114,7 +114,7 @@ const config = {
     // your project tokens — e.g. remaps a Figma/Penpot-exported `primary`
     // color to minimo's own `primary.100` naming
     {
-      src: './project-tokens/*.{js,mjs,jsonc,json}',
+      src: './design-tokens/*.{js,mjs,jsonc,json}',
       prefix: 'my-project',
       transform: { primary: 'primary.100' },
     }
