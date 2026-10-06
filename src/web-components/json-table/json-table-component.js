@@ -91,6 +91,7 @@ const emptyState = () => ({
  * el.init({
  *   debug: false,                       // default: false
  *   jsonUrl: '/api/rows.json',          // default: null
+ *   jqDatatableMode: false,             // default: false (true: default compatibili con jQuery DataTables)
  *   jsonDataField: 'data',              // default: 'data'
  *   totRecField: 'totRec',              // default: 'totRec'
  *   filteredRecField: 'filteredRec',    // default: 'filteredRec' (modalità server-side)
@@ -507,7 +508,8 @@ export class JsonTable extends HTMLElement {
       page: state.page,
       perPage: params.perPage > 0 ? params.perPage : 0,
       sort: state.sort,
-      search: state.searchTerm
+      search: state.searchTerm,
+      cols: this.cols
     };
   }
 

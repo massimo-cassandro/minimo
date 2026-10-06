@@ -198,6 +198,10 @@ import {
  * @typedef {Object} JsonTableParams
  * @property {boolean} debug - Scrive in console i parametri risolti, le colonne, i dati e gli elementi generati (default: false)
  * @property {string|null} jsonUrl - URL del JSON da recuperare. Ignorato quando `data` è impostato (default: null)
+ * @property {boolean} jqDatatableMode - Modalità di compatibilità con il formato server-side di jQuery DataTables: quando è true
+ *   i default di `jsonDataField`, `totRecField`, `filteredRecField`, `serverSide` e `serverParams` diventano quelli di
+ *   `jqDatatableModeDefaults`. Restano sovrascrivibili (precedenza: `init()` > attributo HTML > `setDefaults()` > modalità jQuery
+ *   DataTables > default predefinito) (default: false)
  * @property {string|null} jsonDataField - Chiave del JSON recuperato che contiene l'array delle righe (es. `{ data: [...] }`);
  *   `null` o una stringa vuota significa che la radice del JSON è l'array delle righe stesso (default: 'data')
  * @property {string} totRecField - Chiave del JSON recuperato che contiene il numero totale di record (numerico);
@@ -273,6 +277,39 @@ import {
 export const mergedParams = ['classes', 'labels', 'dataTypes', 'serverParams'];
 
 /**
+ * Default sostitutivi applicati quando `jqDatatableMode` è true (vedi `resolveParams`). Si inseriscono tra i default predefiniti
+ * e quelli di `setDefaults()`. `serverParams` viene unito in modo superficiale come di consueto.
+ *
+ * In questa modalità `buildServerUrl` invia inoltre `draw=1`, `columns[i][name|searchable|orderable]` e, per
+ * `order[0][column]`, l'indice della colonna (non la chiave). Resta un solo criterio di ordinamento (`order[0]`).
+ *
+ * @type {Partial<JsonTableParams>}
+ *
+ * @example
+ * {
+ *   jsonDataField: 'data',
+ *   totRecField: 'recordsTotal',
+ *   filteredRecField: 'recordsFiltered',
+ *   serverSide: true,
+ *   serverParams: { page: null, start: 'start', perPage: 'length', sort: 'order[0][column]', dir: 'order[0][dir]', search: 'search[value]' }
+ * }
+ */
+export const jqDatatableModeDefaults = {
+  jsonDataField: 'data',
+  totRecField: 'recordsTotal',
+  filteredRecField: 'recordsFiltered',
+  serverSide: true,
+  serverParams: {
+    page: null,
+    start: 'start',
+    perPage: 'length',
+    sort: 'order[0][column]',
+    dir: 'order[0][dir]',
+    search: 'search[value]'
+  }
+};
+
+/**
  * Default predefiniti.
  *
  * @type {JsonTableParams}
@@ -281,6 +318,7 @@ export const mergedParams = ['classes', 'labels', 'dataTypes', 'serverParams'];
  * {
  *   debug: false,
  *   jsonUrl: null,
+ *   jqDatatableMode: false,            // true → vedi jqDatatableModeDefaults
  *   jsonDataField: 'data',
  *   totRecField: 'totRec',
  *   filteredRecField: 'filteredRec',
@@ -325,6 +363,7 @@ export const defaults = {
   debug: false,
 
   jsonUrl: null,
+  jqDatatableMode: false,
   jsonDataField: 'data',
   totRecField: 'totRec',
   filteredRecField: 'filteredRec',

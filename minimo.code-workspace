@@ -4,10 +4,6 @@
 			"path": "."
 		},
 		{
-      "name": "src",
-			"path": "./src"
-		},
-		{
       "name": "starter-kit",
 			"path": "./dev-tools/starter-kit"
 		},

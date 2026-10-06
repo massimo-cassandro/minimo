@@ -1,10 +1,6 @@
 # `<json-table>` – datatable da JSON
 
-**json-table** costruisce una tabella HTML da un array di dati JSON (inline o caricato via
-fetch), a partire da una definizione delle colonne (`cols`) e da un insieme di tipi di dato
-predefiniti ed estendibili, con ordinamento, ricerca e paginazione (lato client oppure, con
-`serverSide: true`, delegati al server). È un web component light DOM senza dipendenze esterne:
-può quindi essere stilizzato direttamente dal CSS del progetto in cui è utilizzato.
+**json-table** costruisce una tabella HTML da un array di dati JSON (inline o caricato via fetch), a partire da una definizione delle colonne (`cols`) e da un insieme di tipi di dato predefiniti ed estendibili, con ordinamento, ricerca e paginazione (lato client oppure, con `serverSide: true`, delegati al server). È un web component light DOM senza dipendenze esterne: può quindi essere stilizzato direttamente dal CSS del progetto in cui è utilizzato.
 
 ## Installazione
 
@@ -26,10 +22,7 @@ webpack dello starter-kit).
 
 ### Tipi per gli script consumer
 
-Il file `types/global.d.ts` di minimo dichiara il tipo globale `JsonTable` e registra il tag
-`json-table` in `HTMLElementTagNameMap`: aggiungendolo all'`include` del proprio
-`jsconfig.json`/`tsconfig.json` (`"node_modules/@massimo-cassandro/minimo/types/global.d.ts"`)
-si ottiene il completamento dei metodi senza cast né import di tipo:
+Il file `types/global.d.ts` di minimo dichiara il tipo globale `JsonTable` e registra il tag `json-table` in `HTMLElementTagNameMap`: aggiungendolo all'`include` del proprio `jsconfig.json`/`tsconfig.json` (`"node_modules/@massimo-cassandro/minimo/types/global.d.ts"`) si ottiene il completamento dei metodi senza cast né import di tipo:
 
 ```javascript
 const el = document.querySelector('json-table'); // → JsonTable
@@ -210,106 +203,53 @@ el.init({ jsonUrl: '/api/rows.json', cols: [...] });
 
 ## Parametri
 
-Tutti i parametri sono impostabili sia da attributo HTML che da `init()`. I valori di tipo
-funzione solo da `init()`.
+Tutti i parametri sono impostabili sia da attributo HTML che come oggetto in `init({...})`. I valori di tipo funzione solo da `init()`.
 
-```javascript
-{
-  debug,                  // boolean – log in console di parametri, colonne, dati, stato ed
-                          // elementi generati. Default: false
+| Parametro | Tipo / default | Descrizione |
+|---|---|---|
+| `debug` | boolean (`false`) | Log in console di parametri, colonne, dati, stato ed elementi generati |
+| `jsonUrl` | string (`null`) | URL del JSON da caricare. Ignorato se `data` è presente |
+| `jqDatatableMode` | boolean (`false`) | Se `true` imposta come default i valori compatibili con il formato server-side di jQuery DataTables: `jsonDataField: 'data'`, `totRecField: 'recordsTotal'`, `filteredRecField: 'recordsFiltered'`, `serverSide: true` e i `serverParams` indicati in "Modalità jQuery DataTables". Ogni valore resta sovrascrivibile |
+| `jsonDataField` | string o null (`'data'`) | Chiave del JSON che contiene l'array delle righe (es. `'data'` per `{ data: [...] }`); `null` o `''` = la root del JSON è l'array stesso |
+| `totRecField` | string (`'totRec'`) | Chiave del JSON con il totale dei record (numerico); se assente o non numerico il totale è la lunghezza dell'array |
+| `filteredRecField` | string (`'filteredRec'`) | Solo server-side: chiave del JSON con il numero di record che soddisfano la ricerca corrente; se assente vale `totRecField` |
+| `data` | Array&lt;Object&gt; (`null`) | Righe inline; prevale su `jsonUrl`. Da attributo va passato come stringa JSON ed è sempre inteso come array delle righe (`jsonDataField` ignorato) |
+| `cols` | ColDefinition[] | **OBBLIGATORIO**: definizione delle colonne (vedi sotto). Se assente o vuoto viene segnalato un errore in console e la tabella non viene generata |
+| `dataTypes` | Object (`{}`) | Tipi di dato personalizzati, uniti a quelli predefiniti (vedi sotto) |
+| `caption` | string o Function (`null`) | Caption della tabella (testo o HTML), oppure funzione che restituisce stringa o Node. Mostrata sotto la tabella (vedi "Caption e paginazione") |
+| `search` | boolean (`true`) | Genera l'input di ricerca |
+| `searchDebounce` | number (`300`) | Millisecondi di attesa dopo l'ultimo tasto prima di eseguire la ricerca |
+| `perPage` | number (`25`) | Righe per pagina; `0` = nessuna paginazione (tutte le righe, nessuna navigazione) |
+| `paginationDelta` | number (`2`) | Pulsanti pagina mostrati a ciascun lato della pagina corrente |
+| `serverSide` | boolean (`false`) | Paginazione, ordinamento e ricerca delegati al server (vedi "Modalità server-side"). Richiede `jsonUrl` |
+| `serverParams` | Object | Nomi dei parametri di query string in modalità server-side, uniti ai default (vedi sotto) |
+| `initialSort` | { key, dir } o null (`null`) | Ordinamento applicato al caricamento, es. `{ key: 'name', dir: 'asc' }` |
+| `tfoot` | boolean (`false`) | Genera il tfoot (vedi `tfootRender` delle colonne). Non disponibile in modalità server-side |
+| `updateFooterOnPageChange` | boolean (`false`) | Se `true` `tfootRender` riceve solo i record della pagina corrente (subtotali di pagina) e il footer si aggiorna a ogni cambio pagina; se `false` riceve l'intero set filtrato e si aggiorna solo al cambio filtro |
+| `infoText` | string, Function o null (`null`) | Contenuto dell'area info: stringa mustache-like con i segnaposto `{start}`, `{end}`, `{totRec}`, `{filteredRec}`, `{page}`, `{totPages}`, oppure funzione `(start, end, totRec, filteredRec, page, totPages) => string\|Node`. `null` = viene usato `labels.info` |
+| `template` | Array (`[{ slot: 'infoSection' }, { slot: 'table' }]`) | Layout del contenitore principale (vedi "Template") |
+| `locale` | string (`'it-IT'`) | Locale per numeri, date e confronto stringhe nell'ordinamento |
+| `currency` | string (`'EUR'`) | Codice ISO 4217 usato dal tipo `currency` |
+| `datesLocaleOpts` | Intl.DateTimeFormatOptions (`{ year: 'numeric', month: 'short', day: 'numeric' }`) | Parte data dei tipi date/datetime |
+| `timesLocaleOpts` | Intl.DateTimeFormatOptions (`{ hour12: false, hour: '2-digit', minute: '2-digit' }`) | Parte ora del tipo datetime |
+| `numbersLocaleOpts` | Intl.NumberFormatOptions (`{ maximumFractionDigits: 2 }`) | Tipo `num` |
+| `currPercLocaleOpts` | Intl.NumberFormatOptions (`{ minimumFractionDigits: 2, maximumFractionDigits: 2 }`) | Tipi currency/euro/perc/percDecimal |
+| `renderNullAs` | string o null (`'—'`) | Contenuto per i valori null/undefined |
+| `renderZeroAs` | string o null (`null`) | Se non null, contenuto per i valori numerici pari a zero |
+| `renderNaNAs` | string o null (`'—'`) | Contenuto per i valori non numerici nei tipi numerici |
+| `boolTrueIcon` | icona, vedi nota (icona `check-bold` di minimo (Phosphor)) | Icona per i valori `true` (tipo bool) |
+| `boolFalseIcon` | icona, vedi nota (icona `x-bold`) | Icona per i valori `false` |
+| `sortAscArrowIcon` | icona, vedi nota (icona `arrow-up`) | Icona del pulsante di ordinamento, ordinamento asc attivo |
+| `sortDescArrowIcon` | icona, vedi nota (icona `arrow-down`) | Icona del pulsante di ordinamento, ordinamento desc attivo |
+| `sortNoneArrowIcon` | icona, vedi nota (icona `arrows-down-up`) | Icona del pulsante di ordinamento, nessun ordinamento |
+| `paginationPrevIcon` | icona, vedi nota (icona `caret-left`) | Icona del pulsante "pagina precedente" |
+| `paginationNextIcon` | icona, vedi nota (icona `caret-right`) | Icona del pulsante "pagina successiva" |
+| `trCallback` | (tr, row, params) => void (`null`) | Callback invocata dopo il rendering di ogni riga del body |
+| `tableId` | string (`null`) | Id del tag `<table>` |
+| `classes` | Object | Classi consumer (vedi sotto), unite ai default |
+| `labels` | Object | Testi (vedi sotto), uniti ai default |
 
-  jsonUrl,                // string – URL del JSON da caricare. Ignorato se `data` è presente.
-                          // Default: null
-  jsonDataField,          // string|null – chiave del JSON che contiene l'array delle righe
-                          // (es. 'data' per { data: [...] }); null o '' = la root del JSON è
-                          // l'array stesso. Default: 'data'
-  totRecField,            // string – chiave del JSON con il totale dei record (numerico); se
-                          // assente o non numerico il totale è la lunghezza dell'array.
-                          // Default: 'totRec'
-  filteredRecField,       // string – solo server-side: chiave del JSON con il numero di record
-                          // che soddisfano la ricerca corrente; se assente vale `totRecField`.
-                          // Default: 'filteredRec'
-  data,                   // Array<Object> – righe inline; prevale su `jsonUrl`. Da attributo va
-                          // passato come stringa JSON ed è sempre inteso come array delle righe
-                          // (`jsonDataField` ignorato). Default: null
-
-  cols,                   // ColDefinition[] – OBBLIGATORIO: definizione delle colonne (vedi
-                          // sotto). Se assente o vuoto viene segnalato un errore in console e
-                          // la tabella non viene generata
-  dataTypes,              // Object – tipi di dato personalizzati, uniti a quelli predefiniti
-                          // (vedi sotto). Default: {}
-
-  caption,                // string|Function – caption della tabella (testo o HTML), oppure
-                          // funzione che restituisce stringa o Node. Mostrata sotto la tabella
-                          // (vedi "Caption e paginazione"). Default: null
-  search,                 // boolean – genera l'input di ricerca. Default: true
-  searchDebounce,         // number – ms di attesa dopo l'ultimo tasto prima di eseguire la
-                          // ricerca. Default: 300
-
-  perPage,                // number – righe per pagina; 0 = nessuna paginazione (tutte le righe,
-                          // nessuna navigazione). Default: 25
-  paginationDelta,        // number – pulsanti pagina mostrati a ciascun lato della pagina
-                          // corrente. Default: 2
-  serverSide,             // boolean – paginazione, ordinamento e ricerca delegati al server
-                          // (vedi "Modalità server-side"). Richiede `jsonUrl`. Default: false
-  serverParams,           // Object – nomi dei parametri di query string in modalità server-side,
-                          // uniti ai default (vedi sotto)
-  initialSort,            // { key, dir }|null – ordinamento applicato al caricamento, es.
-                          // { key: 'name', dir: 'asc' }. Default: null
-
-  tfoot,                  // boolean – genera il tfoot (vedi `tfootRender` delle colonne).
-                          // Non disponibile in modalità server-side. Default: false
-  updateFooterOnPageChange, // boolean – se true `tfootRender` riceve solo i record della pagina
-                          // corrente (subtotali di pagina) e il footer si aggiorna a ogni cambio
-                          // pagina; se false riceve l'intero set filtrato e si aggiorna solo al
-                          // cambio filtro. Default: false
-  infoText,               // string|Function|null – contenuto dell'area info: stringa mustache-like
-                          // con i segnaposto {start}, {end}, {totRec}, {filteredRec}, {page},
-                          // {totPages}, oppure funzione
-                          // (start, end, totRec, filteredRec, page, totPages) => string|Node.
-                          // null = viene usato `labels.info`. Default: null
-  template,               // Array – layout del contenitore principale (vedi "Template").
-                          // Default: [{ slot: 'infoSection' }, { slot: 'table' }]
-
-  locale,                 // string – locale per numeri, date e confronto stringhe
-                          // nell'ordinamento. Default: 'it-IT'
-  currency,               // string – codice ISO 4217 usato dal tipo `currency`. Default: 'EUR'
-  datesLocaleOpts,        // Intl.DateTimeFormatOptions – parte data dei tipi date/datetime.
-                          // Default: { year: 'numeric', month: 'short', day: 'numeric' }
-  timesLocaleOpts,        // Intl.DateTimeFormatOptions – parte ora del tipo datetime.
-                          // Default: { hour12: false, hour: '2-digit', minute: '2-digit' }
-  numbersLocaleOpts,      // Intl.NumberFormatOptions – tipo num.
-                          // Default: { maximumFractionDigits: 2 }
-  currPercLocaleOpts,     // Intl.NumberFormatOptions – tipi currency/euro/perc/percDecimal.
-                          // Default: { minimumFractionDigits: 2, maximumFractionDigits: 2 }
-
-  renderNullAs,           // string|null – contenuto per i valori null/undefined. Default: '—'
-  renderZeroAs,           // string|null – se non null, contenuto per i valori numerici pari a
-                          // zero. Default: null
-  renderNaNAs,            // string|null – contenuto per i valori non numerici nei tipi numerici.
-                          // Default: '—'
-
-  boolTrueIcon,           // icona per i valori true (tipo bool).
-                          // Default: icona `check-bold` di minimo (Phosphor)
-  boolFalseIcon,          // icona per i valori false. Default: icona `x-bold`
-  sortAscArrowIcon,       // icona del pulsante di ordinamento, ordinamento asc attivo.
-                          // Default: icona `arrow-up`
-  sortDescArrowIcon,      // idem, ordinamento desc attivo. Default: icona `arrow-down`
-  sortNoneArrowIcon,      // idem, nessun ordinamento. Default: icona `arrows-down-up`
-  paginationPrevIcon,     // icona del pulsante "pagina precedente". Default: icona `caret-left`
-  paginationNextIcon,     // icona del pulsante "pagina successiva". Default: icona `caret-right`
-                          // Ogni icona può essere una stringa SVG/HTML (es. import `?inline`),
-                          // un Node, un oggetto domBuilder o una funzione che restituisce uno
-                          // di questi valori
-
-  trCallback,             // (tr, row, params) => void – callback invocata dopo il rendering di
-                          // ogni riga del body. Default: null
-  tableId,                // string – id del tag <table>. Default: null
-
-  classes,                // Object – classi consumer (vedi sotto), unite ai default
-  labels                  // Object – testi (vedi sotto), uniti ai default
-}
-```
+**Nota sulle icone**: ogni icona può essere una stringa SVG/HTML (es. import `?inline`), un Node, un oggetto domBuilder o una funzione che restituisce uno di questi valori.
 
 ### `classes`
 
@@ -625,6 +565,30 @@ pagina richiesta non esiste più (il set di dati si è ridotto), viene richiesta
 disponibile. In questa modalità `data`, `filtered` e `pageRows` dello stato contengono solo la
 pagina corrente e il `tfoot` non è disponibile. `serverSide` richiede `jsonUrl`: con `data` inline
 viene ignorato con un avviso in console.
+
+### Modalità jQuery DataTables
+
+Con `jqDatatableMode: true` (o l'attributo `jqdatatablemode="true"`) i default dei parametri server-side diventano quelli del formato di jQuery DataTables, utile per riutilizzare endpoint già esistenti:
+
+| Parametro | Default con `jqDatatableMode` |
+|---|---|
+| `jsonDataField` | `'data'` |
+| `totRecField` | `'recordsTotal'` |
+| `filteredRecField` | `'recordsFiltered'` |
+| `serverSide` | `true` |
+| `serverParams` | `{ page: null, start: 'start', perPage: 'length', sort: 'order[0][column]', dir: 'order[0][dir]', search: 'search[value]' }` |
+
+Precedenza: `init()` > attributo HTML > `JsonTable.setDefaults()` > modalità jQuery DataTables > default predefiniti. Ogni parametro può quindi essere sovrascritto singolarmente, e `serverParams` viene unito chiave per chiave.
+
+Oltre ai `serverParams`, in questa modalità vengono inviati anche `draw=1` e, per ogni colonna visualizzata, `columns[i][name]` (la `key`), `columns[i][searchable]` e `columns[i][orderable]`. `order[0][column]` riceve l'**indice** della colonna ordinata (tra quelle visualizzate), non la chiave. È previsto un solo criterio di ordinamento (`order[0]`).
+
+```html
+<json-table jsonurl="/api/rows" jqdatatablemode="true" cols='[{"key":"id"},{"key":"name"}]'></json-table>
+```
+
+```
+GET /api/rows?draw=1&columns[0][name]=id&columns[0][searchable]=true&columns[0][orderable]=true&columns[1][name]=name&…&start=25&length=25&order[0][column]=1&order[0][dir]=desc&search[value]=mar
+```
 
 ## Template
 

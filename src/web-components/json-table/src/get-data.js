@@ -20,6 +20,8 @@
  * @property {number} perPage - Righe per pagina
  * @property {SortDef|null} sort - Ordinamento attivo, oppure null
  * @property {string} search - Termine di ricerca ('' = nessuno)
+ * @property {Array<{key: string, searchable: boolean, sortable: boolean}>} [cols] - Colonne visualizzate (già analizzate);
+ *   usate solo con `jqDatatableMode` per inviare `columns[i][...]` e l'indice della colonna ordinata
  */
 
 /**
@@ -44,6 +46,9 @@ function numericField(json, field) {
  * solo quando è attivo un ordinamento, `search` solo quando non è vuoto). I parametri della query string
  * già presenti in `jsonUrl` vengono conservati.
  *
+ * Con `params.jqDatatableMode` e `request.cols` vengono inviati anche, come fa jQuery DataTables, `draw=1`,
+ * `columns[i][name|searchable|orderable]` e, per `sort`, l'indice della colonna al posto della sua chiave.
+ *
  * @param {JsonTableParams} params - Parametri risolti
  * @param {ServerRequest} request - Stato della richiesta
  * @returns {string}
@@ -60,7 +65,7 @@ export function buildServerUrl(params, request) {
   const url = new URL(String(params.jsonUrl), document.baseURI);
   const names = params.serverParams ?? {};
 
-  /** @type {(name: string|null|undefined, value: string|number|null|undefined) => void} */
+  /** @type {(name: string|null|undefined, value: string|number|boolean|null|undefined) => void} */
   const set = (name, value) => {
     if (name && value != null && value !== '') {
       url.searchParams.set(name, String(value));
@@ -70,7 +75,19 @@ export function buildServerUrl(params, request) {
   set(names.page, request.page);
   set(names.start, (request.page - 1) * request.perPage);
   set(names.perPage, request.perPage);
-  set(names.sort, request.sort?.key);
+  const jqCols = params.jqDatatableMode ? request.cols : null;
+  if (jqCols) {
+    set('draw', 1);
+    jqCols.forEach((col, idx) => {
+      set(`columns[${idx}][name]`, col.key);
+      set(`columns[${idx}][searchable]`, col.searchable);
+      set(`columns[${idx}][orderable]`, col.sortable);
+    });
+  }
+
+  set(names.sort, jqCols && request.sort
+    ? jqCols.findIndex(col => col.key === request.sort?.key)
+    : request.sort?.key);
   set(names.dir, request.sort ? request.sort.dir : null);
   set(names.search, request.search);
 

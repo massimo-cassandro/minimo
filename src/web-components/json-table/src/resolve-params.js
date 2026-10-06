@@ -1,6 +1,6 @@
 /*! minimo - json-table: params resolution */
 
-import { defaults, mergedParams } from './defaults.js';
+import { defaults, mergedParams, jqDatatableModeDefaults } from './defaults.js';
 
 /** @typedef {import('./defaults.js').JsonTableParams} JsonTableParams */
 
@@ -144,6 +144,9 @@ export function getParam(el, config = null, projectDefaults = {}, name) {
 /**
  * Risolve ogni parametro definito in `defaults.js` (vedi `getParam` per le regole di precedenza).
  *
+ * Con `jqDatatableMode` true, `jqDatatableModeDefaults` si inserisce tra i default predefiniti e quelli di progetto:
+ * restano quindi prioritari `setDefaults()`, attributi HTML e `init()`.
+ *
  * @param {HTMLElement} el - L'elemento `<json-table>`
  * @param {Partial<JsonTableParams>|null} [config=null] - Configurazione passata tramite `init()` (default: null)
  * @param {Partial<JsonTableParams>} [projectDefaults={}] - Project-wide defaults (default: {})
@@ -154,6 +157,15 @@ export function getParam(el, config = null, projectDefaults = {}, name) {
  * // → { debug: true, jsonUrl: '/api/rows.json', jsonDataField: 'data', data: null, cols: [], ... }
  */
 export function resolveParams(el, config = null, projectDefaults = {}) {
+
+  // con `jqDatatableMode` i default di modalità si inseriscono sotto quelli di progetto (che restano prioritari)
+  if (getParam(el, config, projectDefaults, 'jqDatatableMode') === true) {
+    projectDefaults = {
+      ...jqDatatableModeDefaults,
+      ...projectDefaults,
+      serverParams: { ...jqDatatableModeDefaults.serverParams, ...projectDefaults.serverParams }
+    };
+  }
 
   const params = Object.fromEntries(
     Object.keys(defaults).map(name => [
