@@ -11,9 +11,11 @@ export async function unsplashPageDemo(){
       ? 'http://localhost:8100/demo-files/unsplash-page-demo/getUnsplashPhotosLocal.php' // local test only
       : 'https://primominuto.altervista.org/proxy/getUnsplashPhotos.php';
 
-  // extra check, demo only: warns if the local PHP server isn't running (or another server is
-  // squatting on the port) instead of leaving the loader spinning forever. Uses a HEAD request
-  // so it doesn't burn an Unsplash API call just to check
+  /*
+    controllo aggiuntivo, solo per la demo: segnala se il server PHP locale non è attivo (o se un altro
+    server occupa la porta) invece di lasciare lo spinner girare all'infinito. Usa una richiesta HEAD
+    per non consumare una chiamata alle API di Unsplash solo per il controllo
+  */
   if(isLocal) {
     try {
       const response = await fetch(unsplashDataUrl, {method: 'HEAD'}),

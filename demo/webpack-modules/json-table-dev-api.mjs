@@ -1,12 +1,14 @@
-// Fake server-side endpoint for the json-table demo (devServer only).
-//
-// Serves `/demo-api/json-table` paginating, sorting and filtering the demo data set on the
-// "server", the way a real backend would do when `<json-table serverside>` is used.
-// Query string parameters (default names of json-table's `serverParams`):
-//   page, start, perPage, sort, dir, search
-// Response: { data: [...rows of the requested page], totRec, filteredRec }
-//
-// Not used in the production build: the "server-side" demo works in development only.
+/*
+  Endpoint server-side fittizio per la demo di json-table (solo devServer).
+
+  Serve `/demo-api/json-table` paginando, ordinando e filtrando il set di dati della demo sul
+  "server", come farebbe un vero backend quando si usa `<json-table serverside>`.
+  Parametri della query string (nomi di default dei `serverParams` di json-table):
+    page, start, perPage, sort, dir, search
+  Risposta: { data: [...righe della pagina richiesta], totRec, filteredRec }
+
+  Non usato nella build di produzione: la demo "server-side" funziona solo in sviluppo.
+*/
 
 import fs from 'fs';
 import path from 'path';
@@ -15,7 +17,7 @@ import { fileURLToPath } from 'url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const dataPath = path.resolve(__dirname, '../demo-files/json-table/demo-data.json');
 
-/** builds a large data set (about 1.000 rows) repeating the demo records with unique ids */
+/** costruisce un set di dati ampio (circa 1.000 righe) ripetendo i record demo con id univoci */
 function buildRows() {
   const base = JSON.parse(fs.readFileSync(dataPath, 'utf-8')).data;
   const rows = [];
@@ -44,7 +46,7 @@ function compare(a, b) {
 }
 
 /**
- * devServer middleware
+ * middleware per devServer
  * @param {import('http').IncomingMessage} req
  * @param {import('http').ServerResponse} res
  * @param {Function} next
@@ -90,7 +92,7 @@ export function jsonTableDevApi(req, res, next) {
     filteredRec: filtered.length
   };
 
-  // small artificial delay, to make the loading state visible
+  // piccolo ritardo artificiale, per rendere visibile lo stato di caricamento
   setTimeout(() => {
     res.setHeader('Content-Type', 'application/json; charset=utf-8');
     res.end(JSON.stringify(body));

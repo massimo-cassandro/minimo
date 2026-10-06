@@ -23,11 +23,11 @@ import { SVG, registerWindow } from '@svgdotjs/svg.js';
 
 export function createSvgCanvasNode() {
 
-  // returns a window with a document and an svg root node
+  // restituisce una window con un document e un nodo radice svg
   const window = createSVGWindow();
   const document = window.document;
 
-  // register window and document
+  // registra window e document
   registerWindow(window, document);
 
   // create svgCanvas

@@ -4,28 +4,28 @@
 /** @typedef {import('./defaults.js').SortDef} SortDef */
 
 /**
- * Result of `getData()`.
+ * Risultato di `getData()`.
  * @typedef {Object} DataResult
- * @property {Array<Object>} rows - The rows array (the requested page only, in server-side mode)
- * @property {number} totRec - Total number of records: the numeric value of `params.totRecField` in the
- *   fetched JSON, `rows.length` otherwise
- * @property {number} filteredRec - Number of records matching the current search: the numeric value of
- *   `params.filteredRecField` in the fetched JSON (server-side mode), `totRec` otherwise
+ * @property {Array<Object>} rows - L'array delle righe (solo la pagina richiesta, in modalità server-side)
+ * @property {number} totRec - Numero totale di record: il valore numerico di `params.totRecField` nel
+ *   JSON recuperato, altrimenti `rows.length`
+ * @property {number} filteredRec - Numero di record che corrispondono alla ricerca corrente: il valore numerico di
+ *   `params.filteredRecField` nel JSON recuperato (modalità server-side), altrimenti `totRec`
  */
 
 /**
- * State of the request in server-side mode.
+ * Stato della richiesta in modalità server-side.
  * @typedef {Object} ServerRequest
- * @property {number} page - Requested page (1-based)
- * @property {number} perPage - Rows per page
- * @property {SortDef|null} sort - Active sort, or null
- * @property {string} search - Search term ('' = none)
+ * @property {number} page - Pagina richiesta (da 1)
+ * @property {number} perPage - Righe per pagina
+ * @property {SortDef|null} sort - Ordinamento attivo, oppure null
+ * @property {string} search - Termine di ricerca ('' = nessuno)
  */
 
 /**
- * Reads a numeric field of the fetched JSON; `undefined` when missing or not numeric.
- * @param {*} json - Fetched JSON
- * @param {string|null|undefined} field - Key to read
+ * Legge un campo numerico del JSON recuperato; `undefined` se mancante o non numerico.
+ * @param {*} json - JSON recuperato
+ * @param {string|null|undefined} field - Chiave da leggere
  * @returns {number|undefined}
  */
 function numericField(json, field) {
@@ -39,13 +39,13 @@ function numericField(json, field) {
 
 
 /**
- * Builds the URL of a server-side request: `params.jsonUrl` plus the query string parameters
- * named in `params.serverParams` (parameters set to `null` are omitted; `sort`/`dir` are sent
- * only when a sort is active, `search` only when not empty). Existing query string parameters
- * of `jsonUrl` are preserved.
+ * Costruisce l'URL di una richiesta server-side: `params.jsonUrl` più i parametri della query string
+ * indicati in `params.serverParams` (i parametri impostati a `null` vengono omessi; `sort`/`dir` vengono inviati
+ * solo quando è attivo un ordinamento, `search` solo quando non è vuoto). I parametri della query string
+ * già presenti in `jsonUrl` vengono conservati.
  *
- * @param {JsonTableParams} params - Resolved params
- * @param {ServerRequest} request - Request state
+ * @param {JsonTableParams} params - Parametri risolti
+ * @param {ServerRequest} request - Stato della richiesta
  * @returns {string}
  *
  * @example
@@ -79,34 +79,34 @@ export function buildServerUrl(params, request) {
 
 
 /**
- * Retrieves the rows array from the configured source.
+ * Recupera l'array delle righe dalla sorgente configurata.
  *
- * `data` takes precedence over `jsonUrl`. With `jsonUrl` the JSON is fetched and the rows are
- * read from the `jsonDataField` key (`null`/`''` = the JSON root is the array itself); when the
- * JSON also holds a numeric `totRecField` key, it is returned as `totRec`, otherwise `totRec` is
- * the rows array length. In server-side mode (`request` given) the URL carries the pagination /
- * sort / search parameters (see `buildServerUrl`) and `filteredRecField` is read too.
- * Returns `null` when no source is configured.
+ * `data` ha la precedenza su `jsonUrl`. Con `jsonUrl` il JSON viene recuperato e le righe vengono
+ * lette dalla chiave `jsonDataField` (`null`/`''` = la radice del JSON è l'array stesso); quando il
+ * JSON contiene anche una chiave numerica `totRecField`, viene restituita come `totRec`, altrimenti `totRec` è
+ * la lunghezza dell'array delle righe. In modalità server-side (`request` indicato) l'URL porta i parametri di paginazione /
+ * ordinamento / ricerca (vedi `buildServerUrl`) e viene letto anche `filteredRecField`.
+ * Restituisce `null` quando non è configurata alcuna sorgente.
  *
- * @param {JsonTableParams} params - Resolved params (see `resolve-params.js`)
- * @param {ServerRequest|null} [request=null] - Server-side request state; `null` for a plain request (default: null)
- * @returns {Promise<DataResult|null>} Rows and totals, or `null` when neither `data` nor `jsonUrl` is set
- * @throws {Error} When `data` is not an array, on HTTP/network errors, or when the fetched JSON
- *   does not contain an array at `jsonDataField`
+ * @param {JsonTableParams} params - Parametri risolti (vedi `resolve-params.js`)
+ * @param {ServerRequest|null} [request=null] - Stato della richiesta server-side; `null` per una richiesta semplice (default: null)
+ * @returns {Promise<DataResult|null>} Righe e totali, oppure `null` quando non sono impostati né `data` né `jsonUrl`
+ * @throws {Error} Quando `data` non è un array, in caso di errori HTTP/di rete, oppure quando il JSON recuperato
+ *   non contiene un array in `jsonDataField`
  *
  * @example
- * // inline data (jsonUrl ignored)
+ * // dati inline (jsonUrl ignorato)
  * await getData({ ...params, data: [{ id: 1 }], jsonUrl: '/ignored.json' });
  * // → { rows: [{ id: 1 }], totRec: 1, filteredRec: 1 }
  *
- * // fetched JSON: { data: [...], totRec: 1500 }  (jsonDataField default: 'data', totRecField default: 'totRec')
+ * // JSON recuperato: { data: [...], totRec: 1500 }  (jsonDataField default: 'data', totRecField default: 'totRec')
  * await getData({ ...params, jsonUrl: '/api/rows.json' });
  *
- * // fetched JSON whose root is the array itself
+ * // JSON recuperato la cui radice è l'array stesso
  * await getData({ ...params, jsonUrl: '/api/rows.json', jsonDataField: null });
  *
  * // server-side: GET /api/rows.json?page=2&start=25&perPage=25&search=mar
- * // expected JSON: { data: [...25 rows], totRec: 1500, filteredRec: 40 }
+ * // JSON atteso: { data: [...25 righe], totRec: 1500, filteredRec: 40 }
  * await getData({ ...params, jsonUrl: '/api/rows.json', serverSide: true }, { page: 2, perPage: 25, sort: null, search: 'mar' });
  */
 export async function getData(params, request = null) {

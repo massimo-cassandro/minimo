@@ -1,2 +1,2 @@
-collection of helpers to build basic tags.
-All functions return a domBuilder array/object
+Raccolta di helper per costruire tag di base.
+Tutte le funzioni restituiscono un array/oggetto domBuilder

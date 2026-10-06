@@ -1,56 +1,56 @@
 /*! minimo - Slide Up/Down Toggle */
 /*
-* CSS Module for slide-up-down-toggle.js
+* CSS Module per slide-up-down-toggle.js
 *
-* Three modern CSS features work together to animate height without JS measurement:
+* Tre funzionalità CSS moderne lavorano insieme per animare l'altezza senza misurazioni JS:
 *
 *   interpolate-size: allow-keywords
-*     Enables transitioning to/from `height: auto` — the browser resolves the
-*     intrinsic size, so JS never reads offsetHeight or scrollHeight.
+*     Consente le transizioni verso/da `height: auto` — il browser risolve la
+*     dimensione intrinseca, quindi il JS non legge mai offsetHeight o scrollHeight.
 *
-*   transition-behavior: allow-discrete  (via `allow-discrete` in shorthand)
-*     Allows `display` to participate in a transition. On collapse: height
-*     animates to 0, then `display: none` snaps at the very end. On expand:
-*     `display: block` snaps at the very start, then height animates to auto.
+*   transition-behavior: allow-discrete  (tramite `allow-discrete` nella shorthand)
+*     Permette a `display` di partecipare a una transizione. In chiusura: height
+*     si anima fino a 0, poi `display: none` scatta proprio alla fine. In apertura:
+*     `display: block` scatta proprio all'inizio, poi height si anima fino ad auto.
 *
 *   @starting-style
-*     Defines the initial state for elements entering from `display: none`.
-*     Without it, the browser has no "before" value to transition from and
-*     the expand animation would not play.
+*     Definisce lo stato iniziale per gli elementi che entrano da `display: none`.
+*     Senza di esso il browser non ha un valore "precedente" da cui far partire la transizione e
+*     l'animazione di apertura non verrebbe eseguita.
 *
-* ─── Usage ────────────────────────────────────────────────────────────────────
+* ─── Utilizzo ─────────────────────────────────────────────────────────────────
 *
 *   wrap: true (default)
-*     JS generates a wrapper <div class="slide"> around the target.
-*     The target element is completely free — any display, padding, margin.
-*     No changes to HTML required; initial open state is the default.
-*     For an element that should start collapsed, add data-slide="closed" to
-*     the target BEFORE calling any slide function — JS transfers it to the wrapper.
+*     Il JS genera un wrapper <div class="slide"> attorno al target.
+*     L'elemento target è completamente libero — qualsiasi display, padding, margin.
+*     Non servono modifiche all'HTML; lo stato iniziale aperto è il default.
+*     Per un elemento che deve partire chiuso, aggiungere data-slide="closed" al
+*     target PRIMA di chiamare qualsiasi funzione slide — il JS lo trasferisce al wrapper.
 *
 *   wrap: false
-*     JS adds .slide directly to the target element.
-*     The target must be a plain block wrapper (no padding, no flex/grid).
-*     All layout, padding and margin must live on an inner child element.
-*     Initial collapsed state: add data-slide="closed" directly to the target in HTML.
+*     Il JS aggiunge .slide direttamente all'elemento target.
+*     Il target deve essere un semplice wrapper block (senza padding, senza flex/grid).
+*     Tutto il layout, il padding e il margin devono stare su un elemento figlio interno.
+*     Stato iniziale chiuso: aggiungere data-slide="closed" direttamente al target nell'HTML.
 *
-* ─── FOUC prevention ──────────────────────────────────────────────────────────
+* ─── Prevenzione del FOUC ─────────────────────────────────────────────────────
 *
-*   Elements with data-slide="closed" are hidden via a :global rule below,
-*   so they start invisible even before JS adds the .slide class.
+*   Gli elementi con data-slide="closed" vengono nascosti da una regola :global qui sotto,
+*   quindi partono invisibili anche prima che il JS aggiunga la classe .slide.
 *
-* ─── Duration override ────────────────────────────────────────────────────────
+* ─── Override della durata ────────────────────────────────────────────────────
 *
-*   Set --slide-duration on the element or pass `duration` in JS options:
+*   Impostare --slide-duration sull'elemento oppure passare `duration` nelle opzioni JS:
 *     style="--slide-duration: 300ms"
 */
 
-/* applied to the animation wrapper (generated or the target itself) */
+/* applicato al wrapper dell'animazione (generato o il target stesso) */
 .slide {
   interpolate-size: allow-keywords;
   /*
-  * !important overrides any external display: none (inline or CSS rule without !important).
-  * .slide[data-slide='closed'] below has higher specificity (0,2,0 vs 0,1,0) so its
-  * display: none !important still wins when the element is collapsed.
+  * !important sovrascrive qualsiasi display: none esterno (inline o regola CSS senza !important).
+  * .slide[data-slide='closed'] qui sotto ha una specificità maggiore (0,2,0 contro 0,1,0), quindi il suo
+  * display: none !important vince comunque quando l'elemento è chiuso.
   */
   /* stylelint-disable-next-line declaration-no-important */
   display: block !important;
@@ -64,7 +64,7 @@
   }
 }
 
-/* collapsed state: height animates to 0, then display snaps to none */
+/* stato chiuso: height si anima fino a 0, poi display passa di scatto a none */
 .slide[data-slide='closed'] {
   /* stylelint-disable-next-line declaration-no-important */
   display: none !important;
@@ -72,18 +72,18 @@
 }
 
 /*
-* Entry state for the expand transition.
-* When .slide transitions from display:none → display:block, the browser needs
-* a starting value for height. @starting-style provides height:0 so the
-* animation plays from zero to auto instead of snapping instantly.
+* Stato di ingresso per la transizione di apertura.
+* Quando .slide passa da display:none → display:block, il browser ha bisogno
+* di un valore iniziale per height. @starting-style fornisce height:0 così che
+* l'animazione parta da zero fino ad auto invece di scattare istantaneamente.
 */
 /*
-* @starting-style targets only [data-slide='open'] — not :not([data-slide='closed']).
-* The broader selector would also match newly inserted wrappers (which have no
-* data-slide attribute), causing an unwanted entry animation from height:0 that
-* conflicts with the first collapse call and makes the transition invisible.
-* Using [data-slide='open'] restricts this to the expand animation triggered by
-* slideDown(), which always sets data-slide="open" on a previously hidden element.
+* @starting-style ha come bersaglio solo [data-slide='open'] — non :not([data-slide='closed']).
+* Il selettore più ampio corrisponderebbe anche ai wrapper appena inseriti (che non hanno
+* l'attributo data-slide), causando un'animazione di ingresso indesiderata da height:0 che
+* confligge con la prima chiamata di chiusura e rende invisibile la transizione.
+* Usare [data-slide='open'] la limita all'animazione di apertura attivata da
+* slideDown(), che imposta sempre data-slide="open" su un elemento in precedenza nascosto.
 */
 @starting-style {
   .slide[data-slide='open'] {
@@ -92,9 +92,9 @@
 }
 
 /*
-* FOUC prevention — global, no class required.
-* Hides elements with data-slide="closed" before JS has run and added .slide.
-* Uses :global so CSS Modules does not hash this selector.
+* Prevenzione del FOUC — globale, non richiede alcuna classe.
+* Nasconde gli elementi con data-slide="closed" prima che il JS sia eseguito e abbia aggiunto .slide.
+* Usa :global così che CSS Modules non applichi l'hash a questo selettore.
 */
 :global([data-slide='closed']) {
   display: none;

@@ -3,13 +3,13 @@
 /*! minimo - Truncate String */
 
 /**
- * Truncates a string to the desired length adding an option suffix
- * from https://www.codegrepper.com/code-examples/javascript/javascript+truncate+string+full+word
+ * Tronca una stringa alla lunghezza desiderata aggiungendo un suffisso opzionale
+ * da https://www.codegrepper.com/code-examples/javascript/javascript+truncate+string+full+word
  *
- * @param {string} str - string yo be truncated
- * @param {number} maxLength - truncated string max length
+ * @param {string} str - stringa da troncare
+ * @param {number} maxLength - lunghezza massima della stringa troncata
  * @param {string} suffix (default: '…')
- * @returns {string|undefined} truncated string, or undefined if str is falsy
+ * @returns {string|undefined} stringa troncata, oppure undefined se str è falsy
  *
  */
 

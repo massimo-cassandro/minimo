@@ -2,23 +2,25 @@
 /* eslint-disable no-console */
 /* globals process */
 
-// generate-class-types.mjs
-// Scans minimo's global CSS source files and generates a TypeScript union
-// type (`MinimoClass`) listing every CSS class name defined by the
-// framework, for JSDoc/TS autocomplete in consuming projects.
-//
-// Only "global" CSS is scanned (src/**/*.css), excluding:
-//   - *.module.css: CSS Modules classes are accessed through a hashed JS
-//     import (`styles.className`), never typed directly by the consumer, so
-//     they don't belong in this union.
-//   - any path with a "TODO ..." segment: components not yet published (see
-//     the "files" field in package.json and CLAUDE.md).
-//
-// Custom properties (--foo, including the --_foo "private" convention) are
-// declarations, not part of a selector, so they are never picked up by the
-// selector walk below — no extra filtering needed.
-//
-// Usage: node scripts/generate-class-types.mjs
+/*
+  generate-class-types.mjs
+  Analizza i file CSS globali di minimo e genera un tipo union TypeScript
+  (`MinimoClass`) che elenca ogni nome di classe CSS definito dal
+  framework, per l'autocomplete JSDoc/TS nei progetti che lo usano.
+
+  Viene analizzato solo il CSS "globale" (tutti i file .css sotto src/), escludendo:
+    - i *.module.css: le classi dei CSS Modules sono accessibili tramite un import JS
+      con hash (`styles.className`), mai tipizzate direttamente dal consumer, quindi
+      non appartengono a questa union.
+    - qualsiasi percorso con un segmento "TODO ...": componenti non ancora pubblicati (vedi
+      il campo "files" in package.json e CLAUDE.md).
+
+  Le custom properties (--foo, inclusa la convenzione "privata" --_foo) sono
+  dichiarazioni, non parte di un selettore, quindi non vengono mai intercettate
+  dalla scansione dei selettori qui sotto — non serve alcun filtro aggiuntivo.
+
+  Utilizzo: node scripts/generate-class-types.mjs
+*/
 
 import * as path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -31,11 +33,13 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const srcDir    = path.resolve(__dirname, '../src');
 const destFile  = path.resolve(__dirname, '../types/classes.d.ts');
 
-// Extracts class names from a rule's selector (media queries, `:not()`/`:is()`
-// nesting, and dark-mode/theme override blocks are all reached automatically
-// since postcss walks rules recursively regardless of at-rule nesting).
-// Pseudo-classes/elements and other selector parts are ignored: only actual
-// class nodes are visited.
+/*
+  Estrae i nomi di classe dal selettore di una regola (media query, annidamento
+  `:not()`/`:is()` e blocchi di override dark-mode/tema vengono raggiunti tutti automaticamente
+  perché postcss visita le regole in modo ricorsivo indipendentemente dall'annidamento delle at-rule).
+  Pseudo-classi/elementi e altre parti del selettore vengono ignorati: vengono visitati solo
+  i veri nodi class.
+*/
 const extractClasses = (selector) => {
   const classes = [];
   selectorParser((selectors) => {
@@ -77,8 +81,8 @@ async function run() {
   const classNames = [...classSet].sort((a, b) => a.localeCompare(b, 'en'));
 
   const content = [
-    '// Auto-generated file, do not edit manually.',
-    '// Run `npm run generate:types` to regenerate.',
+    '// File generato automaticamente, non modificare a mano.',
+    '// Eseguire `npm run generate:types` per rigenerarlo.',
     '',
     'export type MinimoClass =',
     ...classNames.map((name) => `  | '${name}'`),

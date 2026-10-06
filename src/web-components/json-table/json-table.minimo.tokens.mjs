@@ -45,7 +45,7 @@ export default {
       }
     },
 
-    // sortable columns (thead)
+    // colonne ordinabili (thead)
     thead: {
       hover: {
         background: {
@@ -58,7 +58,7 @@ export default {
     },
 
     sort: {
-      // the sort button fills the whole th: same padding/line-height of minimo table cells
+      // il pulsante di ordinamento riempie l'intero th: stesso padding/line-height delle celle tabella di minimo
       btn: {
         padding: {
           block: {
@@ -84,7 +84,7 @@ export default {
           $type: 'dimension',
           $value: '.4em'
         },
-        // opacity of the icon when no sort is active
+        // opacità dell'icona quando non c'è alcun ordinamento attivo
         none: {
           opacity: {
             $type: 'number',
@@ -94,7 +94,7 @@ export default {
       }
     },
 
-    // boolean cells
+    // celle booleane
     bool: {
       icon: {
         size: {
@@ -116,7 +116,7 @@ export default {
       }
     },
 
-    // opacity of the table while a server-side request is in progress
+    // opacità della tabella mentre è in corso una richiesta server-side
     busy: {
       opacity: {
         $type: 'number',
@@ -124,7 +124,7 @@ export default {
       }
     },
 
-    // footer bar below the table (caption + pagination)
+    // barra del footer sotto la tabella (caption + paginazione)
     'table-footer': {
       padding: {
         block: {

@@ -1,9 +1,9 @@
-/* default altert (danger) */
+/* alert di default (danger) */
 
 .alert {
 
   /*
-  symfony message labels:
+  etichette dei messaggi di symfony:
   - success
   - notice
   - error

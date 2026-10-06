@@ -376,7 +376,7 @@ for (const file of cssFiles) {
 const fallbackClasses = new Set([...globalClasses, ...allModuleClasses]);
 
 function isDefined(usage) {
-  /* usages of an excluded CSS module are not checked */
+  /* gli usi di un CSS module escluso non vengono controllati */
   if (usage.module && cfg.excludeCssFiles.has(usage.module)) return true;
   if (!usage.isModule) return globalClasses.has(usage.cls);
   const set = usage.module ? getModuleClasses(usage.module) : fallbackClasses;
@@ -425,7 +425,7 @@ if (values.json) {
   const reportPath = path.resolve(cfg.baseDir, REPORT_FILE);
 
   if (sorted.length) {
-    /* flat list sorted by file and line, with a clickable link to each occurrence */
+    /* elenco piatto ordinato per file e riga, con un link cliccabile a ogni occorrenza */
     const items = sorted
       .flatMap(([cls, locations]) => locations.map(loc => ({ cls, ...loc })))
       .sort((a, b) => a.file.localeCompare(b.file) || a.line - b.line);

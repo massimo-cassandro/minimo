@@ -1,33 +1,33 @@
 /**
- * svg-icons-tools configuration file
+ * File di configurazione di svg-icons-tools
  * ----------------------------
- * all paths relative to the work directory
+ * tutti i percorsi sono relativi alla directory di lavoro
  *
- * More info at https://github.com/massimo-cassandro/svg-icons-tools
+ * Maggiori informazioni su https://github.com/massimo-cassandro/svg-icons-tools
  *
- * run with (from the svg-icons-tools work dir): `npx iconsTools`
- * or specifing a path for the config file: `npx iconsTools --config path/to/config.mjs`
+ * esecuzione (dalla directory di lavoro di svg-icons-tools): `npx iconsTools`
+ * oppure indicando il percorso del file di configurazione: `npx iconsTools --config path/to/config.mjs`
  *
- * All paths in this config object are relative to the folder containing the config file
+ * Tutti i percorsi di questo oggetto di configurazione sono relativi alla cartella che contiene il file di configurazione
  *
  */
 
 const config = {
 
   /**
-   * SVG to JSX components
+   * SVG in componenti JSX
    */
   jsx: {
     /**
-     * Source folders
+     * Cartelle sorgente
      *
-     * Every file with svg extension in these folders will be processed
-     * Sub dirs are ignored.
-     * the `fill` array must contains the icons that use the `fill` attribute
-     * similarly, the `stroke` one must contains the icons that use the `stroke` attribute
-     * It is possible to manage both types of icons at the same time, otherwise leave
-     * them empty or remove the ones you don't need.
-     * If you don't need this feature, just remove the whole `jsx` object
+     * Ogni file con estensione svg presente in queste cartelle viene elaborato.
+     * Le sottocartelle vengono ignorate.
+     * L'array `fill` deve contenere le icone che usano l'attributo `fill`;
+     * analogamente, l'array `stroke` deve contenere le icone che usano l'attributo `stroke`.
+     * È possibile gestire entrambi i tipi di icone contemporaneamente; altrimenti lasciare
+     * vuoti gli array o rimuovere quelli non necessari.
+     * Se non serve questa funzionalità, rimuovere l'intero oggetto `jsx`
      */
     source_folders: {
       fill: ['./svg-sources/fill-icons', './svg-sources/no-square-icons'],
@@ -35,98 +35,98 @@ const config = {
     },
 
     /**
-     * Custom function to create each JSX icon file
+     * Funzione personalizzata per creare ogni file JSX di icona
      *
-     * If not defined, the default function will be used.
-     * See `src/jsx-icon-file-builder.mjs` for more details about function argument and values to be returned
+     * Se non definita, viene usata la funzione predefinita.
+     * Vedi `src/jsx-icon-file-builder.mjs` per maggiori dettagli sull'argomento della funzione e sui valori da restituire
      *
      * @example
-     * custom_icon_builder: (parsed_svg) => { ... your code ... }
+     * custom_icon_builder: (parsed_svg) => { ... il tuo codice ... }
      */
     custom_icon_builder: null,
 
-    /* path to the folder where the jsx components will be saved */
+    /* percorso della cartella in cui vengono salvati i componenti jsx */
     dest_folder: './output/jsx-icons',
 
     /**
-     * Clear dest_folder folder before save new files
+     * Svuota la cartella dest_folder prima di salvare i nuovi file
      */
     clearDestFolder: true,
 
     /*
-     * path to jsx icons index file
+     * percorso del file indice delle icone jsx
      *
-     * Optional file that contains all generated icons as named exports.
-     * Leave empty o remove if you don't need it
+     * File opzionale che contiene tutte le icone generate come named export.
+     * Lasciare vuoto o rimuovere se non serve
      */
     index_file: './output/jsx-icons-index.jsx',
   },
 
   /**
-   * svg file to be optimized
+   * file svg da ottimizzare
    */
   optimize: {
     /**
-     * Source folders
+     * Cartelle sorgente
      *
-     * See comment at `jsx` for more details
-     * Leave empty  or remove the whole `optimize` obj if you don't need this feature
+     * Vedi il commento di `jsx` per maggiori dettagli
+     * Lasciare vuoto o rimuovere l'intero oggetto `optimize` se non serve questa funzionalità
      */
     source_folders: {
       fill: ['./svg-sources/fill-icons', './svg-sources/no-square-icons'],
       stroke: ['./svg-sources/stroke-icons']
     },
 
-    /* path to the folder where the optimized files will be saved */
+    /* percorso della cartella in cui vengono salvati i file ottimizzati */
     dest_folder: './output/optimized-svg',
 
     /**
-     * Clear dest_folder folder before save new files
+     * Svuota la cartella dest_folder prima di salvare i nuovi file
      */
     clearDestFolder: true
   },
 
   /**
-   * SVG as symbols
+   * SVG come symbol
    *
-   * Parameters to combine many svg files into a single svg file with symbols
-   * If you don't need this feature, just remove the `symbols` object or leave paths empty
+   * Parametri per combinare più file svg in un unico file svg con symbol
+   * Se non serve questa funzionalità, rimuovere l'oggetto `symbols` o lasciare vuoti i percorsi
    */
   symbols: {
     /**
-     * Source folders
+     * Cartelle sorgente
      *
-     * Every file with svg extension in these folders will be processed
-     * Sub dirs are ignored.
-     * Leave empty  or remove the whole `symbols` obj if you don't need this feature
+     * Ogni file con estensione svg presente in queste cartelle viene elaborato.
+     * Le sottocartelle vengono ignorate.
+     * Lasciare vuoto o rimuovere l'intero oggetto `symbols` se non serve questa funzionalità
      *
-     * NB: stroke and fill icons are handled by adding some classes to the `symbol` tag.
-     * The same goes for non-square icons.
-     * Adding classes to the `symbol` tag is useful for styling icons with css,
-     * but it is not a well documented feature and may not work as expected in all browsers.
-     * Be aware of this if you plan to use this feature.
+     * NB: le icone stroke e fill vengono gestite aggiungendo alcune classi al tag `symbol`.
+     * Lo stesso vale per le icone non quadrate.
+     * Aggiungere classi al tag `symbol` è utile per stilizzare le icone con css,
+     * ma è una funzionalità poco documentata e potrebbe non funzionare come previsto in tutti i browser.
+     * Tenerne conto se si intende usarla.
      */
     source_folders: {
       fill: ['./svg-sources/fill-icons'],
       stroke: ['./svg-sources/stroke-icons']
     },
 
-    /* path of the processed svg file */
+    /* percorso del file svg elaborato */
     dest_file: './output/icons-as-symbols.svg',
 
-    /* if true, the xml declaration (`<?xml version...`) is added to the resulting file */
+    /* se true, la dichiarazione xml (`<?xml version...`) viene aggiunta al file risultante */
     add_xml_declaration: true,
 
-    /* if true, the svg doctype (`<!DOCTYPE svg PUBLIC...`) is added to the resulting file */
+    /* se true, il doctype svg (`<!DOCTYPE svg PUBLIC...`) viene aggiunto al file risultante */
     add_svg_doctype: true,
 
-    /* if true, the `hidden` attribute is added to the svg tag of the resulting file */
+    /* se true, l'attributo `hidden` viene aggiunto al tag svg del file risultante */
     add_hidden_attribute: true,
 
     /**
-     * optional path to the js file that will contain the list of icons converted as symbols.
+     * percorso opzionale del file js che conterrà l'elenco delle icone convertite in symbol.
      *
-     * Leave empty if you don't need it
+     * Lasciare vuoto se non serve
      *
      * @example
      * icons_list_file: './path/to/icons-list.js',
@@ -134,12 +134,12 @@ const config = {
     icons_list_file: './output/icons-list.js',
 
     /**
-     * optional template for building the icons demo file
+     * template opzionale per creare il file demo delle icone
      *
-     * A basic tpl file is provided when the script is launched with `init` option:
-     * you can customize it as you like.
-     * If you don't need this feature, remove the tpl file and leave empty or remove
-     * the `demo_tpl_path` parameter
+     * Un file tpl di base viene fornito quando lo script viene lanciato con l'opzione `init`:
+     * può essere personalizzato a piacere.
+     * Se non serve questa funzionalità, rimuovere il file tpl e lasciare vuoto o rimuovere
+     * il parametro `demo_tpl_path`
      *
      * @example
      * demo_tpl_path: './path/to/symbols-demo-tpl.html',
@@ -147,12 +147,12 @@ const config = {
     demo_tpl_path: './symbols-demo-tpl.html',
 
     /**
-     * optional path for generated demo file
+     * percorso opzionale del file demo generato
      *
-     * It includes the list of icons converted as symbols and the symbols file itself,
-     * so it can be viewed in a browser using the `file:///` protocol.
-     * Requires the `demo_tpl_path` parameter to be set.
-     * Leave this parameter empty if you don't need it
+     * Include l'elenco delle icone convertite in symbol e il file dei symbol stesso,
+     * quindi può essere visualizzato in un browser tramite il protocollo `file:///`.
+     * Richiede che il parametro `demo_tpl_path` sia impostato.
+     * Lasciare vuoto questo parametro se non serve
      *
      * @example
      * demo_file_path: './symbols-demo.html',
@@ -162,21 +162,21 @@ const config = {
 
 
   /**
-   * GLOBAL PARAMETERS
+   * PARAMETRI GLOBALI
    *
-   * These parameters are used in all the features
+   * Questi parametri sono usati da tutte le funzionalità
    */
 
   /*
-   * prefixes of the svg files names to be removed in `symbols` ids and in jsx and
-   * optimized files names
+   * prefissi dei nomi dei file svg da rimuovere negli id dei `symbols` e nei nomi
+   * dei file jsx e dei file ottimizzati
    */
   remove_prefix: ['heroicons-outline-', 'phosphoricons-raw-', 'phosphoricons-', 'remixicons-'],
 
   /**
-   * SVGO configuration
+   * Configurazione di SVGO
    *
-   * see https://svgo.dev/docs/plugins/
+   * vedi https://svgo.dev/docs/plugins/
    */
   svgo_config: {
     multipass: true,
@@ -201,13 +201,13 @@ const config = {
   },
 
   /**
-   * “pallet” markups to be removed from the svg files
+   * markup “pallet” da rimuovere dai file svg
    *
-   * As clearly explained on the [remixicon site](https://remixicon.com/),
-   * the "pallet" is a transparent rectangle that ensures that the SVGs maintain
-   * their dimensions in your design software. They are not necessary in the final SVGs,
-   * and can even produce unwanted effects, so they are removed.
-   * Each item is a regular expression.
+   * Come spiegato chiaramente sul [sito di remixicon](https://remixicon.com/),
+   * il "pallet" è un rettangolo trasparente che garantisce che gli SVG mantengano
+   * le proprie dimensioni nel software di design. Non è necessario negli SVG finali
+   * e può persino produrre effetti indesiderati, quindi viene rimosso.
+   * Ogni elemento è un'espressione regolare.
    */
   pallets: [
     /<rect width="256" height="256" fill="none" ?\/?>(<\/rect>)?/gmi, // phosphoricons raw
@@ -215,20 +215,20 @@ const config = {
   ],
 
   /**
-   * Opacity classes for duotone icons
+   * Classi di opacità per le icone duotone
    *
-   * Convert opacity values to predefined classes
-   * the key is the decimal part of the opacity value (e.g.: 2 == 0.2), the value
-   * is the class to be added in place of the opacity value.
-   * The purpose of this feature is to convert the opacity values of duotone icons
-   * to predefined classes, merging similar values to an unique class:
-   * the script will assign the class whose key is the closest to the opacity value.
-   * For example, both 0.2 and 0.26 opacity values are converted
-   * to the class `duotone-light` (whose key is 2). You then only need to set the classes in your css.
-   * NB: only opacity attributes applied to elements inside the svg tag will be considered.
-   * If you don't want to use this feature, remove the `opacity_classes` object or leave it empty
+   * Converte i valori di opacità in classi predefinite.
+   * La chiave è la parte decimale del valore di opacità (es.: 2 == 0.2), il valore
+   * è la classe da aggiungere al posto del valore di opacità.
+   * Lo scopo è convertire i valori di opacità delle icone duotone in classi
+   * predefinite, unendo valori simili in un'unica classe:
+   * lo script assegna la classe la cui chiave è la più vicina al valore di opacità.
+   * Ad esempio, sia 0.2 sia 0.26 vengono convertiti nella classe `duotone-light`
+   * (la cui chiave è 2). Poi basta definire le classi nel proprio css.
+   * NB: vengono considerati solo gli attributi opacity applicati agli elementi all'interno del tag svg.
+   * Se non si vuole usare questa funzionalità, rimuovere l'oggetto `opacity_classes` o lasciarlo vuoto
    *
-   * NB: not available for `symbols` feature
+   * NB: non disponibile per la funzionalità `symbols`
    *
    * @example
    * opacity_classes: {
@@ -244,10 +244,10 @@ const config = {
   },
 
   /**
-     * Icon type classes
+     * Classi per tipo di icona
      *
-     * Optional classes to be added to fill and or stroke icons
-     * leave empty or remove if you don't need them
+     * Classi opzionali da aggiungere alle icone fill e/o stroke
+     * lasciare vuoto o rimuovere se non servono
      *
      * @example
      * icon_type_class: {
@@ -261,23 +261,23 @@ const config = {
   },
 
   /**
-   * Non-square icons classes
+   * Classi per le icone non quadrate
    *
-   * Assign specific classes to non-square icons.
-   * Assuming that all icons have the viewBox attribute, and that all viewboxes
-   * origin is at 0 0, the script analizes all icons widths and heights
-   * and detect those with non-square aspect ratio.
-   * Then, the values are compared (after being rounded to two decimal places)
-   * to find the closest aspect ratio among
-   * those listed in the `non_square_icons_classes` array. The class corresponding
-   * to the found value is then assigned to the icon.
-   * The first value of each subarray of `non_square_icons_classes` is the aspect ratio
-   * (width / height), the second is the class to be assigned.
-   * If you don't want to use this feature, remove the `non_square_icons_classes`
-   * array or leave it empty
+   * Assegna classi specifiche alle icone non quadrate.
+   * Presupponendo che tutte le icone abbiano l'attributo viewBox e che l'origine di
+   * tutti i viewBox sia in 0 0, lo script analizza larghezza e altezza di tutte le icone
+   * e individua quelle con aspect ratio non quadrato.
+   * Poi i valori vengono confrontati (dopo l'arrotondamento a due decimali)
+   * per trovare l'aspect ratio più vicino tra quelli elencati nell'array
+   * `non_square_icons_classes`. La classe corrispondente al valore trovato
+   * viene quindi assegnata all'icona.
+   * Il primo valore di ogni sotto-array di `non_square_icons_classes` è l'aspect ratio
+   * (larghezza / altezza), il secondo è la classe da assegnare.
+   * Se non si vuole usare questa funzionalità, rimuovere l'array
+   * `non_square_icons_classes` o lasciarlo vuoto
    *
-   * NB: Although aspect-ratio classes are added to `symbol` tags, this functionality
-   * is not supported in SVGs with that element type.
+   * NB: anche se le classi di aspect ratio vengono aggiunte ai tag `symbol`, questa funzionalità
+   * non è supportata negli SVG con quel tipo di elemento.
    *
    * @example
    * non_square_icons_classes: [
@@ -293,18 +293,11 @@ const config = {
   ],
 
   /**
-   * Console colors
+   * Colori della console
    *
-   * Colors for console output as defined in <https://nodejs.org/api/util.html#customizing-utilinspect-colors>
-   * The default colors work well on dark background terminals, if you have a light background terminal, you may
-   * need to change the colors.
-   */
-  /**
-   * Console colors
-   *
-   * Colors for console output as defined in <https://nodejs.org/api/util.html#customizing-utilinspect-colors>
-   * The default colors work well on dark background terminals, if you have a light background terminal, you may
-   * need to change the colors.
+   * Colori per l'output in console, come definiti in <https://nodejs.org/api/util.html#customizing-utilinspect-colors>
+   * I colori di default funzionano bene su terminali con sfondo scuro; con un terminale
+   * con sfondo chiaro potrebbe essere necessario cambiarli.
    */
   console_colors: {
     error    : 'bgRed',
@@ -317,19 +310,19 @@ const config = {
 
   /**
    * LEGACY
-   * Features mantained for compatibility reasons
+   * Funzionalità mantenute per ragioni di compatibilità
    */
 
   /**
-   * Svg to scss variables
-   * Generate scss variables from specified svg icons
+   * Svg in variabili scss
+   * Genera variabili scss dalle icone svg indicate
    */
   svg_to_scss: {
-    /* icons to be converted to scss variables.
-     * Paths of the svg files to be processed (relative to config file).
-     * Icons will be parsed and optimized then converted to scss variables.
-     * The variable names will be the same as the file names, without extensions
-     * and parts removed as per the `remove_prefix` parameter.
+    /* icone da convertire in variabili scss.
+     * Percorsi dei file svg da elaborare (relativi al file di configurazione).
+     * Le icone vengono analizzate e ottimizzate, quindi convertite in variabili scss.
+     * I nomi delle variabili coincidono con i nomi dei file, senza estensione
+     * e senza le parti rimosse in base al parametro `remove_prefix`.
      */
     files: [
       './svg-sources/fill-icons/phosphoricons-airplane-tilt.svg',
@@ -337,13 +330,13 @@ const config = {
       './svg-sources/fill-icons/this-file-doesnt-exist.svg',
     ],
 
-    /* string to be prefixed to the variable names */
+    /* stringa da anteporre ai nomi delle variabili */
     varname_prefix: 'icon-',
 
-    /* if true, the svg files are converted to data urls */
+    /* se true, i file svg vengono convertiti in data url */
     convert_to_css_url: true,
 
-    /* path of the generated scss file */
+    /* percorso del file scss generato */
     scss_icons_file: './output/_icons-svg.scss',
   }
 

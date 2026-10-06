@@ -2,23 +2,23 @@
 /*! minimo - Linked Dates */
 
 /**
- * Links date/datetime-local input fields so that one field constrains
- * the min/max of another.
+ * Collega i campi input date/datetime-local in modo che un campo vincoli
+ * il min/max di un altro.
  *
- * The `data-max` attribute on a date field must contain the `id` of the field
- * whose value sets the `max` constraint of the current field (start date).
- * The `data-min` attribute on a date field must contain the `id` of the field
- * whose value sets the `min` constraint of the current field (end date).
+ * L'attributo `data-max` di un campo data deve contenere l'`id` del campo
+ * il cui valore imposta il vincolo `max` del campo corrente (data di inizio).
+ * L'attributo `data-min` di un campo data deve contenere l'`id` del campo
+ * il cui valore imposta il vincolo `min` del campo corrente (data di fine).
  *
- * If the linked field is disabled, the constraint is removed on focus
- * and restored when the linked field is re-enabled.
+ * Se il campo collegato è disabilitato, il vincolo viene rimosso al focus
+ * e ripristinato quando il campo collegato viene riabilitato.
  *
- * @param {Document|Element} context - root element to search within (default: document)
+ * @param {Document|Element} context - elemento radice in cui cercare (default: document)
  * @returns {void}
  */
 export function linkedDates(context = document) {
 
-  // start date fields: constrained by a max value from a linked field
+  // campi data di inizio: vincolati da un valore max proveniente da un campo collegato
   context.querySelectorAll('input[type="date"][data-max], input[type="datetime-local"][data-max]').forEach(el => {
     const maxId = /** @type {HTMLInputElement} */ (el).dataset.max;
     let linked_field = maxId ? document.getElementById(maxId) : null;
@@ -30,7 +30,7 @@ export function linkedDates(context = document) {
         el.setAttribute('max', /** @type {HTMLInputElement} */ (linked_field).value);
       });
 
-      // remove max if the linked field is disabled; restore it when re-focused enabled
+      // rimuove max se il campo collegato è disabilitato; lo ripristina quando riceve di nuovo il focus da abilitato
       el.addEventListener('focus', () => {
         if(/** @type {HTMLInputElement} */ (linked_field).disabled) {
           el.removeAttribute('max');
@@ -41,7 +41,7 @@ export function linkedDates(context = document) {
     }
   });
 
-  // end date fields: constrained by a min value from a linked field
+  // campi data di fine: vincolati da un valore min proveniente da un campo collegato
   context.querySelectorAll('input[type="date"][data-min], input[type="datetime-local"][data-min]').forEach(el => {
     const minId = /** @type {HTMLInputElement} */ (el).dataset.min;
     let linked_field = minId ? document.getElementById(minId) : null;
@@ -51,7 +51,7 @@ export function linkedDates(context = document) {
         el.setAttribute('min', /** @type {HTMLInputElement} */ (linked_field).value);
       });
 
-      // remove min if the linked field is disabled; restore it when re-focused enabled
+      // rimuove min se il campo collegato è disabilitato; lo ripristina quando riceve di nuovo il focus da abilitato
       el.addEventListener('focus', () => {
         if(/** @type {HTMLInputElement} */ (linked_field).disabled) {
           el.removeAttribute('min');

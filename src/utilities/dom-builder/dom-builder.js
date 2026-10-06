@@ -2,50 +2,51 @@
 import { domBuilderBasicSetup } from './domBuilderBasicSetup.js';
 import { parseDomString } from './parseDomString.js';
 
-// TODO multi-line string syntax where each line maps to an element
-// TODO same as above with optional nesting via indentation
+// TODO sintassi stringa multi-riga in cui ogni riga corrisponde a un elemento
+// TODO come sopra, con nidificazione opzionale tramite indentazione
 
 /**
  * @typedef {Object} DomBuilderItem
- * @property {string | string[]} [tag='div'] - HTML tag name or array of nested tags (each is parent of the next). Also `tagName`. (default: 'div')
- * @property {string | string[]} [tagName='div'] - Alias for `tag`. (default: 'div')
- * @property {string | string[]} [className] - CSS class(es): a single string or an array (falsy values filtered out).
- * @property {string | string[]} [class] - Alias for `className`.
- * @property {string | string[]} [classname] - Alias for `className`.
- * @property {string | null} [id] - Unique element ID.
- * @property {[string, *] | [string, *][] | Object<string, *>} [attrs] - Attributes: a `[name, value]` pair, array of pairs, or `{name: value}` object.
- * @property {string | number | Function | Node | DomBuilderItem[] | null} [content] - Element content.
- *   A string or number is set as plain text (`textContent`) unless it contains `<`, in which case it is
- *   treated as markup: sanitized and inserted via the native Sanitizer API (`Element.setHTML`) where
- *   supported, falling back to raw `innerHTML` on browsers without it. A `Node` (an `Element`, a
- *   `DocumentFragment`, ...) is appended as-is, either directly or returned from a function.
- * @property {string | number} [text] - Literal text node shorthand: inserts a plain `Text` node (never
- *   parsed as markup) in place of an element, so it can sit as a sibling of tags within `children`/`content`
- *   arrays. Mutually exclusive with `tag`/`content`/`children`: when set (and `tag` is absent), every other
- *   property except `condition` and `callback` is ignored.
- * @property {boolean} [condition=true] - When false, the element (or text node) is skipped. (default: true)
- * @property {((el: HTMLElement|Text) => void) | null} [callback] - Callback invoked after the element (or text node) is created.
- * @property {Array<DomBuilderItem|string|Node>} [children] - Configuration array for child elements. Accepts strings (shorthand per `parseDomString`), configuration objects, and/or `Node`s (an `Element`, a `DocumentFragment`, ...) inserted as-is.
+ * @property {string | string[]} [tag='div'] - Nome del tag HTML o array di tag annidati (ciascuno è il genitore del successivo). Anche `tagName` (default: 'div')
+ * @property {string | string[]} [tagName='div'] - Alias di `tag` (default: 'div')
+ * @property {string | string[]} [className] - Classe/i CSS: una singola stringa o un array (i valori falsy vengono scartati).
+ * @property {string | string[]} [class] - Alias di `className`.
+ * @property {string | string[]} [classname] - Alias di `className`.
+ * @property {string | null} [id] - ID univoco dell'elemento.
+ * @property {[string, *] | [string, *][] | Object<string, *>} [attrs] - Attributi: una coppia `[name, value]`, un array di coppie o un oggetto `{name: value}`.
+ * @property {string | number | Function | Node | DomBuilderItem[] | null} [content] - Contenuto dell'elemento.
+ *   Una stringa o un numero viene impostato come testo semplice (`textContent`), a meno che contenga `<`:
+ *   in tal caso viene trattato come markup, sanificato e inserito tramite la Sanitizer API nativa
+ *   (`Element.setHTML`) dove supportata, con ripiego su `innerHTML` grezzo nei browser che non la hanno.
+ *   Un `Node` (un `Element`, un `DocumentFragment`, ...) viene aggiunto così com'è, direttamente o
+ *   restituito da una funzione.
+ * @property {string | number} [text] - Scorciatoia per un nodo di testo letterale: inserisce un nodo `Text` semplice (mai
+ *   interpretato come markup) al posto di un elemento, così da poter essere fratello dei tag negli array
+ *   `children`/`content`. Mutuamente esclusivo con `tag`/`content`/`children`: quando è impostato (e `tag` è assente),
+ *   ogni altra proprietà tranne `condition` e `callback` viene ignorata.
+ * @property {boolean} [condition=true] - Se false, l'elemento (o il nodo di testo) viene saltato (default: true)
+ * @property {((el: HTMLElement|Text) => void) | null} [callback] - Callback invocata dopo la creazione dell'elemento (o del nodo di testo).
+ * @property {Array<DomBuilderItem|string|Node>} [children] - Array di configurazione degli elementi figli. Accetta stringhe (scorciatoia secondo `parseDomString`), oggetti di configurazione e/o `Node` (un `Element`, un `DocumentFragment`, ...) inseriti così come sono.
  */
 
 /**
  * domBuilder
- * Builds a DOM structure from a configuration array.
+ * Costruisce una struttura DOM a partire da un array di configurazione.
  *
- * Parses an array of configuration objects to create HTML elements.
+ * Analizza un array di oggetti di configurazione per creare elementi HTML.
  *
- * **Configuration structure format (structureArray):**
+ * **Formato della struttura di configurazione (structureArray):**
  *
  * ```javascript
  * structure = [
  *   '#mainContainer.container',
  *   'p#main-info.info.active{data-id:123,role=button} Lorem ipsum',
  *   {
- *     tag: 'div' | ['.divClass', 'h2#id', 'table.class1', 'thead', 'tr.class2.class3(attr1: attrValue)'], // also tagName
- *     className: 'xxx' | ['class1', 'class2'], // also `class`
+ *     tag: 'div' | ['.divClass', 'h2#id', 'table.class1', 'thead', 'tr.class2.class3(attr1: attrValue)'], // anche tagName
+ *     className: 'xxx' | ['class1', 'class2'], // anche `class`
  *     id: 'element-id',
  *     attrs: [attr_name, attr_value] | [[...], [...]] | {name: value},
- *     content: 'xxx' | 'xxx <strong>yyy</strong>' | 123 | domBuilder Array | function | Node, // see DomBuilderItem.content above
+ *     content: 'xxx' | 'xxx <strong>yyy</strong>' | 123 | domBuilder Array | function | Node, // vedi DomBuilderItem.content sopra
  *     condition: true | false,
  *     callback: el => ...,
  *     children: [...]
@@ -58,9 +59,9 @@ import { parseDomString } from './parseDomString.js';
  * ]
  * ```
  *
- * To mix literal text and tags as siblings within the same element (e.g. `Lorem <strong>ipsum</strong> dolor`),
- * use the `text` shorthand in `children`/`content`, since a plain string item is always parsed as a tag
- * (see `parseDomString`), never as a text node:
+ * Per mescolare testo letterale e tag come fratelli nello stesso elemento (es. `Lorem <strong>ipsum</strong> dolor`),
+ * usare la scorciatoia `text` in `children`/`content`, dato che una semplice stringa viene sempre interpretata come tag
+ * (vedi `parseDomString`), mai come nodo di testo:
  *
  * ```javascript
  * children: [
@@ -70,39 +71,39 @@ import { parseDomString } from './parseDomString.js';
  * ]
  * ```
  *
- * IDs and classes can be specified either as top-level object keys or inside the `attrs` object.
- * When both are present, top-level properties take precedence.
+ * ID e classi possono essere indicati come chiavi di primo livello dell'oggetto oppure dentro l'oggetto `attrs`.
+ * Quando sono presenti entrambi, le proprietà di primo livello hanno la precedenza.
  *
- * A shorthand string syntax is also available, built according to `parseDomString` conventions.
- * See `parseDomString` for details.
+ * È disponibile anche una sintassi abbreviata a stringa, costruita secondo le convenzioni di `parseDomString`.
+ * Vedi `parseDomString` per i dettagli.
  *
- * The shorthand syntax does not support `content`, `callback`, `condition`, or `children`; use the object syntax for those.
+ * La sintassi abbreviata non supporta `content`, `callback`, `condition` o `children`; per questi usare la sintassi a oggetto.
  *
- * The shorthand can also be used for the `tag` property in object syntax.
- * When `tag` is an array, each element becomes the parent of the next one. Any other object properties
- * (className, callback, etc.) are applied only to the last element in the array.
- * When shorthand string and object-level properties conflict (classes, id, or attributes),
- * object-level properties take precedence.
+ * La sintassi abbreviata può essere usata anche per la proprietà `tag` nella sintassi a oggetto.
+ * Quando `tag` è un array, ogni elemento diventa il genitore del successivo. Tutte le altre proprietà dell'oggetto
+ * (className, callback, ecc.) vengono applicate solo all'ultimo elemento dell'array.
+ * Quando la stringa abbreviata e le proprietà a livello di oggetto sono in conflitto (classi, id o attributi),
+ * le proprietà a livello di oggetto hanno la precedenza.
  *
  * @function domBuilder
- * @param {Array<DomBuilderItem|string|Node>} [structureArray=[]] - Configuration array. Accepts strings (shorthand per `parseDomString`), configuration objects, and/or `Node`s (an `Element`, a `DocumentFragment`, ...) inserted as-is; each configuration object supports:
- * - `tag` / `tagName` {string | string[]} - HTML tag name, or array of nested tags (each is parent of the next). Default `'div'`.
- * - `className` / `class` / `classname` {string | string[]} - CSS class(es): a single string or an array (falsy values filtered out).
- * - `id` {string | null} - Unique element ID.
- * - `attrs` {[string, *] | [string, *][] | Object<string, *>} - Attributes: a `[name, value]` pair, array of pairs, or `{name: value}` object.
- * - `content` {string | number | Function | Node | DomBuilderItem[] | null} - Element content. A string/number is set as `textContent` unless it contains `<`, in which case it's sanitized and inserted as markup (`Element.setHTML`, falling back to `innerHTML`). A `Node` (`Element`, `DocumentFragment`, ...), passed directly or returned from a function, is appended as-is.
- * - `text` {string | number} - Literal text node shorthand: inserts a plain `Text` node (never parsed as markup) as a sibling of other items, in place of an element. Mutually exclusive with `tag`/`content`/`children`.
- * - `condition` {boolean} - When false, the element (or text node) is skipped. Default `true`.
- * - `callback` {(function(HTMLElement|Text): void) | null} - Invoked after the element (or text node) is created.
- * - `children` {Array<DomBuilderItem|string|Node>} - Configuration array for child elements (same format, nested; also accepts `Node`s inserted as-is).
+ * @param {Array<DomBuilderItem|string|Node>} [structureArray=[]] - Array di configurazione. Accetta stringhe (scorciatoia secondo `parseDomString`), oggetti di configurazione e/o `Node` (un `Element`, un `DocumentFragment`, ...) inseriti così come sono; ogni oggetto di configurazione supporta:
+ * - `tag` / `tagName` {string | string[]} - Nome del tag HTML, o array di tag annidati (ciascuno è il genitore del successivo). Default `'div'`.
+ * - `className` / `class` / `classname` {string | string[]} - Classe/i CSS: una singola stringa o un array (i valori falsy vengono scartati).
+ * - `id` {string | null} - ID univoco dell'elemento.
+ * - `attrs` {[string, *] | [string, *][] | Object<string, *>} - Attributi: una coppia `[name, value]`, un array di coppie o un oggetto `{name: value}`.
+ * - `content` {string | number | Function | Node | DomBuilderItem[] | null} - Contenuto dell'elemento. Una stringa/numero viene impostato come `textContent`, a meno che contenga `<`: in tal caso viene sanificato e inserito come markup (`Element.setHTML`, con ripiego su `innerHTML`). Un `Node` (`Element`, `DocumentFragment`, ...), passato direttamente o restituito da una funzione, viene aggiunto così com'è.
+ * - `text` {string | number} - Scorciatoia per un nodo di testo letterale: inserisce un nodo `Text` semplice (mai interpretato come markup) come fratello degli altri elementi, al posto di un elemento. Mutuamente esclusivo con `tag`/`content`/`children`.
+ * - `condition` {boolean} - Se false, l'elemento (o il nodo di testo) viene saltato. Default `true`.
+ * - `callback` {(function(HTMLElement|Text): void) | null} - Invocata dopo la creazione dell'elemento (o del nodo di testo).
+ * - `children` {Array<DomBuilderItem|string|Node>} - Array di configurazione degli elementi figli (stesso formato, annidato; accetta anche `Node` inseriti così come sono).
  *
- * IDs and classes can be specified either as top-level object keys or inside `attrs`; top-level properties take precedence. (default: [])
- * @param {HTMLElement} [parent] - Parent element the structure is attached to (see `options.insertMode`).
- * @param {Object} [options={}] - Configuration options. (default: {})
- * @param {boolean} [options.emptyParent=false] - When true, the parent element is emptied before building. (default: false)
- * @param {'append'|'prepend'|'before'|'after'} [options.insertMode='append'] - How each root element of `structureArray` is attached to `parent`: `append` inserts it as the last child (default), `prepend` as the first child, `before`/`after` insert it as a previous/next sibling of `parent`. In every mode, `structureArray` order is preserved. Only applies to the elements produced by this call — nested `domBuilder` calls (`content`, `children`) always append. (default: 'append')
- * @param {boolean} [options.debug=false] - When true, logs `structureArray` to the console after each string item has been parsed via `parseDomString` (i.e. the elaborated array actually used to build the DOM). (default: false)
- * @returns {HTMLElement|null} The first created element, or null if nothing was created.
+ * ID e classi possono essere indicati come chiavi di primo livello dell'oggetto o dentro `attrs`; le proprietà di primo livello hanno la precedenza (default: [])
+ * @param {HTMLElement} [parent] - Elemento genitore a cui viene agganciata la struttura (vedi `options.insertMode`).
+ * @param {Object} [options={}] - Opzioni di configurazione (default: {})
+ * @param {boolean} [options.emptyParent=false] - Se true, l'elemento genitore viene svuotato prima della costruzione (default: false)
+ * @param {'append'|'prepend'|'before'|'after'} [options.insertMode='append'] - Come ogni elemento radice di `structureArray` viene agganciato a `parent`: `append` lo inserisce come ultimo figlio (default), `prepend` come primo figlio, `before`/`after` lo inseriscono come fratello precedente/successivo di `parent`. In ogni modalità l'ordine di `structureArray` viene mantenuto. Si applica solo agli elementi prodotti da questa chiamata — le chiamate annidate a `domBuilder` (`content`, `children`) fanno sempre append (default: 'append')
+ * @param {boolean} [options.debug=false] - Se true, scrive `structureArray` in console dopo che ogni elemento stringa è stato analizzato con `parseDomString` (cioè l'array elaborato effettivamente usato per costruire il DOM) (default: false)
+ * @returns {HTMLElement|null} Il primo elemento creato, oppure null se non è stato creato nulla.
  */
 
 
@@ -119,17 +120,19 @@ export function domBuilder(/** @type {Array<DomBuilderItem|string|Node>} */ stru
     parent.innerHTML = '';
   }
 
-  // For the 'append'/'prepend' insert modes, root-level siblings are accumulated into a
-  // DocumentFragment and attached to `parent` with a single appendChild/insertBefore at
-  // the end, instead of one call per sibling. 'before'/'after' modes need `target` to stay
-  // the real, live parent node throughout the loop for anchor resolution (see afterAnchors
-  // below), so batching is skipped for those.
+  /*
+    Per le modalità di inserimento 'append'/'prepend', i fratelli di primo livello vengono accumulati in un
+    DocumentFragment e agganciati a `parent` con un solo appendChild/insertBefore alla
+    fine, invece di una chiamata per fratello. Le modalità 'before'/'after' richiedono che `target` resti
+    il vero nodo genitore attivo per tutto il ciclo per la risoluzione dell'ancora (vedi afterAnchors
+    più sotto), quindi per queste il raggruppamento viene saltato.
+  */
   const useFragment = !!parent && (options.insertMode === 'append' || options.insertMode === 'prepend');
 
   /** @type {HTMLElement | DocumentFragment | null} */
   let target = useFragment ? document.createDocumentFragment() : (parent ?? null);
 
-  /** @type {Map<HTMLElement | DocumentFragment, Node>} tracks, for `insertMode: 'after'`, the last inserted sibling per parent node */
+  /** @type {Map<HTMLElement | DocumentFragment, Node>} tiene traccia, per `insertMode: 'after'`, dell'ultimo fratello inserito per ogni nodo genitore */
   const afterAnchors = new Map();
 
   /** @type {HTMLElement | null} */
@@ -144,8 +147,8 @@ export function domBuilder(/** @type {Array<DomBuilderItem|string|Node>} */ stru
 
   structureArray.forEach(inputItem => {
 
-    // A DOM Node (Element, DocumentFragment, ...) passed directly: inserted as-is,
-    // bypassing element creation and config parsing entirely.
+    // Un Node DOM (Element, DocumentFragment, ...) passato direttamente: inserito così com'è,
+    // saltando del tutto la creazione dell'elemento e l'analisi della configurazione.
     if (inputItem instanceof Node) {
 
       elaboratedStructureArray.push(/** @type {DomBuilderItem} */ (/** @type {unknown} */ (inputItem)));
@@ -184,10 +187,10 @@ export function domBuilder(/** @type {Array<DomBuilderItem|string|Node>} */ stru
 
     if (item != null && (item.condition ?? true)) {
 
-      const safeItem = item; // const binding so TypeScript tracks non-null type in nested closures
+      const safeItem = item; // binding const così che TypeScript tracci il tipo non nullo nelle closure annidate
 
-      // `{ text: '...' }` shorthand: a literal Text node, never parsed as markup, inserted in
-      // place of an element so it can sit as a sibling of tags within `children`/`content` arrays
+      // scorciatoia `{ text: '...' }`: un nodo Text letterale, mai interpretato come markup, inserito
+      // al posto di un elemento così da poter essere fratello dei tag negli array `children`/`content`
       if (safeItem.tag == null && (typeof safeItem.text === 'string' || typeof safeItem.text === 'number')) {
 
         const textNode = document.createTextNode(String(safeItem.text));
@@ -214,8 +217,8 @@ export function domBuilder(/** @type {Array<DomBuilderItem|string|Node>} */ stru
         return;
       }
 
-      // when tag is an array, create a series of nested elements;
-      // the last one receives the remaining object properties
+      // quando tag è un array, crea una serie di elementi annidati;
+      // l'ultimo riceve le restanti proprietà dell'oggetto
       if (Array.isArray(safeItem.tag)) {
 
         grand_parent = target;
@@ -226,7 +229,7 @@ export function domBuilder(/** @type {Array<DomBuilderItem|string|Node>} */ stru
           const isLast = idx === tags.length - 1;
           const parsedItem = parseDomString(tagItem) ?? { tag: 'div', id: undefined, className: '', attrs: {}, content: undefined };
 
-          // for the last element, merge with the object's own options; object-level properties take precedence
+          // per l'ultimo elemento, unisce con le opzioni proprie dell'oggetto; le proprietà a livello di oggetto hanno la precedenza
           if(isLast) {
             safeItem.attrs = {...parsedItem.attrs ?? {}, ...safeItem.attrs ?? {}};
           }
@@ -235,7 +238,7 @@ export function domBuilder(/** @type {Array<DomBuilderItem|string|Node>} */ stru
             {...parsedItem, ...(isLast ? safeItem : {})}
           );
 
-          if (!isLast) { // the last element is handled by the standard path below
+          if (!isLast) { // l'ultimo elemento viene gestito dal percorso standard qui sotto
             if (target) {
               target.appendChild(el);
             }
@@ -255,8 +258,8 @@ export function domBuilder(/** @type {Array<DomBuilderItem|string|Node>} */ stru
       if (safeItem.content != null) {
 
         if (Array.isArray(safeItem.content)) {
-          // build directly into `el` (instead of passing no parent) so that every item of
-          // the array is actually inserted, not just the first one returned as `mainElement`
+          // costruisce direttamente dentro `el` (invece di non passare alcun genitore) così che ogni elemento
+          // dell'array venga effettivamente inserito, non solo il primo restituito come `mainElement`
           domBuilder(safeItem.content, el);
 
         } else {
@@ -274,29 +277,29 @@ export function domBuilder(/** @type {Array<DomBuilderItem|string|Node>} */ stru
           }
 
           if (content instanceof Node) {
-            // Element, DocumentFragment, Text, ... appended as-is (a DocumentFragment's
-            // children are moved into `el`, emptying the fragment, per native DOM behavior)
+            // Element, DocumentFragment, Text, ... aggiunti così come sono (i figli di un
+            // DocumentFragment vengono spostati dentro `el`, svuotando il fragment, come da comportamento nativo del DOM)
             el.appendChild(content);
 
           } else if (content != null) {
 
             if (!content.includes('<')) {
-              // plain text: no HTML parsing needed, textContent is faster and safe by construction
+              // testo semplice: non serve il parsing HTML, textContent è più veloce e sicuro per costruzione
               el.textContent = content;
 
             } else if (typeof el.setHTML === 'function') {
-              /* markup: sanitize via the native Sanitizer API, stripping <script>, event handler
-                 attributes, javascript: URLs, etc. while still allowing harmless formatting tags
+              /* markup: sanifica tramite la Sanitizer API nativa, eliminando <script>, attributi
+                 di gestione eventi, URL javascript:, ecc. pur consentendo i tag di formattazione innocui
                  (<strong>, <em>, <a>, ...).
-                 The empty sanitizer config keeps every element/attribute not in the built-in unsafe
-                 baseline: without it the browser default configuration also removes `class`, `id`,
-                 `style` and `data-*` attributes (observed in Chrome 152), breaking any markup string
-                 that relies on CSS classes */
+                 La configurazione vuota del sanitizer mantiene ogni elemento/attributo che non rientra nella
+                 baseline non sicura integrata: senza di essa la configurazione predefinita del browser rimuove anche
+                 gli attributi `class`, `id`, `style` e `data-*` (osservato in Chrome 152), rompendo qualsiasi
+                 stringa di markup che si affidi alle classi CSS */
               el.setHTML(content, { sanitizer: {} });
 
             } else {
-              // Sanitizer API not supported by this browser: fall back to the historical,
-              // unsanitized behavior
+              // Sanitizer API non supportata da questo browser: ripiega sul comportamento storico,
+              // non sanificato
               el.innerHTML = content;
             }
           }
@@ -331,7 +334,7 @@ export function domBuilder(/** @type {Array<DomBuilderItem|string|Node>} */ stru
         }
       }
 
-      // TODO callbacks that act on the element's children may not run when no parent is set
+      // TODO le callback che agiscono sui figli dell'elemento potrebbero non essere eseguite quando non è impostato alcun parent
       if (safeItem.callback && typeof safeItem.callback === 'function') {
         safeItem.callback(el);
       }

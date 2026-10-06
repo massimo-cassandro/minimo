@@ -2,10 +2,10 @@
 
 <!-- TODO intro  -->
 
-## Using design tokens
+## Uso dei design token
 
 <!-- TODO modalità d'uso (da tokens penpots o figma, con o snza merge css ecc...) -->
 
 ## Design Tokens Builder
 
-The Node.js scripts that generate the CSS custom properties / JSON token files from the sources in this directory (`build-tokens.mjs`, `check-unresolved-custom-props.mjs`, exposed as the `buildTokens` / `checkUnresolvedProps` bins) live in [dev-tools/design-tokens-builder](../dev-tools/design-tokens-builder/README.md), alongside the other standalone dev-tools CLI utilities.
+Gli script Node.js che generano le custom properties CSS / i file JSON dei token a partire dai sorgenti di questa directory (`build-tokens.mjs`, `check-unresolved-custom-props.mjs`, esposti come bin `buildTokens` / `checkUnresolvedProps`) si trovano in [dev-tools/design-tokens-builder](../dev-tools/design-tokens-builder/README.md), insieme alle altre utilità CLI standalone di dev-tools.

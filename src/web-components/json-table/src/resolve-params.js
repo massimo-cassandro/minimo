@@ -5,7 +5,7 @@ import { defaults, mergedParams } from './defaults.js';
 /** @typedef {import('./defaults.js').JsonTableParams} JsonTableParams */
 
 /**
- * Whether `value` is a plain object (not null, not an array).
+ * Indica se `value` è un oggetto semplice (non null, non un array).
  * @param {*} value
  * @returns {value is Object<string, *>}
  */
@@ -15,25 +15,25 @@ function isPlainObject(value) {
 
 
 /**
- * Reads and parses an HTML attribute of the `<json-table>` element.
+ * Legge e analizza un attributo HTML dell'elemento `<json-table>`.
  *
- * - booleans are auto-parsed when the built-in default is a boolean
+ * - i booleani vengono convertiti automaticamente quando il default predefinito è un booleano
  *   (`search`, `search="true"`, `search="1"` → true; `search="false"`, `search="0"` → false)
- * - numbers are auto-parsed when the built-in default is a number (`perpage="10"` → 10; a
- *   non-numeric value is reported in the console and treated as a missing attribute)
- * - values starting with `[` or `{` are parsed as JSON (invalid JSON is reported in the
- *   console and treated as a missing attribute)
- * - every other value is returned as a string
+ * - i numeri vengono convertiti automaticamente quando il default predefinito è un numero (`perpage="10"` → 10; un
+ *   valore non numerico viene segnalato in console e trattato come attributo mancante)
+ * - i valori che iniziano con `[` o `{` vengono letti come JSON (un JSON non valido viene segnalato in
+ *   console e trattato come attributo mancante)
+ * - ogni altro valore viene restituito come stringa
  *
- * @param {HTMLElement} el - The `<json-table>` element
- * @param {keyof JsonTableParams} name - Parameter name (attribute names are case-insensitive)
- * @returns {*} The parsed value, or `undefined` when the attribute is missing or invalid
+ * @param {HTMLElement} el - L'elemento `<json-table>`
+ * @param {keyof JsonTableParams} name - Nome del parametro (i nomi degli attributi non distinguono maiuscole e minuscole)
+ * @returns {*} Il valore analizzato, oppure `undefined` quando l'attributo è mancante o non valido
  *
  * @example
  * // <json-table search="false" cols='[{"key":"id"}]'></json-table>
  * readAttr(el, 'search'); // → false
  * readAttr(el, 'cols');   // → [{ key: 'id' }]
- * readAttr(el, 'perPage'); // → 10 (from perpage="10")
+ * readAttr(el, 'perPage'); // → 10 (da perpage="10")
  * readAttr(el, 'caption'); // → undefined
  */
 export function readAttr(el, name) {
@@ -47,7 +47,7 @@ export function readAttr(el, name) {
 
   if (typeof defaults[name] === 'boolean') {
     const lower = trimmed.toLowerCase();
-    // empty string = attribute present without value → true (standard HTML)
+    // stringa vuota = attributo presente senza valore → true (HTML standard)
     return lower !== 'false' && lower !== '0';
   }
 
@@ -76,38 +76,38 @@ export function readAttr(el, name) {
 
 
 /**
- * Resolves a single parameter, merging the four possible sources.
+ * Risolve un singolo parametro, unendo le quattro possibili sorgenti.
  *
- * Precedence (highest first):
- * 1. `config` – value passed via `init()`/`reload()`. Present and `!== undefined` always wins;
- *    pass `null` explicitly to skip the HTML attribute and fall back to the defaults.
- * 2. HTML attribute (see `readAttr`).
- * 3. `projectDefaults` – values set via `JsonTable.setDefaults()`.
- * 4. Built-in default (see `defaults.js`).
+ * Precedenza (dalla più alta):
+ * 1. `config` – valore passato tramite `init()`/`reload()`. Se presente e `!== undefined` vince sempre;
+ *    passare `null` esplicitamente per saltare l'attributo HTML e ripiegare sui default.
+ * 2. Attributo HTML (vedi `readAttr`).
+ * 3. `projectDefaults` – valori impostati con `JsonTable.setDefaults()`.
+ * 4. Default predefinito (vedi `defaults.js`).
  *
- * Object params listed in `mergedParams` (`classes`, `labels`, `dataTypes`, `serverParams`) are shallow-merged
- * across the sources instead of being replaced, so every source only needs the keys to override.
+ * I parametri oggetto elencati in `mergedParams` (`classes`, `labels`, `dataTypes`, `serverParams`) vengono uniti in modo
+ * superficiale tra le sorgenti invece di essere sostituiti, così ogni sorgente deve indicare solo le chiavi da sovrascrivere.
  *
- * @param {HTMLElement} el - The `<json-table>` element (source of the HTML attributes)
- * @param {Partial<JsonTableParams>|null} config - Config passed via `init()` (default: null)
- * @param {Partial<JsonTableParams>} projectDefaults - Project-wide defaults (default: {})
- * @param {keyof JsonTableParams} name - Parameter name
- * @returns {*} The resolved value
+ * @param {HTMLElement} el - L'elemento `<json-table>` (sorgente degli attributi HTML)
+ * @param {Partial<JsonTableParams>|null} config - Configurazione passata tramite `init()` (default: null)
+ * @param {Partial<JsonTableParams>} projectDefaults - Default a livello di progetto (default: {})
+ * @param {keyof JsonTableParams} name - Nome del parametro
+ * @returns {*} Il valore risolto
  *
  * @example
  * // <json-table jsonurl="/api/rows.json" search="false" classes='{"table":"table"}'></json-table>
  * getParam(el, { jsonUrl: '/api/other.json' }, {}, 'jsonUrl'); // → '/api/other.json' (config)
- * getParam(el, null, {}, 'search');                             // → false (attribute)
- * getParam(el, null, { tableId: 'tbl' }, 'tableId');            // → 'tbl' (project defaults)
- * getParam(el, null, {}, 'locale');                             // → 'it-IT' (built-in default)
+ * getParam(el, null, {}, 'search');                             // → false (attributo)
+ * getParam(el, null, { tableId: 'tbl' }, 'tableId');            // → 'tbl' (default di progetto)
+ * getParam(el, null, {}, 'locale');                             // → 'it-IT' (default predefinito)
  * getParam(el, { classes: { sortBtn: 'btn' } }, {}, 'classes');
- * // → { ...defaults.classes, table: 'table', sortBtn: 'btn' } (merged)
+ * // → { ...defaults.classes, table: 'table', sortBtn: 'btn' } (unito)
  */
 export function getParam(el, config = null, projectDefaults = {}, name) {
 
   const configValue = config ? config[name] : undefined;
 
-  // merged object params: built-in ← project ← attribute ← config
+  // parametri oggetto uniti: predefinito ← progetto ← attributo ← config
   if (mergedParams.includes(name)) {
     const builtIn = /** @type {Object<string, *>} */ (defaults[name]);
     const projectValue = projectDefaults[name];
@@ -120,34 +120,34 @@ export function getParam(el, config = null, projectDefaults = {}, name) {
     };
   }
 
-  // 1. config from script (undefined = key not present → go down one level)
+  // 1. config dallo script (undefined = chiave non presente → scende di un livello)
   if (configValue !== undefined) {
     return configValue;
   }
 
-  // 2. HTML attribute
+  // 2. attributo HTML
   const attrValue = readAttr(el, name);
   if (attrValue !== undefined) {
     return attrValue;
   }
 
-  // 3. project defaults
+  // 3. default di progetto
   if (projectDefaults[name] !== undefined) {
     return projectDefaults[name];
   }
 
-  // 4. built-in default
+  // 4. default predefinito
   return defaults[name];
 }
 
 
 /**
- * Resolves every parameter defined in `defaults.js` (see `getParam` for the precedence rules).
+ * Risolve ogni parametro definito in `defaults.js` (vedi `getParam` per le regole di precedenza).
  *
- * @param {HTMLElement} el - The `<json-table>` element
- * @param {Partial<JsonTableParams>|null} [config=null] - Config passed via `init()` (default: null)
+ * @param {HTMLElement} el - L'elemento `<json-table>`
+ * @param {Partial<JsonTableParams>|null} [config=null] - Configurazione passata tramite `init()` (default: null)
  * @param {Partial<JsonTableParams>} [projectDefaults={}] - Project-wide defaults (default: {})
- * @returns {JsonTableParams} The complete params object
+ * @returns {JsonTableParams} L'oggetto completo dei parametri
  *
  * @example
  * const params = resolveParams(el, { jsonUrl: '/api/rows.json', debug: true }, {});

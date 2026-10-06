@@ -123,7 +123,7 @@ export async function ratingDisplay({
   displayLabelRowGap = 2,
 
   /**
-   * @param {Object[]|null} [miniDisplay=null] - Configurazione mini display secondari (max 2). Srray di uno o due oggetti (default: null)
+   * @param {Object[]|null} [miniDisplay=null] - Configurazione mini display secondari (max 2). Array di uno o due oggetti (default: null)
    * @param {string} miniDisplay[].position - Posizione: 'sx' | 'dx' (alias: 'left' | 'right').
    * @param {number} miniDisplay[].value - Valore numerico da rappresentare.
    * @param {string} miniDisplay[].type - Tipo di visualizzazione: 'gauge' (tachimetro) o 'value' (testo di `value`).

@@ -19,10 +19,10 @@ export async function svg_to_optimized() {
 
     dest_folder = path.resolve(cfg.work_dir, cfg_obj.dest_folder);
 
-    // checking output dir for optimized svg files
+    // verifica la directory di output dei file svg ottimizzati
     await create_dest_folder(dest_folder, cfg_obj.clearDestFolder);
 
-    // parsing and saving optimized svg files
+    // parsing e salvataggio dei file svg ottimizzati
     fileCount = parseSvgFiles('optimize',
       (parsedSvg) => {
         fs.writeFileSync(path.resolve(dest_folder, `${parsedSvg.filename}.svg`), parsedSvg.svg);

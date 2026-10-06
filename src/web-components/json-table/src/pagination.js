@@ -9,10 +9,10 @@ import { iconContent } from './icons.js';
 /** @typedef {import('./main-builder.js').JsonTableElements} JsonTableElements */
 
 /**
- * Number of pages needed to show `count` rows, `perPage` per page (at least 1).
- * `perPage` <= 0 means no pagination: a single page.
+ * Numero di pagine necessarie per mostrare `count` righe, `perPage` per pagina (almeno 1).
+ * `perPage` <= 0 significa nessuna paginazione: una sola pagina.
  *
- * @param {number} count - Number of rows
+ * @param {number} count - Numero di righe
  * @param {number} perPage - Rows per page
  * @returns {number}
  *
@@ -30,21 +30,21 @@ export function calcTotPages(count, perPage) {
 
 
 /**
- * Builds the list of page numbers to show in the navigation: the current page with `delta`
- * pages on each side (the window is widened near the edges so that it keeps a constant size),
- * plus the first and the last page; `null` marks a gap (ellipsis). When the gap would hide a
- * single page, that page is shown instead of the ellipsis.
+ * Costruisce l'elenco dei numeri di pagina da mostrare nella navigazione: la pagina corrente con `delta`
+ * pagine per lato (la finestra viene allargata vicino ai bordi in modo da mantenere una dimensione costante),
+ * più la prima e l'ultima pagina; `null` indica un salto (puntini di sospensione). Quando il salto nasconderebbe una
+ * sola pagina, viene mostrata quella pagina al posto dei puntini.
  *
- * @param {number} current - Current page (1-based)
- * @param {number} totPages - Total number of pages
- * @param {number} [delta=2] - Pages on each side of the current one (default: 2)
+ * @param {number} current - Pagina corrente (da 1)
+ * @param {number} totPages - Numero totale di pagine
+ * @param {number} [delta=2] - Pagine per lato rispetto alla corrente (default: 2)
  * @returns {Array<number|null>}
  *
  * @example
  * pageList(1, 3);       // → [1, 2, 3]
  * pageList(1, 10);      // → [1, 2, 3, 4, 5, null, 10]
  * pageList(6, 12);      // → [1, null, 4, 5, 6, 7, 8, null, 12]
- * pageList(5, 10);      // → [1, 2, 3, 4, 5, 6, 7, null, 10]  (page 2 shown instead of an ellipsis hiding it alone)
+ * pageList(5, 10);      // → [1, 2, 3, 4, 5, 6, 7, null, 10]  (pagina 2 mostrata al posto dei puntini che la nasconderebbero da sola)
  * pageList(10, 10);     // → [1, null, 6, 7, 8, 9, 10]
  * pageList(4, 10, 1);   // → [1, 2, 3, 4, 5, null, 10]
  */
@@ -60,7 +60,7 @@ export function pageList(current, totPages, delta = 2) {
   let min = Math.max(1, current - side);
   let max = Math.min(totPages, current + side);
 
-  // keep the window size constant near the edges
+  // mantiene costante la dimensione della finestra vicino ai bordi
   while (max - min + 1 < width) {
     if (min > 1) {
       min--;
@@ -95,7 +95,7 @@ export function pageList(current, totPages, delta = 2) {
 
 
 /**
- * Replaces the `{page}` placeholder of a pagination label.
+ * Sostituisce il segnaposto `{page}` di un'etichetta di paginazione.
  * @param {string|undefined} label
  * @param {number} page
  * @param {string} locale
@@ -107,29 +107,29 @@ function pageLabel(label, page, locale) {
 
 
 /**
- * domBuilder item of the pagination `<nav>` (template slot `pagination`), rendered only when
- * `params.perPage` is > 0. The `<nav>` is stored in `elements.pagination` and gets a delegated
- * `click` listener on its buttons, which calls `jt.goToPage()`. The content (page list) is
- * rendered by `renderPagination()` and the whole `<nav>` is hidden when there is a single page.
+ * Elemento domBuilder del `<nav>` della paginazione (slot del template `pagination`), renderizzato solo quando
+ * `params.perPage` è > 0. Il `<nav>` viene memorizzato in `elements.pagination` e riceve un listener
+ * `click` delegato sui suoi pulsanti, che chiama `jt.goToPage()`. Il contenuto (elenco delle pagine) viene
+ * renderizzato da `renderPagination()` e l'intero `<nav>` è nascosto quando c'è una sola pagina.
  *
- * Generated structure (see `renderPagination`):
+ * Struttura generata (vedi `renderPagination`):
  * ```
  * nav.pagination[classes.pagination][aria-label=labels.paginationAriaLabel]
  *   ul.paginationList
  *     li.paginationItem > button.paginationBtn[classes.paginationBtn][data-page=prev][aria-label][title] > icon
  *     li.paginationItem > button.paginationBtn[data-page=1][aria-label="Vai a pagina 1"] 1
- *     li.paginationItem > button.paginationBtn[data-page=2][aria-current=page] 2      ← current page
+ *     li.paginationItem > button.paginationBtn[data-page=2][aria-current=page] 2      ← pagina corrente
  *     li.paginationItem > span.paginationEllipsis …
  *     li.paginationItem > button.paginationBtn[data-page=next] > icon
  * ```
  *
- * @param {JsonTable} jt - The component instance
- * @param {JsonTableElements} elements - Object collecting the generated elements (mutated)
+ * @param {JsonTable} jt - L'istanza del componente
+ * @param {JsonTableElements} elements - Oggetto che raccoglie gli elementi generati (modificato)
  * @returns {DomBuilderItem}
  *
  * @example
  * domBuilder([paginationPart(jt, elements)], host);
- * elements.pagination; // → HTMLElement (nav), when params.perPage > 0
+ * elements.pagination; // → HTMLElement (nav), quando params.perPage > 0
  */
 export function paginationPart(jt, elements) {
 
@@ -162,21 +162,21 @@ export function paginationPart(jt, elements) {
 
 
 /**
- * Renders the page list inside `elements.pagination` from the current state (`page`, `totPages`),
- * replacing the previous content; the `<nav>` is hidden when there is a single page.
+ * Renderizza l'elenco delle pagine dentro `elements.pagination` a partire dallo stato corrente (`page`, `totPages`),
+ * sostituendo il contenuto precedente; il `<nav>` è nascosto quando c'è una sola pagina.
  *
- * When `focusTarget` is given (the `data-page` of the button that triggered the change:
- * `'prev'`, `'next'` or a page number) the focus is moved to the corresponding new button, or
- * to the current page button when that one is no longer available, so that keyboard users do
- * not lose their position.
+ * Quando `focusTarget` è indicato (il `data-page` del pulsante che ha causato il cambio:
+ * `'prev'`, `'next'` o un numero di pagina) il focus viene spostato sul corrispondente nuovo pulsante, oppure
+ * sul pulsante della pagina corrente quando quello non è più disponibile, così che gli utenti da tastiera
+ * non perdano la loro posizione.
  *
- * @param {JsonTable} jt - The component instance
- * @param {string|null} [focusTarget=null] - `data-page` of the button to focus after the rendering (default: null)
+ * @param {JsonTable} jt - L'istanza del componente
+ * @param {string|null} [focusTarget=null] - `data-page` del pulsante a cui dare il focus dopo il rendering (default: null)
  * @returns {void}
  *
  * @example
- * renderPagination(jt);         // after `jt.state` has been updated
- * renderPagination(jt, 'next'); // same, moving the focus to the "next" button
+ * renderPagination(jt);         // dopo l'aggiornamento di `jt.state`
+ * renderPagination(jt, 'next'); // come sopra, spostando il focus sul pulsante "avanti"
  */
 export function renderPagination(jt, focusTarget = null) {
 

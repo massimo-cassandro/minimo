@@ -2,10 +2,10 @@
 /*! minimo - Cookies */
 
 /**
- * Returns the value of a cookie by name.
+ * Restituisce il valore di un cookie dal nome.
  * @param {string} name
  * @param {object} [options]
- * @param {boolean} [options.parseJson=false] - If true, JSON-parses the value and returns an object instead of a string. (default: false)
+ * @param {boolean} [options.parseJson=false] - Se true, esegue il parsing JSON del valore e restituisce un oggetto invece di una stringa (default: false)
  * @returns {string | object | null}
  */
 export function getCookie(name, {parseJson = false} = {}) {
@@ -21,19 +21,19 @@ export function getCookie(name, {parseJson = false} = {}) {
 
 
 /**
- * Sets a cookie.
+ * Imposta un cookie.
  * @param {object} params
  * @param {string} params.name
  * @param {string} params.value
  * @param {string|null} [params.path=null] (default: null)
- * @param {number|null} [params.expire=null] - Max-Age in seconds (default: null)
+ * @param {number|null} [params.expire=null] - Max-Age in secondi (default: null)
  * @example
- * // Cookie scoped to the current page only, lasting 15 days
+ * // Cookie limitato alla sola pagina corrente, con durata di 15 giorni
  * setCookie({
  *   name: 'cookieName',
  *   value: 'cookieValue',
  *   path: window.location.pathname,
- *   expire: 15 * 24 * 60 * 60 // 15 days
+ *   expire: 15 * 24 * 60 * 60 // 15 giorni
  * });
  */
 export function setCookie({name, value, path = null, expire = null}) {

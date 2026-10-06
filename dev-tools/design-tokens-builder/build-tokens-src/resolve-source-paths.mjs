@@ -1,13 +1,15 @@
-// build-tokens-src/resolve-source-paths.mjs
-// Pure helper: resolves Style Dictionary `source` glob patterns relative to a
-// base directory, without touching glob syntax.
-// Shared by config.mjs (build-tokens.mjs) and check-unresolved-custom-props.mjs.
-//
-// Glob patterns (containing *, ?, {, [) are NOT passed through path.join,
-// because path.join can normalise/collapse sequences that carry syntactic
-// meaning in a glob (e.g. "**"). They are only prefixed with baseDir and
-// converted to forward slashes.
-// Concrete paths (no glob characters) are resolved canonically with path.resolve.
+/*
+  build-tokens-src/resolve-source-paths.mjs
+  Helper puro: risolve i pattern glob `source` di Style Dictionary rispetto a una
+  directory base, senza toccare la sintassi glob.
+  Condiviso da config.mjs (build-tokens.mjs) e da check-unresolved-custom-props.mjs.
+
+  I pattern glob (che contengono *, ?, {, [) NON vengono passati a path.join,
+  perché path.join può normalizzare/comprimere sequenze che in un glob hanno un
+  significato sintattico (ad es. "**"). Vengono solo preceduti da baseDir e
+  convertiti con forward slash.
+  I percorsi concreti (senza caratteri glob) vengono risolti in modo canonico con path.resolve.
+*/
 
 import * as path from 'node:path';
 
@@ -20,14 +22,14 @@ const GLOB_CHARS = /[*?{[]/;
  */
 export const resolveSourcePaths = (source, baseDir) => source.map((s) => {
   if (path.isAbsolute(s)) {
-    // Already absolute: only normalise separators (needed on Windows)
+    // Già assoluto: normalizza solo i separatori (necessario su Windows)
     return s.split(path.sep).join('/');
   }
   if (GLOB_CHARS.test(s)) {
-    // Glob pattern: prefix with baseDir without touching the pattern
+    // Pattern glob: antepone baseDir senza toccare il pattern
     const prefix = baseDir.split(path.sep).join('/');
     return `${prefix}/${s}`;
   }
-  // Concrete relative path: canonical resolution
+  // Percorso relativo concreto: risoluzione canonica
   return path.resolve(baseDir, s).split(path.sep).join('/');
 });

@@ -1,5 +1,5 @@
-// Auto-generated file, do not edit manually.
-// Run `npm run generate:types` to regenerate.
+// File generato automaticamente, non modificare a mano.
+// Eseguire `npm run generate:types` per rigenerarlo.
 
 export type MinimoClass =
   | 'ac-autocomplete-wrapper'

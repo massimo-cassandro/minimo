@@ -1,6 +1,6 @@
 /*! minimo - Title Case */
 /**
- * Converts a string to title case (first letter of each word uppercase, rest lowercase).
+ * Converte una stringa in title case (prima lettera di ogni parola maiuscola, il resto minuscolo).
  * @param {string | null | undefined} str
  * @returns {string | null | undefined}
  */

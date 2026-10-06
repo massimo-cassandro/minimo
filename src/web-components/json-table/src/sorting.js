@@ -4,7 +4,7 @@
 /** @typedef {'asc'|'desc'} SortDir */
 
 /**
- * Whether a sort value counts as "empty" (sorted last in both directions).
+ * Indica se un valore di ordinamento conta come "vuoto" (ordinato per ultimo in entrambe le direzioni).
  * @param {*} value
  * @returns {boolean}
  */
@@ -13,7 +13,7 @@ function isEmpty(value) {
 }
 
 /**
- * Whether a value is a number or a numeric string.
+ * Indica se un valore è un numero o una stringa numerica.
  * @param {*} value
  * @returns {boolean}
  */
@@ -26,20 +26,20 @@ function isNumeric(value) {
 
 
 /**
- * Compares two sort values in ascending order: empty values (`null`, `undefined`, `''`, `NaN`)
- * always last, numbers (and numeric strings, when both are numeric) numerically, booleans as
- * 0/1, everything else as strings via `localeCompare` (numeric collation, accent/case insensitive).
+ * Confronta due valori di ordinamento in ordine crescente: i valori vuoti (`null`, `undefined`, `''`, `NaN`)
+ * sempre per ultimi, i numeri (e le stringhe numeriche, quando entrambi sono numerici) in modo numerico, i booleani come
+ * 0/1, tutto il resto come stringhe tramite `localeCompare` (collazione numerica, senza distinzione di accenti/maiuscole).
  *
  * @param {*} a
  * @param {*} b
- * @param {string} [locale] - Locale used by `localeCompare` (default: browser default)
- * @returns {number} Negative when `a` comes first, positive when `b` comes first, 0 when equal
+ * @param {string} [locale] - Locale usato da `localeCompare` (default: quello del browser)
+ * @returns {number} Negativo quando `a` viene prima, positivo quando `b` viene prima, 0 quando sono uguali
  *
  * @example
- * compareValues(2, 10);                  // → negative
- * compareValues('file10', 'file2');      // → positive (numeric collation)
+ * compareValues(2, 10);                  // → negativo
+ * compareValues('file10', 'file2');      // → positivo (collazione numerica)
  * compareValues('à', 'b', 'it-IT');      // → negative
- * compareValues(null, 'a');              // → positive (empty values last)
+ * compareValues(null, 'a');              // → positivo (valori vuoti per ultimi)
  */
 export function compareValues(a, b, locale) {
 
@@ -63,14 +63,14 @@ export function compareValues(a, b, locale) {
 
 
 /**
- * Returns a sorted copy of the parsed rows, by the precomputed `sortValues[key]` of every row.
- * The sort is stable, so rows with equal values keep their original order.
+ * Restituisce una copia ordinata delle righe analizzate, in base al `sortValues[key]` precalcolato di ogni riga.
+ * L'ordinamento è stabile, quindi le righe con valori uguali mantengono l'ordine originale.
  *
- * @param {ParsedRow[]} rows - Parsed rows (see `parse-rows.js`)
- * @param {string} key - Column key
- * @param {SortDir} dir - Direction
- * @param {string} [locale] - Locale used to compare strings
- * @returns {ParsedRow[]} A new array
+ * @param {ParsedRow[]} rows - Righe analizzate (vedi `parse-rows.js`)
+ * @param {string} key - Chiave della colonna
+ * @param {SortDir} dir - Direzione
+ * @param {string} [locale] - Locale usato per confrontare le stringhe
+ * @returns {ParsedRow[]} Un nuovo array
  *
  * @example
  * sortRows(state.rows, 'amount', 'desc', 'it-IT');
@@ -83,16 +83,16 @@ export function sortRows(rows, key, dir, locale) {
     const va = a.sortValues[key];
     const vb = b.sortValues[key];
     const cmp = compareValues(va, vb, locale);
-    // empty values stay last regardless of the direction
+    // i valori vuoti restano per ultimi indipendentemente dalla direzione
     return (isEmpty(va) || isEmpty(vb)) ? cmp : cmp * sign;
   });
 }
 
 
 /**
- * Next direction in the sort cycle of a column button: none → `asc` → `desc` → none.
+ * Direzione successiva nel ciclo di ordinamento del pulsante di una colonna: nessuna → `asc` → `desc` → nessuna.
  *
- * @param {SortDir|null|undefined} current - Current direction of the column (null = not sorted)
+ * @param {SortDir|null|undefined} current - Direzione corrente della colonna (null = non ordinata)
  * @returns {SortDir|null}
  *
  * @example

@@ -1,1 +1,1 @@
-Quite most icons from <https://phosphoricons.com/>
+Quasi tutte le icone provengono da <https://phosphoricons.com/>

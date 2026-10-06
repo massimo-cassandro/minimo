@@ -4,7 +4,7 @@ h2 {
   border-block: 1px solid #666;
 }
 
-/* custom template demo: search + info below the table */
+/* demo template personalizzato: search + info sotto la tabella */
 .customInfo {
   align-items: center;
   justify-content: space-between;

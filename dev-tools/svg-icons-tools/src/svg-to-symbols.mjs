@@ -44,8 +44,8 @@ export function svg_to_symbols() {
   const icon_list_var_string = 'const icons_list = ' + JSON.stringify(icons_list.sort(), null, '  ').replace(/"/g, '\'') + ';\n';
   if(fileCount && cfg.symbols.icons_list_file) {
     fs.writeFileSync(path.resolve(cfg.work_dir, cfg.symbols.icons_list_file),
-      '// List of icon symbols\n' +
-      '// NB: this is a generated file, any changes will be overwritten\n\n' +
+      '// Elenco dei symbol delle icone\n' +
+      '// NB: file generato, le eventuali modifiche verranno sovrascritte\n\n' +
       'export ' + icon_list_var_string
     );
 

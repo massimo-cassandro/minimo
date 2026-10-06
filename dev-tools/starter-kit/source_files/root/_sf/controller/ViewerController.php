@@ -129,7 +129,7 @@ class ViewerController extends AbstractController
    *              es: crop=10,10,100,100 -> ritaglia un quadrato di 100px a partire dal punto 10,10
    * @param bb: bounding box dell'area che deve contenere l'immagine ridimensionata (image magick)
    * @param fd: forza dimensioni (utilizzato in coppia con bb)
-   * @param q: compression quality (ex jq)
+   * @param q: qualità di compressione (ex jq)
    * @param alpha: mantiene la trasparenza nelle png (default 0)
    * @param bg: in combinazione con alpha=1 definisce il bkg color della png
    * @param refresh: forza la rigenerazione dell'immagine
@@ -177,7 +177,7 @@ class ViewerController extends AbstractController
     // formati accettati dal browser
     $accept = $request->server->get('HTTP_ACCEPT');
 
-    // format 'auto' default
+    // formato 'auto' di default
     if(!isset($get['f'])) {
       $get['f'] ='auto';
     } else {

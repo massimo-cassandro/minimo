@@ -1,8 +1,8 @@
 /*! minimo - Dismiss Alerts */
 /**
- * Adds click listeners to all `[data-dismiss]` elements to remove their closest ancestor
- * that matches the class specified in the `data-dismiss` attribute.
- * Typically used to remove alert boxes.
+ * Aggiunge listener click a tutti gli elementi `[data-dismiss]` per rimuovere il loro antenato
+ * più vicino che corrisponde alla classe indicata nell'attributo `data-dismiss`.
+ * Tipicamente usato per rimuovere i box di alert.
  * @returns {void}
  */
 export function dismissAlerts(){

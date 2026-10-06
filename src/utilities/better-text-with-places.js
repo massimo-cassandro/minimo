@@ -404,7 +404,7 @@ const places = [
 
 
   // --------------------
-  // places not tied to a single country (seas, oceans, regions, polar areas)
+  // luoghi non legati a un singolo paese (mari, oceani, regioni, aree polari)
   'Ande', 'Amazzonia', 'Terra del Fuoco',
   'Artide', 'Polo Nord', 'Antartide', 'Polo Sud',
   'Groenlandia', 'Lapponia', 'Siberia',
@@ -416,20 +416,20 @@ const places = [
 
 
 /**
- * Key used to match a place regardless of case, spacing and apostrophe style
+ * Chiave usata per far corrispondere un luogo indipendentemente da maiuscole/minuscole, spaziatura e stile dell'apostrofo
  * @param {string} str
  * @returns {string}
  */
 const placeKey = str => str.toLowerCase().replace(/[ \u00A0]+/g, ' ').replace(/['‘’]/g, '’');
 
 /**
- * Builds the matcher for a list of places: a single regex (longest places first, so that
- * e.g. "Lago di Como" wins over a shorter overlapping name) and a key → canonical form map.
- * The canonical form uses the typographic apostrophe and non-breaking spaces after particles,
- * consistently with betterText().
+ * Costruisce il matcher per un elenco di luoghi: una singola regex (prima i luoghi più lunghi, così che
+ * ad es. "Lago di Como" prevalga su un nome più corto sovrapposto) e una mappa chiave → forma canonica.
+ * La forma canonica usa l'apostrofo tipografico e gli spazi non separabili dopo le particelle,
+ * in modo coerente con betterText().
  *
- * @param {string[]} list - places list
- * @returns {{regex: RegExp, canonical: Map<string, string>} | null} null if the list is empty
+ * @param {string[]} list - elenco dei luoghi
+ * @returns {{regex: RegExp, canonical: Map<string, string>} | null} null se l'elenco è vuoto
  */
 function buildPlacesMatcher(list) {
   const canonical = new Map();
@@ -459,7 +459,7 @@ function buildPlacesMatcher(list) {
     );
 
   return {
-    // custom boundaries instead of \b, which doesn't work with accented edge letters (e.g. "Perù")
+    // delimitatori personalizzati al posto di \b, che non funziona con lettere accentate ai bordi (es. "Perù")
     regex: new RegExp(`(?<![\\p{L}\\p{N}])(?:${patterns.join('|')})(?![\\p{L}\\p{N}])`, 'giu'),
     canonical
   };
@@ -468,21 +468,21 @@ function buildPlacesMatcher(list) {
 const defaultMatcher = buildPlacesMatcher(places);
 
 /**
- * Version of betterText() that also normalizes the occurrences of known places
- * (countries, cities, rivers, mountains, tourist locations) found in the text:
- * matching is case-insensitive and tolerant to spacing and apostrophe style, and every
- * match is replaced by the canonical form listed in `places` (casing, typographic
- * apostrophe, non-breaking spaces after particles).
- * Places replacement runs after betterText(), so it takes precedence over the casing
- * enforced on particles and custom words.
+ * Versione di betterText() che normalizza anche le occorrenze di luoghi noti
+ * (paesi, città, fiumi, monti, località turistiche) presenti nel testo:
+ * il confronto non distingue maiuscole/minuscole ed è tollerante su spaziatura e stile
+ * dell'apostrofo, e ogni corrispondenza viene sostituita dalla forma canonica elencata in `places`
+ * (capitalizzazione, apostrofo tipografico, spazi non separabili dopo le particelle).
+ * La sostituzione dei luoghi viene eseguita dopo betterText(), quindi ha la precedenza sulla
+ * capitalizzazione imposta a particelle e parole personalizzate.
  *
- * NOTE: places that are also common words (e.g. "Meno", "Po", "Reno") are capitalized
- * wherever they appear.
+ * NOTA: i luoghi che sono anche parole comuni (es. "Meno", "Po", "Reno") vengono messi in maiuscolo
+ * ovunque compaiano.
  *
- * @param {string} str - input string to process
- * @param {string[]} [custom_words] - list of words whose exact casing must be preserved (e.g. `['iPhone', 'macOS']`) (default: [])
- * @param {string[]} [extra_places] - additional places, merged with the built-in list (default: [])
- * @returns {string} processed string, or empty string if input is falsy
+ * @param {string} str - stringa da elaborare
+ * @param {string[]} [custom_words] - elenco di parole di cui va mantenuta la capitalizzazione esatta (es. `['iPhone', 'macOS']`) (default: [])
+ * @param {string[]} [extra_places] - luoghi aggiuntivi, uniti all'elenco predefinito (default: [])
+ * @returns {string} stringa elaborata, oppure stringa vuota se l'input è falsy
  *
  * @example
  * betterTextWithPlaces("vacanza a  new york e  nel lago di como ,l'avana");

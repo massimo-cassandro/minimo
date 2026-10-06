@@ -1,7 +1,7 @@
 /*! minimo - json-table */
 
-/* Custom properties (`--jt-*`) are defined in `json-table.minimo.tokens.mjs`
-   and compiled into minimo's custom-properties.css by build-tokens */
+/* Le custom properties (`--jt-*`) sono definite in `json-table.minimo.tokens.mjs`
+   e compilate da build-tokens nel custom-properties.css di minimo */
 
 /* purgecss start ignore */
 
@@ -68,15 +68,15 @@ json-table {
 }
 
 .table {
-  /* vertical spacing is handled by the wrapper */
+  /* la spaziatura verticale è gestita dal wrapper */
   margin-block: 0;
 
-  /* the sort button fills the whole cell: the cell padding moves to the button */
+  /* il pulsante di ordinamento riempie l'intera cella: il padding della cella passa al pulsante */
   th.sortable {
     padding: 0;
   }
 
-  /* cell shown when there are no rows */
+  /* cella mostrata quando non ci sono righe */
   .empty {
     padding-block: var(--jt-empty-padding-block);
     font-style: italic;
@@ -238,7 +238,7 @@ json-table {
     fill: currentColor;
   }
 
-  /* an active sort (aria-sort on the th) shows the icon at full opacity */
+  /* un ordinamento attivo (aria-sort sul th) mostra l'icona a piena opacità */
   [aria-sort] & {
     opacity: 1;
   }

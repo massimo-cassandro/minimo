@@ -7,13 +7,13 @@ import { classnames } from '../../../utilities/classnames.js';
 /** @typedef {import('./main-builder.js').JsonTableElements} JsonTableElements */
 
 /**
- * domBuilder item of the info text container (template slot `resultInfo`).
+ * Elemento domBuilder del contenitore del testo informativo (slot del template `resultInfo`).
  *
- * Generated structure: `div.resultInfo[classes.resultInfo][aria-live=polite]`; the content is
- * set by `update-info.js`. The element is stored in `elements.resultInfo`.
+ * Struttura generata: `div.resultInfo[classes.resultInfo][aria-live=polite]`; il contenuto è
+ * impostato da `update-info.js`. L'elemento viene memorizzato in `elements.resultInfo`.
  *
- * @param {JsonTableParams} params - Resolved params
- * @param {JsonTableElements} elements - Object collecting the generated elements (mutated)
+ * @param {JsonTableParams} params - Parametri risolti
+ * @param {JsonTableElements} elements - Oggetto che raccoglie gli elementi generati (modificato)
  * @returns {DomBuilderItem}
  *
  * @example
@@ -30,21 +30,21 @@ export function resultInfoPart(params, elements) {
 
 
 /**
- * domBuilder item of the search input (template slot `search`), rendered only when
- * `params.search` is true.
+ * Elemento domBuilder dell'input di ricerca (slot del template `search`), renderizzato solo quando
+ * `params.search` è true.
  *
- * Generated structure: `div.search[classes.search] > input[type=search][classes.searchInput]`.
- * The input is stored in `elements.searchInput`.
+ * Struttura generata: `div.search[classes.search] > input[type=search][classes.searchInput]`.
+ * L'input viene memorizzato in `elements.searchInput`.
  *
  * TODO listener sull'input di ricerca: step 3
  *
- * @param {JsonTableParams} params - Resolved params
- * @param {JsonTableElements} elements - Object collecting the generated elements (mutated)
+ * @param {JsonTableParams} params - Parametri risolti
+ * @param {JsonTableElements} elements - Oggetto che raccoglie gli elementi generati (modificato)
  * @returns {DomBuilderItem}
  *
  * @example
  * domBuilder([searchPart(params, elements)], host);
- * elements.searchInput; // → HTMLInputElement (when params.search is true)
+ * elements.searchInput; // → HTMLInputElement (quando params.search è true)
  */
 export function searchPart(params, elements) {
   return {
@@ -68,21 +68,21 @@ export function searchPart(params, elements) {
 
 
 /**
- * domBuilder item of the whole info section (template slot `infoSection`): info text + search input.
+ * Elemento domBuilder dell'intera sezione informativa (slot del template `infoSection`): testo informativo + input di ricerca.
  *
- * Generated structure:
+ * Struttura generata:
  * ```
  * div.infoOuter[classes.infoOuter]
  *   div.info[classes.info]
  *     div.resultInfo                       ← resultInfoPart()
- *     div.search > input[type=search]      ← searchPart(), only if `params.search` is true
+ *     div.search > input[type=search]      ← searchPart(), solo se `params.search` è true
  * ```
  *
- * References to the generated elements are stored in `elements`
+ * I riferimenti agli elementi generati vengono memorizzati in `elements`
  * (`infoOuter`, `info`, `resultInfo`, `searchInput`).
  *
- * @param {JsonTableParams} params - Resolved params
- * @param {JsonTableElements} elements - Object collecting the generated elements (mutated)
+ * @param {JsonTableParams} params - Parametri risolti
+ * @param {JsonTableElements} elements - Oggetto che raccoglie gli elementi generati (modificato)
  * @returns {DomBuilderItem}
  *
  * @example

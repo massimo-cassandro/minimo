@@ -1,28 +1,28 @@
 # Minimo
 
-My light framework + utilities
+Il mio framework leggero + utilità
 
-## Install
+## Installazione
 
 ```bash
 npm i @massimo-cassandro/minimo
 
-# optional:
+# opzionale:
 npm i -D @massimo-cassandro/eslint-config
 ```
 
-> Note: a stylelint config is bundled with minimo itself (no separate install needed) — see [dev-tools/stylelint-config/README.md](dev-tools/stylelint-config/README.md).
+> Nota: una configurazione stylelint è inclusa in minimo (non serve un'installazione separata) — vedi [dev-tools/stylelint-config/README.md](dev-tools/stylelint-config/README.md).
 
-> Note: **minimo** is designed to be used with WebPack using the configuration you can find in the [starter-kit folder](./dev-tools/starter-kit/) of this repository. If changes are made (for example, to how SVG files are imported), things may not work as expected.
+> Nota: **minimo** è pensato per essere usato con webpack, con la configurazione disponibile nella [cartella starter-kit](./dev-tools/starter-kit/) di questo repository. Se vengono apportate modifiche (ad esempio al modo in cui vengono importati i file SVG), il funzionamento potrebbe non essere quello atteso.
 >
 
-For a complete install of all required webpack modules, use the install script at `./dev-tools/starter-kit/starter-install.sh` launching:
+Per installare tutti i moduli webpack necessari, usare lo script `./dev-tools/starter-kit/starter-install.sh`, eseguendo:
 
 ```bash
 zsh ./node_modules/@massimo-cassandro/minimo/dev-tools/starter-kit/starter-install.sh
 ```
 
-To bootstrap a project **before** installing the whole package, download only the `starter-kit` folder from the npm tarball and run the script from there:
+Per avviare un progetto **prima** di installare l'intero pacchetto, scaricare solo la cartella `starter-kit` dal tarball npm ed eseguire lo script da lì:
 
 ```bash
 curl -sL "$(npm view @massimo-cassandro/minimo dist.tarball)" | tar xz package/dev-tools/starter-kit
@@ -34,16 +34,16 @@ rm -rf package
 
 ## Design tokens
 
-Minimo comes with a set of design tokens and some utilities to manage them. See [Design Tokens readme](design-tokens/README.md).
+Minimo include un insieme di design token e alcune utilità per gestirli. Vedi il [readme dei Design Tokens](design-tokens/README.md).
 
 ## Dev Tools
 
-The [`dev-tools`](./dev-tools/README.md) directory contains a set of standalone Node.js CLI utilities for managing a web project — updating dependencies, bumping the version and changelog, and generating/optimizing SVG icons and favicons. They are published as part of the `minimo` package and exposed via the `bin` entries in `package.json` (`update-version`, `upd@m`, `svgIconsTools`, `create-favicons`); see the [Dev Tools README](./dev-tools/README.md) for the full list and usage.
+La cartella [`dev-tools`](./dev-tools/README.md) contiene un insieme di utilità CLI Node.js indipendenti per la gestione di un progetto web: aggiornamento delle dipendenze, incremento della versione e del changelog, generazione e ottimizzazione di icone SVG e favicon. Sono pubblicate insieme al pacchetto `minimo` ed esposte tramite le voci `bin` di `package.json` (`update-version`, `upd@m`, `svgIconsTools`, `create-favicons`); vedi il [README di Dev Tools](./dev-tools/README.md) per l'elenco completo e le istruzioni d'uso.
 
 
-## Docs & Demo
+## Documentazione e demo
 
-[Docs](docs/README.md)
+[Documentazione](docs/README.md)
 
-[Demo](https://massimo-cassandro.github.io/minimo/) (in progress)
+[Demo](https://massimo-cassandro.github.io/minimo/) (in lavorazione)
 

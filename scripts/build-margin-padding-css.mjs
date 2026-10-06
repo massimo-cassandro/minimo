@@ -1,22 +1,24 @@
 #!/usr/bin/env node
 /* eslint-disable no-console */
 
-// build-margin-padding-css.mjs
-// Generates 2 files from a single `classes` map:
-//   - margin-padding.css        no breakpoints
-//   - margin-padding-media.css  one @media block per breakpoint
-// By default the classes use the minimo naming. With the `--bs` flag the same
-// files (same names) are generated using the Bootstrap naming instead.
-// es: `.mbs { margin-block-start: var(--size-base) !important; }`
-// es (bootstrap naming): `.mt { margin-block-start: var(--size-base) !important; }`
-//
-// usage: `node scripts/build-margin-padding-css.mjs [--bs]`
-//
-// Each file is the cross product of `classes` x `sizes` (optionally x `media`).
-// Only the class prefixes differ between the minimo/Bootstrap variants: the
-// size scale and breakpoints are the same (minimo's own scale is used even with
-// the Bootstrap naming, since Bootstrap's numeric 0-5/auto scale has no
-// equivalent here).
+/*
+  build-margin-padding-css.mjs
+  Genera 2 file a partire da un'unica mappa `classes`:
+    - margin-padding.css        senza breakpoint
+    - margin-padding-media.css  un blocco @media per ogni breakpoint
+  Per default le classi usano la nomenclatura di minimo. Con il flag `--bs` gli stessi
+  file (stessi nomi) vengono generati con la nomenclatura di Bootstrap.
+  es: `.mbs { margin-block-start: var(--size-base) !important; }`
+  es (nomenclatura bootstrap): `.mt { margin-block-start: var(--size-base) !important; }`
+
+  utilizzo: `node scripts/build-margin-padding-css.mjs [--bs]`
+
+  Ogni file è il prodotto cartesiano di `classes` x `sizes` (eventualmente x `media`).
+  Tra le varianti minimo/Bootstrap cambiano solo i prefissi delle classi: la
+  scala delle dimensioni e i breakpoint sono gli stessi (la scala di minimo viene usata anche con
+  la nomenclatura Bootstrap, dato che la scala numerica 0-5/auto di Bootstrap non ha
+  equivalenti qui).
+*/
 
 // TODO potrebbe essere sostituito da future funzionalità native del CSS?
 
@@ -34,9 +36,9 @@ import stylelint from 'stylelint';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-const addLayer = false; // true to add `@layer` rule
+const addLayer = false; // true per aggiungere la regola `@layer`
 
-const buildBootstrap = process.argv.includes('--bs'); // use Bootstrap class naming (same target files)
+const buildBootstrap = process.argv.includes('--bs'); // usa la nomenclatura delle classi di Bootstrap (stessi file di destinazione)
 
 const target_file            = '../src/css/margin-padding.css',
   target_file_media           = '../src/css/margin-padding-media.css';
@@ -63,7 +65,7 @@ const sizes = {
   'auto'  : 'auto',
   '3xl'   : '--size-3xl',
   '2xl'   : '--size-2xl',
-  'base'  : '--size-base', // NB: no suffix in class name
+  'base'  : '--size-base', // NB: nessun suffisso nel nome della classe
   'lg'    : '--size-lg',
   'md'    : '--size-md',
   'sm'    : '--size-sm',
@@ -72,8 +74,8 @@ const sizes = {
   'xxs'   : '--size-xxs',
 };
 
-// classes and properties. Key is the minimo class prefix, `bs` is the
-// equivalent Bootstrap class prefix (used for the *-bootstrap.css files)
+// classi e proprietà. La chiave è il prefisso della classe di minimo, `bs` è il
+// prefisso equivalente della classe Bootstrap (usato per i file *-bootstrap.css)
 const classes = {
   m   : {
     property: 'margin',
@@ -133,9 +135,11 @@ const classes = {
   },
 };
 
-// keys are used verbatim as the class name suffix (see `responsiveClassName`)
-// — kept short and semantic (rather than xl/lg/md/sm) so they don't collide
-// with the `sizes` scale suffixes (e.g. `.mbs-lg-dsk`, not `.mbs-lg-vw-lg`)
+/*
+  le chiavi vengono usate così come sono come suffisso del nome della classe (vedi `responsiveClassName`)
+  — brevi e semantiche (invece di xl/lg/md/sm) per non collidere
+  con i suffissi della scala `sizes` (ad es. `.mbs-lg-dsk`, non `.mbs-lg-vw-lg`)
+*/
 //
 // TODO queste chiavi sono un workaround locale, non legate ai nomi --media-*
 // in src/custom-media.css (che usano ancora il vocabolario xxlarge/xlarge/
@@ -153,15 +157,15 @@ const media = {
 
 // ── helpers ───────────────────────────────────────────────────────────────
 
-// [prefix, property] pairs, using either the minimo or the Bootstrap prefix
+// coppie [prefisso, proprietà], che usano il prefisso di minimo o quello di Bootstrap
 const minimoEntries = Object.entries(classes).map(([key, def]) => [key, def.property]);
 const bsEntries = Object.values(classes).map((def) => [def.bs, def.property]);
 
-// sizes values are either a literal ('0', 'auto') or a custom property name
-// ('--size-lg'), to be wrapped in var()
+// i valori di sizes sono un letterale ('0', 'auto') oppure il nome di una custom property
+// ('--size-lg'), da racchiudere in var()
 const sizeValue = (raw) => (raw.startsWith('--') ? `var(${raw})` : raw);
 
-// NB: the 'base' size has no suffix in the class name
+// NB: la dimensione 'base' non ha suffisso nel nome della classe
 const className = (prefix, sizeKey) => (sizeKey === 'base' ? prefix : `${prefix}-${sizeKey}`);
 
 const responsiveClassName = (prefix, sizeKey, mediaKey) =>
@@ -170,20 +174,20 @@ const responsiveClassName = (prefix, sizeKey, mediaKey) =>
 const rule = (selector, property, value, indent = '') =>
   `${indent}.${selector} {\n${indent}  ${property}: ${sizeValue(value)};\n${indent}}\n`;
 
-// 'auto' is a valid value for `margin*` properties but not for `padding*`
-// (invalid CSS — must not be generated)
+// 'auto' è un valore valido per le proprietà `margin*` ma non per `padding*`
+// (CSS non valido — non deve essere generato)
 const sizeKeysFor = (property) =>
   property.startsWith('padding')
     ? Object.entries(sizes).filter(([sizeKey]) => sizeKey !== 'auto')
     : Object.entries(sizes);
 
-// comments are kept outside `@layer utilities` on purpose: they document the
-// file, they're not part of the cascade
+// i commenti restano volutamente fuori da `@layer utilities`: documentano il
+// file, non fanno parte della cascata
 const fileHeader = (notes) =>
   '/* stylelint-disable selector-class-pattern */\n\n' +
-  '/* AUTO-GENERATED FILE — do not edit by hand.\n' +
-  '   Generated by `node scripts/build-margin-padding-css.mjs`.\n' +
-  '   Edit the `sizes` / `classes` / `media` maps there instead.\n\n' +
+  '/* FILE GENERATO AUTOMATICAMENTE — non modificare a mano.\n' +
+  '   Generato da `node scripts/build-margin-padding-css.mjs`.\n' +
+  '   Modificare invece le mappe `sizes` / `classes` / `media` dello script.\n\n' +
   notes.map((n) => `   ${n}`).join('\n') +
   ' */\n\n';
 
@@ -237,14 +241,14 @@ const files = [
     dest: path.resolve(__dirname, target_file),
     content: buildPlainCss(entries, fileHeader([
       ...namingNotes,
-      `Responsive variants live in \`${path.basename(target_file_media)}\`.`,
+      `Le varianti responsive sono in \`${path.basename(target_file_media)}\`.`,
     ])),
   },
   {
     dest: path.resolve(__dirname, target_file_media),
     content: buildMediaCss(entries, fileHeader([
       ...namingNotes,
-      `Responsive companion of \`${path.basename(target_file)}\`, one @media block per breakpoint.`,
+      `Controparte responsive di \`${path.basename(target_file)}\`, un blocco @media per breakpoint.`,
     ])),
   },
 ];

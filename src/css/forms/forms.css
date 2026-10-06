@@ -8,7 +8,7 @@
 
 .form-group:has([required]):not(:has([disabled])) {
 
-  /* `>` excludes labels within form-collections  */
+  /* `>` esclude le label all'interno delle form-collection  */
   > .form-label {
     position: relative;
     padding-inline-start: var(--form-control-required-label-padding-inline-start);
@@ -24,7 +24,7 @@
   }
 }
 
-/* single checkboxes and radios are vertically centered */
+/* le singole checkbox e radio sono centrate verticalmente */
 .form-group:not(.form-collection-fset):has(.form-check:not(.form-check-top-label)) {
   align-self: center;
   .form-check {
@@ -40,8 +40,8 @@
 }
 
 /*
-with implicit label, without id and for.
-Example:
+con label implicita, senza id e for.
+Esempio:
 
 <div class="form-group">
   <label>

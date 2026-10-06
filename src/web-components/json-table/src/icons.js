@@ -10,41 +10,41 @@ import caretRight from '../../../icons/caret-right.svg?inline';
 
 /** @typedef {import('./defaults.js').IconDef} IconDef */
 
-/** Default icon of `true` values (minimo `check-bold`, inline SVG markup) */
+/** Icona predefinita dei valori `true` (`check-bold` di minimo, markup SVG inline) */
 export const boolTrueIcon = checkBold;
-/** Default icon of `false` values (minimo `x-bold`) */
+/** Icona predefinita dei valori `false` (`x-bold` di minimo) */
 export const boolFalseIcon = xBold;
-/** Default sort button icon, ascending sort active (minimo `arrow-up`) */
+/** Icona predefinita del pulsante di ordinamento, ordinamento crescente attivo (`arrow-up` di minimo) */
 export const sortAscArrowIcon = arrowUp;
-/** Default sort button icon, descending sort active (minimo `arrow-down`) */
+/** Icona predefinita del pulsante di ordinamento, ordinamento decrescente attivo (`arrow-down` di minimo) */
 export const sortDescArrowIcon = arrowDown;
-/** Default sort button icon, no sort active (minimo `arrows-down-up`) */
+/** Icona predefinita del pulsante di ordinamento, nessun ordinamento attivo (`arrows-down-up` di minimo) */
 export const sortNoneArrowIcon = arrowsDownUp;
-/** Default previous page button icon (minimo `caret-left`) */
+/** Icona predefinita del pulsante pagina precedente (`caret-left` di minimo) */
 export const paginationPrevIcon = caretLeft;
-/** Default next page button icon (minimo `caret-right`) */
+/** Icona predefinita del pulsante pagina successiva (`caret-right` di minimo) */
 export const paginationNextIcon = caretRight;
 
 /**
- * Markup strings already parsed, keyed by the string itself.
+ * Stringhe di markup già analizzate, indicizzate dalla stringa stessa.
  * @type {Map<string, DocumentFragment>}
  */
 const fragmentCache = new Map();
 
 /**
- * Resolves an icon definition to a content usable by domBuilder (`content`) or `setContent()`.
+ * Risolve la definizione di un'icona in un contenuto utilizzabile da domBuilder (`content`) o da `setContent()`.
  *
- * Markup strings are parsed once through an inert `<template>` and cloned on every call, so the
- * same icon can be inserted in many cells without re-parsing and without going through the HTML
- * sanitizer used by domBuilder for markup strings (icons are developer-supplied configuration,
- * not user data). DOM nodes are cloned too, since a node can live in one place only.
+ * Le stringhe di markup vengono analizzate una sola volta tramite un `<template>` inerte e clonate a ogni chiamata, così che la
+ * stessa icona possa essere inserita in molte celle senza nuova analisi e senza passare dal sanitizer HTML
+ * usato da domBuilder per le stringhe di markup (le icone sono configurazione fornita dallo sviluppatore,
+ * non dati dell'utente). Anche i nodi DOM vengono clonati, dato che un nodo può stare in un solo posto.
  *
- * @param {IconDef|null|undefined} icon - Icon definition (see `IconDef`)
- * @returns {Node|DomBuilderItem[]|null} A fresh node (or domBuilder array), `null` when `icon` is nullish
+ * @param {IconDef|null|undefined} icon - Definizione dell'icona (vedi `IconDef`)
+ * @returns {Node|DomBuilderItem[]|null} Un nodo nuovo (o un array domBuilder), `null` quando `icon` è nullish
  *
  * @example
- * iconContent('<svg …></svg>');                  // → DocumentFragment (clone of the parsed markup)
- * iconContent(document.querySelector('svg'));   // → cloned SVGElement
+ * iconContent('<svg …></svg>');                  // → DocumentFragment (clone del markup analizzato)
+ * iconContent(document.querySelector('svg'));   // → SVGElement clonato
  * iconContent({ tag: 'span', content: '✓' });   // → [{ tag: 'span', content: '✓' }] (domBuilder array)
  * iconContent(() => '<svg …></svg>');           // → DocumentFragment
  * iconContent(null);                            // → null

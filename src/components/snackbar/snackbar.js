@@ -4,7 +4,7 @@ import { classnames } from '../../utilities/classnames.js';
 import * as styles from './snackbar.module.css';
 
 /*
-References
+Riferimenti
 * https://web.dev/learn/css/popover-and-dialog
 * https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Global_attributes/popover
 * https://developer.mozilla.org/en-US/docs/Web/API/Popover_API
@@ -14,19 +14,19 @@ References
 
 */
 
-// TODO snackbar action
-// TODO handle multiple simultaneous snackbars (no stacking)
+// TODO azione della snackbar
+// TODO gestire più snackbar simultanee (senza stacking)
 // TODO test con prefers-reduced-motion
 
 /**
- * Displays a snackbar / toast notification using the Popover API.
- * @param {string} message - The message to display.
+ * Mostra una notifica snackbar / toast usando la Popover API.
+ * @param {string} message - Il messaggio da mostrare.
  * @param {Object} [options={}] (default: {})
- * @param {string | null} [options.status=null] - Status variant: `danger`, `warning`, `info`, or `success`. (default: null)
- * @param {number | false | null} [options.duration=4000] - Auto-close delay in ms; `false` or `null` disables auto-close. (default: 4000)
- * @param {boolean} [options.close_btn=true] - Whether to show the close button. (default: true)
- * @param {Function | null} [options.action=null] - Action callback. (default: null)
- * @param {string | null} [options.action_text=null] - Label for the action button. (default: null)
+ * @param {string | null} [options.status=null] - Variante di stato: `danger`, `warning`, `info` o `success` (default: null)
+ * @param {number | false | null} [options.duration=4000] - Ritardo di chiusura automatica in ms; `false` o `null` disattiva la chiusura automatica (default: 4000)
+ * @param {boolean} [options.close_btn=true] - Se mostrare il pulsante di chiusura (default: true)
+ * @param {Function | null} [options.action=null] - Callback dell'azione (default: null)
+ * @param {string | null} [options.action_text=null] - Etichetta del pulsante di azione (default: null)
  * @returns {{ close: function(): void }}
  */
 export function snackbar(message, options = {}){
@@ -34,11 +34,11 @@ export function snackbar(message, options = {}){
   options = {
 
     status       : null, // danger, warning, info, success
-    duration     : 4000, // ms or false/null to avoid autoclose
+    duration     : 4000, // ms oppure false/null per evitare la chiusura automatica
     close_btn    : true, // true | false
 
-    action       : null, // null or function
-    action_text  : null, // null or string
+    action       : null, // null o funzione
+    action_text  : null, // null o stringa
 
     ...options
   };
@@ -51,7 +51,7 @@ export function snackbar(message, options = {}){
 
   const removePopover = () => {
     if (_isRemoving || !_popover?.matches(':popover-open')) return;
-    _isRemoving = true; // prevents double-removal if called multiple times during the close animation
+    _isRemoving = true; // evita la doppia rimozione se chiamata più volte durante l'animazione di chiusura
 
     if (_timeoutID) clearTimeout(_timeoutID);
 
@@ -62,10 +62,10 @@ export function snackbar(message, options = {}){
 
     _popover?.classList.add(styles.isHiding);
 
-    // with `prefers-reduced-motion` (or any override disabling animations) no animation
-    // runs and `animationend` would never fire: in that case remove immediately
+    // con `prefers-reduced-motion` (o qualsiasi override che disattivi le animazioni) non parte
+    // alcuna animazione e `animationend` non scatterebbe mai: in tal caso rimuove subito
     if (_popover?.getAnimations().length) {
-      // 'once' prevents duplicate listeners; the flag guards against calls before animation ends
+      // 'once' evita listener duplicati; il flag protegge dalle chiamate prima della fine dell'animazione
       _popover.addEventListener('animationend', remove, { once: true });
     }
     else {
@@ -115,10 +115,10 @@ export function snackbar(message, options = {}){
 
 
   if(options.duration) {
-    const duration = options.duration; // const preserves narrowing inside closures
+    const duration = options.duration; // const mantiene il narrowing dentro le closure
     _timeoutID = setTimeout(removePopover, duration);
 
-    // pause the auto-close timeout on hover
+    // mette in pausa il timeout di chiusura automatica al passaggio del mouse
     _popover?.addEventListener('mouseenter', () => clearTimeout(_timeoutID));
     _popover?.addEventListener('mouseleave', () => {
       _timeoutID = setTimeout(removePopover, duration);

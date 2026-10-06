@@ -67,21 +67,21 @@ export const unsplashParams = {
 
 
 
-// Default query parameters for the Unsplash /search/photos endpoint.
-// All params are optional except `query` (passed at call time).
+// Parametri di query di default per l'endpoint /search/photos di Unsplash.
+// Tutti i parametri sono opzionali tranne `query` (passato al momento della chiamata).
 const defaultUnsplashParams = {
-    per_page: 18,           // results per page — max: 30
+    per_page: 18,           // risultati per pagina — max: 30
     // order_by: 'relevant',   // "relevant" | "latest"
-    content_filter: 'high', // "low" | "high" — filters explicit content
+    content_filter: 'high', // "low" | "high" — filtra i contenuti espliciti
     orientation: 'landscape', // "landscape" | "portrait" | "squarish"
     lang: 'it',
 
-    // Other available params (not set by default):
-    // page        : (int)    — page number, default 1
+    // Altri parametri disponibili (non impostati di default):
+    // page        : (int)    — numero di pagina, default 1
     // color       : (string) — "black_and_white" | "black" | "white" | "yellow" |
     //                          "orange" | "red" | "purple" | "magenta" |
     //                          "green" | "teal" | "blue"
-    // collections : (string) — comma-separated collection IDs to narrow results
+    // collections : (string) — ID delle collezioni separati da virgola per restringere i risultati
   }
 
   ,app_data = getAppData()
@@ -170,7 +170,7 @@ export function unsplashPictureTag(img_data, options = {}){
     ...options
   };
 
-  const formats = ['avif', 'webp', 'pjpg'] // `fmt` parameter, in order of use
+  const formats = ['avif', 'webp', 'pjpg'] // parametro `fmt`, in ordine di utilizzo
     ,base_url = new URL(img_data.raw_url)
     ,searchParams = new URLSearchParams(base_url.search)
     ,img_params = [['q', '60']]
@@ -264,7 +264,7 @@ export function unsplashPictureTag(img_data, options = {}){
 
     // img_params.push(
     //   ['fit', 'crop'],
-    //   ['crop', 'faces,entropy,edges'], // top, bottom, left, right, faces, focalpoint, edges, and entropy
+    //   ['crop', 'faces,entropy,edges'], // top, bottom, left, right, faces, focalpoint, edges ed entropy
     // );
     // const sizes = [
     //   {w: 2560, ratio: 16/9},

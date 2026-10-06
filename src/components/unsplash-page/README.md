@@ -1,15 +1,15 @@
 # Unsplash page
-Single page with random photo from [Unsplash](https://unsplash.com/) to display some messages (useful for error pages).
+Pagina singola con una foto casuale da [Unsplash](https://unsplash.com/) per mostrare alcuni messaggi (utile per le pagine di errore).
 
-This component comes from some experiments I did with the Unsplash API. The initial purpose was to display more appealing error pages, but you can use it for any use.
+Questo componente nasce da alcuni esperimenti fatti con le API di Unsplash. Lo scopo iniziale era mostrare pagine di errore più accattivanti, ma si può usare per qualsiasi altro scopo.
 
-For best results, it is advisable to display images from a photo collection prepared on Unsplash. The demos in this repository use my collection ["World"](https://unsplash.com/collections/3660951/world).
+Per ottenere i risultati migliori è consigliabile mostrare immagini da una collezione di foto preparata su Unsplash. Le demo di questo repository usano la mia collezione ["World"](https://unsplash.com/collections/3660951/world).
 
-You need to create a server script to retrieve the JSON data of a random image from Unsplash (see [Get a Random Photo](https://unsplash.com/documentation#get-a-random-photo) on Unsplash API docs).
+Serve uno script lato server per recuperare i dati JSON di un'immagine casuale da Unsplash (vedi [Get a Random Photo](https://unsplash.com/documentation#get-a-random-photo) nella documentazione delle API di Unsplash).
 
-The script also implements [BlurHash](https://blurha.sh/), to show a placeholder of the image until it loads.
+Lo script implementa anche [BlurHash](https://blurha.sh/), per mostrare un placeholder dell'immagine fino al suo caricamento.
 
-For more details and examples take a look at:
+Per maggiori dettagli ed esempi vedi:
 
 * <https://unsplash.com/developers>
 * [A Random Image Slideshow With Unsplash and React](https://betterprogramming.pub/a-random-image-slideshow-with-unsplash-and-react-1b6aee698652)
@@ -18,6 +18,6 @@ For more details and examples take a look at:
 * [A Split Image Effect in React](https://medium.com/better-programming/a-split-image-effect-in-react-beb2baa3fe5f) and [split image](https://github.com/massimo-cassandro/area-test/tree/main/2023-07-split-image)
 
 
-The SVG icons used in the script are from [Phosphor Icon](https://phosphoricons.com/). At the moment it is not possible to use different ones without modifying the source code.
+Le icone SVG usate nello script provengono da [Phosphor Icon](https://phosphoricons.com/). Al momento non è possibile usarne di diverse senza modificare il codice sorgente.
 
-The `snippets` directory contains an example of implementing Unsplash Page for an error page system in twig/Symfony
+La directory `snippets` contiene un esempio di implementazione di Unsplash Page per un sistema di pagine di errore in twig/Symfony

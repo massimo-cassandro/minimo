@@ -60,7 +60,7 @@ export function cssRules({
       oneOf: [
 
         {
-          // `import url from './file.css?as_url'`: the file is emitted as is and its URL is returned
+          // `import url from './file.css?as_url'`: il file viene emesso così com'è e ne viene restituito l'URL
           resourceQuery: /as_url/,
           type: 'asset/resource',
           generator: {

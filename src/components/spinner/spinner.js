@@ -1,10 +1,10 @@
 import * as styles from './spinner.module.css';
 
-// The spinner class depends on the spinner type in use; the corresponding CSS file must be included.
-// TODO: system for configuring the spinner type to allow multiple spinner types in the same project
+// La classe dello spinner dipende dal tipo di spinner in uso; deve essere incluso il file CSS corrispondente.
+// TODO: sistema per configurare il tipo di spinner, così da consentire più tipi di spinner nello stesso progetto
 
 /**
- * Returns the HTML markup for a loading spinner.
+ * Restituisce il markup HTML di uno spinner di caricamento.
  * @returns {string}
  */
 export function spinner() {

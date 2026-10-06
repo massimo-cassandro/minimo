@@ -1,17 +1,17 @@
 # Stylelint config
 
-My [stylelint](https://stylelint.io/) config,
+La mia configurazione di [stylelint](https://stylelint.io/),
 
 
-## Use
+## Utilizzo
 
-Install package:
+Installare il pacchetto:
 
 ```bash
 npm install @massimo-cassandro/minimo
 ```
 
-Create a `stylelint.config.mjs` file and add:
+Creare un file `stylelint.config.mjs` e aggiungere:
 
 ```javascript
 export default {
@@ -19,7 +19,7 @@ export default {
     '@massimo-cassandro/minimo/stylelint-config',
   ],
 
-  // Files to be ignored
+  // File da ignorare
   ignoreFiles: [
     'node_modules/**/*.{css,scss}',
     'vendor/**/*.{css,scss}',
@@ -30,9 +30,9 @@ export default {
     'test/**/*.css'
   ],
 
-  // Overrides
+  // Override
   rules: {
-    //********************** optionally for tailwind:
+    //********************** opzionale per tailwind:
     // 'at-rule-no-unknown': [
     //   true,
     //   'value-keyword-case': null,

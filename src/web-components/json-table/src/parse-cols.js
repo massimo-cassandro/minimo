@@ -5,8 +5,8 @@
 /** @typedef {import('./defaults.js').DataTypeDefinition} DataTypeDefinition */
 
 /**
- * Column definition after parsing: every property has a value, `condition` is resolved to a
- * boolean, `headerClass`/`cellClass` are the final class strings and `_type` is the data type object.
+ * Definizione della colonna dopo l'analisi: ogni proprietà ha un valore, `condition` è risolto in un
+ * booleano, `headerClass`/`cellClass` sono le stringhe di classi finali e `_type` è l'oggetto del data type.
  * @typedef {Required<Omit<ColDefinition, 'type'|'condition'|'sortValue'|'searchValue'>> & {
  *   condition: boolean,
  *   sortValue: *,
@@ -16,7 +16,7 @@
  */
 
 /**
- * Column defaults.
+ * Default delle colonne.
  * @type {Omit<Required<ColDefinition>, 'type'|'sortValue'|'searchValue'> & { sortValue: *, searchValue: * }}
  */
 export const colDefaults = {
@@ -37,28 +37,28 @@ export const colDefaults = {
 
 
 /**
- * Normalizes the `cols` param: applies the column defaults and the data type `colDefaults`,
- * resolves the `type`/`dataType` alias, the `condition` and the `headerClass`/`cellClass`
- * fallbacks, and drops the columns whose `condition` is false.
+ * Normalizza il parametro `cols`: applica i default delle colonne e i `colDefaults` del data type,
+ * risolve l'alias `type`/`dataType`, `condition` e i fallback di `headerClass`/`cellClass`,
+ * ed elimina le colonne la cui `condition` è false.
  *
- * `cols` is required: an empty or missing definition throws.
+ * `cols` è obbligatorio: una definizione vuota o mancante lancia un errore.
  *
- * Merge order (lowest first): `colDefaults` ← data type `colDefaults` ← column definition.
- * Class resolution: `headerClass` = column `headerClass` ?? column `cellClass` ?? type `headerClass`;
- * `cellClass` = column `cellClass` ?? column `headerClass` ?? type `cellClass`.
+ * Ordine di unione (dal più basso): `colDefaults` ← `colDefaults` del data type ← definizione della colonna.
+ * Risoluzione delle classi: `headerClass` = `headerClass` della colonna ?? `cellClass` della colonna ?? `headerClass` del tipo;
+ * `cellClass` = `cellClass` della colonna ?? `headerClass` della colonna ?? `cellClass` del tipo.
  *
- * @param {ColDefinition[]|null|undefined} cols - Columns definition (`params.cols`)
- * @param {Object<string, DataTypeDefinition>} dataTypes - Data types map (see `buildDataTypes`)
- * @param {JsonTableParams} params - Resolved params (passed to `condition` functions)
- * @returns {ParsedCol[]} Visible columns only
- * @throws {Error} On missing/empty `cols`, missing `key` or unknown data type
+ * @param {ColDefinition[]|null|undefined} cols - Definizione delle colonne (`params.cols`)
+ * @param {Object<string, DataTypeDefinition>} dataTypes - Mappa dei data type (vedi `buildDataTypes`)
+ * @param {JsonTableParams} params - Parametri risolti (passati alle funzioni `condition`)
+ * @returns {ParsedCol[]} Solo le colonne visibili
+ * @throws {Error} In caso di `cols` mancante/vuoto, `key` mancante o data type sconosciuto
  *
  * @example
  * parseCols([
  *   { key: 'id', dataType: 'id' },                       // title: 'id' (default: key)
  *   { key: 'name', title: 'Nome', cellClass: 'fw-bold' }, // headerClass: 'fw-bold' (default: cellClass)
- *   { key: 'amount', type: 'euro', tfootRender: '@sum' }, // `type` alias of `dataType`
- *   { key: 'notes', condition: false }                     // dropped
+ *   { key: 'amount', type: 'euro', tfootRender: '@sum' }, // `type` alias di `dataType`
+ *   { key: 'notes', condition: false }                     // scartata
  * ], dataTypes, params);
  */
 export function parseCols(cols, dataTypes, params) {
@@ -81,7 +81,7 @@ export function parseCols(cols, dataTypes, params) {
         throw new Error(`[json-table] colonna #${idx} (${col.key}): dataType \`${dataType}\` non definito`);
       }
 
-      // `type` is only an alias of `dataType`: dropped from the merged definition
+      // `type` è solo un alias di `dataType`: eliminato dalla definizione unita
       const colProps = { ...col };
       delete colProps.type;
 

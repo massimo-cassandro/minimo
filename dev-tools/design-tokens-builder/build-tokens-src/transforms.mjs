@@ -1,14 +1,16 @@
-// build-tokens-src/transforms.mjs
-// Registers all custom Style Dictionary transforms.
-// Imported once by build-tokens.mjs before buildAllPlatforms() is called.
+/*
+  build-tokens-src/transforms.mjs
+  Registra tutte le transform personalizzate di Style Dictionary.
+  Importato una sola volta da build-tokens.mjs prima di chiamare buildAllPlatforms().
+*/
 
 import StyleDictionary from 'style-dictionary';
 import { getSourcePrefix } from './source-prefixes.mjs';
 
 const BASE_FONT_SIZE = 16;
 
-// Converts a px value to rem. Returns the original string unchanged for
-// non-px values, and '0' for zero values regardless of unit.
+// Converte un valore px in rem. Restituisce invariata la stringa originale per i
+// valori non px, e '0' per i valori zero indipendentemente dall'unità.
 const toRem = (val) => {
   if (val === undefined || val === null) return '0';
   const str = String(val).trim();
@@ -19,11 +21,13 @@ const toRem = (val) => {
   return str;
 };
 
-// ---------------------------------------------------------------------------
-// 1. Shadow
-// Converts shadow token objects (single or array) to a CSS box-shadow string.
-// px values are converted to rem. Alias references are resolved transitively.
-// ---------------------------------------------------------------------------
+/*
+  ---------------------------------------------------------------------------
+  1. Shadow
+  Converte gli oggetti token shadow (singoli o array) in una stringa CSS box-shadow.
+  I valori px vengono convertiti in rem. I riferimenti alias vengono risolti in modo transitivo.
+  ---------------------------------------------------------------------------
+*/
 StyleDictionary.registerTransform({
   name: 'shadow/css',
   type: 'value',
@@ -38,7 +42,7 @@ StyleDictionary.registerTransform({
 
     const shadows = Array.isArray(value) ? value : [value];
 
-    // Already a resolved CSS string (e.g. from an alias)
+    // È già una stringa CSS risolta (ad es. da un alias)
     if (shadows.length === 1 && typeof shadows[0] === 'string') return shadows[0];
 
     return shadows
@@ -55,9 +59,11 @@ StyleDictionary.registerTransform({
   },
 });
 
-// ---------------------------------------------------------------------------
-// 2. px → rem (dimension tokens only, skips values already in rem, %, em, ...)
-// ---------------------------------------------------------------------------
+/*
+  ---------------------------------------------------------------------------
+  2. px → rem (solo token dimension, salta i valori già in rem, %, em, ...)
+  ---------------------------------------------------------------------------
+*/
 StyleDictionary.registerTransform({
   name: 'size/pxToRem-smart',
   type: 'value',
@@ -75,11 +81,13 @@ StyleDictionary.registerTransform({
   },
 });
 
-// ---------------------------------------------------------------------------
-// 3. Color passthrough
-// Ensures the resolved value is returned as-is, supporting both $value and
-// legacy value fields and transitive alias resolution.
-// ---------------------------------------------------------------------------
+/*
+  ---------------------------------------------------------------------------
+  3. Passthrough dei colori
+  Garantisce che il valore risolto venga restituito così com'è, supportando sia i campi $value sia
+  i campi value legacy e la risoluzione transitiva degli alias.
+  ---------------------------------------------------------------------------
+*/
 StyleDictionary.registerTransform({
   name: 'color/css-modern',
   type: 'value',
@@ -87,8 +95,8 @@ StyleDictionary.registerTransform({
   filter: (token) => token.$type === 'color' || token.type === 'color',
   transform: (token) => {
     const original = token.original?.$value ?? token.original?.value;
-    // If the original value is a CSS function containing {references},
-    // return it untouched so the css format can resolve refs to var(--...)
+    // Se il valore originale è una funzione CSS che contiene {riferimenti},
+    // lo restituisce intatto così che il format css possa risolvere i riferimenti in var(--...)
     if (typeof original === 'string' && original.includes('{') && !original.startsWith('{')) {
       return original;
     }
@@ -96,12 +104,14 @@ StyleDictionary.registerTransform({
   },
 });
 
-// ---------------------------------------------------------------------------
-// 4. Gradient
-// Converts gradient token objects to CSS gradient functions.
-// Supports linear, radial and conic types. Alias references are resolved
-// transitively; already-resolved strings are returned unchanged.
-// ---------------------------------------------------------------------------
+/*
+  ---------------------------------------------------------------------------
+  4. Gradient
+  Converte gli oggetti token gradient in funzioni CSS gradient.
+  Supporta i tipi linear, radial e conic. I riferimenti alias vengono risolti
+  in modo transitivo; le stringhe già risolte vengono restituite invariate.
+  ---------------------------------------------------------------------------
+*/
 StyleDictionary.registerTransform({
   name: 'gradient/css',
   type: 'value',
@@ -110,8 +120,8 @@ StyleDictionary.registerTransform({
   transform: (token) => {
     const original = token.original?.$value ?? token.original?.value;
 
-    // If the original is a CSS function containing {references}, return it
-    // untouched so the css format can resolve refs to var(--...).
+    // Se l'originale è una funzione CSS che contiene {riferimenti}, lo restituisce
+    // intatto così che il format css possa risolvere i riferimenti in var(--...).
     if (typeof original === 'string' && original.includes('{') && !original.startsWith('{')) {
       return original;
     }
@@ -143,11 +153,13 @@ StyleDictionary.registerTransform({
   },
 });
 
-// ---------------------------------------------------------------------------
-// 5. Composite (border, outline, transition, animation)
-// Converts composite token objects to their CSS shorthand equivalents.
-// Only applied to object values; strings pass through unchanged.
-// ---------------------------------------------------------------------------
+/*
+  ---------------------------------------------------------------------------
+  5. Composite (border, outline, transition, animation)
+  Converte gli oggetti token composite nei corrispondenti shorthand CSS.
+  Applicata solo ai valori oggetto; le stringhe passano invariate.
+  ---------------------------------------------------------------------------
+*/
 StyleDictionary.registerTransform({
   name: 'composite/css',
   type: 'value',
@@ -201,11 +213,13 @@ StyleDictionary.registerTransform({
   },
 });
 
-// ---------------------------------------------------------------------------
-// 6. Typography passthrough
-// Returns the token value as-is. The css/variables-sorted format is
-// responsible for exploding typography tokens into individual CSS properties.
-// ---------------------------------------------------------------------------
+/*
+  ---------------------------------------------------------------------------
+  6. Passthrough della tipografia
+  Restituisce il valore del token così com'è. Il format css/variables-sorted
+  si occupa di scomporre i token tipografici nelle singole proprietà CSS.
+  ---------------------------------------------------------------------------
+*/
 StyleDictionary.registerTransform({
   name: 'typography/css',
   type: 'value',
@@ -214,15 +228,17 @@ StyleDictionary.registerTransform({
   transform: (token) => token.$value ?? token.value,
 });
 
-// ---------------------------------------------------------------------------
-// 7. Kebab-case name with per-source prefix
-// Same as the built-in name/kebab, but prepends the prefix registered for the
-// token's source file (`{ src, prefix }` entries of `source`/`sourceModes`, see
-// source-prefixes.mjs), e.g. Open Props' gray.0 with prefix 'op' -> op-gray-0.
-// Only the name changes: the token path is untouched, so {references} keep
-// resolving and are rendered as var(--<prefixed-name>). Files without a
-// prefix get exactly the built-in name/kebab result.
-// ---------------------------------------------------------------------------
+/*
+  ---------------------------------------------------------------------------
+  7. Nome in kebab-case con prefisso per sorgente
+  Come il name/kebab predefinito, ma antepone il prefisso registrato per il
+  file sorgente del token (voci `{ src, prefix }` di `source`/`sourceModes`, vedi
+  source-prefixes.mjs), ad es. gray.0 di Open Props con prefisso 'op' -> op-gray-0.
+  Cambia solo il nome: il percorso del token resta intatto, quindi i {riferimenti} continuano a
+  essere risolti e vengono resi come var(--<nome-prefissato>). I file senza
+  prefisso ottengono esattamente il risultato del name/kebab predefinito.
+  ---------------------------------------------------------------------------
+*/
 StyleDictionary.registerTransform({
   name: 'name/kebab-prefixed',
   type: 'name',

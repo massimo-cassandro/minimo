@@ -1,35 +1,35 @@
-// compiled once at module load, since the pattern never changes between calls
+// compilato una sola volta al caricamento del modulo, dato che il pattern non cambia tra le chiamate
 const DOM_STRING_REGEX = new RegExp(
-  /^([a-zA-Z][a-zA-Z0-9-]*)?/.source +    // tag (also accepts web component names)
-  /((?:[#.][a-zA-Z0-9_-]+)*)?/.source +   // id and classes, in any order
-  /([([{].*?[)\]}])?/.source +            // attrs
-  /(?: +(.*))?$/.source                   // content
+  /^([a-zA-Z][a-zA-Z0-9-]*)?/.source +    // tag (accetta anche i nomi dei web component)
+  /((?:[#.][a-zA-Z0-9_-]+)*)?/.source +   // id e classi, in qualsiasi ordine
+  /([([{].*?[)\]}])?/.source +            // attributi
+  /(?: +(.*))?$/.source                   // contenuto
 );
 
 /**
- * Parses a string to extract tag name, ID, classes, and attributes.
+ * Analizza una stringa per estrarne nome del tag, ID, classi e attributi.
  *
- * Expected string format:
+ * Formato atteso della stringa:
  *
  * `tag#id.class1.class2.classN(attr1: val1, attr2=val2) text content`
  *
- * Where:
- * * `tag` is the element name; defaults to `div` if omitted
- * * `#id` is the optional element id, preceded by `#`
- * * `.class1, .class2...` are optional CSS classes, each preceded by `.`
- * * `#id` and `.class` tokens can appear in any order and interleaved (e.g. `.class1#id.class2`)
- * * `(...)` is the optional attribute block; can also use `[...]` or `{...}`.
- *   Each name–value pair is separated by `:` or `=`. A bare name (no value) defaults to `true`.
- * * Text content follows after a space
+ * Dove:
+ * * `tag` è il nome dell'elemento; se omesso vale `div`
+ * * `#id` è l'id opzionale dell'elemento, preceduto da `#`
+ * * `.class1, .class2...` sono classi CSS opzionali, ciascuna preceduta da `.`
+ * * i token `#id` e `.class` possono comparire in qualsiasi ordine e alternati (es. `.class1#id.class2`)
+ * * `(...)` è il blocco opzionale degli attributi; si possono usare anche `[...]` o `{...}`.
+ *   Ogni coppia nome–valore è separata da `:` o `=`. Un nome senza valore vale `true`.
+ * * Il contenuto testuale segue dopo uno spazio
  *
- * Returns a domBuilder child object.
+ * Restituisce un oggetto figlio di domBuilder.
  *
- * Examples:
+ * Esempi:
  * > p#main-info.info.active{data-id:123,role=button} text content
  *
  * > input#search-field[type=text,disabled]
  *
- * @param {string} domString - The domBuilder string to parse.
+ * @param {string} domString - La stringa domBuilder da analizzare.
  * @returns {{tag: string, id: string|null, className: string, attrs: Object<string, string|true>, content: string|null}|null}
  */
 export function parseDomString(domString) {
@@ -41,12 +41,12 @@ export function parseDomString(domString) {
     return null;
   }
 
-  // Capture group indexes:
-  // [0]: full match
+  // Indici dei gruppi di cattura:
+  // [0]: corrispondenza completa
   // [1]: tag
-  // [2]: id and classes (e.g. "#id.class1.class2" or ".class1#id.class2")
-  // [3]: raw attributes
-  // [4]: content
+  // [2]: id e classi (es. "#id.class1.class2" oppure ".class1#id.class2")
+  // [3]: attributi grezzi
+  // [4]: contenuto
 
   const idAndClasses = matches[2] || '',
     idMatch = idAndClasses.match(/#([a-zA-Z0-9_-]+)/),

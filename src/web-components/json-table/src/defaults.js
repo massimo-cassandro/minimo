@@ -6,157 +6,157 @@ import {
 } from './icons.js';
 
 /**
- * Content accepted by every cell / heading / info area: plain text, HTML string, number,
- * DOM node or domBuilder array. `null` is rendered as `renderNullAs`, `undefined` lets the
- * default rendering pipeline go on (see `cell-content.js`).
+ * Contenuto accettato da ogni cella / intestazione / area informativa: testo semplice, stringa HTML, numero,
+ * nodo DOM o array domBuilder. `null` viene reso come `renderNullAs`, `undefined` lascia proseguire la
+ * pipeline di rendering predefinita (vedi `cell-content.js`).
  * @typedef {string|number|Node|DomBuilderItem[]|null|undefined} CellContent
  */
 
 /**
- * Icon / markup used for booleans, sort and pagination buttons: an SVG/HTML string (e.g. an
- * `.svg?inline` import), a DOM node, a domBuilder item, or a function returning one of them.
+ * Icona / markup usato per i booleani e per i pulsanti di ordinamento e paginazione: una stringa SVG/HTML (ad es. un
+ * import `.svg?inline`), un nodo DOM, un elemento domBuilder o una funzione che ne restituisce uno.
  * @typedef {string|Node|DomBuilderItem|(() => string|Node|DomBuilderItem)} IconDef
  */
 
 /**
- * Column cell renderer. Arguments are positional (all optional) to keep the simplest
- * case (`row => row.name`) as short as possible.
+ * Renderer delle celle di una colonna. Gli argomenti sono posizionali (tutti opzionali) per tenere il caso
+ * più semplice (`row => row.name`) il più breve possibile.
  * @callback ColRender
- * @param {Object} row - The data object of the current row
- * @param {HTMLTableRowElement} [tr] - The `<tr>` element of the current row
- * @param {HTMLTableCellElement} [td] - The cell element (`<td>` or `<th scope="row">`)
- * @returns {CellContent|void} Cell content; `undefined` (no `return`) falls back to the data type rendering,
- *   `null` to `renderNullAs`
+ * @param {Object} row - L'oggetto dati della riga corrente
+ * @param {HTMLTableRowElement} [tr] - L'elemento `<tr>` della riga corrente
+ * @param {HTMLTableCellElement} [td] - L'elemento cella (`<td>` o `<th scope="row">`)
+ * @returns {CellContent|void} Contenuto della cella; `undefined` (nessun `return`) ripiega sul rendering del data type,
+ *   `null` su `renderNullAs`
  */
 
 /**
- * Footer cell renderer.
+ * Renderer delle celle del footer.
  * @callback TfootRender
- * @param {Object[]} rows - The whole filtered data set, or the current page only when `updateFooterOnPageChange` is true
- * @param {HTMLTableCellElement} [td] - The footer cell element
+ * @param {Object[]} rows - L'intero insieme di dati filtrato, oppure solo la pagina corrente quando `updateFooterOnPageChange` è true
+ * @param {HTMLTableCellElement} [td] - L'elemento cella del footer
  * @returns {CellContent}
  */
 
 /**
- * Column definition (`cols` items).
+ * Definizione di una colonna (elementi di `cols`).
  *
  * @typedef {Object} ColDefinition
- * @property {string} key - REQUIRED: key of the row object (dot notation allowed for nested values, e.g. `owner.name`)
- * @property {CellContent|(() => CellContent)} [title] - Heading content (text, HTML, Node, domBuilder array or function).
- *   When the column is sortable it is the text of the sort button (default: the key itself)
- * @property {string} [dataType] - Data type, one of the `dataTypes` keys. `type` is accepted as an alias (default: 'string')
- * @property {string} [type] - Alias of `dataType`
- * @property {ColRender|string|null} [render] - Cell renderer: a function `(row, tr, td) => content` or,
- *   via HTML attribute too, a mustache-like string where `[[key]]` placeholders are replaced with the row
- *   values (nested keys allowed). Overrides the data type rendering (default: null)
- * @property {TfootRender|string|null} [tfootRender] - Footer cell content (only when `tfoot` is true): a function
- *   `(rows, td) => content`, a static string, or one of the built-in aggregates `'@sum'`, `'@avg'`, `'@min'`,
- *   `'@max'`, `'@count'` computed on the column values and formatted by the column data type.
- *   `null` renders an empty cell (default: null)
- * @property {boolean} [rowHeading] - When true the cell is a row heading (`<th scope="row">`) (default: false)
- * @property {boolean} [searchable] - Enables the search on this column (default: true)
- * @property {boolean} [sortable] - Enables the sorting on this column (default: true)
- * @property {*|((row: Object) => *)} [sortValue] - Value used for sorting, or function `row => value`.
- *   Overrides the data type `sortValue` (default: undefined = data type / raw value)
- * @property {*|((row: Object) => *)} [searchValue] - Same as `sortValue`, for the search (default: undefined)
- * @property {boolean|((params: JsonTableParams) => boolean)} [condition] - When false (or a function returning
- *   false) the column is not rendered at all (default: true)
- * @property {string|null} [headerClass] - Class(es) of the `<th>`, replacing the data type ones. When only one of
- *   `headerClass`/`cellClass` is set, the other one takes the same value (default: null)
- * @property {string|null} [cellClass] - Class(es) of the body/footer cells, replacing the data type ones (default: null)
+ * @property {string} key - OBBLIGATORIO: chiave dell'oggetto riga (notazione con punto ammessa per i valori annidati, es. `owner.name`)
+ * @property {CellContent|(() => CellContent)} [title] - Contenuto dell'intestazione (testo, HTML, Node, array domBuilder o funzione).
+ *   Quando la colonna è ordinabile è il testo del pulsante di ordinamento (default: la chiave stessa)
+ * @property {string} [dataType] - Data type, una delle chiavi di `dataTypes`. `type` è accettato come alias (default: 'string')
+ * @property {string} [type] - Alias di `dataType`
+ * @property {ColRender|string|null} [render] - Renderer della cella: una funzione `(row, tr, td) => content` oppure,
+ *   anche tramite attributo HTML, una stringa in stile mustache in cui i segnaposto `[[key]]` vengono sostituiti con i valori
+ *   della riga (chiavi annidate ammesse). Sovrascrive il rendering del data type (default: null)
+ * @property {TfootRender|string|null} [tfootRender] - Contenuto della cella del footer (solo quando `tfoot` è true): una funzione
+ *   `(rows, td) => content`, una stringa statica o uno degli aggregati predefiniti `'@sum'`, `'@avg'`, `'@min'`,
+ *   `'@max'`, `'@count'` calcolati sui valori della colonna e formattati dal data type della colonna.
+ *   `null` rende una cella vuota (default: null)
+ * @property {boolean} [rowHeading] - Se true la cella è un'intestazione di riga (`<th scope="row">`) (default: false)
+ * @property {boolean} [searchable] - Abilita la ricerca su questa colonna (default: true)
+ * @property {boolean} [sortable] - Abilita l'ordinamento su questa colonna (default: true)
+ * @property {*|((row: Object) => *)} [sortValue] - Valore usato per l'ordinamento, oppure funzione `row => value`.
+ *   Sovrascrive il `sortValue` del data type (default: undefined = data type / valore grezzo)
+ * @property {*|((row: Object) => *)} [searchValue] - Come `sortValue`, per la ricerca (default: undefined)
+ * @property {boolean|((params: JsonTableParams) => boolean)} [condition] - Se false (o una funzione che restituisce
+ *   false) la colonna non viene renderizzata affatto (default: true)
+ * @property {string|null} [headerClass] - Classe/i del `<th>`, che sostituiscono quelle del data type. Quando è impostato solo uno tra
+ *   `headerClass`/`cellClass`, l'altro assume lo stesso valore (default: null)
+ * @property {string|null} [cellClass] - Classe/i delle celle del body/footer, che sostituiscono quelle del data type (default: null)
  */
 
 /**
- * Data type definition (`dataTypes` values). Every function is optional.
+ * Definizione di un data type (valori di `dataTypes`). Ogni funzione è opzionale.
  *
  * @typedef {Object} DataTypeDefinition
- * @property {string|null} [headerClass] - Default class(es) of the `<th>` (overridable via `ColDefinition.headerClass`)
- * @property {string|null} [cellClass] - Default class(es) of the cells (overridable via `ColDefinition.cellClass`)
- * @property {((value: *, row: Object, params: JsonTableParams) => string|null)} [internalCellClass] - Class(es) always
- *   added to the cells, regardless of `cellClass` (used by the built-in `bool` type for the icon styles)
- * @property {(value: *, row: Object|null, params: JsonTableParams) => CellContent} [render] - Cell renderer; not invoked
- *   for `null`/`undefined` values, which are rendered as `renderNullAs`. `row` is null when the function is
- *   used to format a footer aggregate (`tfootRender: '@sum'`, ...)
- * @property {(value: *, row: Object, params: JsonTableParams) => *} [sortValue] - Value used for sorting (default: raw value)
- * @property {(value: *, row: Object, params: JsonTableParams) => string} [searchValue] - Value used for searching (default: `String(value)`)
- * @property {Partial<ColDefinition>} [colDefaults] - Column defaults forced by this type (e.g. `{ sortable: false }`),
- *   still overridable in the column definition
- * @property {string} [inheritsFrom] - Custom types only: key of the built-in type to extend
+ * @property {string|null} [headerClass] - Classe/i predefinite del `<th>` (sovrascrivibili tramite `ColDefinition.headerClass`)
+ * @property {string|null} [cellClass] - Classe/i predefinite delle celle (sovrascrivibili tramite `ColDefinition.cellClass`)
+ * @property {((value: *, row: Object, params: JsonTableParams) => string|null)} [internalCellClass] - Classe/i sempre
+ *   aggiunte alle celle, indipendentemente da `cellClass` (usata dal tipo `bool` predefinito per gli stili delle icone)
+ * @property {(value: *, row: Object|null, params: JsonTableParams) => CellContent} [render] - Renderer della cella; non invocato
+ *   per i valori `null`/`undefined`, che vengono resi come `renderNullAs`. `row` è null quando la funzione è
+ *   usata per formattare un aggregato del footer (`tfootRender: '@sum'`, ...)
+ * @property {(value: *, row: Object, params: JsonTableParams) => *} [sortValue] - Valore usato per l'ordinamento (default: valore grezzo)
+ * @property {(value: *, row: Object, params: JsonTableParams) => string} [searchValue] - Valore usato per la ricerca (default: `String(value)`)
+ * @property {Partial<ColDefinition>} [colDefaults] - Default delle colonne imposti da questo tipo (es. `{ sortable: false }`),
+ *   comunque sovrascrivibili nella definizione della colonna
+ * @property {string} [inheritsFrom] - Solo per i tipi personalizzati: chiave del tipo predefinito da estendere
  */
 
 /**
- * Consumer class names used by the generated structure. Internal layout classes (CSS module)
- * are always applied in addition to these.
+ * Nomi di classe del consumer usati dalla struttura generata. Le classi interne di layout (CSS module)
+ * vengono sempre applicate in aggiunta a queste.
  *
  * @typedef {Object} JsonTableClasses
- * @property {string|null} [wrapper] - Main wrapper (`<section>`: info section + table) (default: null)
- * @property {string|null} [infoOuter] - Outer info container (default: null)
- * @property {string|null} [info] - Info container (info text + search) (default: null)
- * @property {string|null} [resultInfo] - Info text container (default: null)
- * @property {string|null} [search] - Search input wrapper (default: null)
- * @property {string|null} [searchInput] - Search input (default: 'form-control form-control-sm')
- * @property {string|null} [tableWrapper] - Div wrapping the table (default: 'table-responsive')
- * @property {string|null} [table] - `<table>` element (default: 'table table-bordered')
- * @property {string|null} [tableFooter] - Bar below the table holding caption and pagination (default: null)
- * @property {string|null} [caption] - Caption container inside the table footer bar (default: null)
- * @property {string|null} [pagination] - Pagination `<nav>` (default: null)
- * @property {string|null} [paginationBtn] - Pagination buttons (default: 'btn-reset')
- * @property {string|null} [sortBtn] - Sort buttons inside the `<th>` (default: 'btn-reset')
- * @property {string|null} [empty] - The single cell shown when there are no rows (default: null)
- * @property {string|null} [textStart] - Inline-start alignment class (default: null, minimo cells are start-aligned by default)
- * @property {string|null} [textCenter] - Center alignment class (default: 'text-center')
- * @property {string|null} [textEnd] - Inline-end alignment class (default: 'text-end')
- * @property {string|null} [nowrap] - No-wrap class (default: 'text-nowrap')
- * @property {string|null} [numeric] - Tabular figures class, used by numeric types (default: 'text-numeric')
- * @property {string|null} [boolCell] - Extra class of every `bool` cell (default: null)
- * @property {string|null} [boolTrue] - Extra class of `bool` cells whose value is `true` (default: null)
- * @property {string|null} [boolFalse] - Extra class of `bool` cells whose value is `false` (default: null)
+ * @property {string|null} [wrapper] - Wrapper principale (`<section>`: sezione info + tabella) (default: null)
+ * @property {string|null} [infoOuter] - Contenitore esterno delle info (default: null)
+ * @property {string|null} [info] - Contenitore delle info (testo informativo + ricerca) (default: null)
+ * @property {string|null} [resultInfo] - Contenitore del testo informativo (default: null)
+ * @property {string|null} [search] - Wrapper dell'input di ricerca (default: null)
+ * @property {string|null} [searchInput] - Input di ricerca (default: 'form-control form-control-sm')
+ * @property {string|null} [tableWrapper] - Div che racchiude la tabella (default: 'table-responsive')
+ * @property {string|null} [table] - Elemento `<table>` (default: 'table table-bordered')
+ * @property {string|null} [tableFooter] - Barra sotto la tabella che contiene caption e paginazione (default: null)
+ * @property {string|null} [caption] - Contenitore della caption dentro la barra del footer della tabella (default: null)
+ * @property {string|null} [pagination] - `<nav>` della paginazione (default: null)
+ * @property {string|null} [paginationBtn] - Pulsanti di paginazione (default: 'btn-reset')
+ * @property {string|null} [sortBtn] - Pulsanti di ordinamento dentro il `<th>` (default: 'btn-reset')
+ * @property {string|null} [empty] - L'unica cella mostrata quando non ci sono righe (default: null)
+ * @property {string|null} [textStart] - Classe di allineamento inline-start (default: null, le celle di minimo sono allineate all'inizio di default)
+ * @property {string|null} [textCenter] - Classe di allineamento al centro (default: 'text-center')
+ * @property {string|null} [textEnd] - Classe di allineamento inline-end (default: 'text-end')
+ * @property {string|null} [nowrap] - Classe no-wrap (default: 'text-nowrap')
+ * @property {string|null} [numeric] - Classe per le cifre tabulari, usata dai tipi numerici (default: 'text-numeric')
+ * @property {string|null} [boolCell] - Classe extra di ogni cella `bool` (default: null)
+ * @property {string|null} [boolTrue] - Classe extra delle celle `bool` il cui valore è `true` (default: null)
+ * @property {string|null} [boolFalse] - Classe extra delle celle `bool` il cui valore è `false` (default: null)
  */
 
 /**
- * Texts used by the component. The `{page}` placeholder of the pagination labels is replaced
- * with the page number.
+ * Testi usati dal componente. Il segnaposto `{page}` delle label di paginazione viene sostituito
+ * con il numero di pagina.
  *
  * @typedef {Object} JsonTableLabels
- * @property {string} [loading] - Loading placeholder (visually hidden) (default: 'Caricamento dati…')
- * @property {string} [searchPlaceholder] - Search input placeholder (default: 'Cerca...')
- * @property {string} [searchTitle] - Search input `title` (default: 'Cerca nella tabella')
- * @property {string} [searchAriaLabel] - Search input `aria-label` (default: 'Filtra risultati')
- * @property {string} [info] - Info text template, placeholders: `{start}`, `{end}`, `{totRec}`, `{filteredRec}`,
+ * @property {string} [loading] - Placeholder di caricamento (nascosto visivamente) (default: 'Caricamento dati…')
+ * @property {string} [searchPlaceholder] - Placeholder dell'input di ricerca (default: 'Cerca...')
+ * @property {string} [searchTitle] - `title` dell'input di ricerca (default: 'Cerca nella tabella')
+ * @property {string} [searchAriaLabel] - `aria-label` dell'input di ricerca (default: 'Filtra risultati')
+ * @property {string} [info] - Template del testo informativo, segnaposto: `{start}`, `{end}`, `{totRec}`, `{filteredRec}`,
  *   `{page}`, `{totPages}` (default: 'Stai visualizzando le righe da {start} a {end}, su un totale di {filteredRec} record trovati')
- * @property {string} [noRows] - Info text and empty cell content when the data set is empty (default: 'Nessun record trovato')
- * @property {string} [noResults] - Same as `noRows`, when a search returns nothing (default: 'Nessun risultato per la ricerca')
- * @property {string} [sortAsc] - `aria-label`/`title` of the sort button when the next click sorts ascending
+ * @property {string} [noRows] - Testo informativo e contenuto della cella vuota quando l'insieme di dati è vuoto (default: 'Nessun record trovato')
+ * @property {string} [noResults] - Come `noRows`, quando una ricerca non restituisce nulla (default: 'Nessun risultato per la ricerca')
+ * @property {string} [sortAsc] - `aria-label`/`title` del pulsante di ordinamento quando il prossimo click ordina in modo crescente
  *   (default: 'Ordina questa colonna in senso ascendente (A → Z)')
- * @property {string} [sortDesc] - Same, descending (default: 'Ordina questa colonna in senso discendente (Z → A)')
- * @property {string} [sortNone] - Same, sorting removal (default: 'Rimuovi l’ordinamento a questa colonna')
- * @property {string} [paginationAriaLabel] - `aria-label` of the pagination `<nav>` (default: 'Navigazione pagine')
- * @property {string} [prevPage] - `aria-label`/`title` of the previous page button (default: 'Pagina precedente')
- * @property {string} [nextPage] - Same, next page button (default: 'Pagina successiva')
- * @property {string} [pageTitle] - `aria-label`/`title` of the page buttons (default: 'Vai a pagina {page}')
- * @property {string} [currentPage] - `aria-label`/`title` of the current page button (default: 'Pagina {page}, corrente')
+ * @property {string} [sortDesc] - Come sopra, decrescente (default: 'Ordina questa colonna in senso discendente (Z → A)')
+ * @property {string} [sortNone] - Come sopra, rimozione dell'ordinamento (default: 'Rimuovi l’ordinamento a questa colonna')
+ * @property {string} [paginationAriaLabel] - `aria-label` del `<nav>` della paginazione (default: 'Navigazione pagine')
+ * @property {string} [prevPage] - `aria-label`/`title` del pulsante pagina precedente (default: 'Pagina precedente')
+ * @property {string} [nextPage] - Come sopra, pulsante pagina successiva (default: 'Pagina successiva')
+ * @property {string} [pageTitle] - `aria-label`/`title` dei pulsanti di pagina (default: 'Vai a pagina {page}')
+ * @property {string} [currentPage] - `aria-label`/`title` del pulsante della pagina corrente (default: 'Pagina {page}, corrente')
  */
 
 /**
- * Info text function.
+ * Funzione del testo informativo.
  * @callback InfoTextFn
- * @param {number} start - Index (1-based) of the first displayed row
- * @param {number} end - Index of the last displayed row
- * @param {number} totRec - Total number of records (unfiltered)
- * @param {number} filteredRec - Number of records after filtering
- * @param {number} page - Current page (1-based)
- * @param {number} totPages - Total number of pages
+ * @param {number} start - Indice (da 1) della prima riga visualizzata
+ * @param {number} end - Indice dell'ultima riga visualizzata
+ * @param {number} totRec - Numero totale di record (non filtrati)
+ * @param {number} filteredRec - Numero di record dopo il filtro
+ * @param {number} page - Pagina corrente (da 1)
+ * @param {number} totPages - Numero totale di pagine
  * @returns {CellContent}
  */
 
 /**
- * Names of the built-in template parts.
+ * Nomi delle parti predefinite del template.
  * @typedef {'infoSection'|'resultInfo'|'search'|'table'|'caption'|'pagination'} TemplateSlot
  */
 
 /**
- * Template item: a domBuilder item (whose `children`/`content` may hold other template items)
- * or a slot placeholder `{ slot: 'name' }` replaced with one of the built-in parts.
+ * Elemento del template: un elemento domBuilder (i cui `children`/`content` possono contenere altri elementi del template)
+ * oppure un segnaposto di slot `{ slot: 'name' }` sostituito da una delle parti predefinite.
  * @typedef {(Omit<DomBuilderItem, 'children'|'content'> & {
  *   children?: Array<TemplateItem|string|Node>,
  *   content?: DomBuilderItem['content']|TemplateItem[]
@@ -164,116 +164,116 @@ import {
  */
 
 /**
- * Sort state / initial sort definition.
+ * Stato di ordinamento / definizione dell'ordinamento iniziale.
  * @typedef {Object} SortDef
- * @property {string} key - Column key
- * @property {'asc'|'desc'} dir - Direction
+ * @property {string} key - Chiave della colonna
+ * @property {'asc'|'desc'} dir - Direzione
  */
 
 /**
- * Names of the query string parameters sent to `jsonUrl` in server-side mode (`serverSide: true`).
- * A `null` value omits the parameter.
+ * Nomi dei parametri della query string inviati a `jsonUrl` in modalità server-side (`serverSide: true`).
+ * Un valore `null` omette il parametro.
  *
  * @typedef {Object} ServerParams
- * @property {string|null} [page] - Requested page, 1-based (default: 'page')
- * @property {string|null} [start] - Index (0-based) of the first requested record, i.e. `(page - 1) * perPage`,
- *   handy for `LIMIT start, perPage` queries (default: 'start')
- * @property {string|null} [perPage] - Number of records per page (default: 'perPage')
- * @property {string|null} [sort] - Key of the sorted column; omitted when no sort is active (default: 'sort')
- * @property {string|null} [dir] - Sort direction, `asc`/`desc`; omitted when no sort is active (default: 'dir')
- * @property {string|null} [search] - Search term; omitted when empty (default: 'search')
+ * @property {string|null} [page] - Pagina richiesta, da 1 (default: 'page')
+ * @property {string|null} [start] - Indice (da 0) del primo record richiesto, cioè `(page - 1) * perPage`,
+ *   comodo per le query `LIMIT start, perPage` (default: 'start')
+ * @property {string|null} [perPage] - Numero di record per pagina (default: 'perPage')
+ * @property {string|null} [sort] - Chiave della colonna ordinata; omesso quando non c'è un ordinamento attivo (default: 'sort')
+ * @property {string|null} [dir] - Direzione di ordinamento, `asc`/`desc`; omesso quando non c'è un ordinamento attivo (default: 'dir')
+ * @property {string|null} [search] - Termine di ricerca; omesso quando vuoto (default: 'search')
  */
 
 /**
- * `<json-table>` parameters (resolved: every key has a value, see `defaults`).
+ * Parametri di `<json-table>` (risolti: ogni chiave ha un valore, vedi `defaults`).
  *
- * Every parameter can be set either as an HTML attribute of the `<json-table>` element
- * (attribute names are case-insensitive, so `jsonurl="…"` and `jsonUrl="…"` are equivalent)
- * or as a property of the object passed to `init()`. Values that are functions can only be
- * set via `init()`. Object parameters (`classes`, `labels`, `dataTypes`, `serverParams`) are
- * merged with the defaults, so only the keys to override need to be passed.
+ * Ogni parametro può essere impostato come attributo HTML dell'elemento `<json-table>`
+ * (i nomi degli attributi non distinguono maiuscole e minuscole, quindi `jsonurl="…"` e `jsonUrl="…"` sono equivalenti)
+ * oppure come proprietà dell'oggetto passato a `init()`. I valori che sono funzioni si possono
+ * impostare solo tramite `init()`. I parametri oggetto (`classes`, `labels`, `dataTypes`, `serverParams`) vengono
+ * uniti ai default, quindi basta passare solo le chiavi da sovrascrivere.
  *
- * Precedence: `init()` > HTML attribute > `JsonTable.setDefaults()` > built-in default.
+ * Precedenza: `init()` > attributo HTML > `JsonTable.setDefaults()` > default predefinito.
  *
  * @typedef {Object} JsonTableParams
- * @property {boolean} debug - Logs resolved params, columns, data and generated elements to the console (default: false)
- * @property {string|null} jsonUrl - URL of the JSON to fetch. Ignored when `data` is set (default: null)
- * @property {string|null} jsonDataField - Key of the fetched JSON holding the rows array (e.g. `{ data: [...] }`);
- *   `null` or an empty string means the JSON root is the rows array itself (default: 'data')
- * @property {string} totRecField - Key of the fetched JSON holding the total number of records (numeric);
- *   when missing or not numeric the total is the rows array length (default: 'totRec')
- * @property {string} filteredRecField - Server-side mode only: key of the fetched JSON holding the number of
- *   records matching the current search (numeric); when missing the value of `totRecField` is used (default: 'filteredRec')
- * @property {Array<Object>|null} data - Inline rows (array of plain objects); takes precedence over `jsonUrl`.
- *   As an HTML attribute it must be a JSON string, which is always treated as the rows array itself
- *   (`jsonDataField` is ignored) (default: null)
- * @property {ColDefinition[]} cols - REQUIRED: columns definition (default: [])
- * @property {Object<string, DataTypeDefinition>} dataTypes - Custom data types, merged with the built-in ones
+ * @property {boolean} debug - Scrive in console i parametri risolti, le colonne, i dati e gli elementi generati (default: false)
+ * @property {string|null} jsonUrl - URL del JSON da recuperare. Ignorato quando `data` è impostato (default: null)
+ * @property {string|null} jsonDataField - Chiave del JSON recuperato che contiene l'array delle righe (es. `{ data: [...] }`);
+ *   `null` o una stringa vuota significa che la radice del JSON è l'array delle righe stesso (default: 'data')
+ * @property {string} totRecField - Chiave del JSON recuperato che contiene il numero totale di record (numerico);
+ *   se mancante o non numerica il totale è la lunghezza dell'array delle righe (default: 'totRec')
+ * @property {string} filteredRecField - Solo modalità server-side: chiave del JSON recuperato che contiene il numero di
+ *   record che corrispondono alla ricerca corrente (numerico); se mancante viene usato il valore di `totRecField` (default: 'filteredRec')
+ * @property {Array<Object>|null} data - Righe inline (array di oggetti semplici); ha la precedenza su `jsonUrl`.
+ *   Come attributo HTML deve essere una stringa JSON, sempre trattata come l'array delle righe stesso
+ *   (`jsonDataField` viene ignorato) (default: null)
+ * @property {ColDefinition[]} cols - OBBLIGATORIO: definizione delle colonne (default: [])
+ * @property {Object<string, DataTypeDefinition>} dataTypes - Data type personalizzati, uniti a quelli predefiniti
  *   (`string`, `num`, `id`, `perc`, `percDecimal`, `currency`, `euro`, `date`, `datetime`, `bool`, `email`).
- *   A key matching a built-in type overrides only the given properties (default: {})
- * @property {string|Function|null} caption - Table caption, shown below the table (start side of the footer bar)
- *   and linked to the table via `aria-labelledby`: a string (plain text or HTML) or, via `init()` only, a function
- *   returning a string or a Node (default: null)
- * @property {boolean} search - Whether to render the search input (default: true)
- * @property {number} searchDebounce - Delay (ms) between the last keystroke and the search execution (default: 300)
- * @property {number} perPage - Rows per page; `0` disables the pagination (every row in a single page, no
- *   navigation) (default: 25)
- * @property {number} paginationDelta - Number of page buttons shown on each side of the current page (default: 2)
- * @property {boolean} serverSide - Server-side mode: pagination, sorting and search are delegated to the server.
- *   Every change triggers a new request to `jsonUrl` (see `serverParams`) and the JSON is expected to hold the
- *   rows of the requested page only, plus `totRecField` and `filteredRecField`. Requires `jsonUrl`; `tfoot` is
- *   not available in this mode (default: false)
- * @property {ServerParams} serverParams - Server-side mode only: names of the query string parameters (see `ServerParams`)
- * @property {SortDef|null} initialSort - Sort applied on load, e.g. `{ key: 'name', dir: 'asc' }` (default: null)
- * @property {boolean} tfoot - Whether to render the `<tfoot>` (see `ColDefinition.tfootRender`); ignored in
- *   server-side mode (default: false)
- * @property {boolean} updateFooterOnPageChange - When true, `tfootRender` receives the rows of the current page
- *   only (page subtotals) and the footer is updated on every page change; when false it receives the whole
- *   filtered set and is updated on filter changes only (default: false)
- * @property {string|InfoTextFn|null} infoText - Info area content: a mustache-like string (placeholders
- *   `{start}`, `{end}`, `{totRec}`, `{filteredRec}`, `{page}`, `{totPages}`) or a function
- *   `(start, end, totRec, filteredRec, page, totPages) => content`. `null` uses `labels.info` (default: null)
+ *   Una chiave che corrisponde a un tipo predefinito ne sovrascrive solo le proprietà indicate (default: {})
+ * @property {string|Function|null} caption - Caption della tabella, mostrata sotto la tabella (lato iniziale della barra del footer)
+ *   e collegata alla tabella tramite `aria-labelledby`: una stringa (testo semplice o HTML) oppure, solo tramite `init()`, una funzione
+ *   che restituisce una stringa o un Node (default: null)
+ * @property {boolean} search - Se renderizzare l'input di ricerca (default: true)
+ * @property {number} searchDebounce - Ritardo (ms) tra l'ultima pressione di un tasto e l'esecuzione della ricerca (default: 300)
+ * @property {number} perPage - Righe per pagina; `0` disattiva la paginazione (tutte le righe in una sola pagina, nessuna
+ *   navigazione) (default: 25)
+ * @property {number} paginationDelta - Numero di pulsanti di pagina mostrati per lato rispetto alla pagina corrente (default: 2)
+ * @property {boolean} serverSide - Modalità server-side: paginazione, ordinamento e ricerca sono delegati al server.
+ *   Ogni cambiamento attiva una nuova richiesta a `jsonUrl` (vedi `serverParams`) e si presume che il JSON contenga solo le
+ *   righe della pagina richiesta, più `totRecField` e `filteredRecField`. Richiede `jsonUrl`; `tfoot` non è
+ *   disponibile in questa modalità (default: false)
+ * @property {ServerParams} serverParams - Solo modalità server-side: nomi dei parametri della query string (vedi `ServerParams`)
+ * @property {SortDef|null} initialSort - Ordinamento applicato al caricamento, es. `{ key: 'name', dir: 'asc' }` (default: null)
+ * @property {boolean} tfoot - Se renderizzare il `<tfoot>` (vedi `ColDefinition.tfootRender`); ignorato in
+ *   modalità server-side (default: false)
+ * @property {boolean} updateFooterOnPageChange - Se true, `tfootRender` riceve solo le righe della pagina corrente
+ *   (subtotali di pagina) e il footer viene aggiornato a ogni cambio di pagina; se false riceve l'intero
+ *   insieme filtrato e viene aggiornato solo ai cambi di filtro (default: false)
+ * @property {string|InfoTextFn|null} infoText - Contenuto dell'area informativa: una stringa in stile mustache (segnaposto
+ *   `{start}`, `{end}`, `{totRec}`, `{filteredRec}`, `{page}`, `{totPages}`) oppure una funzione
+ *   `(start, end, totRec, filteredRec, page, totPages) => content`. `null` usa `labels.info` (default: null)
  * @property {TemplateItem[]|((parts: Object<string, DomBuilderItem>, params: JsonTableParams) => TemplateItem[])} template -
- *   Layout of the main wrapper content, as a domBuilder array where `{ slot: 'name' }` items are replaced with the
- *   built-in parts `infoSection` (info text + search), `resultInfo`, `search`, `table`, `caption`, `pagination`.
- *   `caption` and `pagination` are included in the `table` part (footer bar) unless placed explicitly.
- *   A function receiving the parts and returning the array is accepted too (`init()` only)
+ *   Layout del contenuto del wrapper principale, come array domBuilder in cui gli elementi `{ slot: 'name' }` vengono sostituiti dalle
+ *   parti predefinite `infoSection` (testo informativo + ricerca), `resultInfo`, `search`, `table`, `caption`, `pagination`.
+ *   `caption` e `pagination` sono inclusi nella parte `table` (barra del footer) a meno che siano collocati esplicitamente.
+ *   È accettata anche una funzione che riceve le parti e restituisce l'array (solo tramite `init()`)
  *   (default: [{ slot: 'infoSection' }, { slot: 'table' }])
- * @property {string} locale - Locale used to format numbers and dates, and to compare strings when sorting (default: 'it-IT')
- * @property {string} currency - ISO 4217 code used by the `currency` data type (default: 'EUR')
- * @property {Intl.DateTimeFormatOptions} datesLocaleOpts - Options for the date part of `date`/`datetime`
+ * @property {string} locale - Locale usato per formattare numeri e date e per confrontare le stringhe durante l'ordinamento (default: 'it-IT')
+ * @property {string} currency - Codice ISO 4217 usato dal data type `currency` (default: 'EUR')
+ * @property {Intl.DateTimeFormatOptions} datesLocaleOpts - Opzioni per la parte data di `date`/`datetime`
  *   (default: { year: 'numeric', month: 'short', day: 'numeric' })
- * @property {Intl.DateTimeFormatOptions} timesLocaleOpts - Options for the time part of `datetime`
+ * @property {Intl.DateTimeFormatOptions} timesLocaleOpts - Opzioni per la parte oraria di `datetime`
  *   (default: { hour12: false, hour: '2-digit', minute: '2-digit' })
- * @property {Intl.NumberFormatOptions} numbersLocaleOpts - Options for the `num` type (default: { maximumFractionDigits: 2 })
- * @property {Intl.NumberFormatOptions} currPercLocaleOpts - Options for the `currency`/`euro`/`perc`/`percDecimal`
- *   types (default: { minimumFractionDigits: 2, maximumFractionDigits: 2 })
- * @property {string|null} renderNullAs - Content shown for `null`/`undefined` values (default: '—')
- * @property {string|null} renderZeroAs - When not null, content shown for numeric values equal to zero (default: null)
- * @property {string|null} renderNaNAs - Content shown by numeric types for non-numeric values (default: '—')
- * @property {IconDef} boolTrueIcon - Icon of `true` values in `bool` columns (default: minimo `check-bold` icon)
- * @property {IconDef} boolFalseIcon - Icon of `false` values in `bool` columns (default: minimo `x-bold` icon)
- * @property {IconDef} sortAscArrowIcon - Sort button icon, ascending sort active (default: minimo `arrow-up` icon)
- * @property {IconDef} sortDescArrowIcon - Sort button icon, descending sort active (default: minimo `arrow-down` icon)
- * @property {IconDef} sortNoneArrowIcon - Sort button icon, no sort active (default: minimo `arrows-down-up` icon)
- * @property {IconDef} paginationPrevIcon - Previous page button icon (default: minimo `caret-left` icon)
- * @property {IconDef} paginationNextIcon - Next page button icon (default: minimo `caret-right` icon)
+ * @property {Intl.NumberFormatOptions} numbersLocaleOpts - Opzioni per il tipo `num` (default: { maximumFractionDigits: 2 })
+ * @property {Intl.NumberFormatOptions} currPercLocaleOpts - Opzioni per i tipi `currency`/`euro`/`perc`/`percDecimal`
+ *   (default: { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+ * @property {string|null} renderNullAs - Contenuto mostrato per i valori `null`/`undefined` (default: '—')
+ * @property {string|null} renderZeroAs - Se non null, contenuto mostrato per i valori numerici uguali a zero (default: null)
+ * @property {string|null} renderNaNAs - Contenuto mostrato dai tipi numerici per i valori non numerici (default: '—')
+ * @property {IconDef} boolTrueIcon - Icona dei valori `true` nelle colonne `bool` (default: icona `check-bold` di minimo)
+ * @property {IconDef} boolFalseIcon - Icona dei valori `false` nelle colonne `bool` (default: icona `x-bold` di minimo)
+ * @property {IconDef} sortAscArrowIcon - Icona del pulsante di ordinamento, ordinamento crescente attivo (default: icona `arrow-up` di minimo)
+ * @property {IconDef} sortDescArrowIcon - Icona del pulsante di ordinamento, ordinamento decrescente attivo (default: icona `arrow-down` di minimo)
+ * @property {IconDef} sortNoneArrowIcon - Icona del pulsante di ordinamento, nessun ordinamento attivo (default: icona `arrows-down-up` di minimo)
+ * @property {IconDef} paginationPrevIcon - Icona del pulsante pagina precedente (default: icona `caret-left` di minimo)
+ * @property {IconDef} paginationNextIcon - Icona del pulsante pagina successiva (default: icona `caret-right` di minimo)
  * @property {((tr: HTMLTableRowElement, row: Object, params: JsonTableParams) => void)|null} trCallback - Callback
- *   invoked after the rendering of every body row (default: null)
- * @property {string|null} tableId - `id` attribute of the `<table>` element (default: null)
- * @property {JsonTableClasses} classes - Consumer class names (see `JsonTableClasses`)
- * @property {JsonTableLabels} labels - Texts (see `JsonTableLabels`)
+ *   invocata dopo il rendering di ogni riga del body (default: null)
+ * @property {string|null} tableId - Attributo `id` dell'elemento `<table>` (default: null)
+ * @property {JsonTableClasses} classes - Nomi di classe del consumer (vedi `JsonTableClasses`)
+ * @property {JsonTableLabels} labels - Testi (vedi `JsonTableLabels`)
  */
 
 /**
- * Names of the object params whose value is shallow-merged across the sources
- * (built-in default ← `setDefaults()` ← HTML attribute ← `init()`) instead of being replaced.
+ * Nomi dei parametri oggetto il cui valore viene unito in modo superficiale tra le sorgenti
+ * (default predefinito ← `setDefaults()` ← attributo HTML ← `init()`) invece di essere sostituito.
  * @type {ReadonlyArray<keyof JsonTableParams>}
  */
 export const mergedParams = ['classes', 'labels', 'dataTypes', 'serverParams'];
 
 /**
- * Built-in defaults.
+ * Default predefiniti.
  *
  * @type {JsonTableParams}
  *
@@ -285,16 +285,16 @@ export const mergedParams = ['classes', 'labels', 'dataTypes', 'serverParams'];
  *   totRecField: 'totRec',
  *   filteredRecField: 'filteredRec',
  *   data: null,
- *   cols: [],                          // required
+ *   cols: [],                          // obbligatorio
  *   dataTypes: {},
  *   caption: null,
  *   search: true,
  *   searchDebounce: 300,
- *   perPage: 25,                       // 0 = no pagination
+ *   perPage: 25,                       // 0 = nessuna paginazione
  *   paginationDelta: 2,
  *   serverSide: false,
  *   serverParams: { page: 'page', start: 'start', perPage: 'perPage', sort: 'sort', dir: 'dir', search: 'search' },
- *   initialSort: null,                 // e.g. { key: 'name', dir: 'asc' }
+ *   initialSort: null,                 // es. { key: 'name', dir: 'asc' }
  *   tfoot: false,
  *   updateFooterOnPageChange: false,
  *   infoText: null,                    // → labels.info
@@ -317,8 +317,8 @@ export const mergedParams = ['classes', 'labels', 'dataTypes', 'serverParams'];
  *   paginationNextIcon: '<svg …>',     // minimo caret-right
  *   trCallback: null,
  *   tableId: null,
- *   classes: { … },                    // see JsonTableClasses
- *   labels: { … }                      // see JsonTableLabels
+ *   classes: { … },                    // vedi JsonTableClasses
+ *   labels: { … }                      // vedi JsonTableLabels
  * }
  */
 export const defaults = {

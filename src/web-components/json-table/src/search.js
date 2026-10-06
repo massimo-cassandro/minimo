@@ -4,7 +4,7 @@
 /** @typedef {import('./parse-rows.js').ParsedRow} ParsedRow */
 
 /**
- * Normalizes a search term: trimmed, lowercased, split into words (whitespace separated).
+ * Normalizza un termine di ricerca: senza spazi ai bordi, in minuscolo, diviso in parole (separate da spazi).
  * @param {string|null|undefined} term
  * @returns {string[]}
  *
@@ -18,16 +18,16 @@ export function searchWords(term) {
 
 
 /**
- * Filters the parsed rows by a search term: every word of the term must be contained in the
- * row `searchText` (precomputed by `parse-rows.js` from the searchable columns; case-insensitive).
- * An empty term returns the original array.
+ * Filtra le righe analizzate per un termine di ricerca: ogni parola del termine deve essere contenuta nel
+ * `searchText` della riga (precalcolato da `parse-rows.js` dalle colonne ricercabili; senza distinzione tra maiuscole e minuscole).
+ * Un termine vuoto restituisce l'array originale.
  *
- * @param {ParsedRow[]} rows - Parsed rows
- * @param {string} term - Search term
+ * @param {ParsedRow[]} rows - Righe analizzate
+ * @param {string} term - Termine di ricerca
  * @returns {ParsedRow[]}
  *
  * @example
- * filterRows(state.rows, 'mario 2024'); // rows whose searchText contains both 'mario' and '2024'
+ * filterRows(state.rows, 'mario 2024'); // righe il cui searchText contiene sia 'mario' sia '2024'
  * filterRows(state.rows, '');           // → state.rows
  */
 export function filterRows(rows, term) {
@@ -43,16 +43,16 @@ export function filterRows(rows, term) {
 
 
 /**
- * Attaches the `input` listener to the search input (`elements.searchInput`, when present):
- * the search is executed through `jt.setSearch()` after `params.searchDebounce` milliseconds
- * from the last keystroke. The pending timer id is stored in `jt._searchTimer` so that
- * `destroy()` can clear it.
+ * Collega il listener `input` all'input di ricerca (`elements.searchInput`, quando presente):
+ * la ricerca viene eseguita tramite `jt.setSearch()` dopo `params.searchDebounce` millisecondi
+ * dall'ultima pressione di un tasto. L'id del timer in sospeso viene memorizzato in `jt._searchTimer` così che
+ * `destroy()` possa cancellarlo.
  *
- * @param {JsonTable} jt - The component instance
+ * @param {JsonTable} jt - L'istanza del componente
  * @returns {void}
  *
  * @example
- * setSearchListener(jt); // after mainBuilder(jt)
+ * setSearchListener(jt); // dopo mainBuilder(jt)
  */
 export function setSearchListener(jt) {
 

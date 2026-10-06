@@ -1,5 +1,5 @@
 /*! minimo - Inner Nav */
-// tab / list navigation — copies the primary nav markup into all `.inner-nav` containers
+// navigazione a tab / lista — copia il markup della nav principale in tutti i contenitori `.inner-nav`
 /*
 <p class="inner-nav-main">...</p>
 ...
@@ -9,7 +9,7 @@
 import './inner-nav.css';
 
 /**
- * Copies the inner HTML of `.inner-nav-main` into every `.inner-nav` element on the page.
+ * Copia l'HTML interno di `.inner-nav-main` in ogni elemento `.inner-nav` della pagina.
  * @returns {void}
  */
 export function innerNav(){

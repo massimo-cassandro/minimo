@@ -89,7 +89,7 @@ export function svgRules({
         ],
       ),
 
-      // 2. as react component -> https://react-svgr.com/docs/webpack/
+      // 2. come componente react -> https://react-svgr.com/docs/webpack/
       //    Supporta anche `?react&noSVGO`.
       ...(useSvgr
         ? withNoSVGOVariant(
@@ -140,7 +140,7 @@ export function svgRules({
         },
       },
 
-      // 5. svg file (copy image files to build folder)
+      // 5. file svg (copia i file immagine nella cartella di build)
       {
         type: 'asset/resource',
         exclude: [ /cssInline/, /inline/ ],

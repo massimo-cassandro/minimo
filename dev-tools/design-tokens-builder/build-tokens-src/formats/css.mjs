@@ -1,16 +1,18 @@
-// build-tokens-src/formats/css.mjs
-// Registers the 'css/variables-sorted' format.
-// Generates a :root { ... } block with custom properties sorted alphabetically.
-// Typography tokens are exploded into multiple CSS properties:
-//   - a `font` shorthand (when both fontSize and fontFamily are present)
-//   - individual properties for letterSpacing, textTransform, textDecoration
+/*
+  build-tokens-src/formats/css.mjs
+  Registra il format 'css/variables-sorted'.
+  Genera un blocco :root { ... } con le custom properties ordinate alfabeticamente.
+  I token tipografici vengono scomposti in più proprietà CSS:
+    - una shorthand `font` (quando sono presenti sia fontSize sia fontFamily)
+    - proprietà singole per letterSpacing, textTransform, textDecoration
+*/
 
 import StyleDictionary from 'style-dictionary';
 import { mergeCustomProps, parseCustomProps } from '../merge-css.mjs';
 
 const BASE_FONT_SIZE = 16;
 
-// Converts a px value to rem. Returns the original string for non-px values.
+// Converte un valore px in rem. Restituisce la stringa originale per i valori non px.
 const toRem = (val) => {
   if (val === undefined || val === null) return '0';
   const str = String(val).trim();
@@ -20,14 +22,14 @@ const toRem = (val) => {
   return str;
 };
 
-// Replaces {a.b.c} references with var(--token-name) using the tokenByPath map.
+// Sostituisce i riferimenti {a.b.c} con var(--token-name) usando la mappa tokenByPath.
 const makeResolveRefs = (tokenByPath) => (str) =>
   String(str).replace(/\{([^}]+)\}/g, (_, p) => {
     const ref = tokenByPath[p];
     return ref ? `var(--${ref.name})` : `{${p}}`;
   });
 
-// ── Complex-type builders ────────────────────────────────────────────────────
+// ── Builder dei tipi complessi ───────────────────────────────────────────────
 
 const buildShadow = (original, resolveRefs) => {
   const shadows = Array.isArray(original) ? original : [original];
@@ -85,9 +87,11 @@ const buildAnimation = (original, resolveRefs) => [
   resolveRefs(String(original.name           ?? 'none')),
 ].join(' ');
 
-// Builds CSS custom properties for a typography token.
-// Produces a `font` shorthand when both fontSize and fontFamily are present,
-// plus separate properties for letterSpacing, textTransform and textDecoration.
+/*
+  Costruisce le custom properties CSS per un token tipografico.
+  Produce una shorthand `font` quando sono presenti sia fontSize sia fontFamily,
+  più proprietà separate per letterSpacing, textTransform e textDecoration.
+*/
 const buildTypography = (tokenName, original, resolveRefs) => {
   const {
     fontStyle, fontVariant, fontWeight, fontStretch,
@@ -117,7 +121,7 @@ const buildTypography = (tokenName, original, resolveRefs) => {
     letterSpacing:  ['letter-spacing',  letterSpacing],
     textTransform:  ['text-transform',  textTransform],
     textDecoration: ['text-decoration', textDecoration],
-    // Fallback: expose size/family individually if the shorthand could not be built
+    // Fallback: espone size/family singolarmente se non è stato possibile costruire la shorthand
     ...(!fontSize   ? { fontSize:   ['font-size',   original.fontSize]   } : {}),
     ...(!fontFamily ? { fontFamily: ['font-family', original.fontFamily] } : {}),
   };
@@ -131,48 +135,52 @@ const buildTypography = (tokenName, original, resolveRefs) => {
   return lines.join('\n');
 };
 
-// Builds a trailing ` /* ... */` comment from a token's $description, to be
-// appended at the end of its generated custom prop declaration (same line).
-// Newlines are collapsed (declarations are parsed one line at a time, see
-// parseCustomProps in ../merge-css.mjs) and `*/` is escaped so the comment
-// can't be closed early by its own content.
+/*
+  Costruisce un commento CSS finale (stile slash-asterisco) dal $description di un token, da
+  accodare alla fine della sua dichiarazione di custom prop generata (sulla stessa riga).
+  I a capo vengono compattati (le dichiarazioni sono lette una riga alla volta, vedi
+  parseCustomProps in ../merge-css.mjs) e la sequenza di chiusura del commento viene sottoposta a escape perché il commento
+  non possa essere chiuso prematuramente dal proprio contenuto.
+*/
 const buildDescriptionComment = (description) => {
   if (!description) return '';
   const flat = String(description).replace(/\s*\n\s*/g, ' ').trim().replace(/\*\//g, '* /');
   return flat ? ` /* ${flat} */` : '';
 };
 
-// Builds a customPropsGroups title comment, e.g.:
+// Costruisce il commento di titolo di un customPropsGroups, ad es.:
 //   /* ****** LAYOUT ****** */
-// Dashes fill out a fixed total width so titles line up regardless of name length.
+// Gli asterischi riempiono una larghezza totale fissa così che i titoli siano allineati a prescindere dalla lunghezza del nome.
 const DECORATOR_LENGHT = 6;
 const buildGroupTitle = (name) => {
   return `  /** ${'*'.repeat(DECORATOR_LENGHT)} ${name} ${'*'.repeat(DECORATOR_LENGHT)} **/`;
 };
 
-// ── Format registration ──────────────────────────────────────────────────────
+// ── Registrazione del format ─────────────────────────────────────────────────
 
-// Exported counter — read by build-tokens.mjs for the final log line
+// Contatore esportato — letto da build-tokens.mjs per la riga finale del log
 export let customPropsCount = 0;
 
-// Exported live binding holding the name → declaration-tail map last computed
-// by computeFinalProps() (see below), i.e. the structured result of the most
-// recent 'css/variables-sorted' format call. Read by
-// build-tokens-src/build-source-modes.mjs right after each per-mode
-// sd.formatPlatform('css') call (synchronous, same pattern as
-// customPropsCount) — needed by build-tokens-src/light-dark.mjs to reconcile
-// shared light/dark properties into light-dark() calls, working on the
-// structured props instead of the rendered CSS text.
+/*
+  Live binding esportato che contiene la mappa nome → coda della dichiarazione calcolata per ultima
+  da computeFinalProps() (vedi sotto), cioè il risultato strutturato della
+  chiamata più recente al format 'css/variables-sorted'. Letto da
+  build-tokens-src/build-source-modes.mjs subito dopo ogni chiamata per modalità a
+  sd.formatPlatform('css') (sincrono, stesso schema di
+  customPropsCount) — serve a build-tokens-src/light-dark.mjs per riconciliare
+  le proprietà light/dark condivise in chiamate light-dark(), lavorando sulle
+  props strutturate invece che sul testo CSS già reso.
+*/
 export let lastFinalProps = {};
 
 /**
- * Computes the final `name -> declaration-tail` map for a token dictionary:
- * resolves each token's CSS value (including the complex-type builders above),
- * then merges in any pre-existing custom properties via mergeCustomProps()
- * (see ../merge-css.mjs and the `mergeCustomProps` config option).
- * @param {object} dictionary  Style Dictionary's resolved token dictionary (format() `dictionary` arg)
- * @param {object} options     format() `options` arg — only `outputReferences` and `mode` are read here
- * @returns {Record<string,string>} name → declaration tail (value + terminating `;` + optional trailing comment)
+ * Calcola la mappa finale `nome -> coda della dichiarazione` per un dizionario di token:
+ * risolve il valore CSS di ogni token (inclusi i builder dei tipi complessi qui sopra),
+ * poi vi unisce le eventuali custom properties preesistenti tramite mergeCustomProps()
+ * (vedi ../merge-css.mjs e l'opzione di config `mergeCustomProps`).
+ * @param {object} dictionary  dizionario dei token risolto di Style Dictionary (argomento `dictionary` di format())
+ * @param {object} options     argomento `options` di format() — qui vengono lette solo `outputReferences` e `mode`
+ * @returns {Record<string,string>} nome → coda della dichiarazione (valore + `;` finale + eventuale commento finale)
  */
 export const computeFinalProps = (dictionary, options) => {
   const tokenByPath = {};
@@ -204,13 +212,14 @@ export const computeFinalProps = (dictionary, options) => {
     return a.name.localeCompare(b.name, 'en', { numeric: true, sensitivity: 'base' });
   };
 
-  // Tokens loaded via `include` (sourceModes: base-mode tokens made
-  // available to other modes) stay in tokenByPath, so references to them
-  // resolve to var(--name), but are not declared in this mode's block.
-  // property name → token source file, used by mergeCustomProps when the
-  // merge is limited to some source files (a token may generate several
-  // properties, e.g. typography)
-  /** @type {Record<string,string>} */
+  /*
+    I token caricati tramite `include` (sourceModes: token della modalità base resi
+    disponibili alle altre modalità) restano in tokenByPath, quindi i riferimenti a essi
+    si risolvono in var(--name), ma non vengono dichiarati nel blocco di questa modalità.
+    nome della proprietà → file sorgente del token, usato da mergeCustomProps quando il
+    merge è limitato ad alcuni file sorgente (un token può generare più
+    proprietà, ad es. la tipografia)
+  */
   const sourceFileMap = {};
   const trackSource = (token, tokenLines) => {
     for (const name of Object.keys(parseCustomProps(tokenLines.join('\n')))) {
@@ -260,13 +269,17 @@ export const computeFinalProps = (dictionary, options) => {
           ? resolveRefs(orig) : buildAnimation(orig, resolveRefs);
 
       } else if (options.outputReferences && typeof orig === 'string' && orig.includes('{')) {
-        // Covers both plain aliases and CSS functions containing {references}
-        // e.g. color-mix(in srgb, {btn.secondary.background.color} 60%, #000)
-        // {references} are replaced with var(--name); arithmetic gets calc().
+        /*
+          Copre sia i semplici alias sia le funzioni CSS che contengono {riferimenti}
+          ad es. color-mix(in srgb, {btn.secondary.background.color} 60%, #000)
+          I {riferimenti} vengono sostituiti con var(--name); le operazioni aritmetiche ottengono calc().
+        */
         const resolved = resolveRefs(orig);
-        // Strip var(...) and CSS function calls (word chars + hyphens followed by '(')
-        // before checking for arithmetic operators, so that hyphens in names like
-        // "color-mix" or "linear-gradient" don't trigger a spurious calc() wrap.
+        /*
+          Rimuove var(...) e le chiamate a funzioni CSS (caratteri di parola + trattini seguiti da '(')
+          prima di cercare gli operatori aritmetici, così che i trattini in nomi come
+          "color-mix" o "linear-gradient" non attivino un calc() spurio.
+        */
         const stripped = resolved
           .replace(/var\([^)]+\)/g, '0')
           .replace(/[\w-]+\(/g, '(');
@@ -277,10 +290,12 @@ export const computeFinalProps = (dictionary, options) => {
         value = String(token.$value ?? token.value);
       }
 
-      // Multi-line values (e.g. Open Props' linear() easings) are collapsed
-      // to a single line: declarations are parsed one line at a time (see
-      // parseCustomProps in ../merge-css.mjs), so a multi-line value would
-      // be truncated to its first line.
+      /*
+        I valori su più righe (ad es. gli easing linear() di Open Props) vengono compattati
+        su una sola riga: le dichiarazioni sono lette una riga alla volta (vedi
+        parseCustomProps in ../merge-css.mjs), quindi un valore su più righe
+        verrebbe troncato alla prima riga.
+      */
       value = String(value)
         .replace(/\s*\n\s*/g, ' ')
         .replace(/\(\s+/g, '(')
@@ -289,42 +304,44 @@ export const computeFinalProps = (dictionary, options) => {
       return trackSource(token, [`  --${token.name}: ${value};${commentSuffix}`]);
     });
 
-  // Build a name → declaration-tail map from the declarations generated
-  // above, then merge with any pre-existing custom properties loaded via
-  // loadExistingCustomProps() / loadExistingCustomPropsScoped() (see
-  // ../merge-css.mjs). Pre-existing values (including trailing comments)
-  // take priority when both exist; pre-existing-only properties are kept.
-  // options.mode (sourceModes build only, see ../build-source-modes.mjs)
-  // scopes the merge to that mode, so same-named props with different
-  // values across modes are never mixed up.
+  /*
+    Costruisce una mappa nome → coda della dichiarazione dalle dichiarazioni generate
+    qui sopra, poi la unisce alle eventuali custom properties preesistenti caricate tramite
+    loadExistingCustomProps() / loadExistingCustomPropsScoped() (vedi
+    ../merge-css.mjs). I valori preesistenti (inclusi i commenti finali)
+    hanno priorità quando esistono entrambi; le proprietà presenti solo nel preesistente vengono mantenute.
+    options.mode (solo build sourceModes, vedi ../build-source-modes.mjs)
+    limita il merge a quella modalità, così che proprietà con lo stesso nome ma valori
+    diversi tra le modalità non vengano mai confuse.
+  */
   const generatedProps = parseCustomProps(lines.join('\n'));
   return mergeCustomProps(generatedProps, options.mode ?? null, sourceFileMap);
 };
 
 /**
- * Builds the final CSS block text (`<selector> { ... }`) from an already
- * computed name → declaration-tail map (see computeFinalProps() above):
- * sorts properties alphabetically, pulls out customPropsGroups, prepends an
- * optional `color-scheme` declaration, and optionally wraps the result in
+ * Costruisce il testo finale del blocco CSS (`<selector> { ... }`) a partire da una mappa
+ * nome → coda della dichiarazione già calcolata (vedi computeFinalProps() qui sopra):
+ * ordina le proprietà alfabeticamente, estrae i customPropsGroups, antepone una
+ * dichiarazione `color-scheme` opzionale e, se richiesto, racchiude il risultato in
  * `@layer <addLayer> { ... }`.
  *
- * Extracted as its own function (rather than inline in the format() call
- * below) so build-tokens-src/light-dark.mjs can re-run it on an adjusted
- * props map — e.g. after moving properties shared by `light` and `dark` into
- * a single `light-dark()` declaration — and get back a properly sorted and
- * grouped block, instead of appending raw text after the fact.
+ * Estratta come funzione a sé (invece che inline nella chiamata a format()
+ * più sotto) così che build-tokens-src/light-dark.mjs possa rieseguirla su una mappa
+ * di props modificata — ad es. dopo aver spostato le proprietà condivise da `light` e `dark` in
+ * un'unica dichiarazione `light-dark()` — e ottenere un blocco correttamente ordinato e
+ * raggruppato, invece di accodare testo grezzo a posteriori.
  * @param {object} opts
- * @param {Record<string,string>} opts.finalProps  name → declaration tail, as returned by computeFinalProps()
- * @param {string} [opts.selector] CSS selector wrapping the block (default: (default: ':root'))
- * @param {string} [opts.colorScheme] optional value for a `color-scheme: <value>;` declaration prepended to the block
- * @param {{name:string,prefixes:string[]}[]} [opts.customPropsGroups] named groups of name prefixes, moved to the top of the block in list order (default: [])
- * @param {string|null} [opts.addLayer] wraps the block in `@layer <addLayer> { ... }` (default: null — no layer)
+ * @param {Record<string,string>} opts.finalProps  nome → coda della dichiarazione, come restituito da computeFinalProps()
+ * @param {string} [opts.selector] selettore CSS che racchiude il blocco (default: ':root')
+ * @param {string} [opts.colorScheme] valore opzionale per una dichiarazione `color-scheme: <valore>;` anteposta al blocco
+ * @param {{name:string,prefixes:string[]}[]} [opts.customPropsGroups] gruppi nominati di prefissi di nome, spostati in cima al blocco nell'ordine dell'elenco (default: [])
+ * @param {string|null} [opts.addLayer] racchiude il blocco in `@layer <addLayer> { ... }` (default: null — nessun layer)
  * @returns {string}
  * @example
  * buildCssBlock({
  *   finalProps: { 'accent-color': '#123;' },
  *   selector: ':root', // default: ':root'
- *   colorScheme: 'light dark', // default: undefined — no color-scheme line
+ *   colorScheme: 'light dark', // default: undefined — nessuna riga color-scheme
  *   customPropsGroups: [], // default: []
  *   addLayer: null, // default: null
  * });
@@ -336,17 +353,21 @@ export const buildCssBlock = ({
   customPropsGroups = [],
   addLayer = null,
 }) => {
-  // Final output is always sorted alphabetically ascending by property
-  // name, regardless of merge — this also keeps pre-existing-only
-  // properties from merge-css.mjs in order instead of trailing at the end.
+  /*
+    L'output finale è sempre ordinato alfabeticamente in modo crescente per nome della
+    proprietà, a prescindere dal merge — questo mantiene in ordine anche le proprietà
+    presenti solo nel preesistente (da merge-css.mjs) invece di accodarle alla fine.
+  */
   const sortedProps = Object.entries(finalProps)
     .sort(([a], [b]) => a.localeCompare(b, 'en', { numeric: true, sensitivity: 'base' }));
 
-  // customPropsGroups: properties whose first hyphen-separated name segment
-  // matches one of a group's prefixes are pulled out, labelled with that
-  // group's name and placed, in group-list order, at the beginning of the
-  // output file. A property matches the first group (in list order) whose
-  // prefixes include it.
+  /*
+    customPropsGroups: le proprietà il cui primo segmento del nome (separato da trattini)
+    corrisponde a uno dei prefissi di un gruppo vengono estratte, etichettate con il
+    nome di quel gruppo e collocate, nell'ordine dell'elenco dei gruppi, all'inizio del
+    file di output. Una proprietà corrisponde al primo gruppo (in ordine di elenco) i cui
+    prefissi la includono.
+  */
   const groupedProps = customPropsGroups.map(() => []);
   const restProps = [];
   for (const entry of sortedProps) {
@@ -368,9 +389,11 @@ export const buildCssBlock = ({
     });
   });
 
-  // A blank line is inserted between blocks of properties sharing the same
-  // first hyphen-separated segment (e.g. all `btn-*` together), to visually
-  // group related custom properties in the generated file.
+  /*
+    Viene inserita una riga vuota tra i blocchi di proprietà che condividono lo stesso
+    primo segmento separato da trattini (ad es. tutte le `btn-*` insieme), per raggruppare
+    visivamente le custom properties correlate nel file generato.
+  */
   const outLines = [];
 
   if (colorScheme) {
@@ -407,8 +430,8 @@ export const buildCssBlock = ({
 
   const block = `${selector} {\n${outLines.join('\n')}\n}\n`;
 
-  // addLayer: wraps the whole block inside `@layer <name> { ... }`.
-  // Indentation is left to stylelint's fix step (run right after the build).
+  // addLayer: racchiude l'intero blocco in `@layer <name> { ... }`.
+  // L'indentazione è lasciata al passaggio di fix di stylelint (eseguito subito dopo la build).
   return addLayer
     ? `@layer ${addLayer} {\n\n${block}}\n`
     : block;

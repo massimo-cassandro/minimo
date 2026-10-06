@@ -8,7 +8,7 @@ import { iconContent } from './icons.js';
 /** @typedef {import('./defaults.js').DataTypeDefinition} DataTypeDefinition */
 
 /**
- * Converts a value to a number; empty strings and nullish values give `NaN`.
+ * Converte un valore in numero; le stringhe vuote e i valori nullish danno `NaN`.
  * @param {*} value
  * @returns {number}
  *
@@ -26,8 +26,8 @@ export function toNumber(value) {
 
 
 /**
- * Converts a boolean-like value (`true`/`false`, `1`/`0`, `'1'`/`'0'`, `'true'`/`'false'`)
- * to a boolean; every other value gives `null`, so that `null` can be told apart from `false`.
+ * Converte un valore simile a un booleano (`true`/`false`, `1`/`0`, `'1'`/`'0'`, `'true'`/`'false'`)
+ * in booleano; ogni altro valore dà `null`, così che `null` si distingua da `false`.
  * @param {*} value
  * @returns {boolean|null}
  *
@@ -49,11 +49,11 @@ export function toBool(value) {
 
 
 /**
- * Parses a date-like value: ISO string, timestamp, `Date` object or a Symfony-like object
+ * Analizza un valore simile a una data: stringa ISO, timestamp, oggetto `Date` o un oggetto in stile Symfony
  * (`{ date: '2022-12-02 06:18:55', timezone_type: 3, timezone: 'Europe/Berlin' }`).
  * TODO fuso orario degli oggetti Symfony non gestito (la stringa `date` è interpretata come ora locale)
  * @param {*} value
- * @returns {Date|null} `null` for empty or invalid values
+ * @returns {Date|null} `null` per i valori vuoti o non validi
  *
  * @example
  * parseDate('2024-01-31');                       // → Date
@@ -77,11 +77,11 @@ export function parseDate(value) {
 
 
 /**
- * Formats a numeric value, applying `renderNaNAs` and `renderZeroAs`.
- * @param {*} value - Raw value
- * @param {JsonTableParams} params - Resolved params
- * @param {Intl.NumberFormatOptions} formatOpts - `toLocaleString` options
- * @param {(formatted: string, num: number) => string} [wrap] - Optional decorator of the formatted string
+ * Formatta un valore numerico, applicando `renderNaNAs` e `renderZeroAs`.
+ * @param {*} value - Valore grezzo
+ * @param {JsonTableParams} params - Parametri risolti
+ * @param {Intl.NumberFormatOptions} formatOpts - Opzioni di `toLocaleString`
+ * @param {(formatted: string, num: number) => string} [wrap] - Decoratore opzionale della stringa formattata
  * @returns {string}
  *
  * @example
@@ -104,23 +104,23 @@ export function formatNumber(value, params, formatOpts, wrap) {
 
 
 /**
- * Built-in data types, built on the resolved params (class names, locale options, icons).
+ * Data type predefiniti, costruiti sui parametri risolti (nomi delle classi, opzioni locale, icone).
  *
- * | key           | description                                                     | cell classes            |
+ * | chiave        | descrizione                                                     | classi della cella      |
  * |---------------|-----------------------------------------------------------------|-------------------------|
- * | `string`      | default type, value as-is                                       | –                       |
- * | `num`         | number formatted with `numbersLocaleOpts`                       | textEnd numeric nowrap  |
- * | `id`          | numeric id: raw value, right aligned, not searchable            | textEnd numeric         |
- * | `perc`        | percentage already in 0–100 scale, `currPercLocaleOpts` + " %"  | textEnd numeric nowrap  |
- * | `percDecimal` | percentage in 0–1 scale (multiplied by 100)                     | textEnd numeric nowrap  |
- * | `currency`    | `Intl` currency format, `params.currency`                       | textEnd numeric nowrap  |
- * | `euro`        | as `currency`, EUR forced                                       | textEnd numeric nowrap  |
- * | `date`        | `<time>` element, `datesLocaleOpts`                             | textEnd nowrap          |
- * | `datetime`    | as `date`, plus time part (`timesLocaleOpts`)                   | textEnd nowrap          |
- * | `bool`        | `boolTrueIcon`/`boolFalseIcon`; not sortable/searchable         | (internal icon styles)  |
- * | `email`       | soft line breaks around `@`                                     | –                       |
+ * | `string`      | tipo predefinito, valore così com'è                             | –                       |
+ * | `num`         | numero formattato con `numbersLocaleOpts`                       | textEnd numeric nowrap  |
+ * | `id`          | id numerico: valore grezzo, allineato a destra, non ricercabile | textEnd numeric         |
+ * | `perc`        | percentuale già in scala 0–100, `currPercLocaleOpts` + " %"     | textEnd numeric nowrap  |
+ * | `percDecimal` | percentuale in scala 0–1 (moltiplicata per 100)                 | textEnd numeric nowrap  |
+ * | `currency`    | formato valuta `Intl`, `params.currency`                        | textEnd numeric nowrap  |
+ * | `euro`        | come `currency`, EUR forzato                                    | textEnd numeric nowrap  |
+ * | `date`        | elemento `<time>`, `datesLocaleOpts`                            | textEnd nowrap          |
+ * | `datetime`    | come `date`, più la parte oraria (`timesLocaleOpts`)            | textEnd nowrap          |
+ * | `bool`        | `boolTrueIcon`/`boolFalseIcon`; non ordinabile/ricercabile      | (stili interni delle icone) |
+ * | `email`       | a capo morbidi attorno a `@`                                    | –                       |
  *
- * @param {JsonTableParams} params - Resolved params
+ * @param {JsonTableParams} params - Parametri risolti
  * @returns {Object<string, DataTypeDefinition>}
  *
  * @example
@@ -237,21 +237,21 @@ export function builtInDataTypes(params) {
 
 
 /**
- * Merges the custom data types (`params.dataTypes`) with the built-in ones.
+ * Unisce i data type personalizzati (`params.dataTypes`) a quelli predefiniti.
  *
- * A custom key matching a built-in type overrides only the given properties; a new key can
- * extend a built-in type via `inheritsFrom`.
+ * Una chiave personalizzata che corrisponde a un tipo predefinito ne sovrascrive solo le proprietà indicate; una nuova chiave può
+ * estendere un tipo predefinito tramite `inheritsFrom`.
  *
- * @param {JsonTableParams} params - Resolved params
- * @returns {Object<string, DataTypeDefinition>} The complete data types map
- * @throws {Error} When `inheritsFrom` refers to an unknown type
+ * @param {JsonTableParams} params - Parametri risolti
+ * @returns {Object<string, DataTypeDefinition>} La mappa completa dei data type
+ * @throws {Error} Quando `inheritsFrom` si riferisce a un tipo sconosciuto
  *
  * @example
  * const types = buildDataTypes({
  *   ...params,
  *   dataTypes: {
- *     num: { cellClass: 'text-end fw-bold' },                 // overrides only `cellClass` of the built-in `num`
- *     km: { inheritsFrom: 'num', render: v => `${v} km` }     // new type based on `num`
+ *     num: { cellClass: 'text-end fw-bold' },                 // sovrascrive solo `cellClass` del `num` predefinito
+ *     km: { inheritsFrom: 'num', render: v => `${v} km` }     // nuovo tipo basato su `num`
  *   }
  * });
  */

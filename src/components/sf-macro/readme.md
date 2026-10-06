@@ -1,7 +1,7 @@
 # sf-macro
 
 
-## Usage
+## Utilizzo
 
 ```javascript
 import { sf_macro } from '@minimo/components/sf-macro/sf-macro.js';

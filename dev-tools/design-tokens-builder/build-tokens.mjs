@@ -2,21 +2,23 @@
 /// <reference types="node" />
 /* eslint-disable no-console */
 
-// build-tokens.mjs
-// Entry point: imports modules, runs the build, lints the CSS output, prints the log.
-//
-// Project structure:
-//   build-tokens.mjs              <- this file
-//   build-tokens-src/config.mjs   <- reads --config flag and resolves all paths
-//   build-tokens-src/transforms.mjs  <- registers custom Style Dictionary transforms
-//   build-tokens-src/formats/css.mjs    <- registers the css/variables-sorted format
-//   build-tokens-src/formats/json.mjs   <- registers the json/tokens format, exports helpers
-//   build-tokens-src/platforms.mjs      <- builds the platforms object (css + optional json)
-//   build-tokens-src/build-source-modes.mjs  <- alternative build path used when sourceModes is set
-//   build-tokens-src/merge-css.mjs      <- supports the mergeCustomProps option (flat and per-mode)
-//   build-tokens-src/source-prefixes.mjs <- supports `{ src, prefix }` entries in source/sourceModes
-//   build-tokens-src/source-transforms.mjs <- supports `{ src, transform }` entries in source/sourceModes
-//   build-tokens-src/token-rename-parser.mjs <- parser applying the `transform` rename maps
+/*
+  build-tokens.mjs
+  Entry point: importa i moduli, esegue la build, esegue il lint dell'output CSS, stampa il log.
+
+    Struttura del progetto:
+      build-tokens.mjs              <- questo file
+      build-tokens-src/config.mjs   <- legge il flag --config e risolve tutti i percorsi
+      build-tokens-src/transforms.mjs  <- registra le transform personalizzate di Style Dictionary
+      build-tokens-src/formats/css.mjs    <- registra il format css/variables-sorted
+      build-tokens-src/formats/json.mjs   <- registra il format json/tokens, esporta gli helper
+      build-tokens-src/platforms.mjs      <- costruisce l'oggetto platforms (css + json opzionale)
+      build-tokens-src/build-source-modes.mjs  <- percorso di build alternativo usato quando sourceModes è impostato
+      build-tokens-src/merge-css.mjs      <- supporta l'opzione mergeCustomProps (flat e per modalità)
+      build-tokens-src/source-prefixes.mjs <- supporta le voci `{ src, prefix }` in source/sourceModes
+      build-tokens-src/source-transforms.mjs <- supporta le voci `{ src, transform }` in source/sourceModes
+      build-tokens-src/token-rename-parser.mjs <- parser che applica le mappe di rinomina `transform`
+*/
 
 import StyleDictionary from 'style-dictionary';
 import * as path from 'node:path';
@@ -25,7 +27,7 @@ import { homedir } from 'node:os';
 import stylelint from 'stylelint';
 import { pathToFileURL } from 'node:url';
 
-// ── 1. Configuration (args + resolved paths) ────────────────────────────────
+// ── 1. Configurazione (argomenti + percorsi risolti) ────────────────────────
 import {
   configAbsPath,
   buildPath,
@@ -48,29 +50,33 @@ import {
   customPropsSelector,
 } from './build-tokens-src/config.mjs';
 
-// ── 2. Custom transforms ─────────────────────────────────────────────────────
+// ── 2. Transform personalizzate ──────────────────────────────────────────────
 import './build-tokens-src/transforms.mjs';
 
-// ── 2b. Legacy token syntax bridge ───────────────────────────────────────────
-// Converts legacy (non-DTCG, e.g. Open Props) .json/.jsonc source files to
-// DTCG v5 syntax at parse time — see build-tokens-src/legacy-tokens-parser.mjs.
+// ── 2b. Bridge per la sintassi legacy dei token ──────────────────────────────
+// Converte i file sorgente .json/.jsonc legacy (non DTCG, ad es. Open Props) alla
+// sintassi DTCG v5 in fase di parsing — vedi build-tokens-src/legacy-tokens-parser.mjs.
 import { LEGACY_TOKENS_PARSER_NAME, registerLegacyTokensParser } from './build-tokens-src/legacy-tokens-parser.mjs';
 registerLegacyTokensParser();
 
-// ── 2c. Per-source custom property prefixes ──────────────────────────────────
-// Expands the `{ src, prefix }` entries of source/sourceModes into the file ->
-// prefix map read by the name/kebab-prefixed transform (needs the legacy
-// parser above, to load legacy .json sources) — see source-prefixes.mjs.
+// ── 2c. Prefissi delle custom properties per sorgente ────────────────────────
+/*
+  Espande le voci `{ src, prefix }` di source/sourceModes nella mappa file ->
+  prefisso letta dalla transform name/kebab-prefixed (richiede il parser legacy
+  qui sopra, per caricare le sorgenti .json legacy) — vedi source-prefixes.mjs.
+*/
 import { registerSourcePrefixes } from './build-tokens-src/source-prefixes.mjs';
 await registerSourcePrefixes(prefixedSources);
 
-// ── 2d. Per-source token rename maps ─────────────────────────────────────────
-// Expands the `{ src, transform }` entries of source/sourceModes into the
-// file -> rename-map read by the token-rename parser, and registers that
-// parser (only if at least one file actually has a transform) — see
-// source-transforms.mjs / token-rename-parser.mjs. `parserNames` is reused
-// below and passed down to buildSourceModes() so every Style Dictionary
-// instance opts in consistently.
+// ── 2d. Mappe di rinomina dei token per sorgente ─────────────────────────────
+/*
+  Espande le voci `{ src, transform }` di source/sourceModes nella mappa
+  file -> rinomina letta dal parser di rinomina dei token, e registra quel
+  parser (solo se almeno un file ha effettivamente una transform) — vedi
+  source-transforms.mjs / token-rename-parser.mjs. `parserNames` viene riutilizzato
+  più sotto e passato a buildSourceModes() in modo che ogni istanza di
+  Style Dictionary lo adotti in modo coerente.
+*/
 import { registerSourceTransforms, transformedFilesPattern, hasRegisteredTransforms } from './build-tokens-src/source-transforms.mjs';
 import {
   TOKEN_RENAME_PARSER_NAME,
@@ -83,34 +89,36 @@ const tokenRenamePattern = transformedFilesPattern();
 if (tokenRenamePattern) registerTokenRenameParser(tokenRenamePattern);
 registerTokenRenamePreprocessor();
 const parserNames = [LEGACY_TOKENS_PARSER_NAME, ...(hasRegisteredTransforms() ? [TOKEN_RENAME_PARSER_NAME] : [])];
-// Rewrites {references} to any renamed token's OLD path, tree-wide, once all
-// files are merged (see registerTokenRenamePreprocessor() above).
+// Riscrive i {riferimenti} al VECCHIO percorso di ogni token rinominato, in tutto l'albero,
+// una volta uniti tutti i file (vedi registerTokenRenamePreprocessor() qui sopra).
 const preprocessorNames = hasRegisteredTransforms() ? [TOKEN_RENAME_PREPROCESSOR_NAME] : [];
 
-// ── 3. CSS format ─────────────────────────────────────────────────────────────
-// customPropsCount is updated by the format at render time
-// loadExistingCustomProps supports the mergeCustomProps option (see below)
+// ── 3. Format CSS ─────────────────────────────────────────────────────────────
+// customPropsCount viene aggiornato dal format al momento del rendering
+// loadExistingCustomProps supporta l'opzione mergeCustomProps (vedi sotto)
 import { customPropsCount } from './build-tokens-src/formats/css.mjs';
 import { loadExistingCustomProps } from './build-tokens-src/merge-css.mjs';
 
-// ── 4. JSON format ────────────────────────────────────────────────────────────
+// ── 4. Format JSON ────────────────────────────────────────────────────────────
 import { buildJsonFiles, collectConcreteFilePaths } from './build-tokens-src/formats/json.mjs';
 
-// ── 5. Platforms builder ──────────────────────────────────────────────────────
+// ── 5. Builder delle platform ─────────────────────────────────────────────────
 import { buildPlatforms } from './build-tokens-src/platforms.mjs';
 
-// ── 5b. sourceModes builder (alternative to the single-source build below) ──
+// ── 5b. Builder sourceModes (alternativa alla build a sorgente singola più sotto) ──
 import { buildSourceModes } from './build-tokens-src/build-source-modes.mjs';
 
-// ── 6. Clean json output directory ───────────────────────────────────────────
-// Remove only previously generated *.json/*.jsonc files, so that tokens
-// removed from the source are not left behind as stale artefacts, while any
-// other file placed in jsonBuildPath by the user (e.g. a README) is left
-// untouched. Files are written flat in jsonBuildPath (no subdirectories), so
-// only its top level is scanned. Runs regardless of sourceModes.
+// ── 6. Pulizia della directory di output json ────────────────────────────────
+/*
+  Rimuove solo i file *.json/*.jsonc generati in precedenza, in modo che i token
+  rimossi dalla sorgente non restino come artefatti obsoleti, lasciando intatto
+  ogni altro file inserito dall'utente in jsonBuildPath (ad es. un README). I file
+  vengono scritti nella stessa cartella jsonBuildPath (senza sottocartelle), quindi
+  viene analizzato solo il suo primo livello. Viene eseguito a prescindere da sourceModes.
+*/
 if (jsonBuildPath) {
-  // Local const: narrowing of the imported `jsonBuildPath` binding is lost
-  // inside the .map() callback below.
+  // Costante locale: il narrowing del binding importato `jsonBuildPath` si perde
+  // dentro la callback .map() qui sotto.
   const jsonDir = jsonBuildPath;
   const { readdir, rm, mkdir } = await import('fs/promises');
   const existingEntries = await readdir(jsonDir, { withFileTypes: true }).catch(() => []);
@@ -123,15 +131,15 @@ if (jsonBuildPath) {
 }
 
 // ── 7. Build ──────────────────────────────────────────────────────────────────
-// concreteFilePaths / modeResult are used below in the log section (10).
+// concreteFilePaths / modeResult sono usati più sotto nella sezione di log (10).
 /** @type {string[]} */
 let concreteFilePaths = [];
 /** @type {Awaited<ReturnType<typeof buildSourceModes>>|null} */
 let modeResult = null;
 
 if (sourceModes) {
-  // sourceModes build: one StyleDictionary instance per mode, composed into
-  // a single destFile — see build-tokens-src/build-source-modes.mjs.
+  // Build con sourceModes: un'istanza di StyleDictionary per modalità, composte in
+  // un unico destFile — vedi build-tokens-src/build-source-modes.mjs.
   modeResult = await buildSourceModes({
     sourceModes,
     baseMode: sourceModesBase,
@@ -152,28 +160,32 @@ if (sourceModes) {
   });
 
 } else {
-  // Single-source build (default).
+  // Build a sorgente singola (default).
 
-  // Pre-existing custom properties (mergeCustomProps option): read before
-  // Style Dictionary runs, since it overwrites the destination file. The
-  // css/variables-sorted format (formats/css.mjs) merges these values in —
-  // pre-existing values take priority — right before serialising the final
-  // CSS output. See merge-css.mjs.
+  /*
+    Custom properties preesistenti (opzione mergeCustomProps): lette prima
+    che Style Dictionary venga eseguito, perché sovrascrive il file di destinazione. Il
+    format css/variables-sorted (formats/css.mjs) vi unisce questi valori —
+    i valori preesistenti hanno priorità — subito prima di serializzare l'output
+    CSS finale. Vedi merge-css.mjs.
+  */
   if (mergeCustomProps) {
     loadExistingCustomProps(path.join(buildPath, destFile), mergeCustomProps);
   }
 
-  // Collect concrete source file paths (multi-file JSON mode only). Source
-  // entries may be glob patterns. SD expands them internally and stores the
-  // concrete path in token.filePath. We need those concrete paths to build
-  // the per-file descriptors for the json platform.
-  //
-  // SD v5 lazy-loads sources: `await sd.hasInitialized` triggers loading;
-  // after that sd.allTokens is a plain synchronous array with filePath populated.
-  //
-  // In single-file mode (jsonDestFile is set) we skip this step entirely.
-  // source is only null when sourceModes is set (see config.mjs); this
-  // branch runs exclusively when sourceModes is not set.
+  /*
+    Raccoglie i percorsi dei file sorgente concreti (solo modalità JSON multi-file). Le
+    voci di source possono essere pattern glob. SD li espande internamente e memorizza il
+    percorso concreto in token.filePath. Servono questi percorsi concreti per costruire
+    i descrittori per file per la platform json.
+
+    SD v5 carica le sorgenti in modo lazy: `await sd.hasInitialized` attiva il caricamento;
+    dopo, sd.allTokens è un normale array sincrono con filePath popolato.
+
+    In modalità file singolo (jsonDestFile è impostato) questo passaggio viene saltato del tutto.
+    source è null solo quando sourceModes è impostato (vedi config.mjs); questo
+    ramo viene eseguito esclusivamente quando sourceModes non è impostato.
+  */
   const singleSource = /** @type {string[]} */ (source);
 
   if (jsonBuildPath && !jsonDestFile) {
@@ -210,7 +222,7 @@ if (sourceModes) {
   await sd.buildAllPlatforms();
 }
 
-// ── 8. CSS lint ───────────────────────────────────────────────────────────────
+// ── 8. Lint CSS ───────────────────────────────────────────────────────────────
 const stylelintConfig = await import(pathToFileURL(stylelintConfigPath).href).then(m => m.default);
 
 

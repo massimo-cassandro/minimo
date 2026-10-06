@@ -5,24 +5,24 @@ import { setContent } from './content-utils.js';
 /** @typedef {import('../json-table-component.js').JsonTable} JsonTable */
 
 /**
- * Updates the info text (`elements.resultInfo`) from the current state.
+ * Aggiorna il testo informativo (`elements.resultInfo`) a partire dallo stato corrente.
  *
- * Content resolution:
- * - `params.infoText` function → `infoText(start, end, totRec, filteredRec, page, totPages)`
- * - no rows → `labels.noResults` (search active) or `labels.noRows`
- * - otherwise the mustache-like template `params.infoText` (string) or `labels.info`, with the
- *   placeholders `{start}`, `{end}`, `{totRec}`, `{filteredRec}`, `{page}`, `{totPages}` replaced
- *   by the locale-formatted numbers
+ * Risoluzione del contenuto:
+ * - funzione `params.infoText` → `infoText(start, end, totRec, filteredRec, page, totPages)`
+ * - nessuna riga → `labels.noResults` (ricerca attiva) oppure `labels.noRows`
+ * - altrimenti il template in stile mustache `params.infoText` (stringa) o `labels.info`, con i
+ *   segnaposto `{start}`, `{end}`, `{totRec}`, `{filteredRec}`, `{page}`, `{totPages}` sostituiti
+ *   dai numeri formattati secondo il locale
  *
- * `start`/`end` are the 1-based indexes of the first/last row of the current page within the
- * filtered set (0 when there are no rows).
+ * `start`/`end` sono gli indici (da 1) della prima/ultima riga della pagina corrente all'interno
+ * dell'insieme filtrato (0 quando non ci sono righe).
  *
- * @param {JsonTable} jt - The component instance
+ * @param {JsonTable} jt - L'istanza del componente
  * @returns {void}
  *
  * @example
  * updateInfo(jt);
- * // default `labels.info`, page 2 of 25 rows per page, 60 rows → "Stai visualizzando le righe da 26 a 50, su un totale di 60 record trovati"
+ * // `labels.info` di default, pagina 2 con 25 righe per pagina, 60 righe → "Stai visualizzando le righe da 26 a 50, su un totale di 60 record trovati"
  */
 export function updateInfo(jt) {
 

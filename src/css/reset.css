@@ -1,19 +1,19 @@
 /*
-Josh's Custom CSS Reset
+Reset CSS personalizzato di Josh
 https://www.joshwcomeau.com/css/custom-css-reset/
 */
-/* 1. Use a more-intuitive box-sizing model */
+/* 1. Usa un modello di box-sizing più intuitivo */
 
 *, *::before, *::after {
   box-sizing: border-box;
 }
 
-/* 2. Remove default margin */
+/* 2. Rimuove il margin predefinito */
 * {
   margin: 0;
 }
 
-/* 3. Enable keyword animations */
+/* 3. Abilita le animazioni con keyword */
 @media (prefers-reduced-motion: no-preference) {
   html {
     interpolate-size: allow-keywords;
@@ -21,29 +21,29 @@ https://www.joshwcomeau.com/css/custom-css-reset/
 }
 
 body {
-  /* 4. Add accessible line-height */
+  /* 4. Aggiunge un line-height accessibile */
   line-height: 1.5;
-  /* 5. Improve text rendering */
+  /* 5. Migliora il rendering del testo */
   -webkit-font-smoothing: antialiased;
 }
 
-/* 6. Improve media defaults */
+/* 6. Migliora i default dei media */
 img, picture, video, canvas, svg {
   display: block;
   max-width: 100%;
 }
 
-/* 7. Inherit fonts for form controls */
+/* 7. Eredita i font per i controlli dei form */
 input, button, textarea, select {
   font: inherit;
 }
 
-/* 8. Avoid text overflows */
+/* 8. Evita l'overflow del testo */
 p, h1, h2, h3, h4, h5, h6 {
   overflow-wrap: break-word;
 }
 
-/* 9. Improve line wrapping */
+/* 9. Migliora l'a capo del testo */
 p {
   text-wrap: pretty;
 }
@@ -52,7 +52,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /*
-  10. Create a root stacking context
+  10. Crea uno stacking context alla radice
 */
 /* stylelint-disable-next-line selector-id-pattern, selector-max-id */
 #root, #__next {

@@ -3,8 +3,8 @@ import { classnames } from '../classnames.js';
 
 /**
  * @typedef {Object} PictureSizeEntry
- * @property {number} [from] - Breakpoint (px) the size applies from (`width >=` media condition); omitted in the (single) mobile-first default entry.
- * @property {number | [number, number]} size - Rendered width (px, height computed with `ratio`, if set) or explicit `[width, height]` pair (px).
+ * @property {number} [from] - Breakpoint (px) da cui si applica la size (condizione media `width >=`); omesso nell'(unica) entry predefinita mobile-first.
+ * @property {number | [number, number]} size - Larghezza renderizzata (px, altezza calcolata con `ratio`, se impostato) oppure coppia esplicita `[width, height]` (px).
  */
 
 // TODO aggiungere compatibilità con immagini Unsplash basate su imgix
@@ -13,25 +13,25 @@ import { classnames } from '../classnames.js';
 // per altri servizi con parametri diversi (es. imgix/Unsplash)
 
 /**
- * Creates a `picture` domBuilder item for an image rendered through the viewer.
+ * Crea un elemento domBuilder `picture` per un'immagine servita tramite il viewer.
  *
- * Every `source`/`img` `srcset` is built with width descriptors (`w`): for each entry
- * of `sizes`, a candidate is generated for every integer density from 1 to `dpr`.
- * The `sizes` attribute is built mobile-first: the entry without `from` is the
- * default, and every other entry applies from its `from` breakpoint up, as a
- * `(width >= …)` media condition (range syntax).
+ * Ogni `srcset` di `source`/`img` è costruito con descrittori di larghezza (`w`): per ogni entry
+ * di `sizes` viene generato un candidato per ogni densità intera da 1 a `dpr`.
+ * L'attributo `sizes` è costruito in modalità mobile-first: l'entry senza `from` è il
+ * default e ogni altra entry si applica dal proprio breakpoint `from` in su, come
+ * condizione media `(width >= …)` (sintassi range).
  *
  * @example
- * // fixed-width thumb (250px, 1x and 2x candidates); with no `ratio` nor explicit
- * // heights, the viewer gets a width-only resize (bb=250x) and the `img` has no
- * // `height` attribute
- * buildPictureTag({ baseSrc: 'https://img-viewer.example.com/abc123', alt: '…' });
+ * // thumb a larghezza fissa (250px, candidati 1x e 2x); senza `ratio` né altezze
+ * // esplicite, il viewer riceve un resize solo in larghezza (bb=250x) e l'`img` non ha
+ * // l'attributo `height`
+ * buildPictureTag({ baseSrc: 'https://img-viewer.example.com/abc123', alt: '...' });
  * // sizes="250px", srcset="… 250w, … 500w"
  *
  * @example
- * // responsive image: 250px by default, 500px from 576px, 800px from 992px.
- * // NB: the entry without `from` is the mobile-first default (exactly one is
- * // expected); a bare number or [width, height] pair is a shorthand for it
+ * // immagine responsive: 250px di default, 500px da 576px, 800px da 992px.
+ * // NB: l'entry senza `from` è il default mobile-first (ne è attesa esattamente
+ * // una); un numero semplice o una coppia [width, height] ne è la scorciatoia
  * buildPictureTag({
  *   baseSrc,
  *   sizes: [250, { from: 576, size: 500 }, { from: 992, size: 800 }],
@@ -39,7 +39,7 @@ import { classnames } from '../classnames.js';
  * // sizes="(width >= 992px) 800px, (width >= 576px) 500px, 250px"
  *
  * @example
- * // custom ratio for numeric sizes and candidates up to 3x
+ * // ratio personalizzato per le size numeriche e candidati fino a 3x
  * buildPictureTag({
  *   baseSrc,
  *   sizes: [250, { from: 768, size: 500 }],
@@ -48,19 +48,19 @@ import { classnames } from '../classnames.js';
  * });
  *
  * @example
- * // different aspect ratio per breakpoint: explicit [width, height] pairs
- * // (can be mixed with numeric sizes, which use `ratio`)
+ * // aspect ratio diverso per breakpoint: coppie [width, height] esplicite
+ * // (si possono mescolare con size numeriche, che usano `ratio`)
  * buildPictureTag({
  *   baseSrc,
- *   sizes: [[250, 250], { from: 576, size: [800, 450] }], // square on mobile, 16:9 on desktop
+ *   sizes: [[250, 250], { from: 576, size: [800, 450] }], // quadrato su mobile, 16:9 su desktop
  * });
  *
  * @example
- * // dev environment (no avif) and above-the-fold img (no loading="lazy")
+ * // ambiente di sviluppo (senza avif) e img above-the-fold (senza loading="lazy")
  * buildPictureTag({ baseSrc, devMode: true, lazy: false });
  *
  * @example
- * // onLoad callback: reveal the image once it has finished loading
+ * // callback onLoad: mostra l'immagine al termine del caricamento
  * buildPictureTag({
  *   baseSrc,
  *   imgExtraClass: 'img-loading',
@@ -68,24 +68,24 @@ import { classnames } from '../classnames.js';
  * });
  *
  * @param {Object} args
- * @param {string} args.baseSrc - Image base URL (viewer endpoint); its query params are preserved.
- * @param {(number | [number, number] | PictureSizeEntry)[]} [args.sizes=[250]] - Rendered image sizes, in any order. Each entry is a `{from, size}` object (see {@link PictureSizeEntry}); a bare number or `[width, height]` pair is a shorthand for the mobile-first default entry (the one without `from`), expected exactly once. (default: [250])
- * @param {number|null} [args.ratio=null] - Default aspect ratio (width / height, as in the CSS `aspect-ratio` property) used to compute the height of numeric sizes. When null, no height is computed: the height-related output (`height` attribute, height in the `bb` param) is omitted and the viewer preserves the image's own ratio. (default: null)
- * @param {number} [args.dpr=2] - Maximum pixel density (integer): `srcset` candidates are generated for every density from 1 to `dpr`. (default: 2)
- * @param {[string, string|number][]} [args.img_params=[['q','60']]] - Query params (`[name, value]` pairs) added to every generated URL. (default: [['q','60']])
- * @param {string[]} [args.formats=['avif','webp','pjpg']] - Image formats: the last one is used for the `img` fallback element, the others for the `source` elements. (default: ['avif','webp','pjpg'])
- * @param {boolean} [args.devMode=false] - When true, `avif` is excluded from `formats` (not supported by the local dev environment). (default: false)
- * @param {boolean} [args.lazy=true] - When true, the `img` element gets `loading="lazy"`. (default: true)
- * @param {'high'|'low'|null} [args.fetchpriority=null] - `fetchpriority` attribute for the `img` element: use `high` for the LCP/above-the-fold image (typically with `lazy: false`). When null the attribute is omitted (browser default `auto`). (default: null)
- * @param {((img: HTMLImageElement) => void) | null} [args.onLoad=null] - Called once the image has finished loading, receiving the `img` element (called immediately if the image is already complete). (default: null)
- * @param {boolean} [args.condition=true] - When false, the function returns `null` without building anything. (default: true)
- * @param {boolean} [args.legacyMediaSyntax=false] - When true, the `sizes` media conditions use `(min-width: …)` instead of the range syntax `(width >= …)`, for older browsers (pre Chrome/Edge 104, Firefox 102, Safari 16.4). (default: false)
- * @param {string|null} [args.pictureExtraClass=null] - Extra class(es) for the `picture` element. (default: null)
- * @param {Object<string, *>} [args.pictureExtraAttrs={}] - Extra attributes for the `picture` element. (default: {})
- * @param {string|null} [args.imgExtraClass=null] - Extra class(es) for the `img` element. (default: null)
- * @param {Object<string, *>} [args.imgExtraAttrs={}] - Extra attributes for the `img` element. (default: {})
- * @param {string} [args.alt=''] - `alt` text for the `img` element. (default: '')
- * @returns {DomBuilderItem|null} The `picture` domBuilder item, or `null` when `baseSrc` is missing or `condition` is false.
+ * @param {string} args.baseSrc - URL base dell'immagine (endpoint del viewer); i suoi parametri di query vengono conservati.
+ * @param {(number | [number, number] | PictureSizeEntry)[]} [args.sizes=[250]] - Dimensioni renderizzate dell'immagine, in qualsiasi ordine. Ogni entry è un oggetto `{from, size}` (vedi {@link PictureSizeEntry}); un numero semplice o una coppia `[width, height]` è la scorciatoia per l'entry predefinita mobile-first (quella senza `from`), attesa esattamente una volta (default: [250])
+ * @param {number|null} [args.ratio=null] - Aspect ratio predefinito (larghezza / altezza, come nella proprietà CSS `aspect-ratio`) usato per calcolare l'altezza delle size numeriche. Se null, l'altezza non viene calcolata: gli output legati all'altezza (attributo `height`, altezza nel parametro `bb`) vengono omessi e il viewer mantiene il ratio originale dell'immagine (default: null)
+ * @param {number} [args.dpr=2] - Densità di pixel massima (intero): i candidati di `srcset` vengono generati per ogni densità da 1 a `dpr` (default: 2)
+ * @param {[string, string|number][]} [args.img_params=[['q','60']]] - Parametri di query (coppie `[name, value]`) aggiunti a ogni URL generato (default: [['q','60']])
+ * @param {string[]} [args.formats=['avif','webp','pjpg']] - Formati dell'immagine: l'ultimo viene usato per l'elemento `img` di fallback, gli altri per gli elementi `source` (default: ['avif','webp','pjpg'])
+ * @param {boolean} [args.devMode=false] - Se true, `avif` viene escluso da `formats` (non supportato dall'ambiente di sviluppo locale) (default: false)
+ * @param {boolean} [args.lazy=true] - Se true, l'elemento `img` riceve `loading="lazy"` (default: true)
+ * @param {'high'|'low'|null} [args.fetchpriority=null] - Attributo `fetchpriority` per l'elemento `img`: usare `high` per l'immagine LCP/above-the-fold (tipicamente con `lazy: false`). Se null l'attributo viene omesso (default del browser `auto`) (default: null)
+ * @param {((img: HTMLImageElement) => void) | null} [args.onLoad=null] - Chiamata al termine del caricamento dell'immagine, riceve l'elemento `img` (chiamata subito se l'immagine è già completa) (default: null)
+ * @param {boolean} [args.condition=true] - Se false, la funzione restituisce `null` senza costruire nulla (default: true)
+ * @param {boolean} [args.legacyMediaSyntax=false] - Se true, le condizioni media di `sizes` usano `(min-width: …)` invece della sintassi range `(width >= …)`, per i browser più vecchi (precedenti a Chrome/Edge 104, Firefox 102, Safari 16.4) (default: false)
+ * @param {string|null} [args.pictureExtraClass=null] - Classe/i extra per l'elemento `picture`. (default: null)
+ * @param {Object<string, *>} [args.pictureExtraAttrs={}] - Attributi extra per l'elemento `picture`. (default: {})
+ * @param {string|null} [args.imgExtraClass=null] - Classe/i extra per l'elemento `img`. (default: null)
+ * @param {Object<string, *>} [args.imgExtraAttrs={}] - Attributi extra per l'elemento `img`. (default: {})
+ * @param {string} [args.alt=''] - Testo `alt` per l'elemento `img`. (default: '')
+ * @returns {DomBuilderItem|null} L'elemento domBuilder `picture`, oppure `null` quando `baseSrc` manca o `condition` è false.
  */
 export function buildPictureTag({
   baseSrc,

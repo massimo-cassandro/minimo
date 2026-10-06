@@ -21,7 +21,7 @@ export default {
 
     // 'color-function-notation': null,
 
-    //********************** optionally for tailwind:
+    //********************** opzionale per tailwind:
     // 'at-rule-no-unknown': [
     //   true,
     //   'value-keyword-case': null,

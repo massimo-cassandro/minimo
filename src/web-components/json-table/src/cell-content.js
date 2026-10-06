@@ -8,21 +8,21 @@ import { toNumber } from './data-types.js';
 /** @typedef {import('./parse-cols.js').ParsedCol} ParsedCol */
 
 /**
- * Computes the content of a body cell.
+ * Calcola il contenuto di una cella del body.
  *
  * Pipeline:
- * 1. column `render`: function `(row, tr, td)` or mustache-like string (`[[key]]`); a function
- *    returning `undefined` lets the pipeline go on (useful to only decorate `td`/`tr`), `null`
- *    gives `renderNullAs`
- * 2. `null`/`undefined` raw value → `renderNullAs`
- * 3. data type `render(value, row, params)`
- * 4. raw value
+ * 1. `render` della colonna: funzione `(row, tr, td)` o stringa in stile mustache (`[[key]]`); una funzione
+ *    che restituisce `undefined` lascia proseguire la pipeline (utile per decorare solo `td`/`tr`), `null`
+ *    dà `renderNullAs`
+ * 2. valore grezzo `null`/`undefined` → `renderNullAs`
+ * 3. `render(value, row, params)` del data type
+ * 4. valore grezzo
  *
- * @param {ParsedCol} col - Parsed column
- * @param {Object} row - Row object
- * @param {JsonTableParams} params - Resolved params
- * @param {HTMLTableRowElement} [tr] - Row element, passed to the column `render`
- * @param {HTMLTableCellElement} [td] - Cell element, passed to the column `render`
+ * @param {ParsedCol} col - Colonna analizzata
+ * @param {Object} row - Oggetto riga
+ * @param {JsonTableParams} params - Parametri risolti
+ * @param {HTMLTableRowElement} [tr] - Elemento riga, passato al `render` della colonna
+ * @param {HTMLTableCellElement} [td] - Elemento cella, passato al `render` della colonna
  * @returns {CellContent}
  *
  * @example
@@ -30,7 +30,7 @@ import { toNumber } from './data-types.js';
  * cellContent({ ...col, key: 'amount', _type: types.euro }, { amount: null }, params); // → '—' (renderNullAs)
  * cellContent({ ...col, render: '<b>[[name]]</b>' }, { name: 'Mario' }, params);      // → '<b>Mario</b>'
  * cellContent({ ...col, render: (row, tr, td) => { td.title = row.name; } }, row, params, tr, td);
- * // → data type / raw value (render returned undefined)
+ * // → data type / valore grezzo (render ha restituito undefined)
  */
 export function cellContent(col, row, params, tr, td) {
 
@@ -61,8 +61,8 @@ export function cellContent(col, row, params, tr, td) {
 
 
 /**
- * Built-in footer aggregates (`tfootRender: '@sum'`, ...), computed on the numeric values
- * of the column (non-numeric values are skipped).
+ * Aggregati predefiniti del footer (`tfootRender: '@sum'`, ...), calcolati sui valori numerici
+ * della colonna (i valori non numerici vengono saltati).
  * @type {Object<string, (nums: number[]) => number>}
  */
 const aggregates = {
@@ -75,17 +75,17 @@ const aggregates = {
 
 
 /**
- * Computes the content of a footer cell from the column `tfootRender`:
- * - function `(rows, td) => content`
- * - built-in aggregate `'@sum'`, `'@avg'`, `'@min'`, `'@max'` (formatted by the column data
- *   type, e.g. as currency for `euro` columns) or `'@count'` (number of numeric values)
- * - any other string: static content (e.g. a "Totale" label)
- * - `null`: empty cell
+ * Calcola il contenuto di una cella del footer dal `tfootRender` della colonna:
+ * - funzione `(rows, td) => content`
+ * - aggregato predefinito `'@sum'`, `'@avg'`, `'@min'`, `'@max'` (formattato dal data
+ *   type della colonna, ad es. come valuta per le colonne `euro`) oppure `'@count'` (numero di valori numerici)
+ * - qualsiasi altra stringa: contenuto statico (ad es. un'etichetta "Totale")
+ * - `null`: cella vuota
  *
- * @param {ParsedCol} col - Parsed column
- * @param {Array<Object>} rows - Rows to aggregate (filtered set or current page, see `updateFooterOnPageChange`)
- * @param {JsonTableParams} params - Resolved params
- * @param {HTMLTableCellElement} [td] - Footer cell element, passed to the `tfootRender` function
+ * @param {ParsedCol} col - Colonna analizzata
+ * @param {Array<Object>} rows - Righe da aggregare (insieme filtrato o pagina corrente, vedi `updateFooterOnPageChange`)
+ * @param {JsonTableParams} params - Parametri risolti
+ * @param {HTMLTableCellElement} [td] - Elemento cella del footer, passato alla funzione `tfootRender`
  * @returns {CellContent}
  *
  * @example

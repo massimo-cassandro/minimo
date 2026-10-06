@@ -1,55 +1,57 @@
-// build-tokens-src/source-transforms.mjs
-// Supports per-source token renaming: an entry of `source` (or of a
-// `sourceModes` mode) can carry a `transform` object next to (or instead of)
-// `prefix` — see splitSourceEntries() in source-prefixes.mjs — e.g.
-//
-//   { src: './project-tokens/*.jsonc', transform: { primary: 'primary.100' } }
-//
-// so that the token found at dot-path `primary` in those files is moved to
-// dot-path `primary.100` before Style Dictionary ever sees it, i.e. before
-// {references} are resolved and before the CSS/JSON output is built.
-//
-// Typical use case: a preexisting project defines its tokens (e.g. exported
-// from Figma/Penpot) under names that don't match minimo's own naming (e.g.
-// the project's base color is `primary`, minimo's equivalent is
-// `primary.100`). Without this feature every custom property generated from
-// the project's tokens would have to be renamed by hand after each build, or
-// every minimo reference to `{primary.100}` would have to be tracked down and
-// changed instead. `transform` fixes the token's OWN path once, in config.
-//
-// Notation: both sides of the map use Style Dictionary's own dot-path
-// notation (e.g. 'primary.100'), NOT the hyphen-joined custom-property
-// notation (e.g. 'primary-100'). Token name segments in this project can
-// themselves contain hyphens (e.g. btn-close, status-buttons), so a hyphen
-// can't reliably tell a path separator from a literal part of a segment name;
-// a dot can, since Style Dictionary already reserves it as the path
-// separator in {references} and never allows it inside a single segment
-// name.
-//
-// Moving a node would otherwise leave every {reference} to its OLD path
-// dangling (in the same file or a completely different one) — so this module
-// also collects a flat, file-independent from -> to map (getAllRenames()),
-// used by the token-rename PREPROCESSOR (see token-rename-parser.mjs) to
-// rewrite every such {reference} tree-wide, once all files are merged. This
-// is safe to do because Style Dictionary resolves {references} against the
-// single merged token tree by absolute path: if `primary` existed exactly
-// once before the rename, every {primary} anywhere in the build
-// unambiguously pointed at that one node, so every one of them must now
-// become {primary.100} — there is no risk of rewriting an unrelated
-// reference. The one case this can't disambiguate is the same "from" key
-// renamed to a DIFFERENT destination in a different file (each valid on its
-// own, per-file); see registerSourceTransforms() below — that key is
-// excluded from the tree-wide rewrite (with a console warning), and its
-// {references} are left for the user to fix by hand.
-//
-// How it works: unlike `prefix` (a purely cosmetic CSS name transform, see
-// source-prefixes.mjs, which never touches the token tree), `transform`
-// restructures the actual parsed token tree of the source file, via a
-// dedicated Style Dictionary parser (see token-rename-parser.mjs) that runs
-// at parse time, before files are merged and before reference resolution.
-// Since both the CSS and JSON output formats rebuild their tree from
-// token.path (by then already renamed), no separate handling is needed to
-// make the JSON output reflect the renamed structure too.
+/*
+  build-tokens-src/source-transforms.mjs
+  Supporta la rinomina dei token per sorgente: una voce di `source` (o di una
+  modalità di `sourceModes`) può avere un oggetto `transform` accanto a (o al posto di)
+  `prefix` — vedi splitSourceEntries() in source-prefixes.mjs — ad es.
+
+    { src: './project-tokens/*.jsonc', transform: { primary: 'primary.100' } }
+
+  in modo che il token trovato al dot-path `primary` in quei file venga spostato al
+  dot-path `primary.100` prima ancora che Style Dictionary lo veda, cioè prima che
+  i {riferimenti} vengano risolti e prima che venga costruito l'output CSS/JSON.
+
+  Caso d'uso tipico: un progetto preesistente definisce i propri token (ad es. esportati
+  da Figma/Penpot) con nomi che non corrispondono alla nomenclatura di minimo (ad es.
+  il colore base del progetto è `primary`, l'equivalente di minimo è
+  `primary.100`). Senza questa funzionalità ogni custom property generata dai token
+  del progetto andrebbe rinominata a mano dopo ogni build, oppure ogni riferimento di minimo
+  a `{primary.100}` andrebbe cercato e modificato. `transform` corregge una volta
+  sola il percorso PROPRIO del token, nella config.
+
+  Notazione: entrambi i lati della mappa usano la notazione dot-path di Style Dictionary
+  (ad es. 'primary.100'), NON la notazione delle custom properties con trattini
+  (ad es. 'primary-100'). I segmenti dei nomi dei token in questo progetto possono
+  contenere trattini (ad es. btn-close, status-buttons), quindi un trattino
+  non permette di distinguere in modo affidabile un separatore di percorso da una parte letterale
+  del nome di un segmento; un punto sì, dato che Style Dictionary lo riserva già come
+  separatore di percorso nei {riferimenti} e non lo ammette mai dentro il nome
+  di un singolo segmento.
+
+  Spostare un nodo lascerebbe altrimenti ogni {riferimento} al suo VECCHIO percorso
+  pendente (nello stesso file o in uno completamente diverso) — quindi questo modulo
+  raccoglie anche una mappa piatta from -> to, indipendente dal file (getAllRenames()),
+  usata dal PREPROCESSOR di rinomina dei token (vedi token-rename-parser.mjs) per
+  riscrivere ogni {riferimento} di questo tipo in tutto l'albero, una volta uniti tutti i file. Si
+  può fare in sicurezza perché Style Dictionary risolve i {riferimenti} sull'unico
+  albero di token unito, tramite percorso assoluto: se `primary` esisteva una sola
+  volta prima della rinomina, ogni {primary} in qualsiasi punto della build
+  puntava senza ambiguità a quell'unico nodo, quindi ognuno deve ora
+  diventare {primary.100} — non c'è rischio di riscrivere un riferimento non correlato. L'unico
+  caso che non si può disambiguare è la stessa chiave "from" rinominata con una
+  destinazione DIVERSA in un file diverso (ciascuna valida per conto proprio, per
+  file); vedi registerSourceTransforms() più sotto — quella chiave viene
+  esclusa dalla riscrittura su tutto l'albero (con un warning in console) e i suoi
+  {riferimenti} restano da correggere a mano.
+
+  Come funziona: a differenza di `prefix` (una trasformazione puramente estetica del nome CSS, vedi
+  source-prefixes.mjs, che non tocca mai l'albero dei token), `transform`
+  ristruttura il vero albero dei token letto dal file sorgente, tramite un
+  parser dedicato di Style Dictionary (vedi token-rename-parser.mjs) che viene eseguito
+  in fase di parsing, prima dell'unione dei file e della risoluzione dei riferimenti.
+  Poiché sia l'output CSS sia quello JSON ricostruiscono il proprio albero da
+  token.path (ormai già rinominato), non serve una gestione separata perché
+  anche l'output JSON rifletta la struttura rinominata.
+*/
 
 import StyleDictionary from 'style-dictionary';
 import { collectConcreteFilePaths } from './formats/json.mjs';
@@ -58,29 +60,31 @@ import { LEGACY_TOKENS_PARSER_NAME } from './legacy-tokens-parser.mjs';
 /** @type {Map<string, Record<string,string>>} */
 let transformByFile = new Map();
 
-// Flat, file-independent from -> to map, used by the token-rename
-// preprocessor (see token-rename-parser.mjs) to rewrite any {reference}
-// pointing to a renamed token's OLD path, anywhere in the build (same file or
-// another one) — references are resolved by Style Dictionary against the
-// single merged token tree, by absolute path, so a bare dot-path is
-// unambiguous UNLESS the same "from" key was given a different destination
-// in a different file (each valid on its own — see registerSourceTransforms
-// below), in which case that key is excluded here (with a warning) and its
-// {references} are left for the user to fix by hand, same as before this
-// preprocessor existed.
+/*
+  Mappa piatta from -> to, indipendente dal file, usata dal preprocessor di
+  rinomina dei token (vedi token-rename-parser.mjs) per riscrivere ogni {riferimento}
+  che punta al VECCHIO percorso di un token rinominato, in qualsiasi punto della build (stesso file o
+  un altro) — i riferimenti vengono risolti da Style Dictionary sull'unico albero di
+  token unito, tramite percorso assoluto, quindi un semplice dot-path non è
+  ambiguo A MENO CHE la stessa chiave "from" non abbia ricevuto una destinazione diversa
+  in un file diverso (ciascuna valida per conto proprio — vedi registerSourceTransforms
+  più sotto), nel qual caso quella chiave viene esclusa qui (con un warning) e i suoi
+  {riferimenti} restano da correggere a mano, come prima dell'esistenza di questo
+  preprocessor.
+*/
 /** @type {Map<string, string>} */
 let globalRenames = new Map();
 
 const DOT_PATH = /^[^.\s][\w-]*(\.[^.\s][\w-]*)*$/;
 
 /**
- * Validates a `transform` map: every key/value must be a non-empty
- * Style-Dictionary dot-path string (e.g. 'primary.100'), not a
- * hyphen-joined custom-property name (e.g. 'primary-100') — see the notation
+ * Valida una mappa `transform`: ogni chiave/valore deve essere una stringa dot-path
+ * di Style Dictionary non vuota (ad es. 'primary.100'), non un nome di custom property
+ * con trattini (ad es. 'primary-100') — vedi la motivazione della notazione qui sopra.
  * rationale above.
  * @param {unknown} map
  * @returns {Record<string,string>}
- * @throws {Error} if the map is not a plain object, or a key/value is invalid
+ * @throws {Error} se la mappa non è un oggetto semplice o una chiave/valore non è valido
  */
 export const normalizeTransformMap = (map) => {
   if (map === null || typeof map !== 'object' || Array.isArray(map)) {
@@ -102,22 +106,24 @@ export const normalizeTransformMap = (map) => {
 };
 
 /**
- * Expands the `transform` entries' `src` patterns into concrete file paths
- * and stores the file path -> rename map used by getSourceTransform(). Must
- * be called after registerLegacyTokensParser() and before any real build.
- * Maps from different entries touching the same file are merged; the build
- * fails only if two entries disagree on the destination of the same source
- * key.
+ * Espande i pattern `src` delle voci `transform` in percorsi di file concreti
+ * e memorizza la mappa percorso file -> mappa di rinomina usata da getSourceTransform().
+ * Va chiamata dopo registerLegacyTokensParser() e prima di qualsiasi build reale.
+ * Le mappe di voci diverse che toccano lo stesso file vengono unite; la build
+ * fallisce solo se due voci non concordano sulla destinazione della stessa chiave
+ * sorgente.
  * @param {import('./source-prefixes.mjs').TransformedSource[]} transformedSources
  * @returns {Promise<void>}
- * @throws {Error} if the same file gets two conflicting destinations for the same key
+ * @throws {Error} se lo stesso file riceve due destinazioni in conflitto per la stessa chiave
  */
 export const registerSourceTransforms = async (transformedSources) => {
   /** @type {Map<string, Record<string,string>>} */
   const map = new Map();
-  // Every destination seen for a given "from" key, across all files — used
-  // below to build globalRenames, and to detect the cross-file ambiguous
-  // case (same "from" key, different destination in a different file).
+  /*
+    Ogni destinazione vista per una data chiave "from", in tutti i file — usata
+    più sotto per costruire globalRenames e per rilevare il caso ambiguo tra file
+    (stessa chiave "from", destinazione diversa in un file diverso).
+  */
   /** @type {Map<string, Set<string>>} */
   const destinationsByFrom = new Map();
 
@@ -166,24 +172,24 @@ export const registerSourceTransforms = async (transformedSources) => {
 };
 
 /**
- * @returns {Map<string, string>} the flat from -> to map used to rewrite
- * {references} across the whole build (see token-rename-parser.mjs)
+ * @returns {Map<string, string>} la mappa piatta from -> to usata per riscrivere
+ * i {riferimenti} in tutta la build (vedi token-rename-parser.mjs)
  */
 export const getAllRenames = () => globalRenames;
 
 /**
  * @param {string|undefined} filePath  token.filePath
- * @returns {Record<string,string>|undefined} the rename map registered for that file, if any
+ * @returns {Record<string,string>|undefined} la mappa di rinomina registrata per quel file, se presente
  */
 export const getSourceTransform = (filePath) => (filePath ? transformByFile.get(filePath) : undefined);
 
-/** @returns {boolean} true if at least one file has a registered transform */
+/** @returns {boolean} true se almeno un file ha una transform registrata */
 export const hasRegisteredTransforms = () => transformByFile.size > 0;
 
 /**
- * Builds the RegExp matching exactly the concrete files that have a
- * registered transform, for the Style Dictionary parser `pattern` (see
- * token-rename-parser.mjs). Returns null if no file has one.
+ * Costruisce la RegExp che corrisponde esattamente ai file concreti che hanno una
+ * transform registrata, per il `pattern` del parser di Style Dictionary (vedi
+ * token-rename-parser.mjs). Restituisce null se nessun file ne ha una.
  * @returns {RegExp|null}
  */
 export const transformedFilesPattern = () => {

@@ -1,17 +1,21 @@
-// build-tokens-src/platforms.mjs
-// Builds and returns the `platforms` object for the Style Dictionary config.
-//
-// The `json` platform is included only if jsonBuildPath is set.
-// Output format (json/jsonc) and file splitting are delegated to buildJsonFiles().
+/*
+  build-tokens-src/platforms.mjs
+  Costruisce e restituisce l'oggetto `platforms` per la config di Style Dictionary.
+
+  La platform `json` è inclusa solo se jsonBuildPath è impostato.
+  Il formato di output (json/jsonc) e la suddivisione in file sono delegati a buildJsonFiles().
+*/
 
 import { buildJsonFiles } from './formats/json.mjs';
 
 /** @typedef {import('style-dictionary/types').PlatformConfig} PlatformConfig */
 
-// Transforms applied to the CSS platform.
-// Exported so other scripts (e.g. check-unresolved-custom-props.mjs) can
-// build a Style Dictionary instance with matching transformed token names.
-// name/kebab-prefixed = name/kebab + per-source prefix (see source-prefixes.mjs).
+/*
+  Transform applicate alla platform CSS.
+  Esportate così che altri script (ad es. check-unresolved-custom-props.mjs) possano
+  costruire un'istanza di Style Dictionary con nomi dei token trasformati in modo coerente.
+  name/kebab-prefixed = name/kebab + prefisso per sorgente (vedi source-prefixes.mjs).
+*/
 export const CSS_TRANSFORMS = [
   'attribute/cti',
   'name/kebab-prefixed',
@@ -25,13 +29,15 @@ export const CSS_TRANSFORMS = [
   'typography/css',
 ];
 
-// Transforms applied to the JSON platform.
-// Kept minimal on purpose: consuming tools expect original values (e.g. "16px"
-// not "1rem") and alias references ({...}) must be preserved to maintain
-// token links. Source prefixes are not applied here (plain name/kebab): the
-// JSON output keeps the original token tree.
-// Exported so build-source-modes.mjs can build a matching json platform per
-// sourceModes mode.
+/*
+  Transform applicate alla platform JSON.
+  Volutamente minimali: gli strumenti che le usano si aspettano i valori originali (es. "16px"
+  e non "1rem") e i riferimenti alias ({...}) devono essere conservati per mantenere
+  i collegamenti tra token. I prefissi delle sorgenti non vengono applicati qui (name/kebab semplice): l'output
+  JSON mantiene l'albero dei token originale.
+  Esportate così che build-source-modes.mjs possa costruire una platform json corrispondente per ogni
+  modalità di sourceModes.
+*/
 export const JSON_TRANSFORMS = [
   'attribute/cti',
   'name/kebab',
@@ -40,20 +46,20 @@ export const JSON_TRANSFORMS = [
 
 /**
  * @param {object}          opts
- * @param {string}          opts.buildPath           Absolute path for CSS output directory
- * @param {string}          opts.destFile            CSS output filename (e.g. "tokens.css")
- * @param {string|null}     opts.jsonBuildPath       Absolute path for JSON output (null = disabled)
- * @param {string|null}     opts.jsonDestFile        Base name for aggregated file; null = one file per source
- * @param {'json'|'jsonc'}  opts.jsonFormat          Output format for JSON files
- * @param {string[]}        opts.concreteFilePaths   Concrete (expanded) source file paths for multi-file mode.
- *                                                   Collected from sd.allTokens after SD initialisation.
- *                                                   Ignored when jsonDestFile is set.
- * @param {'keep'|'calc'|'resolve'} opts.jsonExpression  How to handle math expressions in dimension tokens.
- * @param {{name: string, prefixes: string[]}[]} opts.customPropsGroups  Named groups of name prefixes, moved to the top of the CSS output in list order.
- * @param {boolean}         opts.pxToRem             If false, skips the px→rem transform on the CSS platform. Default: true.
- * @param {string|null}     opts.addLayer            Wraps the generated custom properties inside `@layer <addLayer> { ... }`. null = no layer.
- * @param {string}          opts.selector            CSS selector wrapping the generated block (default: ':root').
- * @returns {Record<string, PlatformConfig>} platforms object ready for Style Dictionary config
+ * @param {string}          opts.buildPath           Percorso assoluto della directory di output CSS
+ * @param {string}          opts.destFile            Nome del file CSS di output (es. "tokens.css")
+ * @param {string|null}     opts.jsonBuildPath       Percorso assoluto dell'output JSON (null = disattivato)
+ * @param {string|null}     opts.jsonDestFile        Nome base del file aggregato; null = un file per sorgente
+ * @param {'json'|'jsonc'}  opts.jsonFormat          Formato di output dei file JSON
+ * @param {string[]}        opts.concreteFilePaths   Percorsi concreti (espansi) dei file sorgente per la modalità multi-file.
+ *                                                   Raccolti da sd.allTokens dopo l'inizializzazione di SD.
+ *                                                   Ignorato quando jsonDestFile è impostato.
+ * @param {'keep'|'calc'|'resolve'} opts.jsonExpression  Come gestire le espressioni matematiche nei token dimension.
+ * @param {{name: string, prefixes: string[]}[]} opts.customPropsGroups  Gruppi nominati di prefissi di nome, spostati in cima all'output CSS nell'ordine dell'elenco.
+ * @param {boolean}         opts.pxToRem             Se false, salta la transform px→rem sulla platform CSS (default: true).
+ * @param {string|null}     opts.addLayer            Racchiude le custom properties generate in `@layer <addLayer> { ... }`. null = nessun layer.
+ * @param {string}          opts.selector            Selettore CSS che racchiude il blocco generato (default: ':root').
+ * @returns {Record<string, PlatformConfig>} oggetto platforms pronto per la config di Style Dictionary
  */
 export const buildPlatforms = ({
   buildPath,

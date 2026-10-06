@@ -1,22 +1,22 @@
 # Svg Icons Tools
 
-Svg Icons Tools provides some utilities for manage and optimize SVG icons:
+Svg Icons Tools fornisce alcune utilità per gestire e ottimizzare le icone SVG:
 
-* optimize all files with [SVGO](https://svgo.dev/)
-* combine svg files into a single file, where each icon is wrapped within a `<symbol>` element (inspired from [svgstore](https://github.com/svgstore/svgstore)) 
-* convert svg files to JSX
-* copy optimized svg files to target directory
-* removes *pallets* from the icon markups (see config file for more details).
-* create a scss file with svg icons converted to sass variables
-* jsx and optimized icons only: ability to manage both icons with `fill` and `stroke` adding optional classes to apply different css properties
+* ottimizza tutti i file con [SVGO](https://svgo.dev/)
+* combina i file svg in un unico file, in cui ogni icona è racchiusa in un elemento `<symbol>` (ispirato a [svgstore](https://github.com/svgstore/svgstore))
+* converte i file svg in JSX
+* copia i file svg ottimizzati nella directory di destinazione
+* rimuove i *pallet* dal markup delle icone (vedi il file di configurazione per maggiori dettagli).
+* crea un file scss con le icone svg convertite in variabili sass
+* solo per jsx e icone ottimizzate: possibilità di gestire sia icone con `fill` sia con `stroke`, aggiungendo classi opzionali per applicare proprietà css diverse
 
-These tools are pretty useless if you download your icons from one of the libraries you can find on the web, but if you design them yourself, *svg-icons-tools* can save you a lot of time in cleaning up and optimizing icons drawn with Illustrator, Figma, Sketch etc.
+Questi strumenti sono poco utili se le icone vengono scaricate da una delle librerie disponibili sul web, ma se le si disegna da sé, *svg-icons-tools* può far risparmiare molto tempo nella pulizia e nell'ottimizzazione delle icone disegnate con Illustrator, Figma, Sketch ecc.
 
-Also, most (or all) libraries only allow you to download icons with a fixed thickness, but you can often download "working" versions where thickness is defined by the stroke attribute. In these cases there is often a *pallet* that you can easily remove.
+Inoltre, la maggior parte (o la totalità) delle librerie permette di scaricare solo icone con spessore fisso, ma spesso si possono scaricare versioni "di lavoro" in cui lo spessore è definito dall'attributo stroke. In questi casi è spesso presente un *pallet* che si può rimuovere facilmente.
 
-Read more in my [Building an Icon System in React](https://medium.com/better-programming/building-an-icon-system-in-react-16757d73cc35) article.
+Maggiori informazioni nel mio articolo [Building an Icon System in React](https://medium.com/better-programming/building-an-icon-system-in-react-16757d73cc35).
 
-## Installation
+## Installazione
 
 ```bash
 npm i -D @massimo-cassandro/svg-icons-tools
@@ -24,52 +24,52 @@ npm i -D @massimo-cassandro/svg-icons-tools
 
 ## Setup
 
-First, create a config file for you project, you can run:
+Per prima cosa creare un file di configurazione per il progetto, eseguendo:
 
 ```bash
 npx iconsTools init
 ```
 
-This creates a `svg-icons-tools` directory which contains the `svg-icons-tools.config.mjs` configuration file.
+Viene creata una directory `svg-icons-tools` che contiene il file di configurazione `svg-icons-tools.config.mjs`.
 
-Rename the folder as you like and move it where you need. Then open and customize the `svg-icons-tools.config.mjs` file.
+Rinominare la cartella a piacere e spostarla dove serve. Poi aprire e personalizzare il file `svg-icons-tools.config.mjs`.
 
-## Run
+## Esecuzione
 
-To launch the script, open your terminal and use the command:
+Per lanciare lo script, aprire il terminale e usare il comando:
 
 ```bash
 npx iconsTools --config ./path/to/svg-icons-tools.config.mjs
 ```
 
-where `--config` must contain the path, relative to the current dir, to the config file.
+dove `--config` deve contenere il percorso, relativo alla directory corrente, del file di configurazione.
 
-If the `--config` parameter is not set, the script will look for the configuration file in the current directory; if the file is not found, an error will be thrown.
+Se il parametro `--config` non è impostato, lo script cerca il file di configurazione nella directory corrente; se il file non viene trovato, viene generato un errore.
 
 
-## Configuration details
+## Dettagli di configurazione
 
-See [src/default-config.mjs](src/default-config.mjs) for more info.
+Vedi [src/default-config.mjs](src/default-config.mjs) per maggiori informazioni.
 
 ## Demo
 
-See [demo/readme](demo/readme.md).
+Vedi [demo/readme](demo/readme.md).
 
 ## TODO
-* documentation to jsdoc
-* prettify the jsx output (update docs)
-* SVG attributes to jsx (upd doc)
-* option to clean-up dest folder for jsx and optimized (?)
-* auto changelog
+* documentazione in jsdoc
+* formattare meglio l'output jsx (aggiornare la documentazione)
+* attributi SVG in jsx (aggiornare la documentazione)
+* opzione per ripulire la cartella di destinazione per jsx e ottimizzati (?)
+* changelog automatico
 
 
-## Changelog / Breaking Changes
+## Changelog / Breaking change
 
 ### 1.1
-* added default jsx icon builder function
+* aggiunta la funzione predefinita per la creazione delle icone jsx
 
-#### Breaking Changes
-* in config file, `config.jsx.icon_builder` becomes `config.jsx.custom_icon_builder`, if not defined the default icon builder is used for jsx files.
+#### Breaking change
+* nel file di configurazione, `config.jsx.icon_builder` diventa `config.jsx.custom_icon_builder`; se non definita, per i file jsx viene usata la funzione predefinita.
 
 ### 1.0
-* First production release
+* Prima release di produzione

@@ -9,21 +9,21 @@ import { decode } from 'blurhash';
 import * as styles from './unsplash-page.module.css';
 
 /**
- * Initialises an Unsplash full-page photo with blurhash placeholder, responsive picture element,
- * and attribution overlay.
+ * Inizializza una foto Unsplash a pagina intera con placeholder blurhash, elemento picture responsive
+ * e overlay di attribuzione.
  * @param {Object} settings
- * @param {HTMLElement | null} settings.targetElement - Container element where the photo will be rendered.
- * @param {string | null} [settings.className=null] - Extra class added to the container. (default: null)
- * @param {string | null} settings.unsplashDataUrl - URL returning Unsplash photo JSON.
- * @param {string | null} settings.utmSource - UTM source value for attribution links.
- * @param {string | null} settings.title - Main heading text.
- * @param {string | null} [settings.text=null] - Optional body text. (default: null)
- * @param {string | null} [settings.backLink=null] - Optional back-link HTML. (default: null)
- * @param {boolean} [settings.hidePhotoLink=true] - When true, the Unsplash link is shown only on hover. (default: true)
+ * @param {HTMLElement | null} settings.targetElement - Elemento contenitore in cui verrà renderizzata la foto.
+ * @param {string | null} [settings.className=null] - Classe extra aggiunta al contenitore (default: null)
+ * @param {string | null} settings.unsplashDataUrl - URL che restituisce il JSON della foto Unsplash.
+ * @param {string | null} settings.utmSource - Valore utm_source per i link di attribuzione.
+ * @param {string | null} settings.title - Testo del titolo principale.
+ * @param {string | null} [settings.text=null] - Testo opzionale del corpo (default: null)
+ * @param {string | null} [settings.backLink=null] - HTML opzionale del link di ritorno (default: null)
+ * @param {boolean} [settings.hidePhotoLink=true] - Se true, il link a Unsplash viene mostrato solo al passaggio del mouse (default: true)
  * @returns {Promise<void>}
  */
 
-// TODO add icon file customization and more custom props for message box
+// TODO aggiungere la personalizzazione del file dell'icona e altre custom props per il box del messaggio
 
 export async function unsplashPage(settings) {
 
@@ -87,23 +87,23 @@ export async function unsplashPage(settings) {
 
     container.insertAdjacentElement('afterbegin', canvas);
 
-    const formats = ['avif', 'webp', 'pjpg']; // `fm` parameter, in order of use
+    const formats = ['avif', 'webp', 'pjpg']; // parametro `fm`, in ordine di utilizzo
 
     /*
-      - image dimensions grouped by aspect ratio: each group becomes one <source> tag
-        per format (avif/webp/pjpg)
-      - each aspect ratio is expressed as [w, h] (e.g. [16, 9]); `widths` lists the target
-        render widths for that group, used both as the `w` imgix param and as the `Nw`
-        descriptor in `srcset`. Height is derived per width from the group's ratio and
-        passed to imgix as `h` (see buildImgixUrl), so groups can safely reuse the same
-        `widths` list (e.g. 9/16 and 9/20) while still requesting a different crop height
-      - orientation and the aspect-ratio media feature are derived from the ratio itself:
+      - dimensioni dell'immagine raggruppate per aspect ratio: ogni gruppo diventa un tag <source>
+        per formato (avif/webp/pjpg)
+      - ogni aspect ratio è espresso come [w, h] (es. [16, 9]); `widths` elenca le larghezze
+        di rendering di destinazione per quel gruppo, usate sia come parametro imgix `w` sia come
+        descrittore `Nw` in `srcset`. L'altezza è derivata per ogni larghezza dal ratio del gruppo e
+        passata a imgix come `h` (vedi buildImgixUrl), quindi i gruppi possono riutilizzare senza problemi lo stesso
+        elenco `widths` (es. 9/16 e 9/20) richiedendo comunque un'altezza di crop diversa
+      - l'orientamento e la media feature aspect-ratio sono derivati dal ratio stesso:
         ratio >= 1 -> landscape + min-aspect-ratio, ratio < 1 -> portrait + max-aspect-ratio
-      - NB: order matters. <picture> uses "first matching <source> wins" (unlike the CSS
-        cascade, where the last matching rule wins), so groups must be ordered from most to
-        least restrictive: landscape groups from the widest ratio to the narrowest, portrait
-        groups from the narrowest ratio to the widest. Orientation makes the two families
-        mutually exclusive, so their relative order doesn't matter
+      - NB: l'ordine conta. <picture> usa "vince il primo <source> che corrisponde" (a differenza della
+        cascata CSS, dove vince l'ultima regola corrispondente), quindi i gruppi devono essere ordinati dal più al
+        meno restrittivo: i gruppi landscape dal ratio più largo al più stretto, i gruppi portrait
+        dal ratio più stretto al più largo. L'orientamento rende le due famiglie
+        mutuamente esclusive, quindi il loro ordine relativo non conta
       */
     const sizes = [
       // landscape 16/9
@@ -126,23 +126,23 @@ export async function unsplashPage(settings) {
         ar: [9,16],
         widths: [1080, 960, 768, 570, 400]
       },
-      // portrait 3/4 (tablets)
+      // portrait 3/4 (tablet)
       {
         ar: [3,4],
         widths: [1200, 1024, 840]
       }
     ];
 
-    // `url`/`searchParams` and the static imgix params (fit/crop/q) are set up once here
-    // and reused on every call: `fm`/`w`/`h` are the only parts that change per image, and
-    // the returned string is always consumed synchronously before the next call mutates them
+    // `url`/`searchParams` e i parametri imgix statici (fit/crop/q) vengono impostati una sola volta qui
+    // e riutilizzati a ogni chiamata: `fm`/`w`/`h` sono le uniche parti che cambiano per immagine, e
+    // la stringa restituita viene sempre consumata in modo sincrono prima che la chiamata successiva le modifichi
     /** @type {(w: number, h: number, fmt: string) => string} */
     const buildImgixUrl = (() => {
       const url = new URL(imgData.base_url),
         searchParams = new URLSearchParams(url.search);
 
       searchParams.set('fit', 'crop');
-      searchParams.set('crop', 'faces,entropy,edges'); // top, bottom, left, right, faces, focalpoint, edges, and entropy
+      searchParams.set('crop', 'faces,entropy,edges'); // top, bottom, left, right, faces, focalpoint, edges ed entropy
       searchParams.set('q', '60');
 
       return (w, h, fmt) => {
@@ -155,8 +155,8 @@ export async function unsplashPage(settings) {
       };
     })();
 
-    // smallest width of the widest (most common) group, used as the plain <img> fallback
-    // for browsers without <picture> support: the <source> tags above cover everything else
+    // larghezza minima del gruppo più largo (il più comune), usata come semplice <img> di fallback
+    // per i browser senza supporto a <picture>: i tag <source> qui sopra coprono tutto il resto
     const default_group = sizes[0],
       default_w = default_group.widths[default_group.widths.length - 1],
       default_h = Math.round(default_w * default_group.ar[1] / default_group.ar[0]);
@@ -199,7 +199,7 @@ export async function unsplashPage(settings) {
             });
           }),
 
-          // =>> img and its listener
+          // =>> img e il suo listener
           {
             tag: 'img',
             className: styles.unsplashPhoto,

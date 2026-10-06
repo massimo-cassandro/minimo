@@ -49,7 +49,7 @@ const params = [{
   // }
   webmanifest_extra: null,
 
-  // if true, all files linked in manifest will end with
+  // se true, tutti i file collegati nel manifest terminano con
   // '?_=[hash]'
   webmanifest_add_hash_to_files: true,
 

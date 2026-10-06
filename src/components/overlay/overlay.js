@@ -2,9 +2,9 @@
 import './overlay.css';
 
 /**
- * Appends an overlay `div` to the given context element.
+ * Aggiunge un `div` overlay all'elemento di contesto indicato.
  * @param {Element} [context=document.body] (default: document.body)
- * @param {boolean} [scroll_lock=false] - When true, locks body scroll via `overflow-hidden`. (default: false)
+ * @param {boolean} [scroll_lock=false] - Se true, blocca lo scroll del body tramite `overflow-hidden` (default: false)
  * @returns {void}
  */
 export function overlay(context = document.body, scroll_lock = false) {
@@ -15,7 +15,7 @@ export function overlay(context = document.body, scroll_lock = false) {
 }
 
 /**
- * Removes the overlay element from the given context and re-enables body scroll.
+ * Rimuove l'elemento overlay dal contesto indicato e riabilita lo scroll del body.
  * @param {Element} [context=document.body] (default: document.body)
  * @returns {void}
  */

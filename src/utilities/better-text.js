@@ -2,10 +2,13 @@
 /*! minimo - Better Text */
 
 
-// Italian particles/articles (plus a few English and topographic terms) whose casing is
-// enforced and after which spaces are turned into non-breaking spaces. Hoisted to module
-// scope with the regexes/lookup built from it below, since none of this depends on the
-// function's arguments and was previously rebuilt on every single betterText() call.
+/*
+  Particelle/articoli italiani (più alcuni termini inglesi e toponomastici) di cui viene
+  imposta la capitalizzazione e dopo i quali gli spazi vengono trasformati in spazi non
+  separabili. Portati a livello di modulo insieme alle regex/lookup costruite qui sotto, dato
+  che nulla di tutto ciò dipende dagli argomenti della funzione e in precedenza veniva
+  ricostruito a ogni singola chiamata di betterText().
+*/
 const PARTICELLE = [
   'e', 'ed',
   'di', 'a', 'da', 'in', 'per', 'con', 'su', 'per', 'tra', 'fra',
@@ -18,72 +21,76 @@ const PARTICELLE = [
   'col', 'collo', 'colla', 'con', 'coi', 'cogli', 'colle',
   'sul', 'sullo', 'sulla', 'sui', 'sugli', 'sulle',
 
-  // topographic terms
+  // termini toponomastici
   'C.so', 'Corso', 'Via', 'P.za', 'Piazza', 'L.go', 'Largo', 'V.le', 'Viale',
   'De', 'San', 'c/o', 'Loc.',
 
-  // English
+  // inglese
   'the', 'a', 'an', 'at', 'out', 'of',
 
-  // words used in geonames
+  // parole usate nei geonames
   'isola', 'isole'
 ];
 
-// matches a particle followed by one-or-more spaces, to be turned into non-breaking spaces
+// corrisponde a una particella seguita da uno o più spazi, da trasformare in spazi non separabili
 export const NBSP_AFTER_PARTICLE_REGEX =new RegExp('\\b(' + PARTICELLE.join('|') + ')\\b +', 'gmi');
 
-// matches any particle regardless of case, to enforce its exact casing in a single pass
+// corrisponde a qualsiasi particella indipendentemente dal maiuscolo/minuscolo, per imporne la capitalizzazione esatta in un solo passaggio
 const PARTICLE_CASING_REGEX = new RegExp('\\b(' + PARTICELLE.join('|') + ')\\b', 'gmi');
 
-// lowercased particle → its exact casing, for the replacer used with PARTICLE_CASING_REGEX
+// particella in minuscolo → sua capitalizzazione esatta, per il replacer usato con PARTICLE_CASING_REGEX
 const PARTICLE_CASING_MAP = new Map(PARTICELLE.map(term => [term.toLowerCase(), term]));
 
 /**
- * Improves a text string by fixing punctuation spacing, multiple spaces,
- * typographic quotes, non-breaking spaces after Italian particles/articles,
- * and optionally enforcing the exact casing of custom words.
- * Particles are forced to their listed casing, except at the start of the text
- * where their first letter is capitalized.
+ * Migliora una stringa di testo correggendo la spaziatura della punteggiatura, gli spazi
+ * multipli, le virgolette tipografiche, gli spazi non separabili dopo le particelle/articoli
+ * italiani e, opzionalmente, imponendo la capitalizzazione esatta di parole personalizzate.
+ * Le particelle vengono forzate alla capitalizzazione elencata, tranne all'inizio del testo
+ * dove la prima lettera è maiuscola.
  *
- * @param {string} str - input string to process
- * @param {string[]} [custom_words] - list of words whose exact casing must be preserved (e.g. `['iPhone', 'macOS']`) (default: [])
- * @returns {string} processed string, or empty string if input is falsy
+ * @param {string} str - stringa da elaborare
+ * @param {string[]} [custom_words] - elenco di parole di cui va mantenuta la capitalizzazione esatta (es. `['iPhone', 'macOS']`) (default: [])
+ * @returns {string} stringa elaborata, oppure stringa vuota se l'input è falsy
  */
 export function betterText(str, custom_words = []) {
 
   if(str) {
     str = str.trim();
 
-    // punctuation: remove space before, ensure single space after
-    // NOTE: must run before any HTML entity replacements to avoid conflicts with `;`
-    // (?!$): negative lookahead to skip punctuation at end of string
+    /*
+      punteggiatura: rimuove lo spazio prima, garantisce un solo spazio dopo
+      NOTA: deve essere eseguito prima di qualsiasi sostituzione di entità HTML per evitare conflitti con `;`
+      (?!$): negative lookahead per saltare la punteggiatura a fine stringa
+    */
     str = str.replace(/ +(,|;|\.|:|!|\?)/g, '$1');
     str = str.replace(/(,|;|\.|:|!|\?)(?!$) +/g, '$1 ');
 
-    // add the missing space after , ; ! ? when directly followed by a letter or a quote;
-    // digits are skipped on purpose (decimals like 1,5), as are . and : (abbreviations, times, URLs)
+    /*
+      aggiunge lo spazio mancante dopo , ; ! ? quando seguiti direttamente da una lettera o da una virgoletta;
+      le cifre vengono saltate di proposito (decimali come 1,5), così come . e : (abbreviazioni, orari, URL)
+    */
     str = str.replace(/([,;!?])(?=[\p{L}"'“‘])/gu, '$1 ');
 
-    // collapse multiple spaces and tabs (including non-breaking spaces)
+    // comprime spazi e tabulazioni multipli (inclusi gli spazi non separabili)
     str = str.replace(/[ \t\u00A0]+/g, ' ');
 
-    // typographic quotes
-    str = str.replace(/(^| )"/g, '$1“')   // opening double quotes
-      .replace(/"/g, '”')                  // remaining double quotes → closing
-      .replace(/(^| )'/g, '$1‘')           // opening single quotes
-      .replace(/'/g, '’')                  // remaining single quotes and apostrophes
+    // virgolette tipografiche
+    str = str.replace(/(^| )"/g, '$1“')   // virgolette doppie di apertura
+      .replace(/"/g, '”')                  // virgolette doppie rimanenti → chiusura
+      .replace(/(^| )'/g, '$1‘')           // virgolette singole di apertura
+      .replace(/'/g, '’')                  // virgolette singole rimanenti e apostrofi
     ;
 
-    // remove space after apostrophe preceded by elided articles (l', un', d', all', ...)
+    // rimuove lo spazio dopo l'apostrofo preceduto da articoli elisi (l', un', d', all', ...)
     str = str.replace(/((^| )(l|un|d|all|dell|nell|sull)('|')) /gi, '$1' );
 
-    // replace regular spaces with non-breaking spaces after Italian particles/articles
+    // sostituisce gli spazi normali con spazi non separabili dopo le particelle/articoli italiani
     str = str.replace(NBSP_AFTER_PARTICLE_REGEX, function (match) {
       return match.replace(/ +/g, '\u00A0');
     });
 
-    // enforce exact casing of every particle in a single pass;
-    // a particle at the very start of the text (optionally after an opening quote) is capitalized
+    // impone la capitalizzazione esatta di ogni particella in un solo passaggio;
+    // una particella all'inizio del testo (eventualmente dopo una virgoletta di apertura) viene messa in maiuscolo
     str = str.replace(PARTICLE_CASING_REGEX, (match, _p1, offset, whole) => {
       const exact = PARTICLE_CASING_MAP.get(match.toLowerCase()) ?? match;
       return /^[“‘]?$/.test(whole.slice(0, offset))
@@ -91,8 +98,8 @@ export function betterText(str, custom_words = []) {
         : exact;
     });
 
-    // capitalize the first letter after ! ? and ellipsis (... or …), optionally after an opening quote;
-    // runs after the particle casing so that a capital is not undone for particles like "e" or "di"
+    // mette in maiuscolo la prima lettera dopo ! ? e i puntini di sospensione (... o …), eventualmente dopo una virgoletta di apertura;
+    // viene eseguito dopo la capitalizzazione delle particelle così che una maiuscola non venga annullata per particelle come "e" o "di"
     str = str.replace(/([!?]|\.{3}|…) +([“‘]?)(\p{Ll})/gu, (_match, punct, quote, letter) =>
       `${punct} ${quote}${letter.toUpperCase()}`
     );

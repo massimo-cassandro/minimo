@@ -1,19 +1,19 @@
 /*! minimo - Classnames */
 
 /**
- * `MinimoClass | any other string`: keeps editor autocomplete for minimo's
- * own class names (see ../../types/classes.d.ts, auto-generated) while still
- * accepting arbitrary consumer-defined class names. The `string & {}` branding
- * is a TS trick that prevents the union from collapsing to plain `string`,
- * which would silently disable the autocomplete.
+ * `MinimoClass | qualsiasi altra stringa`: mantiene l'autocomplete dell'editor per i nomi
+ * di classe di minimo (vedi ../../types/classes.d.ts, generato automaticamente) pur
+ * accettando nomi di classe arbitrari definiti dal consumer. Il branding `string & {}`
+ * è un trucco TS che impedisce all'union di ridursi a semplice `string`,
+ * cosa che disattiverebbe in silenzio l'autocomplete.
  * @typedef {import('../../types/classes.js').MinimoClass | (string & {})} ClassName
  */
 
 /** @typedef {ClassName | null | undefined | false | 0} ClassValue */
 
 /**
- * Joins CSS class names, filtering out falsy and non-string values.
- * Accepts strings, falsy values, and (nested) arrays of the same.
+ * Unisce i nomi di classe CSS, scartando i valori falsy e non stringa.
+ * Accetta stringhe, valori falsy e array (anche annidati) degli stessi.
  * @param {...(ClassValue | ClassValue[])} args
  * @returns {string}
  */
@@ -29,7 +29,7 @@ export function classnames(...args) {
 }
 
 /**
- * Like {@link classnames}, but returns `null` when the result is an empty string.
+ * Come {@link classnames}, ma restituisce `null` quando il risultato è una stringa vuota.
  * @param {...(ClassValue | ClassValue[])} args
  * @returns {string | null}
  */

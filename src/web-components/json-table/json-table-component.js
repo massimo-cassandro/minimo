@@ -24,38 +24,38 @@ import { domBuilder } from '../../utilities/dom-builder/dom-builder.js';
 /** @typedef {import('./src/main-builder.js').JsonTableElements} JsonTableElements */
 
 /**
- * Rendering state.
+ * Stato del rendering.
  *
- * Client-side mode: `rows` holds every parsed row, `filtered` the rows after search and sort,
- * `pageRows` the slice of the current page. Server-side mode: the three arrays hold the rows
- * returned by the last request (the current page), `totRec`/`filteredRec` come from the JSON.
+ * Modalità client-side: `rows` contiene tutte le righe analizzate, `filtered` le righe dopo ricerca e ordinamento,
+ * `pageRows` la porzione della pagina corrente. Modalità server-side: i tre array contengono le righe
+ * restituite dall'ultima richiesta (la pagina corrente), `totRec`/`filteredRec` provengono dal JSON.
  *
  * @typedef {Object} JsonTableState
- * @property {number} totRec - Total number of records (unfiltered, see `totRecField`)
- * @property {number} filteredRec - Number of records matching the current search
- * @property {ParsedRow[]} rows - All the parsed rows (current page only in server-side mode)
- * @property {ParsedRow[]} filtered - Rows after search and sort
- * @property {ParsedRow[]} pageRows - Rows of the current page
- * @property {string} searchTerm - Active search term ('' = none)
- * @property {SortDef|null} sort - Active sort (column key and direction), or null
- * @property {number} page - Current page (1-based)
- * @property {number} totPages - Total number of pages (1 when the pagination is disabled)
+ * @property {number} totRec - Numero totale di record (non filtrati, vedi `totRecField`)
+ * @property {number} filteredRec - Numero di record che corrispondono alla ricerca corrente
+ * @property {ParsedRow[]} rows - Tutte le righe analizzate (solo la pagina corrente in modalità server-side)
+ * @property {ParsedRow[]} filtered - Righe dopo ricerca e ordinamento
+ * @property {ParsedRow[]} pageRows - Righe della pagina corrente
+ * @property {string} searchTerm - Termine di ricerca attivo ('' = nessuno)
+ * @property {SortDef|null} sort - Ordinamento attivo (chiave della colonna e direzione), oppure null
+ * @property {number} page - Pagina corrente (da 1)
+ * @property {number} totPages - Numero totale di pagine (1 quando la paginazione è disattivata)
  */
 
 /**
- * Reason of a state update, passed in the `jt:update` event detail.
+ * Motivo di un aggiornamento dello stato, passato nel detail dell'evento `jt:update`.
  * @typedef {'page'|'sort'|'search'} UpdateReason
  */
 
 /**
- * Project-wide defaults, set via `JsonTable.setDefaults()`.
- * Module-level so they are shared by every instance.
+ * Default a livello di progetto, impostati con `JsonTable.setDefaults()`.
+ * A livello di modulo, così da essere condivisi da ogni istanza.
  * @type {Partial<JsonTableParams>}
  */
 let projectDefaults = {};
 
 /**
- * Empty state.
+ * Stato vuoto.
  * @returns {JsonTableState}
  */
 const emptyState = () => ({
@@ -64,18 +64,18 @@ const emptyState = () => ({
 
 
 /**
- * `<json-table>` – HTML table generator from JSON data (inline or fetched), light DOM custom element,
- * with sorting, search and pagination (client-side, or server-side via `serverSide: true`).
+ * `<json-table>` – generatore di tabelle HTML da dati JSON (inline o recuperati via fetch), custom element in light DOM,
+ * con ordinamento, ricerca e paginazione (client-side, oppure server-side con `serverSide: true`).
  *
- * Parameters (see `src/defaults.js` → `JsonTableParams`) can be set as HTML attributes or via
- * `init()`; precedence: `init()` > HTML attribute > `JsonTable.setDefaults()` > built-in default.
+ * I parametri (vedi `src/defaults.js` → `JsonTableParams`) si possono impostare come attributi HTML o tramite
+ * `init()`; precedenza: `init()` > attributo HTML > `JsonTable.setDefaults()` > default predefinito.
  *
- * Events (both bubble, `event.detail.jsonTable` is the component instance):
- * - `jt:ready`: dispatched once the structure has been built and the first data rendered
- * - `jt:update`: dispatched after every page / sort / search change (`event.detail.reason`)
+ * Eventi (entrambi con bubbling, `event.detail.jsonTable` è l'istanza del componente):
+ * - `jt:ready`: emesso quando la struttura è stata costruita e i primi dati sono stati renderizzati
+ * - `jt:update`: emesso dopo ogni cambio di pagina / ordinamento / ricerca (`event.detail.reason`)
  *
  * @example
- * // markup only
+ * // solo markup
  * // <json-table jsonurl="/api/rows.json" caption="Utenti" perpage="10"
  * //   cols='[{"key":"id","dataType":"id"},{"key":"name","title":"Nome"},{"key":"amount","dataType":"euro"}]'
  * // ></json-table>
@@ -84,7 +84,7 @@ const emptyState = () => ({
  * // script
  * import { JsonTable } from '@massimo-cassandro/minimo/src/web-components/json-table/json-table-component.js';
  *
- * JsonTable.setDefaults({ classes: { table: 'table' } }); // optional, project-wide
+ * JsonTable.setDefaults({ classes: { table: 'table' } }); // opzionale, a livello di progetto
  *
  * const el = document.querySelector('json-table');
  * el.addEventListener('jt:ready', e => console.log(e.detail.jsonTable.data));
@@ -93,24 +93,24 @@ const emptyState = () => ({
  *   jsonUrl: '/api/rows.json',          // default: null
  *   jsonDataField: 'data',              // default: 'data'
  *   totRecField: 'totRec',              // default: 'totRec'
- *   filteredRecField: 'filteredRec',    // default: 'filteredRec' (server-side mode)
- *   data: null,                         // default: null (takes precedence over jsonUrl when set)
- *   cols: [                             // required
+ *   filteredRecField: 'filteredRec',    // default: 'filteredRec' (modalità server-side)
+ *   data: null,                         // default: null (ha la precedenza su jsonUrl quando impostato)
+ *   cols: [                             // obbligatorio
  *     { key: 'id', dataType: 'id' },
  *     { key: 'name', title: 'Nome', render: (row, tr, td) => `<a href="/users/${row.id}">${row.name}</a>` },
  *     { key: 'amount', dataType: 'euro', tfootRender: '@sum' },
  *     { key: 'active', dataType: 'bool' }
  *   ],
- *   dataTypes: {},                      // default: {} (custom types, merged with the built-in ones)
+ *   dataTypes: {},                      // default: {} (tipi personalizzati, uniti a quelli predefiniti)
  *   caption: 'Utenti',                  // default: null
  *   search: true,                       // default: true
  *   searchDebounce: 300,                // default: 300 (ms)
- *   perPage: 25,                        // default: 25 (0 = no pagination)
+ *   perPage: 25,                        // default: 25 (0 = nessuna paginazione)
  *   paginationDelta: 2,                 // default: 2
  *   serverSide: false,                  // default: false
  *   serverParams: { page: 'page', start: 'start', perPage: 'perPage', sort: 'sort', dir: 'dir', search: 'search' }, // default
  *   initialSort: { key: 'name', dir: 'asc' }, // default: null
- *   tfoot: true,                        // default: false (not available in server-side mode)
+ *   tfoot: true,                        // default: false (non disponibile in modalità server-side)
  *   updateFooterOnPageChange: false,    // default: false
  *   infoText: null,                     // default: null → labels.info
  *   template: [{ slot: 'infoSection' }, { slot: 'table' }], // default
@@ -121,25 +121,25 @@ const emptyState = () => ({
  *   renderNaNAs: '—',                   // default: '—'
  *   trCallback: null,                   // default: null
  *   tableId: null,                      // default: null
- *   classes: { table: 'table' },        // merged with the defaults (see JsonTableClasses)
- *   labels: { noRows: 'Nessun utente' } // merged with the defaults (see JsonTableLabels)
+ *   classes: { table: 'table' },        // unito ai default (vedi JsonTableClasses)
+ *   labels: { noRows: 'Nessun utente' } // unito ai default (vedi JsonTableLabels)
  * });
  */
 export class JsonTable extends HTMLElement {
 
   /**
-   * Sets project-wide defaults, shared by every instance created afterwards
-   * (instances already rendered are not updated). Call it once, before the instances
-   * are created, e.g. in a shared script. Values are merged with the previous ones.
+   * Imposta i default a livello di progetto, condivisi da ogni istanza creata successivamente
+   * (le istanze già renderizzate non vengono aggiornate). Chiamarlo una sola volta, prima della creazione
+   * delle istanze, ad es. in uno script condiviso. I valori vengono uniti a quelli precedenti.
    *
-   * @param {Partial<JsonTableParams>} [newDefaults={}] - Parameters to override (default: {})
+   * @param {Partial<JsonTableParams>} [newDefaults={}] - Parametri da sovrascrivere (default: {})
    * @returns {void}
    *
    * @example
    * JsonTable.setDefaults({
    *   perPage: 50,
-   *   classes: { searchInput: 'form-control', table: 'table' }, // merged with the built-in classes
-   *   labels: { searchPlaceholder: 'Cerca…' },                  // merged with the built-in labels
+   *   classes: { searchInput: 'form-control', table: 'table' }, // unito alle classi predefinite
+   *   labels: { searchPlaceholder: 'Cerca…' },                  // unito alle label predefinite
    *   infoText: (start, end, totRec, filteredRec) => `${filteredRec} di ${totRec} record`
    * });
    */
@@ -148,7 +148,7 @@ export class JsonTable extends HTMLElement {
   }
 
   /**
-   * Clears the project-wide defaults set via `setDefaults()`.
+   * Cancella i default a livello di progetto impostati con `setDefaults()`.
    * @returns {void}
    */
   static resetDefaults() {
@@ -156,7 +156,7 @@ export class JsonTable extends HTMLElement {
   }
 
   /**
-   * Returns the built-in defaults merged with the project-wide ones.
+   * Restituisce i default predefiniti uniti a quelli a livello di progetto.
    * @returns {JsonTableParams}
    *
    * @example
@@ -169,36 +169,36 @@ export class JsonTable extends HTMLElement {
 
   constructor() {
     super();
-    // light DOM: no attachShadow
+    // light DOM: nessun attachShadow
 
-    /** @type {Partial<JsonTableParams>|null} config passed via init()/reload() */
+    /** @type {Partial<JsonTableParams>|null} configurazione passata tramite init()/reload() */
     this._config = null;
     this._initCalledProgrammatically = false;
     this._isConnected = false;
     this._loadStarted = false;
-    /** incremented on every init()/reload()/destroy(): a pending _load() whose generation is stale gives up */
+    /** incrementato a ogni init()/reload()/destroy(): un _load() in sospeso la cui generazione è obsoleta rinuncia */
     this._loadGeneration = 0;
-    /** incremented on every server-side request: a stale response is ignored */
+    /** incrementato a ogni richiesta server-side: una risposta obsoleta viene ignorata */
     this._requestGeneration = 0;
-    /** pending search debounce timer (see `search.js`) @type {ReturnType<typeof setTimeout>|undefined} */
+    /** timer di debounce della ricerca in sospeso (vedi `search.js`) @type {ReturnType<typeof setTimeout>|undefined} */
     this._searchTimer = undefined;
 
-    /** Resolved params, available after the first load. @type {JsonTableParams} */
+    /** Parametri risolti, disponibili dopo il primo caricamento. @type {JsonTableParams} */
     this.params = /** @type {JsonTableParams} */ ({ ...defaults });
 
-    /** Raw rows, available after the first load (current page only in server-side mode). @type {Array<Object>|null} */
+    /** Righe grezze, disponibili dopo il primo caricamento (solo la pagina corrente in modalità server-side). @type {Array<Object>|null} */
     this.data = null;
 
-    /** Data types map (built-in + custom), available after the first load. @type {Object<string, DataTypeDefinition>} */
+    /** Mappa dei data type (predefiniti + personalizzati), disponibile dopo il primo caricamento. @type {Object<string, DataTypeDefinition>} */
     this.dataTypes = {};
 
-    /** Parsed visible columns, available after the first load. @type {ParsedCol[]} */
+    /** Colonne visibili analizzate, disponibili dopo il primo caricamento. @type {ParsedCol[]} */
     this.cols = [];
 
-    /** Rendering state, available after the first load. @type {JsonTableState} */
+    /** Stato del rendering, disponibile dopo il primo caricamento. @type {JsonTableState} */
     this.state = emptyState();
 
-    /** Generated elements, available after the first load. @type {JsonTableElements} */
+    /** Elementi generati, disponibili dopo il primo caricamento. @type {JsonTableElements} */
     this.elements = {};
   }
 
@@ -217,30 +217,30 @@ export class JsonTable extends HTMLElement {
   }
 
 
-  // ─── Public API ─────────────────────────────────────────────────────────────
+  // ─── API pubblica ─────────────────────────────────────────────────────────────
 
   /**
-   * Starts the component via script, passing the configuration as an object.
-   * Can be called before or after the element is attached to the DOM.
+   * Avvia il componente tramite script, passando la configurazione come oggetto.
+   * Può essere chiamato prima o dopo che l'elemento è stato aggiunto al DOM.
    *
-   * Parameters not included in `config` are read from the corresponding HTML attribute
-   * (if present), then from the project defaults, then from the built-in defaults.
-   * To explicitly ignore an existing attribute pass `null` in the config.
+   * I parametri non inclusi in `config` vengono letti dal corrispondente attributo HTML
+   * (se presente), poi dai default di progetto, poi dai default predefiniti.
+   * Per ignorare esplicitamente un attributo esistente passare `null` nella config.
    *
-   * @param {Partial<JsonTableParams>} [config={}] - See `JsonTableParams` (default: {})
+   * @param {Partial<JsonTableParams>} [config={}] - Vedi `JsonTableParams` (default: {})
    * @returns {void}
    *
    * @example
    * // <json-table caption="Utenti" search="false" cols='[...]'></json-table>
-   * el.init({ jsonUrl: '/api/rows.json' });   // jsonUrl from script, caption, search and cols from attributes
-   * el.init({ jsonUrl: '/api/rows.json', search: null }); // search → default (true), the attribute is ignored
+   * el.init({ jsonUrl: '/api/rows.json' });   // jsonUrl dallo script, caption, search e cols dagli attributi
+   * el.init({ jsonUrl: '/api/rows.json', search: null }); // search → default (true), l'attributo viene ignorato
    */
   init(config = {}) {
     this._config = config;
     this._initCalledProgrammatically = true;
 
-    // an explicit init() must always restart, even if connectedCallback already
-    // ran a premature _load() (e.g. when domBuilder appends the element before init())
+    // un init() esplicito deve sempre riavviare, anche se connectedCallback ha già
+    // eseguito un _load() prematuro (ad es. quando domBuilder aggiunge l'elemento prima di init())
     this._loadStarted = false;
     this._loadGeneration++;
 
@@ -250,8 +250,8 @@ export class JsonTable extends HTMLElement {
   }
 
   /**
-   * Empties the component and resets its state. `init()` can be called again afterwards
-   * to re-initialize it with new params, without recreating the element.
+   * Svuota il componente e ne azzera lo stato. Dopo si può richiamare `init()`
+   * per reinizializzarlo con nuovi parametri, senza ricreare l'elemento.
    * @returns {void}
    */
   destroy() {
@@ -267,16 +267,16 @@ export class JsonTable extends HTMLElement {
   }
 
   /**
-   * Reloads the data and rebuilds the structure, optionally overriding some params
-   * (merged with the config passed to `init()`, if any). Search, sort and page are reset.
+   * Ricarica i dati e ricostruisce la struttura, sovrascrivendo opzionalmente alcuni parametri
+   * (uniti alla config passata a `init()`, se presente). Ricerca, ordinamento e pagina vengono azzerati.
    *
-   * @param {Partial<JsonTableParams>} [overrides={}] - Params to override (default: {})
+   * @param {Partial<JsonTableParams>} [overrides={}] - Parametri da sovrascrivere (default: {})
    * @returns {Promise<void>}
    *
    * @example
-   * await el.reload();                                  // same source
-   * await el.reload({ jsonUrl: '/api/rows.json?y=2025' }); // new URL
-   * await el.reload({ data: [{ id: 1 }] });             // inline data (takes precedence over jsonUrl)
+   * await el.reload();                                  // stessa sorgente
+   * await el.reload({ jsonUrl: '/api/rows.json?y=2025' }); // nuovo URL
+   * await el.reload({ data: [{ id: 1 }] });             // dati inline (hanno la precedenza su jsonUrl)
    */
   async reload(overrides = {}) {
     this._config = { ...(this._config ?? {}), ...overrides };
@@ -286,12 +286,12 @@ export class JsonTable extends HTMLElement {
   }
 
   /**
-   * Shows the given page (clamped to the available range). In server-side mode a new request
-   * is sent. Nothing happens when the page does not change.
+   * Mostra la pagina indicata (limitata all'intervallo disponibile). In modalità server-side viene inviata
+   * una nuova richiesta. Non succede nulla quando la pagina non cambia.
    *
-   * @param {number} page - Page number (1-based)
-   * @param {string|null} [focusTarget=null] - `data-page` of the pagination button to focus after the
-   *   rendering (used by the pagination buttons themselves) (default: null)
+   * @param {number} page - Numero di pagina (da 1)
+   * @param {string|null} [focusTarget=null] - `data-page` del pulsante di paginazione a cui dare il focus dopo il
+   *   rendering (usato dai pulsanti di paginazione stessi) (default: null)
    * @returns {void}
    *
    * @example
@@ -307,17 +307,17 @@ export class JsonTable extends HTMLElement {
   }
 
   /**
-   * Sorts the rows by a column (`dir` null removes the sort) and goes back to the first page.
-   * The column must exist and be sortable, otherwise the call is ignored with a console error.
-   * In server-side mode a new request is sent.
+   * Ordina le righe per una colonna (`dir` null rimuove l'ordinamento) e torna alla prima pagina.
+   * La colonna deve esistere ed essere ordinabile, altrimenti la chiamata viene ignorata con un errore in console.
+   * In modalità server-side viene inviata una nuova richiesta.
    *
-   * @param {string} key - Column key
-   * @param {'asc'|'desc'|null} dir - Direction, or null to remove the sort
+   * @param {string} key - Chiave della colonna
+   * @param {'asc'|'desc'|null} dir - Direzione, oppure null per rimuovere l'ordinamento
    * @returns {void}
    *
    * @example
    * el.setSort('name', 'desc');
-   * el.setSort('name', null); // original order
+   * el.setSort('name', null); // ordine originale
    */
   setSort(key, dir) {
     if (dir != null) {
@@ -334,11 +334,11 @@ export class JsonTable extends HTMLElement {
   }
 
   /**
-   * Filters the rows by a search term (every whitespace-separated word must match, case-insensitive)
-   * and goes back to the first page; an empty term removes the filter. The search input, when
-   * present, is kept in sync. In server-side mode a new request is sent.
+   * Filtra le righe per un termine di ricerca (ogni parola separata da spazi deve corrispondere, senza distinzione tra maiuscole e minuscole)
+   * e torna alla prima pagina; un termine vuoto rimuove il filtro. L'input di ricerca, quando
+   * presente, resta sincronizzato. In modalità server-side viene inviata una nuova richiesta.
    *
-   * @param {string} term - Search term
+   * @param {string} term - Termine di ricerca
    * @returns {void}
    *
    * @example
@@ -359,11 +359,11 @@ export class JsonTable extends HTMLElement {
   }
 
 
-  // ─── Load & build ───────────────────────────────────────────────────────────
+  // ─── Caricamento e costruzione ───────────────────────────────────────────────────────────
 
   /**
-   * Resolves params, parses the columns, retrieves the data and builds the structure.
-   * Guarded against concurrent/stale calls via `_loadStarted` and `_loadGeneration`.
+   * Risolve i parametri, analizza le colonne, recupera i dati e costruisce la struttura.
+   * Protetto da chiamate concorrenti/obsolete tramite `_loadStarted` e `_loadGeneration`.
    * @returns {Promise<void>}
    */
   async _load() {
@@ -378,7 +378,7 @@ export class JsonTable extends HTMLElement {
     this.params = params;
     this._validateParams(params);
 
-    // loading placeholder (minimo spinner)
+    // placeholder di caricamento (spinner di minimo)
     domBuilder([
       {
         className: 'spinner',
@@ -386,7 +386,7 @@ export class JsonTable extends HTMLElement {
       }
     ], this, { emptyParent: true });
 
-    // columns parsing (configuration errors are reported and stop the rendering)
+    // analisi delle colonne (gli errori di configurazione vengono segnalati e fermano il rendering)
     try {
       this.dataTypes = buildDataTypes(params);
       this.cols = parseCols(params.cols, this.dataTypes, params);
@@ -397,7 +397,7 @@ export class JsonTable extends HTMLElement {
       return;
     }
 
-    // initial state
+    // stato iniziale
     this.state = emptyState();
     if (params.initialSort && typeof params.initialSort === 'object') {
       const { key, dir } = params.initialSort;
@@ -422,7 +422,7 @@ export class JsonTable extends HTMLElement {
       console.error(err);
     }
 
-    // a newer init()/reload()/destroy() superseded this load
+    // un init()/reload()/destroy() più recente ha sostituito questo caricamento
     if (generation !== this._loadGeneration) {
       return;
     }
@@ -433,7 +433,7 @@ export class JsonTable extends HTMLElement {
     }
 
     if (result === null) {
-      // no source: silent when created from markup without attributes (init() may follow)
+      // nessuna sorgente: silenzioso quando creato da markup senza attributi (init() può seguire)
       if (this._initCalledProgrammatically) {
         // eslint-disable-next-line no-console
         console.error('[json-table] Nessuna sorgente dati: specificare `data` o `jsonUrl`.');
@@ -464,17 +464,17 @@ export class JsonTable extends HTMLElement {
       /* eslint-enable no-console */
     }
 
-    // dispatched in the next microtask so listeners registered right after init() still catch it
+    // emesso nel microtask successivo così che i listener registrati subito dopo init() lo ricevano comunque
     const event = new CustomEvent('jt:ready', { detail: { jsonTable: this }, bubbles: true });
     Promise.resolve().then(() => this.dispatchEvent(event));
   }
 
   /**
-   * Normalizes the resolved params that depend on each other, reporting the inconsistencies:
-   * `perPage`/`paginationDelta` must be non-negative numbers, `serverSide` requires `jsonUrl`
-   * (ignored with inline `data`) and disables `tfoot` (the aggregates would be computed on the
-   * current page only).
-   * @param {JsonTableParams} params - Resolved params (mutated)
+   * Normalizza i parametri risolti che dipendono l'uno dall'altro, segnalando le incoerenze:
+   * `perPage`/`paginationDelta` devono essere numeri non negativi, `serverSide` richiede `jsonUrl`
+   * (ignorato con `data` inline) e disattiva `tfoot` (gli aggregati verrebbero calcolati solo sulla
+   * pagina corrente).
+   * @param {JsonTableParams} params - Parametri risolti (modificati)
    * @returns {void}
    */
   _validateParams(params) {
@@ -498,7 +498,7 @@ export class JsonTable extends HTMLElement {
   }
 
   /**
-   * Current server-side request state (see `get-data.js` → `ServerRequest`).
+   * Stato corrente della richiesta server-side (vedi `get-data.js` → `ServerRequest`).
    * @returns {import('./src/get-data.js').ServerRequest}
    */
   _serverRequest() {
@@ -512,7 +512,7 @@ export class JsonTable extends HTMLElement {
   }
 
   /**
-   * Stores a data result: raw rows, parsed rows and totals.
+   * Memorizza un risultato di dati: righe grezze, righe analizzate e totali.
    * @param {import('./src/get-data.js').DataResult} result
    * @returns {void}
    */
@@ -524,11 +524,11 @@ export class JsonTable extends HTMLElement {
   }
 
   /**
-   * Computes `filtered`, `pageRows`, `filteredRec`, `totPages` and clamps `page` from `rows`,
-   * `searchTerm`, `sort` and `page`.
+   * Calcola `filtered`, `pageRows`, `filteredRec`, `totPages` e limita `page` a partire da `rows`,
+   * `searchTerm`, `sort` e `page`.
    *
-   * Client-side mode: search and sort are applied to `rows`, then the current page is sliced.
-   * Server-side mode: `rows` already is the requested page, `filteredRec` comes from the JSON.
+   * Modalità client-side: ricerca e ordinamento vengono applicati a `rows`, poi viene estratta la pagina corrente.
+   * Modalità server-side: `rows` è già la pagina richiesta, `filteredRec` proviene dal JSON.
    * @returns {void}
    */
   _computeState() {
@@ -553,12 +553,12 @@ export class JsonTable extends HTMLElement {
   }
 
   /**
-   * Applies a state change (page, sort or search): recomputes the state and re-renders, or, in
-   * server-side mode, sends a new request (stale responses are ignored) and renders its result.
-   * Dispatches `jt:update` at the end.
+   * Applica un cambio di stato (pagina, ordinamento o ricerca): ricalcola lo stato e rieffettua il rendering oppure, in
+   * modalità server-side, invia una nuova richiesta (le risposte obsolete vengono ignorate) e ne renderizza il risultato.
+   * Emette `jt:update` alla fine.
    *
-   * @param {UpdateReason} reason - What changed
-   * @param {string|null} [focusTarget=null] - Passed to `renderPagination()` (default: null)
+   * @param {UpdateReason} reason - Cosa è cambiato
+   * @param {string|null} [focusTarget=null] - Passato a `renderPagination()` (default: null)
    * @returns {Promise<void>}
    */
   async _update(reason, focusTarget = null) {
@@ -579,7 +579,7 @@ export class JsonTable extends HTMLElement {
       }
 
       if (generation !== this._requestGeneration || loadGeneration !== this._loadGeneration) {
-        return; // superseded by a newer request or by a reload/destroy
+        return; // sostituita da una richiesta più recente o da un reload/destroy
       }
       this.elements.wrapper?.removeAttribute('aria-busy');
 
@@ -589,8 +589,8 @@ export class JsonTable extends HTMLElement {
       this._setData(result);
       this._computeState();
 
-      // the requested page no longer exists (the data set shrank since the last request):
-      // `_computeState` clamped the page, fetch the last available one
+      // la pagina richiesta non esiste più (l'insieme di dati si è ridotto dall'ultima richiesta):
+      // `_computeState` ha limitato la pagina, recupera l'ultima disponibile
       if (!this.state.rows.length && this.state.filteredRec > 0 && this.state.page !== requestedPage) {
         this._update(reason, focusTarget);
         return;
@@ -606,12 +606,12 @@ export class JsonTable extends HTMLElement {
   }
 
   /**
-   * Renders the parts depending on the state: body rows, footer, sort indicators, pagination and
-   * info text. The footer is skipped on page changes when `updateFooterOnPageChange` is false
-   * (its content would not change).
+   * Renderizza le parti che dipendono dallo stato: righe del body, footer, indicatori di ordinamento, paginazione e
+   * testo informativo. Il footer viene saltato ai cambi di pagina quando `updateFooterOnPageChange` è false
+   * (il suo contenuto non cambierebbe).
    *
-   * @param {UpdateReason|null} [reason=null] - What changed (null on the first rendering) (default: null)
-   * @param {string|null} [focusTarget=null] - Passed to `renderPagination()` (default: null)
+   * @param {UpdateReason|null} [reason=null] - Cosa è cambiato (null al primo rendering) (default: null)
+   * @param {string|null} [focusTarget=null] - Passato a `renderPagination()` (default: null)
    * @returns {void}
    */
   _render(reason = null, focusTarget = null) {

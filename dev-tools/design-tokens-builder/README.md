@@ -2,30 +2,30 @@
 
 <!-- TODO rivedere e semplificare -->
 
-A set of Node.js scripts for managing CSS design tokens in a project. Built on top of [Style Dictionary v5](https://styledictionary.com/).
+Un insieme di script Node.js per gestire i design token CSS di un progetto. Costruito su [Style Dictionary v5](https://styledictionary.com/).
 
-### Purpose
+### Scopo
 
-The purpose of this builder is to merge minimo's own design tokens with the tokens used in a project — typically coming from Figma or Penpot — and produce the custom properties used during development.
+Lo scopo di questo builder è unire i design token di minimo con quelli usati in un progetto — tipicamente provenienti da Figma o Penpot — e produrre le custom properties usate durante lo sviluppo.
 
-The goal is to keep the project's token naming as close as possible to minimo's own, so that minimo's components can be customized without any further intervention.
+L'obiettivo è mantenere la nomenclatura dei token del progetto il più possibile vicina a quella di minimo, in modo che i componenti di minimo possano essere personalizzati senza ulteriori interventi.
 
-The best strategy is to name variables in Figma/Penpot after minimo's own names from the start, so that overriding a value stays a transparent, automatic process.
+La strategia migliore è dare alle variabili in Figma/Penpot, fin dall'inizio, gli stessi nomi usati da minimo, così che sovrascrivere un valore resti un processo trasparente e automatico.
 
-In a preexisting project, though, some names may not match (e.g. the project's base color is named `primary`, while minimo's equivalent is `primary.100`). Rather than fixing the generated custom properties by hand after every build, a source entry can carry a `transform` option (see [Source token renaming](#source-token-renaming-transform) below) that remaps token names to minimo's own naming before they are even handed to Style Dictionary.
+In un progetto preesistente, però, alcuni nomi potrebbero non corrispondere (ad es. il colore base del progetto si chiama `primary`, mentre l'equivalente di minimo è `primary.100`). Invece di correggere a mano le custom properties generate dopo ogni build, una voce di `source` può avere un'opzione `transform` (vedi [Rinomina dei token sorgente](#rinomina-dei-token-sorgente-transform) più sotto) che rimappa i nomi dei token su quelli di minimo prima ancora che vengano passati a Style Dictionary.
 
-### Scripts
+### Script
 
-| Script | Purpose |
+| Script | Scopo |
 |---|---|
-| `build-tokens.mjs` | Generates a CSS custom properties file from design token source files |
-| `check-unresolved-custom-props.mjs` | Scans CSS files and reports any `var(--...)` references not found in the generated token file |
+| `build-tokens.mjs` | Genera un file di custom properties CSS a partire dai file sorgente dei design token |
+| `check-unresolved-custom-props.mjs` | Analizza i file CSS e segnala i riferimenti `var(--...)` non presenti nel file dei token generato |
 
-Both scripts share the same config file, passed via `--config`.
+Entrambi gli script condividono lo stesso file di configurazione, passato con `--config`.
 
-### Setup
+### Configurazione iniziale
 
-The scripts are intended to be used as npm scripts. Add them to your `package.json`:
+Gli script sono pensati per essere usati come npm script. Aggiungerli al proprio `package.json`:
 
 ```json
 {
@@ -36,9 +36,9 @@ The scripts are intended to be used as npm scripts. Add them to your `package.js
 }
 ```
 
-### Dependencies
+### Dipendenze
 
-The following packages must be present in your project:
+I seguenti pacchetti devono essere presenti nel progetto:
 
 ```json
 {
@@ -47,43 +47,43 @@ The following packages must be present in your project:
 }
 ```
 
-### Configuration file
+### File di configurazione
 
-Both scripts read a shared config file passed with `--config`. Use `tokens-config-sample.mjs` as a starting point.
+Entrambi gli script leggono un file di configurazione condiviso passato con `--config`. Usare `tokens-config-sample.mjs` come punto di partenza.
 
-Read comments inside the sample file for more info.
+Per maggiori informazioni leggere i commenti all'interno del file di esempio.
 
 
 ### `build-tokens.mjs`
 
-Reads design token source files and generates:
-- A **CSS file** containing all tokens as custom properties inside `:root { ... }`
-- Optionally, one or more **W3C DTCG JSON/JSONC** files, independent of any specific consuming tool (usable in Penpot, Figma via plugin, Token Studio, ...).
+Legge i file sorgente dei design token e genera:
+- Un **file CSS** che contiene tutti i token come custom properties dentro `:root { ... }`
+- Opzionalmente, uno o più file **W3C DTCG JSON/JSONC**, indipendenti da qualsiasi strumento specifico (utilizzabili in Penpot, Figma tramite plugin, Token Studio, ...).
 
-#### Usage
+#### Utilizzo
 
 ```sh
 npx buildTokens --config ./path/to/tokens-config.mjs
 ```
 
-#### Source files
+#### File sorgente
 
-The `source` array accepts any combination of:
-- Concrete file paths: `'./tokens/colors.jsonc'`
-- Glob patterns: `'./tokens/**/*.{json,jsonc,mjs}'`
-- `{ src, prefix, transform }` objects, to add a prefix to the custom properties of those files (see [Source prefixes](#source-prefixes)) and/or to rename token nodes within those files (see [Source token renaming](#source-token-renaming-transform))
+L'array `source` accetta qualsiasi combinazione di:
+- Percorsi di file: `'./tokens/colors.jsonc'`
+- Pattern glob: `'./tokens/**/*.{json,jsonc,mjs}'`
+- Oggetti `{ src, prefix, transform }`, per aggiungere un prefisso alle custom properties di quei file (vedi [Prefissi dei sorgenti](#prefissi-dei-sorgenti)) e/o per rinominare i nodi dei token al loro interno (vedi [Rinomina dei token sorgente](#rinomina-dei-token-sorgente-transform))
 
-**Supported formats:**
-- `.json` / `.jsonc` — parsed directly as token data
-- `.mjs` / `.js` — imported as ES modules; must export a W3C DTCG-compliant object as `default`
+**Formati supportati:**
+- `.json` / `.jsonc` — letti direttamente come dati dei token
+- `.mjs` / `.js` — importati come moduli ES; devono esportare come `default` un oggetto conforme a W3C DTCG
 
-**Legacy token syntax (auto-detected, `.json` only):** `.json` source files written in the older, non-DTCG Style Dictionary syntax (`value`/`type` instead of `$value`/`$type`, references as `{group.token.value}` instead of `{group.token}` — e.g. a file exported from [Open Props](https://open-props.style/)) are converted to DTCG v5 syntax automatically at parse time, node by node. Files already using `$value`/`$type` are left untouched, so no config flag or file list is needed — mixing legacy and DTCG sources in the same `source` array just works. `.jsonc` is not covered (reserved for hand-authored DTCG sources, parsed by Style Dictionary's own loader) and these `.json` files are parsed with plain `JSON.parse` (no comments, no trailing commas). See `build-tokens-src/legacy-tokens-parser.mjs`.
+**Sintassi legacy dei token (rilevata automaticamente, solo `.json`):** i file sorgente `.json` scritti con la vecchia sintassi di Style Dictionary, non DTCG (`value`/`type` invece di `$value`/`$type`, riferimenti come `{group.token.value}` invece di `{group.token}` — ad es. un file esportato da [Open Props](https://open-props.style/)) vengono convertiti automaticamente alla sintassi DTCG v5 in fase di parsing, nodo per nodo. I file che usano già `$value`/`$type` non vengono toccati, quindi non servono flag di configurazione né elenchi di file: mescolare sorgenti legacy e DTCG nello stesso array `source` funziona senza altro. `.jsonc` non è coperto (riservato ai sorgenti DTCG scritti a mano, letti dal loader di Style Dictionary) e questi file `.json` vengono letti con un semplice `JSON.parse` (niente commenti, niente trailing comma). Vedi `build-tokens-src/legacy-tokens-parser.mjs`.
 
-A legacy node that is at the same time a token (own `value`/`type`) *and* a group with nested children (e.g. Open Props' `other.ease.out`, which has its own value plus `out.1` ... `out.5`) can't be represented in DTCG v5, where a node with `$value` is always a leaf. Its own value is moved to a child token named `default` (`other.ease.out.default`, i.e. `--other-ease-out-default`), or `base` if a `default` child already exists; if both exist the build fails with an explicit error. References to such a node from the same file are rewritten accordingly; from other files they must use the child name explicitly.
+Un nodo legacy che è al tempo stesso un token (con `value`/`type` propri) *e* un gruppo con figli annidati (ad es. `other.ease.out` di Open Props, che ha un valore proprio più `out.1` ... `out.5`) non può essere rappresentato in DTCG v5, dove un nodo con `$value` è sempre una foglia. Il suo valore viene spostato in un token figlio chiamato `default` (`other.ease.out.default`, cioè `--other-ease-out-default`), oppure `base` se esiste già un figlio `default`; se esistono entrambi la build fallisce con un errore esplicito. I riferimenti a un nodo di questo tipo dallo stesso file vengono riscritti di conseguenza; da altri file devono usare esplicitamente il nome del figlio.
 
-#### Source prefixes
+#### Prefissi dei sorgenti
 
-An entry of `source` (or of a `sourceModes` mode) can be an object `{ src, prefix }` instead of a string: every custom property generated from the files matched by `src` (a path, a glob or an array of them) is rendered with the given prefix. Useful to avoid name collisions with third-party token sets, or to make their origin explicit:
+Una voce di `source` (o di una modalità di `sourceModes`) può essere un oggetto `{ src, prefix }` al posto di una stringa: ogni custom property generata dai file individuati da `src` (un percorso, un glob o un array di questi) viene resa con il prefisso indicato. Utile per evitare collisioni di nomi con set di token di terze parti o per rendere esplicita la loro origine:
 
 ```js
 source: [
@@ -92,21 +92,21 @@ source: [
 ],
 ```
 
-With this config Open Props' `gray.0` becomes `--op-gray-0`. `prefix` accepts `'op'`, `'op-'` or `'--op-'` (all equivalent).
+Con questa configurazione `gray.0` di Open Props diventa `--op-gray-0`. `prefix` accetta `'op'`, `'op-'` o `'--op-'` (equivalenti).
 
-- Only the custom property **name** changes, not the token path: `{references}` keep working, and a token of another source referencing `{gray.0}` is rendered as `var(--op-gray-0)`.
-- The JSON output (`jsonBuildPath`) is **not** prefixed: it keeps the original token tree.
-- `customPropsGroups` match the prefixed name, so a group can use `prefixes: ['op']`.
-- Giving two different prefixes to the same file fails the build with an error.
-- `check-unresolved-custom-props.mjs` understands the same syntax. Note that `extraCustomPropsFiles` entries are plain CSS files and are never prefixed.
+- Cambia solo il **nome** della custom property, non il percorso del token: i `{riferimenti}` continuano a funzionare e un token di un'altra sorgente che referenzia `{gray.0}` viene reso come `var(--op-gray-0)`.
+- L'output JSON (`jsonBuildPath`) **non** viene prefissato: mantiene l'albero dei token originale.
+- `customPropsGroups` confronta il nome prefissato, quindi un gruppo può usare `prefixes: ['op']`.
+- Assegnare due prefissi diversi allo stesso file fa fallire la build con un errore.
+- `check-unresolved-custom-props.mjs` comprende la stessa sintassi. Le voci di `extraCustomPropsFiles` sono semplici file CSS e non vengono mai prefissate.
 
-See `build-tokens-src/source-prefixes.mjs`.
+Vedi `build-tokens-src/source-prefixes.mjs`.
 
-#### Source token renaming (`transform`)
+#### Rinomina dei token sorgente (`transform`)
 
-An entry of `source` (or of a `sourceModes` mode) can also carry a `transform` object: a token found at a given dot-path in those files is moved to another dot-path, **before** Style Dictionary resolves `{references}` or builds the CSS/JSON output — unlike `prefix` above, which is a purely cosmetic CSS name change applied after the fact.
+Una voce di `source` (o di una modalità di `sourceModes`) può avere anche un oggetto `transform`: un token trovato a un dato dot-path in quei file viene spostato in un altro dot-path, **prima** che Style Dictionary risolva i `{riferimenti}` o costruisca l'output CSS/JSON — a differenza di `prefix` visto sopra, che è una modifica puramente estetica del nome CSS applicata a posteriori.
 
-Typical use case: a preexisting project (e.g. driven by Figma/Penpot) names its own base color `primary`, while minimo's own tokens reference `{primary.100}`. Instead of renaming the generated custom property by hand after every build, or hunting down every minimo reference to change it, `transform` fixes the token's own path once, in config:
+Caso d'uso tipico: un progetto preesistente (ad es. guidato da Figma/Penpot) chiama `primary` il proprio colore base, mentre i token di minimo referenziano `{primary.100}`. Invece di rinominare a mano la custom property generata dopo ogni build, o di cercare ogni riferimento di minimo per modificarlo, `transform` corregge una volta sola il percorso del token, nella configurazione:
 
 ```js
 source: [
@@ -115,22 +115,22 @@ source: [
 ],
 ```
 
-With this config, whatever is defined at dot-path `primary` in the matched files is moved to `primary.100` — so it becomes `--primary-100` in the generated CSS, and every existing minimo reference to `{primary.100}` resolves correctly.
+Con questa configurazione, qualunque cosa sia definita al dot-path `primary` nei file individuati viene spostata in `primary.100` — quindi diventa `--primary-100` nel CSS generato, e ogni riferimento esistente di minimo a `{primary.100}` viene risolto correttamente.
 
-- **Notation:** both sides of the map use Style Dictionary's own dot-path notation (`'primary.100'`), not the hyphen-joined custom-property notation (`'primary-100'`). Token name segments in this project can themselves contain hyphens (e.g. `btn-close`), so a hyphen can't reliably tell a path separator from a literal part of a segment name — a dot can, since it's already reserved by Style Dictionary as the `{reference}` path separator.
-- **References are rewritten automatically:** once every source file is merged, any `{reference}` to the token's *old* path — in the same file or a completely different one — is rewritten tree-wide to the *new* path (e.g. every `{primary}` in the build becomes `{primary.100}`). This is safe because Style Dictionary resolves `{references}` against the single merged token tree by absolute path: if `primary` existed exactly once, every `{primary}` anywhere unambiguously pointed at that one node.
-  - **Exception:** if the *same* source key (e.g. `primary`) is given a *different* destination in two different files' `transform` maps, each rename still works on its own, but the bare reference `{primary}` becomes ambiguous — which destination should it point to? In that case the automatic rewrite is skipped for that key (a warning is logged), and every `{primary}` reference must be fixed by hand to point at the correct one of the two new paths.
-- A source key not found in the file only logs a warning; it does not fail the build.
-- Applies to **both** the CSS and the JSON output (see [JSON output](#json-output) below), since both are rebuilt from the token's path, by then already renamed — no separate handling is needed.
-- Two entries giving different destinations for the same source key in the same file fail the build with an error.
-- `check-unresolved-custom-props.mjs` understands the same syntax.
+- **Notazione:** entrambi i lati della mappa usano la notazione dot-path di Style Dictionary (`'primary.100'`), non la notazione delle custom properties con trattini (`'primary-100'`). In questo progetto i segmenti dei nomi dei token possono a loro volta contenere trattini (ad es. `btn-close`), quindi un trattino non permette di distinguere in modo affidabile un separatore di percorso da una parte letterale del nome di un segmento — un punto invece sì, perché è già riservato da Style Dictionary come separatore di percorso dei `{riferimenti}`.
+- **I riferimenti vengono riscritti automaticamente:** una volta uniti tutti i file sorgente, ogni `{riferimento}` al *vecchio* percorso del token — nello stesso file o in uno completamente diverso — viene riscritto in tutto l'albero col *nuovo* percorso (ad es. ogni `{primary}` della build diventa `{primary.100}`). È sicuro perché Style Dictionary risolve i `{riferimenti}` sull'unico albero di token unito, tramite percorso assoluto: se `primary` esisteva una sola volta, ogni `{primary}` ovunque puntava senza ambiguità a quell'unico nodo.
+  - **Eccezione:** se la *stessa* chiave sorgente (ad es. `primary`) ha una destinazione *diversa* nelle mappe `transform` di due file diversi, ogni rinomina funziona comunque da sola, ma il riferimento semplice `{primary}` diventa ambiguo: a quale destinazione dovrebbe puntare? In quel caso la riscrittura automatica viene saltata per quella chiave (viene registrato un warning) e ogni riferimento `{primary}` va corretto a mano per puntare al giusto fra i due nuovi percorsi.
+- Una chiave sorgente non trovata nel file registra solo un warning; non fa fallire la build.
+- Si applica **sia** all'output CSS sia a quello JSON (vedi [Output JSON](#output-json) più sotto), perché entrambi vengono ricostruiti dal percorso del token, ormai già rinominato — non serve una gestione separata.
+- Due voci che danno destinazioni diverse alla stessa chiave sorgente nello stesso file fanno fallire la build con un errore.
+- `check-unresolved-custom-props.mjs` comprende la stessa sintassi.
 
-See `build-tokens-src/source-transforms.mjs` and `build-tokens-src/token-rename-parser.mjs`.
+Vedi `build-tokens-src/source-transforms.mjs` e `build-tokens-src/token-rename-parser.mjs`.
 
 
-#### Token file format (JS example)
+#### Formato dei file token (esempio JS)
 
-When using `.mjs` source files, export a default object following the [W3C Design Token Community Group format](https://design-tokens.github.io/community-group/format/):
+Quando si usano file sorgente `.mjs`, esportare come default un oggetto che segue il [formato del W3C Design Token Community Group](https://design-tokens.github.io/community-group/format/):
 
 ```js
 // colors.tokens.mjs
@@ -155,85 +155,85 @@ export default {
 };
 ```
 
-The main advantage of `.mjs` over `.json` is the ability to use JavaScript variables, comments, and computed values within the token definition.
+Il principale vantaggio di `.mjs` rispetto a `.json` è la possibilità di usare variabili JavaScript, commenti e valori calcolati nella definizione dei token.
 
-Values can be expressions like `"{size.base} * .25"`, see `tokens-config-sample.mjs` for more info.
+I valori possono essere espressioni come `"{size.base} * .25"`, vedi `tokens-config-sample.mjs` per maggiori informazioni.
 
-#### Custom transforms
+#### Transform personalizzate
 
-The following transforms are registered on top of Style Dictionary's built-ins:
+Le seguenti transform vengono registrate in aggiunta a quelle predefinite di Style Dictionary:
 
-| Name | Type | Description |
+| Nome | Tipo | Descrizione |
 |---|---|---|
-| `shadow/css` | value | Converts shadow objects (single or array) to a `box-shadow` CSS string. px values are converted to rem. |
-| `size/pxToRem-smart` | value | Converts `dimension` token values from px to rem. Skips values already in rem. |
-| `color/css-modern` | value | Color passthrough with transitive alias support. |
-| `gradient/css` | value | Converts gradient objects to CSS `linear-gradient`, `radial-gradient` or `conic-gradient`. |
-| `composite/css` | value | Converts `border`, `outline`, `transition` and `animation` objects to their CSS shorthand. |
-| `typography/css` | value | Typography passthrough — the format handles exploding the value into individual properties. |
+| `shadow/css` | value | Converte gli oggetti shadow (singoli o array) in una stringa CSS `box-shadow`. I valori in px vengono convertiti in rem. |
+| `size/pxToRem-smart` | value | Converte i valori dei token `dimension` da px a rem. Salta i valori già in rem. |
+| `color/css-modern` | value | Passthrough dei colori con supporto agli alias transitivi. |
+| `gradient/css` | value | Converte gli oggetti gradient in `linear-gradient`, `radial-gradient` o `conic-gradient` CSS. |
+| `composite/css` | value | Converte gli oggetti `border`, `outline`, `transition` e `animation` nella relativa shorthand CSS. |
+| `typography/css` | value | Passthrough della tipografia — è il format a occuparsi di scomporre il valore nelle singole proprietà. |
 
-#### CSS output
+#### Output CSS
 
-All tokens are output as CSS custom properties inside `:root`, sorted alphabetically.
+Tutti i token vengono generati come custom properties CSS dentro `:root`, in ordine alfabetico.
 
-Typography tokens are expanded into multiple properties:
-- `--token-name-font` — a `font` shorthand (when both `fontSize` and `fontFamily` are present)
-- `--token-name-letter-spacing`, `--token-name-text-transform`, `--token-name-text-decoration` — individual properties
+I token di tipografia vengono espansi in più proprietà:
+- `--token-name-font` — una shorthand `font` (quando sono presenti sia `fontSize` sia `fontFamily`)
+- `--token-name-letter-spacing`, `--token-name-text-transform`, `--token-name-text-decoration` — proprietà singole
 
-The generated file is linted and auto-fixed with stylelint using the config specified in `stylelintConfigPath`.
+Il file generato viene controllato e corretto automaticamente con stylelint usando la configurazione indicata in `stylelintConfigPath`.
 
-#### JSON output
+#### Output JSON
 
-When `jsonBuildPath` is set, the script also generates W3C DTCG token files, independent of any specific consuming tool (e.g. importable into Penpot via the [Design Tokens plugin](https://penpot.app/penpot-files/design-tokens), into Figma via a compatible plugin, or into Token Studio).
+Quando `jsonBuildPath` è impostato, lo script genera anche file di token W3C DTCG, indipendenti da qualsiasi strumento specifico (ad es. importabili in Penpot tramite il [plugin Design Tokens](https://penpot.app/penpot-files/design-tokens), in Figma tramite un plugin compatibile o in Token Studio).
 
-**Single file** (`jsonDestFile` is a string):
+**File singolo** (`jsonDestFile` è una stringa):
 ```
-jsonBuildPath/tokens.jsonc   ← all tokens in one file
+jsonBuildPath/tokens.jsonc   ← tutti i token in un unico file
 ```
 
-**One file per source** (`jsonDestFile` is `null` or omitted):
+**Un file per ogni sorgente** (`jsonDestFile` è `null` o omesso):
 ```
 jsonBuildPath/colors.tokens.jsonc
 jsonBuildPath/spacing.tokens.jsonc
 jsonBuildPath/typography.tokens.jsonc
 ```
-All files are written flat in `jsonBuildPath`, regardless of the subdirectory structure of the source files — no subdirectories are created. If two source files with different paths would produce the same output filename, the build fails with an error listing the colliding files instead of silently overwriting one with the other.
+Tutti i file vengono scritti nella stessa cartella `jsonBuildPath`, indipendentemente dalla struttura di sottocartelle dei file sorgente — non vengono create sottocartelle. Se due file sorgente con percorsi diversi producessero lo stesso nome di file di output, la build fallisce con un errore che elenca i file in conflitto, invece di sovrascriverne uno silenziosamente con l'altro.
 
-The `jsonFormat` option controls the output:
+L'opzione `jsonFormat` controlla l'output:
 
-| Value | Extension | Disclaimer header |
+| Valore | Estensione | Intestazione di avviso |
 |---|---|---|
-| `'jsonc'` | `.jsonc` | Yes |
+| `'jsonc'` | `.jsonc` | Sì |
 | `'json'` | `.json` | No |
 
-Alias references (`{color.brand.primary}`) are preserved in the output so consuming tools maintain token links between primitive and semantic tokens.
+I riferimenti agli alias (`{color.brand.primary}`) vengono conservati nell'output, in modo che gli strumenti che li usano mantengano i collegamenti tra token primitivi e semantici.
 
-> JSON token files intentionally use a minimal set of transforms (no px→rem conversion, no shorthand expansion) because consuming tools generally expect original values and structured objects, not resolved CSS strings.
+> I file JSON dei token usano volutamente un insieme minimo di transform (nessuna conversione px→rem, nessuna espansione delle shorthand) perché gli strumenti che li usano si aspettano in genere i valori originali e oggetti strutturati, non stringhe CSS già risolte.
 
-#### sourceModes (light/dark split)
+#### sourceModes (suddivisione light/dark)
 
-`sourceModes` is an alternative to `source`, for projects that need a light/dark (or other) custom properties split. See the comments in `tokens-config-sample.mjs` for the full option reference (`sourceModes`, `sourceModesBase`).
+`sourceModes` è un'alternativa a `source`, per i progetti che richiedono una suddivisione light/dark (o altra) delle custom properties. Vedi i commenti in `tokens-config-sample.mjs` per il riferimento completo delle opzioni (`sourceModes`, `sourceModesBase`).
 
-When set, each mode has its own `source` array, and the generated CSS composes all modes into a single `destFile`:
-- the base mode's props go in a top-level `:root { ... }` block, with `color-scheme: <all modes>;` prepended
-- every other mode's props go in `@media (prefers-color-scheme: <mode>) { :root { ... } }`, with `color-scheme: <mode>;` prepended
+Quando è impostato, ogni modalità ha il proprio array `source` e il CSS generato compone tutte le modalità in un unico `destFile`:
+- le proprietà della modalità base vanno in un blocco `:root { ... }` di primo livello, con `color-scheme: <tutte le modalità>;` anteposto
+- le proprietà di ogni altra modalità vanno in `@media (prefers-color-scheme: <modalità>) { :root { ... } }`, con `color-scheme: <modalità>;` anteposto
 
-Tokens of a non-base mode can reference tokens defined in the base mode (e.g. a dark token using `{color.1}` defined in light, output as `var(--color-1)`). References to a non-base mode's tokens (from the base mode or from another non-base mode) fail with a "reference not defined" error, since the target would be undefined outside its own `@media` block.
+I token di una modalità non base possono referenziare token definiti nella modalità base (ad es. un token dark che usa `{color.1}` definito in light, reso come `var(--color-1)`). I riferimenti ai token di una modalità non base (dalla modalità base o da un'altra modalità non base) falliscono con un errore "reference not defined", perché il target risulterebbe non definito fuori dal proprio blocco `@media`.
 
-`customPropsGroups`, `mergeCustomProps`, `addLayer`, `pxToRem` etc. all apply the same way as with a single `source` (`mergeCustomProps` set to an array of strings/RegExps matches the token files of every mode). The JSON output (when `jsonBuildPath` is set) is produced once per mode, with the mode name appended to each filename (e.g. `tokens-light.jsonc` / `tokens-dark.jsonc`).
+`customPropsGroups`, `mergeCustomProps`, `addLayer`, `pxToRem` ecc. si applicano allo stesso modo che con un singolo `source` (`mergeCustomProps` impostato a un array di stringhe/RegExp confronta i file token di ogni modalità). L'output JSON (quando `jsonBuildPath` è impostato) viene prodotto una volta per modalità, con il nome della modalità aggiunto a ogni nome di file (ad es. `tokens-light.jsonc` / `tokens-dark.jsonc`).
 
 ---
 
 ### `check-unresolved-custom-props.mjs`
 
-Scans all `.css` files in `dirToCheck` (recursively) and reports:
+Analizza (ricorsivamente) tutti i file `.css` in `dirToCheck` e segnala:
 
-- **unresolved properties** — `var(--...)` references that are not defined in the generated token CSS file or in any `extraCustomPropsFiles`
-- **unused properties** — custom properties defined in the generated token CSS file (or an `extraCustomPropsFiles` entry) but never referenced via `var()` in any scanned CSS file. Only reported if `checkUnused: true` is set in the config, since it re-runs the Style Dictionary transform pipeline over the token sources to resolve, when possible, the `.mjs` source file for each unused property. When `ignoreUnusedInNodeModules` is true (default), properties sourced from a token file under `node_modules` (e.g. a third-party token package) are never reported as unused.
+- **proprietà non risolte** — riferimenti `var(--...)` non definiti nel file CSS dei token generato né in alcun `extraCustomPropsFiles`
+- **proprietà non usate** — custom properties definite nel file CSS dei token generato (o in una voce di `extraCustomPropsFiles`) ma mai referenziate tramite `var()` in alcun file CSS analizzato. Vengono segnalate solo se nella configurazione è impostato `checkUnused: true`, perché viene rieseguita la pipeline di trasformazione di Style Dictionary sui sorgenti dei token per risalire, quando possibile, al file sorgente `.mjs` di ogni proprietà non usata. Quando `ignoreUnusedInNodeModules` è true (default), le proprietà provenienti da un file token sotto `node_modules` (ad es. un pacchetto di token di terze parti) non vengono mai segnalate come non usate.
 
-Results are written to `unresolved-unused-props.md` in the same directory as the config file.
+I risultati vengono scritti in `unresolved-unused-props.md`, nella stessa directory del file di configurazione.
 
-#### Usage
+#### Utilizzo
 
 ```sh
 npx checkUnresolvedProps --config ./path/to/tokens-config.mjs
@@ -241,29 +241,29 @@ npx checkUnresolvedProps --config ./path/to/tokens-config.mjs
 
 #### Output
 
-The script creates a `unresolved-unused-props.md` file next to the config file (only if there is at least one unresolved or unused property). Each unresolved entry links to the file and line number where the property is used; each unused entry links to its `.mjs` token source file when it can be resolved, otherwise just the property name is reported:
+Lo script crea un file `unresolved-unused-props.md` accanto al file di configurazione (solo se c'è almeno una proprietà non risolta o non usata). Ogni voce non risolta rimanda al file e al numero di riga in cui la proprietà è usata; ogni voce non usata rimanda al relativo file sorgente `.mjs` dei token quando è possibile risalirvi, altrimenti viene riportato solo il nome della proprietà:
 
 ```markdown
-## Unresolved custom properties
+## Custom properties non risolte
 
 * [components.css](../src/components.css#L42) -> `--color-action-hover`
 * [layout.css](../src/layout.css#L17) -> `--spacing-missing`
 
-## Unused custom properties
+## Custom properties non usate
 
 * [colors.minimo.tokens.mjs](../_src/colors.minimo.tokens.mjs) -> `--color-legacy-accent`
 * `--manually-added-prop`
 ```
 
-In VS Code, Option/Alt-clicking on the URL opens the file at the required line.
+In VS Code, Option/Alt-clic sull'URL apre il file alla riga richiesta.
 
 
-#### Excluding properties
+#### Esclusione di proprietà
 
-Use `excludePattern` to suppress false positives — for example, internal/private custom properties that are defined dynamically or inline:
+Usare `excludePattern` per eliminare i falsi positivi — ad esempio le custom properties interne/private definite dinamicamente o inline:
 
 ```js
-// skips all custom props starting with `--_` or `--js-`
+// salta tutte le custom props che iniziano con `--_` o `--js-`
 excludePattern: [
   /^--_/,          
   /^--js-/,        

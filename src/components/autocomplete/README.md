@@ -1,11 +1,11 @@
 # Autocomplete
 
-Implementation of [@tarekraafat/autocomplete.js](https://tarekraafat.github.io/autoComplete.js/#/) to manage key-value items
+Implementazione di [@tarekraafat/autocomplete.js](https://tarekraafat.github.io/autoComplete.js/#/) per gestire elementi chiave-valore
 
-Requires package `@tarekraafat/autocomplete.js`:
+Richiede il pacchetto `@tarekraafat/autocomplete.js`:
 
 ```bash
 npm i -S @tarekraafat/autocomplete.js
 ```
 
-Includes the `checkAutocomplete` function: checks that autocomplete fields are filled in correctly.
+Include la funzione `checkAutocomplete`: verifica che i campi autocomplete siano compilati correttamente.

@@ -1,4 +1,4 @@
-/*! minimo - json-table: table part (table, caption and footer bar) */
+/*! minimo - json-table: parte tabella (tabella, caption e barra del footer) */
 
 import * as styles from '../json-table-component.module.css';
 import { classnames } from '../../../utilities/classnames.js';
@@ -8,14 +8,14 @@ import { theadPart } from './table-thead.js';
 /** @typedef {import('../json-table-component.js').JsonTable} JsonTable */
 /** @typedef {import('./main-builder.js').JsonTableElements} JsonTableElements */
 
-/** Counter used to generate unique caption ids */
+/** Contatore usato per generare id univoci delle caption */
 let captionUid = 0;
 
 /**
- * Id of the caption element of a table (used by `aria-labelledby`): `<tableId>-caption`, or a
- * generated unique id when `tableId` is not set.
+ * Id dell'elemento caption di una tabella (usato da `aria-labelledby`): `<tableId>-caption`, oppure un
+ * id univoco generato quando `tableId` non è impostato.
  *
- * @param {JsonTableParams} params - Resolved params
+ * @param {JsonTableParams} params - Parametri risolti
  * @returns {string}
  *
  * @example
@@ -28,21 +28,21 @@ export function captionId(params) {
 
 
 /**
- * domBuilder item of the caption (template slot `caption`), rendered only when `params.caption`
- * is set. It is a plain container placed below the table (footer bar) instead of a `<caption>`
- * element: the table is linked to it through `aria-labelledby`, which gives the table the same
- * accessible name a `<caption>` would.
+ * Elemento domBuilder della caption (slot del template `caption`), renderizzato solo quando `params.caption`
+ * è impostato. È un semplice contenitore collocato sotto la tabella (barra del footer) invece di un elemento
+ * `<caption>`: la tabella è collegata a esso tramite `aria-labelledby`, che dà alla tabella lo stesso
+ * nome accessibile che avrebbe con un `<caption>`.
  *
- * Generated structure: `div.caption[classes.caption]#<id>`; the element is stored in `elements.caption`.
+ * Struttura generata: `div.caption[classes.caption]#<id>`; l'elemento viene memorizzato in `elements.caption`.
  *
- * @param {JsonTable} jt - The component instance
- * @param {JsonTableElements} elements - Object collecting the generated elements (mutated)
- * @param {string} id - Id of the element (see `captionId`)
+ * @param {JsonTable} jt - L'istanza del componente
+ * @param {JsonTableElements} elements - Oggetto che raccoglie gli elementi generati (modificato)
+ * @param {string} id - Id dell'elemento (vedi `captionId`)
  * @returns {DomBuilderItem}
  *
  * @example
  * domBuilder([captionPart(jt, elements, 'users-caption')], host);
- * elements.caption; // → HTMLElement (when params.caption is set)
+ * elements.caption; // → HTMLElement (quando params.caption è impostato)
  */
 export function captionPart(jt, elements, id) {
 
@@ -59,16 +59,16 @@ export function captionPart(jt, elements, id) {
 
 
 /**
- * domBuilder item of the footer bar below the table: caption (start side) and pagination (end
- * side). Rendered only when `children` is not empty (see `mainBuilder`, which removes the parts
- * placed elsewhere by the template).
+ * Elemento domBuilder della barra del footer sotto la tabella: caption (lato iniziale) e paginazione (lato
+ * finale). Renderizzato solo quando `children` non è vuoto (vedi `mainBuilder`, che rimuove le parti
+ * collocate altrove dal template).
  *
- * Generated structure: `div.tableFooter[classes.tableFooter] > [caption] [pagination]`; the element
- * is stored in `elements.tableFooter`.
+ * Struttura generata: `div.tableFooter[classes.tableFooter] > [caption] [pagination]`; l'elemento
+ * viene memorizzato in `elements.tableFooter`.
  *
- * @param {JsonTable} jt - The component instance
- * @param {JsonTableElements} elements - Object collecting the generated elements (mutated)
- * @param {DomBuilderItem[]} children - Footer parts (caption and/or pagination items)
+ * @param {JsonTable} jt - L'istanza del componente
+ * @param {JsonTableElements} elements - Oggetto che raccoglie gli elementi generati (modificato)
+ * @param {DomBuilderItem[]} children - Parti del footer (elementi caption e/o paginazione)
  * @returns {DomBuilderItem}
  *
  * @example
@@ -89,30 +89,30 @@ export function tableFooterPart(jt, elements, children) {
 
 
 /**
- * domBuilder item of the table (template slot `table`).
+ * Elemento domBuilder della tabella (slot del template `table`).
  *
  * Generated structure:
  * ```
  * div.tableWrapper[classes.tableWrapper]
- *   table#tableId.table[classes.table][aria-labelledby=<caption id>]   (aria-labelledby if `caption`)
+ *   table#tableId.table[classes.table][aria-labelledby=<caption id>]   (aria-labelledby se `caption`)
  *     thead                     ← theadPart()
- *     tbody                     ← filled by `renderTbody()`
- *     tfoot                     (if `tfoot`) ← filled by `renderTfoot()`
- * div.tableFooter               ← footerBar (caption + pagination), if given
+ *     tbody                     ← riempito da `renderTbody()`
+ *     tfoot                     (se `tfoot`) ← riempito da `renderTfoot()`
+ * div.tableFooter               ← footerBar (caption + paginazione), se indicata
  * ```
  *
- * References to the generated elements are stored in `elements`
+ * I riferimenti agli elementi generati vengono memorizzati in `elements`
  * (`tableWrapper`, `table`, `thead`, `tbody`, `tfoot`).
  *
- * @param {JsonTable} jt - The component instance (`params`, `cols`)
- * @param {JsonTableElements} elements - Object collecting the generated elements (mutated)
- * @param {DomBuilderItem|null} [footerBar=null] - Footer bar item (see `tableFooterPart`) (default: null)
- * @param {string|null} [captionElId=null] - Id of the caption element, for `aria-labelledby` (default: null)
- * @returns {DomBuilderItem} A `div` wrapping the table wrapper and the footer bar
+ * @param {JsonTable} jt - L'istanza del componente (`params`, `cols`)
+ * @param {JsonTableElements} elements - Oggetto che raccoglie gli elementi generati (modificato)
+ * @param {DomBuilderItem|null} [footerBar=null] - Elemento della barra del footer (vedi `tableFooterPart`) (default: null)
+ * @param {string|null} [captionElId=null] - Id dell'elemento caption, per `aria-labelledby` (default: null)
+ * @returns {DomBuilderItem} Un `div` che racchiude il wrapper della tabella e la barra del footer
  *
  * @example
  * domBuilder([tablePart(jt, elements, footerBar, 'users-caption')], host);
- * elements.tbody; // → HTMLTableSectionElement (empty until renderTbody() is called)
+ * elements.tbody; // → HTMLTableSectionElement (vuoto finché non viene chiamato renderTbody())
  */
 export function tablePart(jt, elements, footerBar = null, captionElId = null) {
 

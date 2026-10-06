@@ -8,20 +8,20 @@ import { tfootContent } from './cell-content.js';
 /** @typedef {import('../json-table-component.js').JsonTable} JsonTable */
 
 /**
- * Renders the footer row inside `elements.tfoot` (present only when `params.tfoot` is true),
- * replacing the previous content. Every column produces a cell whose content comes from
- * `tfootContent()` (column `tfootRender`); the footer is emptied when there are no rows.
+ * Renderizza la riga del footer dentro `elements.tfoot` (presente solo quando `params.tfoot` è true),
+ * sostituendo il contenuto precedente. Ogni colonna produce una cella il cui contenuto proviene da
+ * `tfootContent()` (`tfootRender` della colonna); il footer viene svuotato quando non ci sono righe.
  *
- * The rows passed to `tfootRender` are the whole filtered set, or the current page only when
- * `updateFooterOnPageChange` is true.
+ * Le righe passate a `tfootRender` sono l'intero insieme filtrato, oppure solo la pagina corrente quando
+ * `updateFooterOnPageChange` è true.
  *
- * Generated structure: `tr > td[data-key][cellClass]…`
+ * Struttura generata: `tr > td[data-key][cellClass]…`
  *
- * @param {JsonTable} jt - The component instance
+ * @param {JsonTable} jt - L'istanza del componente
  * @returns {void}
  *
  * @example
- * renderTfoot(jt); // after `jt.state` has been updated
+ * renderTfoot(jt); // dopo l'aggiornamento di `jt.state`
  */
 export function renderTfoot(jt) {
 

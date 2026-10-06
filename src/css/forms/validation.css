@@ -1,7 +1,7 @@
 /* da BS5 */
 .was-validated {
 
-  /* includes static field which container has is-valid / is-invalid class */
+  /* include il campo statico il cui contenitore ha la classe is-valid / is-invalid */
   .form-group:has(:valid), .form-group:has(.is-valid), .form-group.is-valid .form-control-static{
     --_status-color: var(--status-success-color);
   }

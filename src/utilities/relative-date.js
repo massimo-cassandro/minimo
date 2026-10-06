@@ -1,52 +1,52 @@
 // @ts-check
 /*! minimo - Relative Date */
 
-// Displays a date in relative form to the current date if within the set limits.
-// Relative dates are automatically updated every minute.
+// Mostra una data in forma relativa rispetto alla data corrente, se entro i limiti impostati.
+// Le date relative vengono aggiornate automaticamente ogni minuto.
 
 /**
  * @typedef {object} RelativeDateOptions
- * @property {boolean} [useRelativeTime=true] - Show times near the date as "in xx minutes" (before) or "now" (within `relativeTimeMinutesAfter`) (default: true)
- * @property {string} [nowString] - String to display when the date is right now (default: 'adesso')
- * @property {number} [relativeTimeMinutesBefore] - Minutes before the date within which to show "in xx minutes" (default: 30)
- * @property {number} [relativeTimeMinutesAfter] - Minutes after the date within which to show the now string (default: 30)
- * @property {boolean} [relativeTimeShowTime] - Show the actual time alongside relative date labels (default: true)
- * @property {string} [relativeTimeShowTimeMarkup] - HTML markup for the time portion; `@@time@@` is replaced with the localized time string (default: ' <span class="time-info">(alle @@time@@)</span>')
- * @property {boolean} [firstLetterUpperCase] - Capitalize the first letter of the returned string (default: true)
- * @property {Intl.DateTimeFormatOptions} [dateFormat] - Format for non-relative dates (beyond day after tomorrow) (default: { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric', hour12: false, hour: '2-digit', minute: '2-digit' })
- * @property {Intl.DateTimeFormatOptions} [timeFormat] - Format for time displayed in relative date labels (default: { hour12: false, hour: '2-digit', minute: '2-digit' })
- * @property {string[]} [relativeStrings] - Labels for yesterday / today / tomorrow / day after tomorrow (in chronological order) (default: ['ieri alle', 'oggi alle', 'domani alle', 'dopodomani alle'])
- * @property {string} [locale] - Locale string for date/time formatting (default: 'it-IT')
+ * @property {boolean} [useRelativeTime=true] - Mostra gli orari vicini alla data come "tra xx minuti" (prima) o "adesso" (entro `relativeTimeMinutesAfter`) (default: true)
+ * @property {string} [nowString] - Stringa da mostrare quando la data è proprio adesso (default: 'adesso')
+ * @property {number} [relativeTimeMinutesBefore] - Minuti prima della data entro i quali mostrare "tra xx minuti" (default: 30)
+ * @property {number} [relativeTimeMinutesAfter] - Minuti dopo la data entro i quali mostrare la stringa "adesso" (default: 30)
+ * @property {boolean} [relativeTimeShowTime] - Mostra l'orario effettivo accanto alle etichette delle date relative (default: true)
+ * @property {string} [relativeTimeShowTimeMarkup] - Markup HTML per la parte dell'orario; `@@time@@` viene sostituito dall'orario localizzato (default: ' <span class="time-info">(alle @@time@@)</span>')
+ * @property {boolean} [firstLetterUpperCase] - Mette in maiuscolo la prima lettera della stringa restituita (default: true)
+ * @property {Intl.DateTimeFormatOptions} [dateFormat] - Formato per le date non relative (oltre dopodomani) (default: { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric', hour12: false, hour: '2-digit', minute: '2-digit' })
+ * @property {Intl.DateTimeFormatOptions} [timeFormat] - Formato dell'orario mostrato nelle etichette delle date relative (default: { hour12: false, hour: '2-digit', minute: '2-digit' })
+ * @property {string[]} [relativeStrings] - Etichette per ieri / oggi / domani / dopodomani (in ordine cronologico) (default: ['ieri alle', 'oggi alle', 'domani alle', 'dopodomani alle'])
+ * @property {string} [locale] - Stringa locale per la formattazione di data/ora (default: 'it-IT')
  */
 
 /**
- * Returns an HTML `<time>` element string displaying the date in relative or absolute form.
- * Relative dates are auto-refreshed every minute via a shared `setInterval`.
+ * Restituisce la stringa di un elemento HTML `<time>` che mostra la data in forma relativa o assoluta.
+ * Le date relative vengono aggiornate automaticamente ogni minuto tramite un `setInterval` condiviso.
  *
- * The base param type below is intentionally `object` (not `RelativeDateOptions`): TypeScript only
- * expands dotted `@param` properties (needed for editor IntelliSense to list each property) when
- * the base type is the literal `object`; a named typedef there would error (TS8032).
- * @param {Date | string} date - Date to display (Date object or ISO string)
+ * Il tipo base del parametro qui sotto è volutamente `object` (non `RelativeDateOptions`): TypeScript
+ * espande le proprietà `@param` con notazione puntata (necessarie perché IntelliSense dell'editor elenchi
+ * ogni proprietà) solo quando il tipo base è il letterale `object`; un typedef con nome darebbe errore (TS8032).
+ * @param {Date | string} date - Data da mostrare (oggetto Date o stringa ISO)
  * @param {object} [options={}] (default: {})
- * @param {boolean} [options.useRelativeTime=true] - Show times near the date as "in xx minutes" (before) or "now" (within `relativeTimeMinutesAfter`) (default: true)
- * @param {string} [options.nowString] - String to display when the date is right now (default: 'adesso')
- * @param {number} [options.relativeTimeMinutesBefore] - Minutes before the date within which to show "in xx minutes" (default: 30)
- * @param {number} [options.relativeTimeMinutesAfter] - Minutes after the date within which to show the now string (default: 30)
- * @param {boolean} [options.relativeTimeShowTime] - Show the actual time alongside relative date labels (default: true)
- * @param {string} [options.relativeTimeShowTimeMarkup] - HTML markup for the time portion; `@@time@@` is replaced with the localized time string (default: ' <span class="time-info">(alle @@time@@)</span>')
- * @param {boolean} [options.firstLetterUpperCase] - Capitalize the first letter of the returned string (default: true)
- * @param {Intl.DateTimeFormatOptions} [options.dateFormat] - Format for non-relative dates (beyond day after tomorrow) (default: { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric', hour12: false, hour: '2-digit', minute: '2-digit' })
- * @param {Intl.DateTimeFormatOptions} [options.timeFormat] - Format for time displayed in relative date labels (default: { hour12: false, hour: '2-digit', minute: '2-digit' })
- * @param {string[]} [options.relativeStrings] - Labels for yesterday / today / tomorrow / day after tomorrow (in chronological order) (default: ['ieri alle', 'oggi alle', 'domani alle', 'dopodomani alle'])
- * @param {string} [options.locale] - Locale string for date/time formatting (default: 'it-IT')
- * @returns {string} HTML `<time>` element as a string
+ * @param {boolean} [options.useRelativeTime=true] - Mostra gli orari vicini alla data come "tra xx minuti" (prima) o "adesso" (entro `relativeTimeMinutesAfter`) (default: true)
+ * @param {string} [options.nowString] - Stringa da mostrare quando la data è proprio adesso (default: 'adesso')
+ * @param {number} [options.relativeTimeMinutesBefore] - Minuti prima della data entro i quali mostrare "tra xx minuti" (default: 30)
+ * @param {number} [options.relativeTimeMinutesAfter] - Minuti dopo la data entro i quali mostrare la stringa "adesso" (default: 30)
+ * @param {boolean} [options.relativeTimeShowTime] - Mostra l'orario effettivo accanto alle etichette delle date relative (default: true)
+ * @param {string} [options.relativeTimeShowTimeMarkup] - Markup HTML per la parte dell'orario; `@@time@@` viene sostituito dall'orario localizzato (default: ' <span class="time-info">(alle @@time@@)</span>')
+ * @param {boolean} [options.firstLetterUpperCase] - Mette in maiuscolo la prima lettera della stringa restituita (default: true)
+ * @param {Intl.DateTimeFormatOptions} [options.dateFormat] - Formato per le date non relative (oltre dopodomani) (default: { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric', hour12: false, hour: '2-digit', minute: '2-digit' })
+ * @param {Intl.DateTimeFormatOptions} [options.timeFormat] - Formato dell'orario mostrato nelle etichette delle date relative (default: { hour12: false, hour: '2-digit', minute: '2-digit' })
+ * @param {string[]} [options.relativeStrings] - Etichette per ieri / oggi / domani / dopodomani (in ordine cronologico) (default: ['ieri alle', 'oggi alle', 'domani alle', 'dopodomani alle'])
+ * @param {string} [options.locale] - Stringa locale per la formattazione di data/ora (default: 'it-IT')
+ * @returns {string} Elemento HTML `<time>` come stringa
  *
  * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/RelativeTimeFormat
  */
 
-// TODO: Add option to include start time in relative dates
-// TODO: alternative solution in place of `@@time@@` placeholder
-// TODO reconsider and evaluate the use of Intl.RelativeTimeFormat Intl.RelativeTimeFormat
+// TODO: aggiungere un'opzione per includere l'ora di inizio nelle date relative
+// TODO: soluzione alternativa al segnaposto `@@time@@`
+// TODO rivalutare l'uso di Intl.RelativeTimeFormat
 
 export function relativeDate(date, options = {}) {
 
@@ -73,7 +73,7 @@ export function relativeDate(date, options = {}) {
       hour: '2-digit',
       minute: '2-digit'
     },
-    relativeStrings: [ // NB: in chronological order
+    relativeStrings: [ // NB: in ordine cronologico
       'ieri alle', 'oggi alle', 'domani alle', 'dopodomani alle'
     ],
     locale: 'it-IT'
@@ -92,7 +92,7 @@ export function relativeDate(date, options = {}) {
 
     const d = typeof dateInput === 'string' ? new Date(dateInput) : dateInput
       , now = new Date()
-      , minutesDiff = (d.getTime() - now.getTime()) / 60000 // difference between the two dates in minutes
+      , minutesDiff = (d.getTime() - now.getTime()) / 60000 // differenza tra le due date in minuti
       , daysDiff = (
         new Date(d.getFullYear(), d.getMonth(), d.getDate(), 0, 0, 0).getTime() -
         new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0).getTime()
@@ -113,10 +113,10 @@ export function relativeDate(date, options = {}) {
       (minutesDiff > 0 && minutesDiff <= opts.relativeTimeMinutesBefore)
     )) {
 
-      // formatToParts + reduce needed to strip decimal fractions from the value
+      // formatToParts + reduce necessari per eliminare le frazioni decimali dal valore
       const parts = rtf.formatToParts(minutesDiff, 'minute').reduce((acc, curr) => {
-        if (curr.type !== 'decimal') { // decimal separator
-          if (curr.type === 'fraction') { // fractional part
+        if (curr.type !== 'decimal') { // separatore decimale
+          if (curr.type === 'fraction') { // parte frazionaria
             const intPart = acc.find(i => i.type === 'integer');
             if (intPart) intPart.value += `.${curr.value}`;
           } else {
@@ -131,7 +131,7 @@ export function relativeDate(date, options = {}) {
 
       isRelative = true;
 
-    // between -1 day and +2 days
+    // tra -1 giorno e +2 giorni
     } else if (daysDiff >= -1 && daysDiff <= 2) {
 
       result = opts.relativeStrings[daysDiff + 1] + ' ' + d.toLocaleString(opts.locale, opts.timeFormat);

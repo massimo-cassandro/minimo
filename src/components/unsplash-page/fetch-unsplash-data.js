@@ -16,7 +16,7 @@
  */
 
 /**
- * Fetches and normalises Unsplash photo data from the given URL.
+ * Recupera e normalizza i dati di una foto Unsplash dall'URL indicato.
  * @param {{ unsplash_data_url: string | null }} settings
  * @returns {Promise<UnsplashPhoto | undefined>}
  */
@@ -34,7 +34,7 @@ export async function fetchUnsplashData(settings) {
       throw new Error( 'Unsplash data url must be defined' );
     }
 
-    const url = settings.unsplash_data_url; // const preserves narrowing inside the IIFE closure
+    const url = settings.unsplash_data_url; // const mantiene il narrowing dentro la closure dell'IIFE
 
     const imgData = await (async () => {
       const response = await fetch(url);
@@ -52,7 +52,7 @@ export async function fetchUnsplashData(settings) {
 
         // console.log(data);
 
-        // used data
+        // dati utilizzati
         return {
           id                 : data.id,
           color              : data.color,

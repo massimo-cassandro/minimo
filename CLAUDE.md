@@ -98,7 +98,7 @@ minimo/
 
 ## Convenzioni di codice
 
-**Lingua dei commenti**: i commenti `TODO`/`FIX` (e simili, es. `FIXME`) vanno scritti **in italiano**. Tutti gli altri commenti nel codice vanno scritti **in inglese**.
+**Lingua dei commenti e della documentazione**: tutti i commenti nel codice (inclusi `TODO`/`FIX`, JSDoc, commenti CSS) e tutti i file README/documentazione vanno scritti **in italiano**. Gli identificatori (variabili, funzioni, classi CSS, ecc.) restano in inglese, così come i termini tecnici senza un equivalente italiano naturale. Evitare sempre neologismi e verbi inglesi coniugati all'italiana (vedi *Stile di lavoro*).
 
 **Caratteri Unicode**: dove nel codice si trovano caratteri Unicode letterali (es. em dash, freccie, valuta), vanno lasciati così come sono — non vanno convertiti nella relativa sequenza di escape JS (`\uXXXX`), né viceversa.
 
@@ -317,7 +317,7 @@ Da affrontare con calma in futuro (eventualmente con una utility condivisa che r
 | File | Riga | Nota |
 |---|---|---|
 | [src/components/autocomplete/autocomplete-engine.js](src/components/autocomplete/autocomplete-engine.js#L283) | 283 | TODO[epic=autocomplete] (da definire) |
-| [src/components/autocomplete/check-autocomplete.js](src/components/autocomplete/check-autocomplete.js#L1) | 1 | TODO: trigger ac selection |
+| [src/components/autocomplete/check-autocomplete.js](src/components/autocomplete/check-autocomplete.js#L1) | 1 | TODO: attivare la selezione dell'autocomplete |
 | [src/components/snackbar/snackbar.js](src/components/snackbar/snackbar.js#L16) | 16–17 | TODO: snackbar action; gestione multiple senza stacking |
 
 ### JS — web components
@@ -356,7 +356,8 @@ Da affrontare con calma in futuro (eventualmente con una utility condivisa che r
 - Conferma la comprensione prima di agire su richieste ambigue
 - Il progetto usa ES modules (import/export), evitare soluzioni che utilizzano commonJs
 - In linea di massima non proporre soluzioni che richiedano modifiche alla parte back-end, se presente, a meno che non sia esplicitamente richiesto
-- nella chat evitare neologismi come inlinare, parsare, committare ecc., usare i termini corrispondenti in italiano o il termine originale in inglese dove non sia possibile un equivalente in italiano. Non coniugare mai secondo le regole dell'italiano verbi di altre lingue
-- nei commenti su più righe preferire `/* ... */` piuttosto che ripetere `//` ad igni inizio riga
+- evitare SEMPRE neologismi come 'inlinare', 'parsare', 'committare' ecc., usare i termini corrispondenti in italiano o il termine originale in inglese dove non sia possibile un equivalente in italiano. Non coniugare mai secondo le regole dell'italiano verbi di altre lingue
+- nei commenti di 3 o più righe preferire `/* ... */` piuttosto che ripetere `//` ad igni inizio riga
 - a meno che non sia esplicitamente richiesto di eseguire subito una modifica, NON ESEGUIRE MAI nulla autonomamente ma mostra sempre un piano d'azione prima di procedere
 - nei commenti jsDoc aggiungere sempre dove possibile una sezione example che riepiloghi i vari parametri mostrando i valori di default
+- nei documenti markdown generati non andare a capo forzatamente alla fine di ogni riga: un paragrafo è una sola riga, così si usa il soft wrap dell'editor ed è più semplice fare correzioni

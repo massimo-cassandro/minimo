@@ -1,12 +1,12 @@
 import { configManager } from './config-manager.mjs';
 
-// remove extension and normalize filename
+// rimuove l'estensione e normalizza il nome del file
 export function parseSvgFilename(filename) {
 
   const cfg = configManager.getCfg();
 
-  let parsed_filename = filename.split('.').slice(0, -1).join('.') // remove extension
-    .replaceAll(' ', '-'); // replace spaces with hyphens
+  let parsed_filename = filename.split('.').slice(0, -1).join('.') // rimuove l'estensione
+    .replaceAll(' ', '-'); // sostituisce gli spazi con trattini
 
   // removing filename prefixes
   cfg.remove_prefix.forEach(prefix => {

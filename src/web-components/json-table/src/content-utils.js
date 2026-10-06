@@ -5,17 +5,17 @@ import { domBuilder } from '../../../utilities/dom-builder/dom-builder.js';
 /** @typedef {import('./defaults.js').CellContent} CellContent */
 
 /**
- * Replaces the content of `el` with `content`, accepting every content form used by the
- * component (see `CellContent`): a Node is appended as-is, a domBuilder array is built inside
- * the element, a string/number is set as text or, when it contains `<`, as sanitized markup
- * (`Element.setHTML` where supported, `innerHTML` otherwise, consistently with domBuilder).
- * The empty sanitizer config passed to `setHTML` keeps `class`, `id`, `style` and `data-*`
- * attributes, which the browser default configuration removes, while unsafe content (scripts,
- * event handlers, `javascript:` URLs) is always stripped.
- * A function is invoked and its result used. `null`/`undefined` empty the element.
+ * Sostituisce il contenuto di `el` con `content`, accettando ogni forma di contenuto usata dal
+ * componente (vedi `CellContent`): un Node viene aggiunto così com'è, un array domBuilder viene costruito dentro
+ * l'elemento, una stringa/numero viene impostato come testo oppure, se contiene `<`, come markup sanificato
+ * (`Element.setHTML` dove supportato, altrimenti `innerHTML`, in modo coerente con domBuilder).
+ * La configurazione vuota del sanitizer passata a `setHTML` mantiene gli attributi `class`, `id`, `style` e `data-*`,
+ * che la configurazione predefinita del browser rimuove, mentre il contenuto non sicuro (script,
+ * gestori di eventi, URL `javascript:`) viene sempre eliminato.
+ * Una funzione viene invocata e il suo risultato usato. `null`/`undefined` svuotano l'elemento.
  *
- * @param {HTMLElement} el - Target element (emptied first)
- * @param {CellContent|(() => CellContent)} content - Content to set
+ * @param {HTMLElement} el - Elemento di destinazione (svuotato prima)
+ * @param {CellContent|(() => CellContent)} content - Contenuto da impostare
  * @returns {void}
  *
  * @example
@@ -24,7 +24,7 @@ import { domBuilder } from '../../../utilities/dom-builder/dom-builder.js';
  * setContent(td, 1234);
  * setContent(td, document.createElement('span'));
  * setContent(td, [{ tag: 'a', attrs: { href: '#' }, content: 'link' }]);
- * setContent(td, null); // → empty cell
+ * setContent(td, null); // → cella vuota
  */
 export function setContent(el, content) {
 
@@ -60,11 +60,11 @@ export function setContent(el, content) {
 
 
 /**
- * Reads a value from an object through a dot-separated key path.
- * Returns `undefined` when an intermediate key does not exist.
+ * Legge un valore da un oggetto tramite un percorso di chiavi separate da punti.
+ * Restituisce `undefined` quando una chiave intermedia non esiste.
  *
- * @param {Object|null|undefined} obj - Source object
- * @param {string} path - Key or dot-separated path
+ * @param {Object|null|undefined} obj - Oggetto sorgente
+ * @param {string} path - Chiave o percorso separato da punti
  * @returns {*}
  *
  * @example
@@ -81,13 +81,13 @@ export function getNestedValue(obj, path) {
 
 
 /**
- * Resolves a mustache-like template: every `[[key]]` placeholder is replaced with the
- * corresponding row value (nested keys allowed); placeholders resolving to `null`/`undefined`
- * are replaced with `nullAs`. Useful for the js-free configuration via HTML attributes.
+ * Risolve un template in stile mustache: ogni segnaposto `[[key]]` viene sostituito con il
+ * corrispondente valore della riga (chiavi annidate ammesse); i segnaposto che risultano `null`/`undefined`
+ * vengono sostituiti con `nullAs`. Utile per la configurazione senza JS tramite attributi HTML.
  *
- * @param {string} tpl - Template string
- * @param {Object} row - Row object
- * @param {string} [nullAs=''] - Replacement of null/undefined values (default: '')
+ * @param {string} tpl - Stringa del template
+ * @param {Object} row - Oggetto riga
+ * @param {string} [nullAs=''] - Sostituto dei valori null/undefined (default: '')
  * @returns {string}
  *
  * @example

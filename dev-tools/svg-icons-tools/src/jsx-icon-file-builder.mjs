@@ -1,34 +1,34 @@
 /**
  * jsx_icon_file_builder
  *
- * Function to create JSX icon files
+ * Funzione per creare i file JSX delle icone
  *
- * The `parsed_svg` argument is the object returned by the parse function
- * and contains:
- *  - svg: the whole optimized svg markup (including the svg tag),
- *  - viewbox: the viewbox attribute content,
- *  - svg_content: the optimized svg markup without the svg tag)
- *  - classes: the aspect ratio class as per the `non_square_icons_classes` parameter and or
- *             the 'fill` or `stroke` class as per the `icon_type_class` parameter
- *  - icon_type: icon type string: `fill` or `stroke`
- *  - filename: the name of the svg file without extension and with the `remove_prefix` strings removed
- *  - filename_camel_case: the filename in camel case (nb: dashes follewed ny numbers are converted to underscores)
- *  - filename_pascal_case: similar to `filename_camel_case` but with the first letter capitalized
+ * L'argomento `parsed_svg` è l'oggetto restituito dalla funzione di parsing
+ * e contiene:
+ *  - svg: l'intero markup svg ottimizzato (incluso il tag svg),
+ *  - viewbox: il contenuto dell'attributo viewbox,
+ *  - svg_content: il markup svg ottimizzato senza il tag svg)
+ *  - classes: la classe di aspect ratio in base al parametro `non_square_icons_classes` e/o
+ *             la classe `fill` o `stroke` in base al parametro `icon_type_class`
+ *  - icon_type: stringa con il tipo di icona: `fill` o `stroke`
+ *  - filename: il nome del file svg senza estensione e senza le stringhe `remove_prefix`
+ *  - filename_camel_case: il nome del file in camel case (nb: i trattini seguiti da numeri vengono convertiti in underscore)
+ *  - filename_pascal_case: come `filename_camel_case` ma con la prima lettera maiuscola
  *
- * The function must return an object with the following properties:
- *  - component_name: the name of the component
- *  - jsx_content: the jsx content of the component
- *  - filename: the name of the jsx file (including extension) to be saved (default: `component_name` + '.jsx')
+ * La funzione deve restituire un oggetto con le seguenti proprietà:
+ *  - component_name: il nome del componente
+ *  - jsx_content: il contenuto jsx del componente
+ *  - filename: il nome del file jsx (estensione inclusa) da salvare (default: `component_name` + '.jsx')
  *
  *
- * NB: Since it is assumed that most attributes in the svg content have been removed
- * during optimization, no further cleanup is performed IN THIS VERSION and therefore it is not guaranteed
- * that `parsed_svg.content` is valid JSX markup.
- * If you decide to keep some attributes in the SVGO options, you should check the svg content and, if possible,
- * modify the function accordingly. In the function below, the `replace` method,
- * applied to `parsed_svg.svg_content`, is an example of how to temporarily solve this problem.
+ * NB: poiché si presume che la maggior parte degli attributi del contenuto svg sia stata rimossa
+ * durante l'ottimizzazione, IN QUESTA VERSIONE non viene eseguita alcuna ulteriore pulizia e quindi non è garantito
+ * che `parsed_svg.content` sia markup JSX valido.
+ * Se si decide di mantenere alcuni attributi nelle opzioni di SVGO, bisogna verificare il contenuto svg e, se possibile,
+ * modificare di conseguenza la funzione. Nella funzione qui sotto, il metodo `replace`,
+ * applicato a `parsed_svg.svg_content`, è un esempio di come risolvere temporaneamente il problema.
  *
- * NB: this release doesn't include any prettify feature.
+ * NB: questa release non include alcuna funzionalità di prettify.
  *
  * @param {*} parsed_svg
  * @returns
@@ -39,7 +39,7 @@
 
 export function jsx_icon_file_builder(parsed_svg) {
 
-  // adding `Icon` suffix to the component name
+  // aggiunge il suffisso `Icon` al nome del componente
   const component_name = `${parsed_svg.filename_pascal_case}Icon`;
 
   return {

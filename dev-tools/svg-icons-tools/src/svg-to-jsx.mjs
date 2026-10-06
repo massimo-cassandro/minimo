@@ -23,11 +23,11 @@ export async function svg_to_jsx() {
 
     dest_folder = path.resolve(cfg.work_dir, cfg_obj.dest_folder);
 
-    // checking output dir for optimized svg files
+    // verifica la directory di output dei file jsx
     await create_dest_folder(dest_folder, cfg_obj.clearDestFolder);
 
 
-    // parsing and saving JSX files
+    // parsing e salvataggio dei file JSX
     fileCount = parseSvgFiles('jsx',
       (parsedSvg) => {
         const result = icon_builder(parsedSvg),

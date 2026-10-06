@@ -8,25 +8,27 @@ import './sf-macro.css';
 // di sf-macro.css qui sopra (questione lasciata in sospeso).
 
 /**
- * Initialises Symfony macro collection fields (repeatable fieldsets).
+ * Inizializza i campi collection macro di Symfony (fieldset ripetibili).
  * @param {Object} [options={}] (default: {})
- * @param {string} [options.wrapper_selector='.sf-macro-wrapper'] - Selector for the outer wrapper element. (default: '.sf-macro-wrapper')
- * @param {string} [options.row_selector='.sf-macro-riga'] - Selector for each repeatable row. (default: '.sf-macro-riga')
- * @param {string} [options.closeBtnClass='sf-macro-close-btn'] - Class name of the row-remove button. (default: 'sf-macro-close-btn')
- * @param {string} [options.addBtnClass='sf-macro-riga-add'] - Class name of the row-add button. (default: 'sf-macro-riga-add')
- * @param {string} [options.containerClass='sf-macro-container'] - Class name of the rows container. (default: 'sf-macro-container')
- * @param {((newRow: Element | null, addBtn: Element | null) => void) | null} [options.add_callback=null] - Called after a row is added; receives the new row and the add button. (default: null)
- * @param {((row: Element | null, closeBtn: Element | null) => boolean | Promise<boolean>) | null} [options.preDelCallback=null] - Called when the row-remove button is pressed, before the row is removed; receives the row and the close button. May return a Promise (e.g. to await a confirm dialog): the row is removed only if the resolved value is not `false`. (default: null)
- * @param {((row: Element | null, closeBtn: Element | null) => void) | null} [options.del_callback=null] - Called after a row is removed; receives the removed row (now detached) and the close button. (default: null)
- * @param {boolean} [options.insertAtTop=false] - When true, new rows are inserted at the top. (default: false)
+ * @param {string} [options.wrapper_selector='.sf-macro-wrapper'] - Selettore dell'elemento wrapper esterno. (default: '.sf-macro-wrapper')
+ * @param {string} [options.row_selector='.sf-macro-riga'] - Selettore di ogni riga ripetibile. (default: '.sf-macro-riga')
+ * @param {string} [options.closeBtnClass='sf-macro-close-btn'] - Nome della classe del pulsante di rimozione riga. (default: 'sf-macro-close-btn')
+ * @param {string} [options.addBtnClass='sf-macro-riga-add'] - Nome della classe del pulsante di aggiunta riga. (default: 'sf-macro-riga-add')
+ * @param {string} [options.containerClass='sf-macro-container'] - Nome della classe del contenitore delle righe. (default: 'sf-macro-container')
+ * @param {((newRow: Element | null, addBtn: Element | null) => void) | null} [options.add_callback=null] - Chiamata dopo l'aggiunta di una riga; riceve la nuova riga e il pulsante di aggiunta. (default: null)
+ * @param {((row: Element | null, closeBtn: Element | null) => boolean | Promise<boolean>) | null} [options.preDelCallback=null] - Chiamata alla pressione del pulsante di rimozione riga, prima che la riga venga rimossa; riceve la riga e il pulsante di chiusura. Può restituire una Promise (ad es. per attendere una finestra di conferma): la riga viene rimossa solo se il valore risolto non è `false`. (default: null)
+ * @param {((row: Element | null, closeBtn: Element | null) => void) | null} [options.del_callback=null] - Chiamata dopo la rimozione di una riga; riceve la riga rimossa (ormai scollegata) e il pulsante di chiusura. (default: null)
+ * @param {boolean} [options.insertAtTop=false] - Se true, le nuove righe vengono inserite in cima. (default: false)
  * @returns {void}
  */
 export function sf_macro({
   wrapper_selector = '.sf-macro-wrapper',
   row_selector = '.sf-macro-riga',
-  // Change closeBtnClass/addBtnClass/containerClass only if you don't want to use
-  // the default sf-macro.css: unused default classes are not stripped by this
-  // component, that cleanup is delegated to PurgeCSS (or equivalent) downstream.
+  /*
+    Modificare closeBtnClass/addBtnClass/containerClass solo se non si vuole usare
+    il file sf-macro.css predefinito: le classi predefinite inutilizzate non vengono rimosse da questo
+    componente, la pulizia è delegata a valle a PurgeCSS (o equivalente).
+  */
   closeBtnClass = 'sf-macro-close-btn',
   addBtnClass = 'sf-macro-riga-add',
   containerClass = 'sf-macro-container',
@@ -36,13 +38,15 @@ export function sf_macro({
   insertAtTop = false
 }={}) {
 
-  // Single delegated listener: resolves the nearest wrapper_selector ancestor
-  // of the click target at click time, instead of binding one listener per
-  // wrapper found at init time. This is required for wrapper_selector to be
-  // shared by nested wrapper instances (the nearest one always wins, with no
-  // propagation to outer ones) and to work on wrappers created dynamically
-  // after this call (e.g. a nested wrapper inside a newly added row), which
-  // would otherwise never get their own listener.
+  /*
+    Singolo listener delegato: risolve al momento del click l'antenato wrapper_selector
+    più vicino al target del click, invece di collegare un listener per ogni
+    wrapper trovato in fase di init. È necessario perché wrapper_selector possa essere
+    condiviso da istanze di wrapper annidate (vince sempre la più vicina, senza
+    propagazione a quelle esterne) e perché funzioni sui wrapper creati dinamicamente
+    dopo questa chiamata (ad es. un wrapper annidato in una riga appena aggiunta), che
+    altrimenti non riceverebbero mai un proprio listener.
+  */
   document.addEventListener('click', e => {
     const target = /** @type {HTMLElement} */ (e.target);
 
@@ -89,9 +93,9 @@ export function sf_macro({
       if(preDelCallback && typeof preDelCallback === 'function') {
         const pre_del_result = preDelCallback(riga, action_btn);
 
-        // Supports both a sync boolean and an async (Promise-returning)
-        // preDelCallback (e.g. awaiting a confirm dialog) without requiring
-        // the caller to manage the row removal itself.
+        // Supporta sia un preDelCallback sincrono che restituisce un booleano sia uno asincrono
+        // (che restituisce una Promise, ad es. in attesa di una finestra di conferma) senza richiedere
+        // che il chiamante gestisca da sé la rimozione della riga.
         if(pre_del_result instanceof Promise) {
           pre_del_result.then(ok => {
             if(ok !== false) remove_row();

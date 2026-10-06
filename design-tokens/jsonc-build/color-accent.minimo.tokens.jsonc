@@ -1,8 +1,8 @@
 // -----------------------------------------------------------------------
-// Generated file — do not edit manually.
-// This file is produced by the design-token build pipeline.
-// Source of truth: the token files in the project source directory.
-// Re-generate with: node build-tokens.mjs --config <path/to/config>
+// File generato — non modificare a mano.
+// Questo file è prodotto dalla pipeline di build dei design token.
+// Fonte di verità: i file dei token nella directory sorgente del progetto.
+// Per rigenerarlo: node build-tokens.mjs --config <path/to/config>
 // -----------------------------------------------------------------------
 {
   "accent": {

@@ -21,11 +21,11 @@ export function ratindDisplayAnimation() {
       // request another frame
       const animationRequest = window.requestAnimationFrame(step);
 
-      // if enough time has elapsed, draw the next frame
+      // se è trascorso abbastanza tempo, disegna il frame successivo
       if (elapsed >= fpsInterval) {
 
-        // Get ready for next frame by setting startTimestamp=now, but...
-        // Also, adjust for fpsInterval not being multiple of 16.67
+        // Prepara il frame successivo impostando startTimestamp=now, ma...
+        // regola anche il valore perché fpsInterval non è multiplo di 16.67
         startTimestamp = now - (elapsed % fpsInterval);
 
         svgElement.style.setProperty(

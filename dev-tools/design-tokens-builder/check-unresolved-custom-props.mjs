@@ -3,14 +3,16 @@
 
 /* eslint-disable no-console */
 
-// check-unresolved-custom-props.mjs
-// Scans CSS files in the configured directory and reports:
-//   - unresolved properties: custom property references (var(--...)) that
-//     are not defined in the generated token file
-//   - unused properties: custom properties defined in the generated token
-//     file but never referenced via var() in any scanned CSS file
-//
-// Usage: node check-unresolved-custom-props.mjs --config ./path/to/config.mjs
+/*
+  check-unresolved-custom-props.mjs
+  Analizza i file CSS nella directory configurata e segnala:
+    - proprietà non risolte: riferimenti a custom properties (var(--...)) che
+      non sono definite nel file dei token generato
+    - proprietà non usate: custom properties definite nel file dei token
+      generato ma mai referenziate tramite var() in alcun file CSS analizzato
+
+  Utilizzo: node check-unresolved-custom-props.mjs --config ./path/to/config.mjs
+*/
 
 
 /* globals process */
@@ -57,30 +59,34 @@ if (!configArgPath) {
 const absoluteConfigPath = path.resolve(process.cwd(), configArgPath);
 const configDir = path.dirname(absoluteConfigPath);
 
-// ---------------------------------------------------------------------------
-// 2. Main
-// ---------------------------------------------------------------------------
+/*
+  ---------------------------------------------------------------------------
+  2. Main
+  ---------------------------------------------------------------------------
+*/
 async function run() {
   try {
     const { default: config } = await import(pathToFileURL(absoluteConfigPath).href);
 
-    // Path of the generated CSS file containing all custom property definitions
+    // Percorso del file CSS generato che contiene tutte le definizioni delle custom properties
     const custom_prop_file_path = path.resolve(configDir, path.join(config.buildPath, config.destFile));
 
-    // Directory to scan for CSS files
+    // Directory in cui cercare i file CSS
     const checkdir = path.resolve(configDir, config.dirToCheck);
 
-    // Patterns for custom properties to exclude from the unresolved check
+    // Pattern delle custom properties da escludere dal controllo delle non risolte
     /** @type {RegExp[]} */
     const exclude = config.excludePattern ?? [];
 
-    // Collect all .css files in the scan directory, excluding any file under a
-    // directory whose name starts with "TODO" (work-in-progress folders).
-    // The token file itself (custom_prop_file_path) is intentionally included:
-    // custom properties are often composed from other custom properties
-    // (e.g. `--malert-box-shadow: ... var(--malert-box-shadow-color) ...`)
-    // and those internal var() references must count as usage, otherwise the
-    // referenced property is wrongly reported as unused.
+    /*
+      Raccoglie tutti i file .css nella directory da analizzare, escludendo ogni file sotto una
+      directory il cui nome inizia con "TODO" (cartelle in lavorazione).
+      Il file dei token stesso (custom_prop_file_path) è volutamente incluso:
+      le custom properties sono spesso composte da altre custom properties
+      (ad es. `--malert-box-shadow: ... var(--malert-box-shadow-color) ...`)
+      e quei riferimenti var() interni devono contare come utilizzo, altrimenti la
+      proprietà referenziata viene segnalata erroneamente come non usata.
+    */
     const files = [];
     for await (const entry of glob(path.join(checkdir, '/**/*.css'))) {
       const relDirSegments = path.relative(checkdir, path.dirname(entry)).split(path.sep);
@@ -95,27 +101,33 @@ async function run() {
       throw new Error(`Token CSS file not found: ${custom_prop_file_path}`);
     }
 
-    // ---------------------------------------------------------------------------
-    // 3. Build the list of defined custom properties
-    // ---------------------------------------------------------------------------
+    /*
+      ---------------------------------------------------------------------------
+      3. Costruisce l'elenco delle custom properties definite
+      ---------------------------------------------------------------------------
+    */
     const definitionRegex = /--([a-z0-9-]+)(?=\s*:)/g;
 
-    // defined_props keeps file/line info too, so unused properties (section 6)
-    // can be reported with a link back to their definition. With sourceModes
-    // (see build-tokens-src/config.mjs), the same prop name can legitimately
-    // appear once per mode with a different value — `mode` disambiguates
-    // which one a given entry is, so section 5 resolves each to the correct
-    // per-mode source file instead of mixing them up (see findMediaModeBlocks
-    // in build-tokens-src/merge-css.mjs).
+    /*
+      defined_props conserva anche le informazioni su file/riga, così che le proprietà non usate (sezione 6)
+      possano essere segnalate con un link alla loro definizione. Con sourceModes
+      (vedi build-tokens-src/config.mjs), lo stesso nome di proprietà può legittimamente
+      comparire una volta per modalità con un valore diverso — `mode` indica
+      di quale si tratta, così la sezione 5 risolve ognuna nel file sorgente corretto
+      della propria modalità invece di confonderle (vedi findMediaModeBlocks
+      in build-tokens-src/merge-css.mjs).
+    */
     /** @type {{file: string, line: number, prop: string, mode: string|null}[]} */
     const defined_props = [];
 
     const cssContent = fs.readFileSync(custom_prop_file_path, 'utf-8');
     const custom_prop_relpath = path.relative(configDir, custom_prop_file_path);
 
-    // sourceModesBase mirrors the default-resolution logic in
-    // build-tokens-src/config.mjs: the configured sourceModesBase if it's
-    // actually a key of sourceModes, otherwise the first key.
+    /*
+      sourceModesBase replica la logica di risoluzione del default di
+      build-tokens-src/config.mjs: il sourceModesBase configurato se è
+      effettivamente una chiave di sourceModes, altrimenti la prima chiave.
+    */
     const sourceModeNames = config.sourceModes ? Object.keys(config.sourceModes) : [];
     const sourceModesBase = sourceModeNames.includes(config.sourceModesBase)
       ? config.sourceModesBase
@@ -134,8 +146,8 @@ async function run() {
       defined_props.push({ file: custom_prop_relpath, line, prop: `--${m[1]}`, mode: modeAtIndex(m.index) });
     });
 
-    // Also include any extra CSS files declared in extraCustomPropsFiles.
-    // These are plain (non-sourceModes) files, so mode is always null.
+    // Include anche gli eventuali file CSS extra dichiarati in extraCustomPropsFiles.
+    // Sono file semplici (non sourceModes), quindi mode è sempre null.
     for (const extraFile of (config.extraCustomPropsFiles ?? [])) {
       const extraFilePath = path.resolve(configDir, extraFile);
       const extraContent  = fs.readFileSync(extraFilePath, 'utf-8');
@@ -148,9 +160,11 @@ async function run() {
 
     const propertyNamesList = defined_props.map(item => item.prop);
 
-    // ---------------------------------------------------------------------------
-    // 4. Scan files for unresolved var() references
-    // ---------------------------------------------------------------------------
+    /*
+      ---------------------------------------------------------------------------
+      4. Analizza i file alla ricerca di riferimenti var() non risolti
+      ---------------------------------------------------------------------------
+    */
     const usageRegex = /var\(\s*(--[a-z0-9-]+)\s*(,.*?)?\)/g;
     /** @type {{file: string, line: number, prop: string}[]} */
     const unresolved_props = [];
@@ -177,44 +191,52 @@ async function run() {
 
     unresolved_props.sort((a, b) => a.file.localeCompare(b.file));
 
-    // Unused-properties census is opt-in (config.checkUnused: true) since it
-    // re-runs the Style Dictionary transform pipeline over the token sources
-    // just to resolve source files, which adds a noticeable cost.
+    /*
+      Il censimento delle proprietà non usate è opt-in (config.checkUnused: true) perché
+      riesegue la pipeline di trasformazione di Style Dictionary sui sorgenti dei token
+      solo per risalire ai file sorgente, con un costo apprezzabile.
+    */
     const checkUnused = config.checkUnused === true;
 
-    // If true (default), properties sourced from a token file under
-    // node_modules (e.g. a third-party token package) are never reported as
-    // unused — the consuming project isn't expected to prune those.
+    /*
+      Se true (default), le proprietà provenienti da un file token sotto
+      node_modules (ad es. un pacchetto di token di terze parti) non vengono mai segnalate
+      come non usate — il progetto che le usa non è tenuto a ripulirle.
+    */
     const ignoreUnusedInNodeModules = config.ignoreUnusedInNodeModules !== false;
 
-    // ---------------------------------------------------------------------------
-    // 5. Best-effort: resolve the .mjs token source file for each defined
-    // property, by running the same transform pipeline used to generate the
-    // CSS (see build-tokens-src/formats/css.mjs) over the token sources
-    // declared in config.source. Properties that only exist in the generated
-    // CSS (or an extraCustomPropsFiles entry) — e.g. manual additions kept
-    // across rebuilds via the mergeCustomProps option — have no token source
-    // and are reported by name only.
-    //
-    // With sourceModes, resolution runs once PER MODE, keyed by mode name in
-    // sourceFileByPropByMode: the same prop name can be defined by a
-    // different source file in each mode (see the `dead: {...}` example in
-    // both a light and dark token file), so a single flattened name -> file
-    // map would silently point some entries at the wrong mode's file.
-    // sourceFileByProp (mode: null) covers the non-sourceModes case and
-    // extraCustomPropsFiles entries.
-    // ---------------------------------------------------------------------------
+    /*
+      ---------------------------------------------------------------------------
+      5. Best-effort: risale al file sorgente .mjs dei token per ogni proprietà
+      definita, eseguendo la stessa pipeline di trasformazione usata per generare il
+      CSS (vedi build-tokens-src/formats/css.mjs) sui sorgenti dei token
+      dichiarati in config.source. Le proprietà che esistono solo nel CSS generato
+      (o in una voce di extraCustomPropsFiles) — ad es. aggiunte manuali conservate
+      tra una build e l'altra tramite l'opzione mergeCustomProps — non hanno un
+      sorgente token e vengono segnalate solo per nome.
+
+      Con sourceModes, la risoluzione viene eseguita una volta PER MODALITÀ, indicizzata per nome
+      della modalità in sourceFileByPropByMode: lo stesso nome di proprietà può essere definito da un
+      file sorgente diverso in ogni modalità (vedi l'esempio `dead: {...}` in
+      un file token light e in uno dark), quindi una singola mappa nome -> file
+      appiattita punterebbe in silenzio alcune voci al file della modalità sbagliata.
+      sourceFileByProp (mode: null) copre il caso senza sourceModes e le voci di
+      extraCustomPropsFiles.
+      ---------------------------------------------------------------------------
+    */
     /** @type {Map<string, string>} */
     const sourceFileByProp = new Map();
     /** @type {Map<string, Map<string, string>>} */
     const sourceFileByPropByMode = new Map();
 
-    // includeEntries: base-mode sources, passed as `include` for non-base
-    // modes so cross-mode references resolve (same as build-source-modes.mjs).
+    // includeEntries: sorgenti della modalità base, passate come `include` per le
+    // modalità non base così che i riferimenti tra modalità vengano risolti (come in build-source-modes.mjs).
     /** @param {Parameters<typeof splitSourceEntries>[0]} sourceEntries @param {Parameters<typeof splitSourceEntries>[0]} [includeEntries] @returns {Promise<Map<string,string>>} */
-    // Entries can be strings or `{ src, prefix, transform }` objects (see
-    // build-tokens-src/source-prefixes.mjs): both are registered before the
-    // transform pipeline runs, so token names match the generated CSS.
+    /*
+      Le voci possono essere stringhe od oggetti `{ src, prefix, transform }` (vedi
+      build-tokens-src/source-prefixes.mjs): entrambi vengono registrati prima che la
+      pipeline di trasformazione venga eseguita, così i nomi dei token corrispondono al CSS generato.
+    */
     const resolveSourceFileMap = async (sourceEntries, includeEntries = []) => {
       /** @type {Map<string, string>} */
       const map = new Map();
@@ -243,7 +265,7 @@ async function run() {
           if (token.filePath && token.isSource !== false) map.set(`--${token.name}`, token.filePath);
         }
       } catch {
-        // Non-fatal: unused properties will be reported by name only.
+        // Non bloccante: le proprietà non usate verranno segnalate solo per nome.
       }
       return map;
     };
@@ -264,12 +286,14 @@ async function run() {
         ? sourceFileByPropByMode.get(item.mode)?.get(item.prop)
         : sourceFileByProp.get(item.prop);
 
-    // ---------------------------------------------------------------------------
-    // 6. Build the list of unused custom properties (defined but never
-    // referenced via var() in any scanned CSS file) — the opposite check
-    // of section 4. Properties sourced from node_modules are skipped when
-    // ignoreUnusedInNodeModules is true (default).
-    // ---------------------------------------------------------------------------
+    /*
+      ---------------------------------------------------------------------------
+      6. Costruisce l'elenco delle custom properties non usate (definite ma mai
+      referenziate tramite var() in alcun file CSS analizzato) — il controllo opposto
+      a quello della sezione 4. Le proprietà provenienti da node_modules vengono saltate quando
+      ignoreUnusedInNodeModules è true (default).
+      ---------------------------------------------------------------------------
+    */
     const unused_props = checkUnused
       ? defined_props
         .filter(item => !used_props_set.has(item.prop))
@@ -282,9 +306,11 @@ async function run() {
         .sort((a, b) => a.prop.localeCompare(b.prop))
       : [];
 
-    // ---------------------------------------------------------------------------
-    // 7. Write the report
-    // ---------------------------------------------------------------------------
+    /*
+      ---------------------------------------------------------------------------
+      7. Scrive il report
+      ---------------------------------------------------------------------------
+    */
     const result_file = path.resolve(configDir, 'unresolved-unused-props.md');
 
     const logParts = [`${unresolved_props.length} unresolved custom properties found`];

@@ -2,7 +2,7 @@
 
 /* globals process */
 
-// NB: The base tag doesn't seem to work well with hash routes on GitHub pages.
+// NB: il tag base non sembra funzionare bene con le hash route su GitHub Pages.
 
 import './demo.css';
 
@@ -54,8 +54,8 @@ if(routeObj.incl) {
 
 root.classList.toggle('container', !routeObj.fullPage);
 
-// demo callbacks may load their chunk asynchronously (dynamic import, see routes.js):
-// title and home link are added once the demo content has been rendered
+// le callback delle demo possono caricare il proprio chunk in modo asincrono (dynamic import, vedi routes.js):
+// titolo e link alla home vengono aggiunti dopo il rendering del contenuto della demo
 Promise.resolve(routeObj.callback? routeObj.callback() : null).then(() => {
 
   if(!routeObj.fullPage) {

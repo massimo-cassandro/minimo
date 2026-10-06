@@ -58,12 +58,12 @@ export function slideUpDownToggleDemo(){
 
     'h2 wrap: false (container must not have padding)',
     {
-      // outer container without padding and with display: block
+      // contenitore esterno senza padding e con display: block
       callback: el => {
         target2 = el;
       },
       children: [
-        // inner container with any styling
+        // contenitore interno con qualsiasi stile
         {
           attrs: {
             class: styles.slide
@@ -91,7 +91,7 @@ export function slideUpDownToggleDemo(){
 
     'h2 Starting with display none (wrap: false)',
     {
-      // outer container without padding and with display: block
+      // contenitore esterno senza padding e con display: block
       callback: el => {
         target3 = el;
       },
@@ -99,7 +99,7 @@ export function slideUpDownToggleDemo(){
         style: 'display:none'
       },
       children: [
-        // inner container with any styling
+        // contenitore interno con qualsiasi stile
         {
           attrs: {
             class: styles.slide

@@ -8,7 +8,7 @@ import * as styles from './modal-popup.module.css';
 // https://developer.mozilla.org/en-US/docs/Web/API/HTMLDialogElement
 
 
-// TODO test iframe mode
+// TODO testare la modalità iframe
 
 /** @type {HTMLDialogElement | undefined} */
 let dialogEl;
@@ -28,8 +28,8 @@ function closeDialog(el) {
 }
 
 /**
- * Wraps a single domBuilder object (not an array, not a DOM Node) into an array,
- * so `content`/`headerContent`/`footerContent` can be handled uniformly with domBuilder arrays.
+ * Racchiude in un array un singolo oggetto domBuilder (non un array, non un Node DOM),
+ * così che `content`/`headerContent`/`footerContent` possano essere gestiti in modo uniforme con gli array domBuilder.
  * @param {*} value
  * @returns {*}
  */
@@ -41,7 +41,7 @@ function normalizeContentParam(value) {
 }
 
 /**
- * @param {*} value - a non-null `content`/`headerContent`/`footerContent` value
+ * @param {*} value - un valore non nullo di `content`/`headerContent`/`footerContent`
  * @returns {'domBuilder' | 'node' | 'function' | 'html'}
  */
 function getContentKind(value) {
@@ -58,9 +58,9 @@ function getContentKind(value) {
 }
 
 /**
- * Resolves the `content`/`children` domBuilder props for a `headerContent`/`footerContent` value.
- * The `function` kind is not handled here: it is invoked separately, from the item's `callback`,
- * once the container element exists.
+ * Risolve le proprietà domBuilder `content`/`children` per un valore di `headerContent`/`footerContent`.
+ * Il tipo `function` non viene gestito qui: viene invocato separatamente, dalla `callback` dell'elemento,
+ * una volta che l'elemento contenitore esiste.
  * @param {*} value
  * @returns {{content: string | Node | null, children: DomBuilderItem[] | undefined}}
  */
@@ -77,50 +77,50 @@ function getDomBuilderContentProps(value) {
 
 /**
  * modalPopup
- * Opens a popup dialog with the given content.
+ * Apre un dialog popup con il contenuto indicato.
  *
- * Content can be provided as:
- *  - a domBuilder array, plain text, or HTML (via `content`)
- *  - content loaded via Ajax (via `ajaxUrl` and `ajaxCallback`)
- *  - an iframe (via `iframeUrl`)
+ * Il contenuto può essere fornito come:
+ *  - un array domBuilder, testo semplice o HTML (tramite `content`)
+ *  - contenuto caricato via Ajax (tramite `ajaxUrl` e `ajaxCallback`)
+ *  - un iframe (tramite `iframeUrl`)
  *
- * When multiple options conflict, the first applicable one in the list above takes precedence.
+ * Quando più opzioni sono in conflitto, ha la precedenza la prima applicabile nell'elenco qui sopra.
  *
  * @param {Object} params
- * @param {string | null} [params.dialogExtraClassName=null] - Extra class added to the dialog element. (default: null)
- * @param {string | DomBuilderItem | DomBuilderItem[] | Node | ((container: HTMLElement) => void) | null} [params.content=null] - Plain text, HTML, a domBuilder object, a domBuilder array, a DOM node (appended as-is), or a function invoked with the content container element to populate it directly (`content(dialogContentEl)`). (default: null)
- * @param {string | null} [params.contentExtraClassName=null] - Extra class added to the content wrapper. (default: null)
- * @param {HTMLElement | null} [params.triggerElement=null] - Optional element that triggered the popup; when set, `aria-haspopup`, `aria-controls` and `aria-expanded` are managed on it. (default: null)
- * @param {boolean} [params.addFocus=true] - if true, dialog receives focus after opening (default: true)
- * @param {string | null} [params.headerExtraClassName=null] - Extra class added to the header wrapper. (default: null)
- * @param {string | null} [params.footerExtraClassName=null] - Extra class added to the footer wrapper. (default: null)
- * @param {string | number | null} [params.dialogWidth=null] - optional dialog width value - if set, overrides main css custom prop (default: null)
- * @param {string | number | null} [params.dialogMinWidth=null] - optional dialog min-width value - if set, overrides main css custom prop (default: null)
- * @param {string | number | null} [params.dialogMaxWidth=null] - optional dialog max-width value - if set, overrides main css custom prop (default: null)
- * @param {string | number | null} [params.dialogHeight=null] - optional dialog height value - if set, overrides main css custom prop (default: null)
- * @param {string | number | null} [params.dialogMinHeight=null] - optional dialog min-height value - if set, overrides main css custom prop (default: null)
- * @param {string | number | null} [params.dialogMaxHeight=null] - optional dialog max-height value - if set, overrides main css custom prop (default: null)
- * @param {string | number | null} [params.dialogContentPadding=null] - optional dialog content padding value - if set, overrides main css custom prop (default: null)
- * @param {string | null} [params.iframeUrl=null] - URL to load in an iframe. (default: null)
- * @param {string | null} [params.ajaxUrl=null] - URL for Ajax content loading. (default: null)
- * @param {((el: HTMLDialogElement) => void) | null} [params.openCallback=null] - Called with the dialog element after opening, receives the dialog element (`openCallback(dialogEl)`). (default: null)
- * @param {((el: HTMLDialogElement) => void) | null} [params.closeCallback=null] - Called with the dialog element just before it is removed, receives the dialog element (`closeCallback(dialogEl)`). NB: `dialogEl` is removed immediately after closing. (default: null)
- * @param {((data: *, el: Element) => void) | null} [params.ajaxCallback=null] - Called with the Ajax response and the content element. (default: null)
- * @param {boolean} [params.addScrollbarPadding=false] - Adds right padding to compensate for the scrollbar. (default: false)
- * @param {string | DomBuilderItem | DomBuilderItem[] | Node | ((container: HTMLElement) => void) | null} [params.headerContent=null] - Header content: plain text, HTML, a domBuilder object, a domBuilder array, a DOM node, or a function invoked with the header container element to populate it directly. (default: null)
- * @param {string | DomBuilderItem | DomBuilderItem[] | Node | ((container: HTMLElement) => void) | null} [params.footerContent=null] - Footer content: same accepted types as `headerContent`, invoked with the footer container element. (default: null)
- * @returns {HTMLDialogElement} The dialog element.
+ * @param {string | null} [params.dialogExtraClassName=null] - Classe extra aggiunta all'elemento dialog (default: null)
+ * @param {string | DomBuilderItem | DomBuilderItem[] | Node | ((container: HTMLElement) => void) | null} [params.content=null] - Testo semplice, HTML, un oggetto domBuilder, un array domBuilder, un nodo DOM (aggiunto così com'è) o una funzione invocata con l'elemento contenitore del contenuto per popolarlo direttamente (`content(dialogContentEl)`) (default: null)
+ * @param {string | null} [params.contentExtraClassName=null] - Classe extra aggiunta al wrapper del contenuto (default: null)
+ * @param {HTMLElement | null} [params.triggerElement=null] - Elemento opzionale che ha attivato il popup; se impostato, su di esso vengono gestiti `aria-haspopup`, `aria-controls` e `aria-expanded` (default: null)
+ * @param {boolean} [params.addFocus=true] - se true, il dialog riceve il focus dopo l'apertura (default: true)
+ * @param {string | null} [params.headerExtraClassName=null] - Classe extra aggiunta al wrapper dell'header (default: null)
+ * @param {string | null} [params.footerExtraClassName=null] - Classe extra aggiunta al wrapper del footer (default: null)
+ * @param {string | number | null} [params.dialogWidth=null] - valore opzionale della larghezza del dialog - se impostato, sovrascrive la custom prop css principale (default: null)
+ * @param {string | number | null} [params.dialogMinWidth=null] - valore opzionale della larghezza minima del dialog - se impostato, sovrascrive la custom prop css principale (default: null)
+ * @param {string | number | null} [params.dialogMaxWidth=null] - valore opzionale della larghezza massima del dialog - se impostato, sovrascrive la custom prop css principale (default: null)
+ * @param {string | number | null} [params.dialogHeight=null] - valore opzionale dell'altezza del dialog - se impostato, sovrascrive la custom prop css principale (default: null)
+ * @param {string | number | null} [params.dialogMinHeight=null] - valore opzionale dell'altezza minima del dialog - se impostato, sovrascrive la custom prop css principale (default: null)
+ * @param {string | number | null} [params.dialogMaxHeight=null] - valore opzionale dell'altezza massima del dialog - se impostato, sovrascrive la custom prop css principale (default: null)
+ * @param {string | number | null} [params.dialogContentPadding=null] - valore opzionale del padding del contenuto del dialog - se impostato, sovrascrive la custom prop css principale (default: null)
+ * @param {string | null} [params.iframeUrl=null] - URL da caricare in un iframe (default: null)
+ * @param {string | null} [params.ajaxUrl=null] - URL per il caricamento del contenuto via Ajax (default: null)
+ * @param {((el: HTMLDialogElement) => void) | null} [params.openCallback=null] - Chiamata dopo l'apertura, riceve l'elemento dialog (`openCallback(dialogEl)`) (default: null)
+ * @param {((el: HTMLDialogElement) => void) | null} [params.closeCallback=null] - Chiamata subito prima della rimozione del dialog, riceve l'elemento dialog (`closeCallback(dialogEl)`). NB: `dialogEl` viene rimosso subito dopo la chiusura (default: null)
+ * @param {((data: *, el: Element) => void) | null} [params.ajaxCallback=null] - Chiamata con la risposta Ajax e l'elemento del contenuto (default: null)
+ * @param {boolean} [params.addScrollbarPadding=false] - Aggiunge padding destro per compensare la scrollbar (default: false)
+ * @param {string | DomBuilderItem | DomBuilderItem[] | Node | ((container: HTMLElement) => void) | null} [params.headerContent=null] - Contenuto dell'header: testo semplice, HTML, un oggetto domBuilder, un array domBuilder, un nodo DOM o una funzione invocata con l'elemento contenitore dell'header per popolarlo direttamente (default: null)
+ * @param {string | DomBuilderItem | DomBuilderItem[] | Node | ((container: HTMLElement) => void) | null} [params.footerContent=null] - Contenuto del footer: stessi tipi accettati di `headerContent`, invocata con l'elemento contenitore del footer (default: null)
+ * @returns {HTMLDialogElement} L'elemento dialog.
  */
 
 export function modalPopup({
 
-  /** dialog extra class */
+  /** classe extra del dialog */
   dialogExtraClassName = null,
 
-  /** extra classname added to dialogInner */
+  /** classe extra aggiunta a dialogInner */
   contentExtraClassName = null,
 
-  /** optional values for main custom props overriding */
+  /** valori opzionali per sovrascrivere le custom props principali */
   dialogWidth     = null,
   dialogMinWidth  = null,
   dialogMaxWidth  = null,
@@ -131,14 +131,14 @@ export function modalPopup({
 
   addFocus = true,
 
-  /** iframe url */
+  /** url dell'iframe */
   iframeUrl = null,
 
-  /** content: plain text, html, domBuilder object/array, DOM node, or function(container) */
+  /** content: testo semplice, html, oggetto/array domBuilder, nodo DOM o function(container) */
   content = null,
 
-  /** Ajax url and callback.
-   * The callback is invoked with the response data and the content container element
+  /** url e callback Ajax.
+   * La callback viene invocata con i dati della risposta e l'elemento contenitore del contenuto
    * (`ajaxCallback(data, dialogContentEl)`)
   */
   ajaxUrl = null,
@@ -146,21 +146,21 @@ export function modalPopup({
 
   openCallback = null,
   closeCallback = null,
-  addScrollbarPadding = false, // adds extra right padding to compensate for the scrollbar
+  addScrollbarPadding = false, // aggiunge padding destro extra per compensare la scrollbar
 
-  /** header content: plain text, HTML, domBuilder object/array, DOM node, or function(container) */
+  /** contenuto dell'header: testo semplice, HTML, oggetto/array domBuilder, nodo DOM o function(container) */
   headerContent = null,
 
-  /** extra classname added to header */
+  /** classe extra aggiunta all'header */
   headerExtraClassName = null,
 
-  /** footer content: plain text, HTML, domBuilder object/array, DOM node, or function(container) */
+  /** contenuto del footer: testo semplice, HTML, oggetto/array domBuilder, nodo DOM o function(container) */
   footerContent = null,
 
-  /** extra classname added to footer */
+  /** classe extra aggiunta al footer */
   footerExtraClassName = null,
 
-  /** element that triggered the popup: if set, `aria-haspopup`, `aria-controls` and `aria-expanded` are managed on it */
+  /** elemento che ha attivato il popup: se impostato, su di esso vengono gestiti `aria-haspopup`, `aria-controls` e `aria-expanded` */
   triggerElement = null,
 
 }) {
@@ -170,7 +170,7 @@ export function modalPopup({
     throw '[modalContent] parametri `content`, `ajaxUrl`/ `ajaxCallback` e `iframeUrl` mancanti';
   }
 
-  // allow a single domBuilder object (in addition to a domBuilder array) by wrapping it in an array
+  // consente un singolo oggetto domBuilder (oltre a un array domBuilder) racchiudendolo in un array
   content = normalizeContentParam(content);
   headerContent = normalizeContentParam(headerContent);
   footerContent = normalizeContentParam(footerContent);
@@ -188,10 +188,10 @@ export function modalPopup({
 
 
 
-  // capture for use in the ajax callback closure (ajaxUrl is non-null when mode === 'ajax')
+  // catturato per l'uso nella closure della callback ajax (ajaxUrl non è null quando mode === 'ajax')
   const safeAjaxUrl = /** @type {string} */ (ajaxUrl);
 
-  // fine tuning custom props
+  // regolazione fine delle custom props
   /** @type {Record<string, string | number | null>} */
   const cpropsValues = {
     dialogWidth,
@@ -221,7 +221,7 @@ export function modalPopup({
     }
   });
 
-  // ids for aria-controls (trigger → dialog) and aria-labelledby (dialog → header), generated only when needed
+  // id per aria-controls (trigger → dialog) e aria-labelledby (dialog → header), generati solo quando servono
   const dialogId = triggerElement != null ? `mpopup-${crypto.randomUUID()}` : null;
   const headerId = headerContent != null ? `mpopup-header-${crypto.randomUUID()}` : null;
 
@@ -322,19 +322,19 @@ export function modalPopup({
     }
   ], document.body);
 
-  // snapshot: dialogEl could be overwritten by a subsequent modalPopup call
+  // snapshot: dialogEl potrebbe essere sovrascritto da una successiva chiamata a modalPopup
   const thisDialog = /** @type {HTMLDialogElement} */ (dialogEl);
 
   if(openCallback) {
     openCallback(thisDialog);
   }
 
-  // close button listener
+  // listener del pulsante di chiusura
   thisDialog.querySelector(`.${styles.closeButton}`)?.addEventListener('click', () => {
     closeDialog(thisDialog);
   }, false);
 
-  // // Esc and backdrop click
+  // // Esc e click sul backdrop
   // thisDialog.addEventListener('cancel', (e) => {
   //   e.preventDefault();
   //   closeDialog(thisDialog);

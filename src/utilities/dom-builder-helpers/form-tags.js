@@ -3,17 +3,17 @@ import { randomId } from '../random-id.js';
 
 
 /**
- * Shared `.form-group` wrapper for the tag builders below: handles the
- * `condition` guard, `wrapperClass`, optional help text and `callback` in
- * one place, so each builder only needs to provide its own `children`
- * (typically the label + control).
+ * Wrapper `.form-group` condiviso dai builder di tag qui sotto: gestisce il controllo
+ * `condition`, `wrapperClass`, il testo di aiuto opzionale e `callback` in
+ * un unico punto, così che ogni builder debba fornire solo i propri `children`
+ * (tipicamente label + controllo).
  *
  * @param {Object} args
- * @param {boolean} [args.condition=true] - When false, returns `null` without building anything. (default: true)
- * @param {string | null} [args.wrapperClass=null] - optional class to be added to the `.form-group` wrapper. (default: null)
- * @param {string | HTMLElement | null} [args.help=null] - Optional help text. (default: null)
- * @param {Array<Object>} args.children - domBuilder children to render inside the `.form-group` (before the help text).
- * @returns {DomBuilderItem|null} The `.form-group` domBuilder item, or `null` when `condition` is false.
+ * @param {boolean} [args.condition=true] - Se false, restituisce `null` senza costruire nulla (default: true)
+ * @param {string | null} [args.wrapperClass=null] - classe opzionale da aggiungere al wrapper `.form-group` (default: null)
+ * @param {string | HTMLElement | null} [args.help=null] - Testo di aiuto opzionale (default: null)
+ * @param {Array<Object>} args.children - figli domBuilder da renderizzare dentro il `.form-group` (prima del testo di aiuto).
+ * @returns {DomBuilderItem|null} L'elemento domBuilder `.form-group`, oppure `null` quando `condition` è false.
  */
 function buildFormGroup({
   condition = true,
@@ -41,23 +41,23 @@ function buildFormGroup({
 
 
 /**
- * Input tag builder
+ * Builder del tag input
  *
  * @param {Object} args
- * @param {string} args.label - input label.
- * @param {string | null} args.name - input `name` attribute.
- * @param {string | null} args.id - `id` attribute.
- * @param {string | number | null} args.value - input `value` attribute.
- * @param {string | null} [args.type='text'] - input `type` attribute. (default: 'text')
- * @param {string | null} [args.wrapperClass=null] - optional class to be added to the `.form-group` wrapper. (default: null)
- * @param {string | null} [args.class=null] - optional class to be added to the `input`. (default: null)
- * @param {string | null} [args.classname=null] - Alias for `class`. (default: null)
- * @param {string | null} [args.className=null] - Alias for `class`. (default: null)
- * @param {boolean} [args.condition=true] - When false, the function returns `null` without building anything. (default: true)
- * @param {string | HTMLElement | null} args.help - Optional help text.
- * @param {(function(HTMLElement|Text): void) | null} args.callback - Optional callback function.
- * @param {Record<string, any> | null}  [args.attrs={}] - Optional attributes object. (default: {})
- * @returns {DomBuilderItem|null} The `input` domBuilder item, or `null` when `condition` is false.
+ * @param {string} args.label - label dell'input.
+ * @param {string | null} args.name - attributo `name` dell'input.
+ * @param {string | null} args.id - attributo `id`.
+ * @param {string | number | null} args.value - attributo `value` dell'input.
+ * @param {string | null} [args.type='text'] - attributo `type` dell'input (default: 'text')
+ * @param {string | null} [args.wrapperClass=null] - classe opzionale da aggiungere al wrapper `.form-group` (default: null)
+ * @param {string | null} [args.class=null] - classe opzionale da aggiungere all'`input` (default: null)
+ * @param {string | null} [args.classname=null] - Alias di `class` (default: null)
+ * @param {string | null} [args.className=null] - Alias di `class` (default: null)
+ * @param {boolean} [args.condition=true] - Se false, la funzione restituisce `null` senza costruire nulla (default: true)
+ * @param {string | HTMLElement | null} args.help - Testo di aiuto opzionale.
+ * @param {(function(HTMLElement|Text): void) | null} args.callback - Funzione callback opzionale.
+ * @param {Record<string, any> | null}  [args.attrs={}] - Oggetto di attributi opzionale (default: {})
+ * @returns {DomBuilderItem|null} L'elemento domBuilder `input`, oppure `null` quando `condition` è false.
  */
 export function buildInput({
   label,
@@ -102,27 +102,27 @@ export function buildInput({
 }
 
 /**
- * select tag builder
+ * Builder del tag select
  *
  * @param {Object} args
- * @param {string} args.label - select label.
- * @param {string | null} args.name - select `name` attribute.
- * @param {string | null} args.id - `id` attribute.
- * @param {string | number | null} args.selectedValue - selected value (note: checked against 'options' values using loose equality '=='):
+ * @param {string} args.label - label della select.
+ * @param {string | null} args.name - attributo `name` della select.
+ * @param {string | null} args.id - attributo `id`.
+ * @param {string | number | null} args.selectedValue - valore selezionato (nota: confrontato con i valori di 'options' tramite uguaglianza debole '=='):
  * @param {Array<[string|number, string]> | Array<Record<string, string>> | Record<string, string> | null} args.options -
- *    options value/text pairs, as an array of two-element `[[value, text], ...]` arrays,
- *    as an array of objects `[{somekey: value, somekey2: text},...]` objects, or as a single `{value: text, ...}` object
- * @param {boolean} [args.addEmptyOption=true] - When true, and empty option tag is added at top (default: true)
- * @param {string | null} [args.wrapperClass=null] - optional class to be added to the `.form-group` wrapper. (default: null)
- * @param {string | null} [args.class=null] - optional class to be added to the `input`. (default: null)
- * @param {string | null} [args.classname=null] - Alias for `class`. (default: null)
- * @param {string | null} [args.className=null] - Alias for `class`. (default: null)
- * @param {boolean} [args.condition=true] - When false, the function returns `null` without building anything. (default: true)
- * @param {boolean} [args.useBsClass=false] - When true, uses BS5 class (`form-select`) instead of `form-control` (default: false)
- * @param {string | HTMLElement | null} args.help - Optional help text.
- * @param {(function(HTMLElement|Text): void) | null} args.callback - Optional callback function.
- * @param {Record<string, any> | null}  [args.attrs={}] - Optional attributes object. (default: {})
- * @returns {DomBuilderItem|null} The `input` domBuilder item, or `null` when `condition` is false.
+ *    coppie valore/testo delle opzioni, come array di array a due elementi `[[value, text], ...]`,
+ *    come array di oggetti `[{somekey: value, somekey2: text},...]`, oppure come singolo oggetto `{value: text, ...}`
+ * @param {boolean} [args.addEmptyOption=true] - Se true, viene aggiunto in cima un tag option vuoto (default: true)
+ * @param {string | null} [args.wrapperClass=null] - classe opzionale da aggiungere al wrapper `.form-group` (default: null)
+ * @param {string | null} [args.class=null] - classe opzionale da aggiungere all'`input` (default: null)
+ * @param {string | null} [args.classname=null] - Alias di `class` (default: null)
+ * @param {string | null} [args.className=null] - Alias di `class` (default: null)
+ * @param {boolean} [args.condition=true] - Se false, la funzione restituisce `null` senza costruire nulla (default: true)
+ * @param {boolean} [args.useBsClass=false] - Se true, usa la classe BS5 (`form-select`) al posto di `form-control` (default: false)
+ * @param {string | HTMLElement | null} args.help - Testo di aiuto opzionale.
+ * @param {(function(HTMLElement|Text): void) | null} args.callback - Funzione callback opzionale.
+ * @param {Record<string, any> | null}  [args.attrs={}] - Oggetto di attributi opzionale (default: {})
+ * @returns {DomBuilderItem|null} L'elemento domBuilder `input`, oppure `null` quando `condition` è false.
  */
 export function buildSelect({
   label,
@@ -146,7 +146,7 @@ export function buildSelect({
 
   id = id || randomId();
 
-  // normalizing options as an array of [value, text] pairs
+  // normalizza le opzioni come array di coppie [value, text]
   /** @type {Array<[string|number, string]>} */
   let optionsList = [];
 
@@ -198,23 +198,23 @@ export function buildSelect({
 
 
 /**
- * Checkbox tag builder
+ * Builder del tag checkbox
  *
  * @param {Object} args
- * @param {string} args.label - checkbox label.
- * @param {string | null} args.name - checkbox `name` attribute.
- * @param {string | null} args.id - `id` attribute.
- * @param {string | number | null} [args.value=1] - checkbox `value` attribute. (default: 1)
- * @param {boolean} [args.checked=false] - checkbox `checked` attribute. (default: false)
- * @param {boolean} [args.switch=false] - When true, the checkbox is rendered as a switch
- *    (`.form-switch` wrapper, `role="switch"` and the native `switch` attribute). (default: false)
- * @param {string | null} [args.wrapperClass=null] - optional class to be added to the `.form-group` wrapper (used only when `addFormGroup` is true). (default: null)
- * @param {boolean} [args.addFormGroup=true] - When true, wraps the checkbox in a `.form-group` element. (default: true)
- * @param {boolean} [args.condition=true] - When false, the function returns `null` without building anything. (default: true)
- * @param {string | HTMLElement | null} args.help - Optional help text.
- * @param {(function(HTMLElement|Text): void) | null} args.callback - Optional callback function.
- * @param {Record<string, any> | null}  [args.attrs={}] - Optional attributes object. (default: {})
- * @returns {DomBuilderItem|null} The `.form-check` (or `.form-group`-wrapped) domBuilder item, or `null` when `condition` is false.
+ * @param {string} args.label - label della checkbox.
+ * @param {string | null} args.name - attributo `name` della checkbox.
+ * @param {string | null} args.id - attributo `id`.
+ * @param {string | number | null} [args.value=1] - attributo `value` della checkbox (default: 1)
+ * @param {boolean} [args.checked=false] - attributo `checked` della checkbox (default: false)
+ * @param {boolean} [args.switch=false] - Se true, la checkbox viene resa come switch
+ *    (wrapper `.form-switch`, `role="switch"` e attributo nativo `switch`) (default: false)
+ * @param {string | null} [args.wrapperClass=null] - classe opzionale da aggiungere al wrapper `.form-group` (usata solo quando `addFormGroup` è true) (default: null)
+ * @param {boolean} [args.addFormGroup=true] - Se true, racchiude la checkbox in un elemento `.form-group` (default: true)
+ * @param {boolean} [args.condition=true] - Se false, la funzione restituisce `null` senza costruire nulla (default: true)
+ * @param {string | HTMLElement | null} args.help - Testo di aiuto opzionale.
+ * @param {(function(HTMLElement|Text): void) | null} args.callback - Funzione callback opzionale.
+ * @param {Record<string, any> | null}  [args.attrs={}] - Oggetto di attributi opzionale (default: {})
+ * @returns {DomBuilderItem|null} L'elemento domBuilder `.form-check` (o racchiuso in `.form-group`), oppure `null` quando `condition` è false.
  */
 export function buildCheckbox({
   label,
@@ -236,14 +236,14 @@ export function buildCheckbox({
   }
 
   /*
-  <div class="form-group"> <- optional
+  <div class="form-group"> <- opzionale
     <div class="form-check">
       <input type="checkbox" id="..." name="..." class="form-check-input" value="1">
       <label for="..." class="form-label">...</label>
     </div>
   </div>
 
-  <div class="form-group"> <- optional
+  <div class="form-group"> <- opzionale
     <div class="form-check form-switch">
       <input class="form-check-input" type="checkbox" role="switch" switch id="my-switch">
       <label class="form-label" for="my-switch">My label</label>
@@ -265,7 +265,7 @@ export function buildCheckbox({
           value: value,
           name: name,
           checked: checked,
-          // native switch control (WebKit only for now), with the css fallback elsewhere
+          // controllo switch nativo (per ora solo WebKit), con ripiego css altrove
           ...(isSwitch? {role: 'switch', switch: ''} : {})
         },
         callback: callback
@@ -289,23 +289,23 @@ export function buildCheckbox({
 
 
 /**
- * Textarea tag builder
+ * Builder del tag textarea
  *
  * @param {Object} args
- * @param {string} args.label - textarea label.
- * @param {string | null} args.name - textarea `name` attribute.
- * @param {string | null} args.id - `id` attribute.
- * @param {string | number | null} args.value - textarea content.
- * @param {boolean} [args.autosize=true] - adds `autosize` class (default: true)
- * @param {string | null} [args.wrapperClass=null] - optional class to be added to the `.form-group` wrapper. (default: null)
- * @param {string | null} [args.class=null] - optional class to be added to the textarea element. (default: null)
- * @param {string | null} [args.classname=null] - Alias for `class`. (default: null)
- * @param {string | null} [args.className=null] - Alias for `class`. (default: null)
- * @param {boolean} [args.condition=true] - When false, the function returns `null` without building anything. (default: true)
- * @param {string | HTMLElement | null} args.help - Optional help text.
- * @param {(function(HTMLElement|Text): void) | null} args.callback - Optional callback function.
- * @param {Record<string, any> | null}  [args.attrs={}] - Optional attributes object. (default: {})
- * @returns {DomBuilderItem|null} The `textarea` domBuilder item, or `null` when `condition` is false.
+ * @param {string} args.label - label della textarea.
+ * @param {string | null} args.name - attributo `name` della textarea.
+ * @param {string | null} args.id - attributo `id`.
+ * @param {string | number | null} args.value - contenuto della textarea.
+ * @param {boolean} [args.autosize=true] - aggiunge la classe `autosize` (default: true)
+ * @param {string | null} [args.wrapperClass=null] - classe opzionale da aggiungere al wrapper `.form-group` (default: null)
+ * @param {string | null} [args.class=null] - classe opzionale da aggiungere all'elemento textarea (default: null)
+ * @param {string | null} [args.classname=null] - Alias di `class` (default: null)
+ * @param {string | null} [args.className=null] - Alias di `class` (default: null)
+ * @param {boolean} [args.condition=true] - Se false, la funzione restituisce `null` senza costruire nulla (default: true)
+ * @param {string | HTMLElement | null} args.help - Testo di aiuto opzionale.
+ * @param {(function(HTMLElement|Text): void) | null} args.callback - Funzione callback opzionale.
+ * @param {Record<string, any> | null}  [args.attrs={}] - Oggetto di attributi opzionale (default: {})
+ * @returns {DomBuilderItem|null} L'elemento domBuilder `textarea`, oppure `null` quando `condition` è false.
  */
 export function buildTextarea({
   label,
@@ -349,21 +349,21 @@ export function buildTextarea({
 }
 
 /**
- * Fake field (plain text showed as an input field)
+ * Campo finto (testo semplice mostrato come campo input)
  *
  * @param {Object} args
  * @param {string} args.label - label.
- * @param {string | number | null} args.value - text content.
- * @param {string | null} [args.wrapperClass=null] - optional class to be added to the `.form-group` wrapper. (default: null)
- * @param {boolean} [args.noBorder=true] - adds `no-border` class. (default: true)
- * @param {string | null} [args.class=null] - optional class to be added to the fake field. (default: null)
- * @param {string | null} [args.classname=null] - Alias for `class`. (default: null)
- * @param {string | null} [args.className=null] - Alias for `class`. (default: null)
- * @param {boolean} [args.condition=true] - When false, the function returns `null` without building anything. (default: true)
- * @param {string | HTMLElement | null} args.help - Optional help text.
- * @param {(function(HTMLElement|Text): void) | null} args.callback - Optional callback function.
- * @param {Record<string, any> | null}  [args.attrs={}] - Optional attributes object. (default: {})
- * @returns {DomBuilderItem|null} The fake field domBuilder item, or `null` when `condition` is false.
+ * @param {string | number | null} args.value - contenuto testuale.
+ * @param {string | null} [args.wrapperClass=null] - classe opzionale da aggiungere al wrapper `.form-group` (default: null)
+ * @param {boolean} [args.noBorder=true] - aggiunge la classe `no-border` (default: true)
+ * @param {string | null} [args.class=null] - classe opzionale da aggiungere al campo finto (default: null)
+ * @param {string | null} [args.classname=null] - Alias di `class` (default: null)
+ * @param {string | null} [args.className=null] - Alias di `class` (default: null)
+ * @param {boolean} [args.condition=true] - Se false, la funzione restituisce `null` senza costruire nulla (default: true)
+ * @param {string | HTMLElement | null} args.help - Testo di aiuto opzionale.
+ * @param {(function(HTMLElement|Text): void) | null} args.callback - Funzione callback opzionale.
+ * @param {Record<string, any> | null}  [args.attrs={}] - Oggetto di attributi opzionale (default: {})
+ * @returns {DomBuilderItem|null} L'elemento domBuilder del campo finto, oppure `null` quando `condition` è false.
  */
 export function buildFakeField({
   label,
@@ -402,20 +402,20 @@ export function buildFakeField({
 
 
 /**
- * button tag builder
+ * Builder del tag button
  *
  * @param {Object} args
- * @param {string|HTMLElement|Array<DomBuilderItem>} args.content - button content. When an array of
- *   domBuilder items is passed, it is rendered via `children` instead of `content`.
- * @param {string} [args.type=button] - button type. (default: 'button')
- * @param {string | null} args.id - `id` attribute.
- * @param {string | null} [args.class=null] - optional class to be added to the button element. (default: null)
- * @param {string | null} [args.classname=null] - Alias for `class`. (default: null)
- * @param {string | null} [args.className=null] - Alias for `class`. (default: null)
- * @param {boolean} [args.condition=true] - When false, the function returns `null` without building anything. (default: true)
- * @param {(function(HTMLElement|Text): void) | null} args.callback - Optional callback function.
- * @param {Record<string, any> | null}  [args.attrs={}] - Optional attributes object. (default: {})
- * @returns {DomBuilderItem|null} The `button` domBuilder item, or `null` when `condition` is false.
+ * @param {string|HTMLElement|Array<DomBuilderItem>} args.content - contenuto del button. Quando viene passato un array di
+ *   elementi domBuilder, viene renderizzato tramite `children` invece di `content`.
+ * @param {string} [args.type=button] - tipo del button (default: 'button')
+ * @param {string | null} args.id - attributo `id`.
+ * @param {string | null} [args.class=null] - classe opzionale da aggiungere all'elemento button (default: null)
+ * @param {string | null} [args.classname=null] - Alias di `class` (default: null)
+ * @param {string | null} [args.className=null] - Alias di `class` (default: null)
+ * @param {boolean} [args.condition=true] - Se false, la funzione restituisce `null` senza costruire nulla (default: true)
+ * @param {(function(HTMLElement|Text): void) | null} args.callback - Funzione callback opzionale.
+ * @param {Record<string, any> | null}  [args.attrs={}] - Oggetto di attributi opzionale (default: {})
+ * @returns {DomBuilderItem|null} L'elemento domBuilder `button`, oppure `null` quando `condition` è false.
  */
 export function buildButton({
   content,

@@ -2,16 +2,16 @@
 /*! minimo - Parse File Size */
 
 /**
- * Converts a file size in bytes to a human readable string,
- * using the most appropriate unit (bytes, KB, MB or GB).
+ * Converte una dimensione di file in byte in una stringa leggibile,
+ * usando l'unità più appropriata (bytes, KB, MB o GB).
  *
  * @example
  * parseFileSize(1536);      // "1.5 KB"
  * parseFileSize(10485760);  // "10 MB"
  *
- * @param {number} bytes - file size in bytes
- * @param {number} [decimals=1] - max number of decimal digits (default: 1)
- * @returns {string} formatted size (e.g. "1.5 MB")
+ * @param {number} bytes - dimensione del file in byte
+ * @param {number} [decimals=1] - numero massimo di cifre decimali (default: 1)
+ * @returns {string} dimensione formattata (es. "1.5 MB")
  */
 export function parseFileSize(bytes, decimals = 1) {
 
@@ -28,6 +28,6 @@ export function parseFileSize(bytes, decimals = 1) {
 
   const value = bytes / Math.pow(k, exp);
 
-  // \u202f = narrow no-break space
+  // \u202f = narrow no-break space (spazio sottile non separabile)
   return `${parseFloat(value.toFixed(decimals))}\u202f${units[exp]}`;
 }

@@ -1,8 +1,8 @@
 /*! minimo - Disable Buttons On Submit */
 /**
- * Disables all `[type=submit]` and `[type=button]` buttons on form submit.
+ * Disabilita tutti i pulsanti `[type=submit]` e `[type=button]` al submit del form.
  *
- * Applies to all `<form>` elements in the document except those with
+ * Si applica a tutti gli elementi `<form>` del documento, tranne quelli con
  * `data-disable-submit="false"`.
  *
  * @returns {void}

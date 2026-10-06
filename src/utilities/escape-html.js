@@ -14,14 +14,14 @@ const ESCAPE_RE = /[&"'<>]/g;
 const UNESCAPE_RE = /&amp;|&quot;|&#039;|&lt;|&gt;/g;
 
 /**
- * Escapes special HTML characters in a string.
+ * Esegue l'escape dei caratteri HTML speciali di una stringa.
  * @param {string | null | undefined} str
  * @returns {string}
  */
 export const escapeHTML = str => str?.replace(ESCAPE_RE, m => ESCAPE_MAP[m]) ?? '';
 
 /**
- * Unescapes HTML entities back to their original characters.
+ * Riconverte le entità HTML nei caratteri originali.
  * @param {string | null | undefined} str
  * @returns {string}
  */

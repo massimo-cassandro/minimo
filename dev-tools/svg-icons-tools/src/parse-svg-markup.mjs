@@ -14,7 +14,7 @@ export function parseSvgMarkup(filepath, svg_type, custom_svgo_config = null) {
     svgString = svgString.replace(pallet, '');
   });
 
-  // if present, custom_svgo_config ovverrides cfg.svgo_config
+  // se presente, custom_svgo_config sovrascrive cfg.svgo_config
   const optimized = optimize(svgString, custom_svgo_config? custom_svgo_config : cfg.svgo_config),
     icon_type_class = svg_type? cfg.icon_type_class?.[svg_type]?? null : null,
     classes = icon_type_class? [icon_type_class] : [];
@@ -57,12 +57,12 @@ export function parseSvgMarkup(filepath, svg_type, custom_svgo_config = null) {
   }
 
 
-  // extra classes are immediately assigned to the optimized svg markup
+  // le classi extra vengono assegnate subito al markup svg ottimizzato
   if(classes.length) {
     optimized.data = optimized.data.replace(/<svg/, `<svg class="${classes.join(' ')}"`);
   }
 
-  // get svg content
+  // ricava il contenuto svg
   const svg_content = optimized.data.match(/<svg(?:.*?)>(.*?)<\/svg>/mi)[1];
 
   return {
@@ -70,6 +70,6 @@ export function parseSvgMarkup(filepath, svg_type, custom_svgo_config = null) {
     viewbox: viewbox,
     svg_content: svg_content,
     classes: classes,
-    icon_type: svg_type // fill or stroke
+    icon_type: svg_type // fill o stroke
   };
 }

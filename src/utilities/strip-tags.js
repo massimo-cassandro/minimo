@@ -1,6 +1,6 @@
 /*! minimo - Strip Tags */
 /**
- * Strips HTML tags from a string.
+ * Rimuove i tag HTML da una stringa.
  * @param {string | null | undefined} str
  * @returns {string}
  */

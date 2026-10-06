@@ -142,7 +142,7 @@ const config = {
     compress: true,
     hot: true,
     port: 5701,
-    // fake server-side endpoint for the json-table demo (`/demo-api/json-table`)
+    // endpoint server-side fittizio per la demo di json-table (`/demo-api/json-table`)
     setupMiddlewares: (middlewares, devServer) => {
       devServer.app.use(jsonTableDevApi);
       return middlewares;
@@ -214,7 +214,7 @@ const config = {
       inject: 'body',
       // title: 'Buttons Demo',
       minify: !isDevelopment,
-      // NB: The base tag doesn't seem to work well with hash routes on GitHub pages.
+      // NB: il tag base non sembra funzionare bene con le hash route su GitHub Pages.
       // base: isDevelopment ? '/' : '/minimo/',
 
     }),

@@ -1,37 +1,39 @@
-// build-tokens-src/token-rename-parser.mjs
-// Implements the `transform` feature end-to-end (see source-transforms.mjs):
-//
-// 1. A Style Dictionary PARSER that moves/renames token nodes within a
-//    source file's own tree, according to the `transform` map registered for
-//    that file, BEFORE Style Dictionary merges files together and resolves
-//    {references}.
-// 2. A Style Dictionary PREPROCESSOR that, once every file has been parsed
-//    and merged into a single tree (but still before {references} are
-//    resolved), rewrites every {reference} in the WHOLE tree that points to
-//    one of the renamed tokens' OLD path, to its NEW path — so a reference
-//    doesn't have to be hunted down and updated by hand just because the
-//    token it points to was moved (in the same file or a completely
-//    different one; see getAllRenames() in source-transforms.mjs for why
-//    this is safe to do tree-wide).
-//
-// Only the exact concrete files that declare a `transform` are matched by
-// the parser (the `pattern` built by transformedFilesPattern() in
-// source-transforms.mjs); every other file is untouched by it and falls
-// through to Style Dictionary's own built-in loader, or to the legacy bridge
-// parser (legacy-tokens-parser.mjs) for plain .json sources. The
-// preprocessor, instead, always runs over the entire merged tree once
-// registered — it just has nothing to rewrite where no reference matches a
-// renamed path.
-//
-// Style Dictionary's combineJSON always reads a source file's `contents` as
-// raw text and hands it to whichever parser(s) match, regardless of
-// extension (see node_modules/style-dictionary/lib/utils/combineJSON.js) — a
-// custom parser never receives an already-executed .mjs module or an
-// already-JSON5-parsed object. The parser therefore has to load the file
-// itself the same way Style Dictionary's own loader (loadFile.js) would:
-// dynamic `import()` for .mjs/.js, JSON5 for .jsonc/.json5, and the existing
-// legacy-or-DTCG bridge (parseLegacyFile, reused as-is so hybrid-node
-// handling stays consistent) for .json.
+/*
+  build-tokens-src/token-rename-parser.mjs
+  Implementa la funzionalità `transform` end-to-end (vedi source-transforms.mjs):
+
+  1. Un PARSER di Style Dictionary che sposta/rinomina i nodi dei token nell'albero
+     di un file sorgente, in base alla mappa `transform` registrata per
+     quel file, PRIMA che Style Dictionary unisca i file e risolva i
+     {riferimenti}.
+  2. Un PREPROCESSOR di Style Dictionary che, una volta che ogni file è stato letto
+     e unito in un unico albero (ma sempre prima che i {riferimenti} vengano
+     risolti), riscrive ogni {riferimento} nell'INTERO albero che punta al
+     VECCHIO percorso di uno dei token rinominati, col suo NUOVO percorso — così che un riferimento
+     non debba essere cercato e aggiornato a mano solo perché il
+     token a cui punta è stato spostato (nello stesso file o in uno completamente
+     diverso; vedi getAllRenames() in source-transforms.mjs per capire perché
+     farlo su tutto l'albero è sicuro).
+
+  Il parser considera solo i file concreti esatti che dichiarano un `transform` (il
+  `pattern` costruito da transformedFilesPattern() in
+  source-transforms.mjs); ogni altro file non viene toccato e passa
+  al loader integrato di Style Dictionary, oppure al parser bridge legacy
+  (legacy-tokens-parser.mjs) per i semplici sorgenti .json. Il
+  preprocessor, invece, una volta registrato viene sempre eseguito sull'intero albero unito
+  — semplicemente non ha nulla da riscrivere dove nessun riferimento corrisponde a un
+  percorso rinominato.
+
+  combineJSON di Style Dictionary legge sempre il `contents` di un file sorgente come
+  testo grezzo e lo passa ai parser che corrispondono, indipendentemente dall'
+  estensione (vedi node_modules/style-dictionary/lib/utils/combineJSON.js) — un
+  parser personalizzato non riceve mai un modulo .mjs già eseguito né un oggetto
+  già letto come JSON5. Il parser deve quindi caricare il file da sé, nello stesso modo
+  del loader di Style Dictionary (loadFile.js):
+  `import()` dinamico per .mjs/.js, JSON5 per .jsonc/.json5, e il bridge
+  legacy-o-DTCG esistente (parseLegacyFile, riutilizzato così com'è perché la gestione dei
+  nodi ibridi resti coerente) per .json.
+*/
 
 import StyleDictionary from 'style-dictionary';
 import JSON5 from 'json5';
@@ -53,9 +55,11 @@ const getAtPath = (tree, pathSegments) => pathSegments.reduce(
   tree
 );
 
-// Removes the node at pathSegments (mutates tree), pruning parent groups left
-// empty by the removal (innermost first), so a fully-emptied group doesn't
-// linger as `{}` in the output tree.
+/*
+  Rimuove il nodo in pathSegments (modifica tree), potando i gruppi padre rimasti
+  vuoti dopo la rimozione (dal più interno), così che un gruppo svuotato del tutto non
+  resti come `{}` nell'albero di output.
+*/
 /** @param {Record<string, unknown>} tree @param {string[]} pathSegments */
 const deleteAtPath = (tree, pathSegments) => {
   if (pathSegments.length === 0) return;
@@ -81,8 +85,8 @@ const deleteAtPath = (tree, pathSegments) => {
   }
 };
 
-// Inserts `value` at pathSegments (mutates tree), creating intermediate
-// group objects as needed.
+// Inserisce `value` in pathSegments (modifica tree), creando i gruppi
+// intermedi necessari.
 /** @param {Record<string, unknown>} tree @param {string[]} pathSegments @param {unknown} value */
 const setAtPath = (tree, pathSegments, value) => {
   let node = tree;
@@ -94,25 +98,27 @@ const setAtPath = (tree, pathSegments, value) => {
   node[pathSegments[pathSegments.length - 1]] = value;
 };
 
-// A build can create several StyleDictionary instances over the same source
-// file (e.g. one throwaway pass to enumerate concrete file paths, one for the
-// real build — see build-tokens.mjs), each re-running this parser. Tracked so
-// a missing source key is only ever warned about once per process, instead of
-// once per pass.
+/*
+  Una build può creare più istanze di StyleDictionary sullo stesso file
+  sorgente (ad es. un passaggio usa e getta per enumerare i percorsi concreti dei file, uno per la
+  build vera — vedi build-tokens.mjs), ognuna delle quali riesegue questo parser. Viene tracciato
+  così che una chiave sorgente mancante venga segnalata una sola volta per processo, invece che
+  una volta per passaggio.
+*/
 /** @type {Set<string>} */
 const warnedMissingKeys = new Set();
 
 /**
- * Applies a rename map to a parsed DTCG tree: moves each mapped source path's
- * node to its destination path. Two phases (collect+delete, then insert) so
- * that a destination path used by one entry and a source path used by
- * another never interfere with each other depending on map order. A source
- * key not found in the tree only produces a console warning — it does not
- * fail the build, since a project config may target a key that's only
- * sometimes present.
+ * Applica una mappa di rinomina a un albero DTCG già letto: sposta il nodo di ogni percorso
+ * sorgente mappato verso il suo percorso di destinazione. Due fasi (raccolta+eliminazione, poi
+ * inserimento) così che un percorso di destinazione usato da una voce e un percorso
+ * sorgente usato da un'altra non interferiscano mai tra loro in base all'ordine della mappa. Una chiave
+ * sorgente non trovata nell'albero produce solo un warning in console — non
+ * fa fallire la build, dato che la config di un progetto può puntare a una chiave presente
+ * solo a volte.
  * @param {unknown} tree
  * @param {Record<string,string>} renameMap  dot-path -> dot-path
- * @param {string} filePath  only used for the warning message
+ * @param {string} filePath  usato solo per il messaggio di warning
  * @returns {unknown}
  */
 export const applyTokenRenameMap = (tree, renameMap, filePath) => {
@@ -153,9 +159,11 @@ const loadTree = async (filePath) => {
     try {
       return structuredClone(mod.default);
     } catch {
-      // Cloning may fail for content with non-cloneable values (e.g.
-      // functions) — fall back to the live module object, same as Style
-      // Dictionary's own loadFile.js.
+      /*
+        La clonazione può fallire per contenuti con valori non clonabili (ad es.
+        funzioni) — ripiega sull'oggetto modulo attivo, come il loadFile.js
+        di Style Dictionary.
+      */
       return mod.default;
     }
   }
@@ -163,21 +171,23 @@ const loadTree = async (filePath) => {
   const contents = await readFile(filePath, 'utf-8');
 
   if (ext === '.json') {
-    // Reuses the legacy-or-DTCG bridge so hybrid-node conversion stays
-    // consistent with every other .json source in the project.
+    // Riutilizza il bridge legacy-o-DTCG così che la conversione dei nodi ibridi resti
+    // coerente con ogni altra sorgente .json del progetto.
     return parseLegacyFile(contents, filePath);
   }
 
-  // .jsonc, .json5, or anything else: the same JSON5 parsing Style
-  // Dictionary's own built-in loader uses for these extensions.
+  // .jsonc, .json5 o qualsiasi altro: lo stesso parsing JSON5 che il loader integrato di
+  // Style Dictionary usa per queste estensioni.
   return JSON5.parse(contents);
 };
 
-// Registers the parser globally on the StyleDictionary class. To actually
-// run it, a Style Dictionary instance must also opt in via
-// `parsers: [..., TOKEN_RENAME_PARSER_NAME]` (see build-tokens.mjs,
-// build-source-modes.mjs, check-unresolved-custom-props.mjs) — same
-// activation model as the legacy bridge parser.
+/*
+  Registra il parser globalmente sulla classe StyleDictionary. Per eseguirlo
+  effettivamente, un'istanza di Style Dictionary deve anche aderire tramite
+  `parsers: [..., TOKEN_RENAME_PARSER_NAME]` (vedi build-tokens.mjs,
+  build-source-modes.mjs, check-unresolved-custom-props.mjs) — stesso
+  modello di attivazione del parser bridge legacy.
+*/
 /** @param {RegExp} pattern  from transformedFilesPattern() in source-transforms.mjs */
 export const registerTokenRenameParser = (pattern) => {
   StyleDictionary.registerParser({
@@ -191,19 +201,20 @@ export const registerTokenRenameParser = (pattern) => {
   });
 };
 
-// ── Reference rewriting (preprocessor) ──────────────────────────────────────
-//
-// Matches a bare {reference} (not a CSS function containing one, e.g.
-// "color-mix(in srgb, {primary} 60%, #000)" still matches the {primary} part
-// only) — same pattern style as LEGACY_REF in legacy-tokens-parser.mjs.
+// ── Riscrittura dei riferimenti (preprocessor) ──────────────────────────────────────
+/*
+  Corrisponde a un semplice {riferimento} (non a una funzione CSS che ne contiene uno, ad es.
+  "color-mix(in srgb, {primary} 60%, #000)" corrisponde comunque solo alla parte {primary}) —
+  stesso stile di pattern di LEGACY_REF in legacy-tokens-parser.mjs.
+*/
 const REF = /\{([^}]+)\}/g;
 
 /**
- * Replaces every {reference} in `value` (a token's $value, possibly nested —
- * composite/shadow/gradient objects, arrays) whose dot-path exactly matches a
- * "from" key of `renames`, with `{<to>}`. References that don't match any
- * renamed key (including partial/longer paths, e.g. {primary.200} when only
- * "primary" was renamed) are left untouched.
+ * Sostituisce ogni {riferimento} in `value` (il $value di un token, eventualmente annidato —
+ * oggetti/array composite/shadow/gradient) il cui dot-path corrisponde esattamente a una
+ * chiave "from" di `renames`, con `{<to>}`. I riferimenti che non corrispondono a nessuna
+ * chiave rinominata (inclusi i percorsi parziali/più lunghi, ad es. {primary.200} quando è stata
+ * rinominata solo "primary") restano intatti.
  * @param {unknown} value
  * @param {Map<string,string>} renames
  * @returns {unknown}
@@ -220,11 +231,11 @@ const rewriteRefs = (value, renames) => {
 };
 
 /**
- * Walks the merged token tree (every source file, already combined by Style
- * Dictionary — see StyleDictionary.js's `preprocess()` call site) and, for
- * every leaf token (a node with `$value`), rewrites {references} in its
- * `$value` only — never touching `$type`, `filePath`, `isSource` or any other
- * metadata Style Dictionary attaches to the node.
+ * Percorre l'albero di token unito (ogni file sorgente, già combinato da Style
+ * Dictionary — vedi il punto di chiamata di `preprocess()` in StyleDictionary.js) e, per
+ * ogni token foglia (un nodo con `$value`), riscrive i {riferimenti} nel suo
+ * solo `$value` — senza mai toccare `$type`, `filePath`, `isSource` o qualsiasi altro
+ * metadato che Style Dictionary attacca al nodo.
  * @param {unknown} node
  * @param {Map<string,string>} renames
  * @returns {unknown}
@@ -239,13 +250,15 @@ const rewriteTreeRefs = (node, renames) => {
   );
 };
 
-// Registers the preprocessor globally. To actually run it, a Style
-// Dictionary instance must also opt in via
-// `preprocessors: [TOKEN_RENAME_PREPROCESSOR_NAME]` (see build-tokens.mjs,
-// build-source-modes.mjs, check-unresolved-custom-props.mjs). A no-op
-// (returns the tree unchanged) when getAllRenames() is empty — e.g. every
-// registered transform turned out to be file-ambiguous (see
-// registerSourceTransforms() in source-transforms.mjs).
+/*
+  Registra il preprocessor globalmente. Per eseguirlo effettivamente, un'istanza di
+  Style Dictionary deve anche aderire tramite
+  `preprocessors: [TOKEN_RENAME_PREPROCESSOR_NAME]` (vedi build-tokens.mjs,
+  build-source-modes.mjs, check-unresolved-custom-props.mjs). È un no-op
+  (restituisce l'albero invariato) quando getAllRenames() è vuoto — ad es. quando ogni
+  transform registrata si è rivelata ambigua tra file (vedi
+  registerSourceTransforms() in source-transforms.mjs).
+*/
 export const registerTokenRenamePreprocessor = () => {
   StyleDictionary.registerPreprocessor({
     name: TOKEN_RENAME_PREPROCESSOR_NAME,

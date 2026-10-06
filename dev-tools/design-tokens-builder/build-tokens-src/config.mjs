@@ -1,10 +1,12 @@
 /// <reference types="node" />
-// build-tokens-src/config.mjs
-// Reads the --config flag from argv, imports the project config file,
-// resolves all paths and exports them for build-tokens.mjs.
-//
-// Keeping this logic separate from the entry point makes it easier to test
-// and reuse in other scripts.
+/*
+  build-tokens-src/config.mjs
+  Legge il flag --config da argv, importa il file di configurazione del progetto,
+  risolve tutti i percorsi e li esporta per build-tokens.mjs.
+
+  Tenere questa logica separata dal punto di ingresso ne facilita il test
+  e il riutilizzo in altri script.
+*/
 
 /* globals process */
 
@@ -13,7 +15,7 @@ import { pathToFileURL } from 'node:url';
 import { splitSourceEntries } from './source-prefixes.mjs';
 
 // ---------------------------------------------------------------------------
-// Read the --config flag
+// Legge il flag --config
 // ---------------------------------------------------------------------------
 const args = process.argv.slice(2);
 const configFlagIndex = args.indexOf('--config');
@@ -31,64 +33,74 @@ export const configAbsPath = path.resolve(process.cwd(), configArgPath);
 export const configDir     = path.dirname(configAbsPath);
 
 // ---------------------------------------------------------------------------
-// Import the project config
+// Importa la config del progetto
 // ---------------------------------------------------------------------------
 const buildConfig = (await import(pathToFileURL(configAbsPath).href)).default;
 
-// Helper: resolves a path relative to the config directory.
-// Leaves already-absolute paths untouched.
+// Helper: risolve un percorso relativo alla directory della config.
+// Lascia invariati i percorsi già assoluti.
 /** @param {string} p */
 const resolveFromConfig = (p) => path.resolve(configDir, p);
 
 // ---------------------------------------------------------------------------
-// Path resolution
+// Risoluzione dei percorsi
 // ---------------------------------------------------------------------------
 
-// CSS output
+// Output CSS
 export const buildPath = resolveFromConfig(buildConfig.buildPath);
 export const destFile  = buildConfig.destFile;
 
 // Stylelint
 export const stylelintConfigPath = resolveFromConfig(buildConfig.stylelintConfigPath);
 
-// JSON — platform is active only if jsonBuildPath is set in the config
+// JSON — la platform è attiva solo se jsonBuildPath è impostato nella config
 const jsonBuildPathRaw = buildConfig.jsonBuildPath ?? null;
 export const jsonBuildPath = jsonBuildPathRaw ? resolveFromConfig(jsonBuildPathRaw) : null;
 
-// jsonDestFile: base name (no extension) for the aggregated output file.
-// null  → one file per source (mirrors the source structure)
-// string → single aggregated file (e.g. 'tokens' → 'tokens.jsonc')
-// The extension is added automatically based on jsonFormat.
+/*
+  jsonDestFile: nome base (senza estensione) del file aggregato di output.
+  null  → un file per sorgente (replica la struttura dei sorgenti)
+  string → singolo file aggregato (ad es. 'tokens' → 'tokens.jsonc')
+  L'estensione viene aggiunta automaticamente in base a jsonFormat.
+*/
 export const jsonDestFile = buildConfig.jsonDestFile ?? null;
 
-// jsonFormat: controls output format for the generated JSON token files.
-// 'jsonc' → .jsonc extension + generated-file disclaimer header
-// 'json'  → plain .json, no disclaimer
-// Any value other than 'jsonc' is normalised to 'json'.
+/*
+  jsonFormat: controlla il formato di output dei file JSON dei token generati.
+  'jsonc' → estensione .jsonc + intestazione che segnala il file generato
+  'json'  → .json semplice, senza intestazione
+  Qualsiasi valore diverso da 'jsonc' viene normalizzato a 'json'.
+*/
 export const jsonFormat = buildConfig.jsonFormat === 'jsonc' ? 'jsonc' : 'json';
 
-// jsonExpression: controls how math expressions in dimension token values are handled.
-//   'keep'    (default) — write the expression as-is
-//   'calc'    — wrap in CSS calc()
-//   'resolve' — evaluate numerically; unit inherited from the first referenced token
+/*
+  jsonExpression: controlla come vengono gestite le espressioni matematiche nei valori dei token dimension.
+    'keep'    (default) — scrive l'espressione così com'è
+    'calc'    — la racchiude in calc() CSS
+    'resolve' — la valuta numericamente; unità ereditata dal primo token referenziato
+*/
 const VALID_EXPR_MODES = ['keep', 'calc', 'resolve'];
 export const jsonExpression = VALID_EXPR_MODES.includes(buildConfig.jsonExpression)
   ? buildConfig.jsonExpression
   : 'resolve';
 
-// pxToRem: if true (default), dimension token values expressed in px are
-// converted to rem in the generated CSS (see the size/pxToRem-smart
-// transform in build-tokens-src/transforms.mjs). Values in other units
-// (em, %, vh, dvw, ...) are never touched regardless of this option.
+/*
+  pxToRem: se true (default), i valori dei token dimension espressi in px vengono
+  convertiti in rem nel CSS generato (vedi la transform size/pxToRem-smart
+  in build-tokens-src/transforms.mjs). I valori in altre unità
+  (em, %, vh, dvw, ...) non vengono mai toccati, indipendentemente da questa opzione.
+*/
 export const pxToRem = buildConfig.pxToRem !== false;
 
-// mergeCustomProps: if true, custom properties already present in the CSS
-// destination file take priority over the ones generated by this build (see
-// build-tokens-src/merge-css.mjs). It can also be an array of strings/RegExps:
-// only the properties generated by the token source files matching one of its
-// entries are merged. An empty or invalid array means false. Explicit false
-// disables the merge entirely (the destination file is fully regenerated).
-// Default: true (i.e. when the key is left unset).
+/*
+  mergeCustomProps: se true, le custom properties già presenti nel file CSS di
+  destinazione hanno priorità su quelle generate da questa build (vedi
+  build-tokens-src/merge-css.mjs). Può essere anche un array di stringhe/RegExp:
+  vengono unite solo le proprietà generate dai file token sorgente che corrispondono a una
+  delle sue voci. Un array vuoto o non valido equivale a false. false esplicito
+  disattiva del tutto il merge (il file di destinazione viene rigenerato completamente).
+  Default: true (cioè quando la chiave non è impostata).
+*/
 /** @type {boolean|(string|RegExp)[]} */
 export const mergeCustomProps = (() => {
   const value = buildConfig.mergeCustomProps;
@@ -101,63 +113,73 @@ export const mergeCustomProps = (() => {
   return false;
 })();
 
-// addLayer: wraps the generated custom properties inside a CSS `@layer`
-// at-rule (see formats/css.mjs), e.g. `@layer project { :root { ... } }`.
-// Set to null, undefined or false (default) to emit no layer.
+/*
+  addLayer: racchiude le custom properties generate in una at-rule CSS `@layer`
+  (vedi formats/css.mjs), ad es. `@layer project { :root { ... } }`.
+  Impostare a null, undefined o false (default) per non emettere alcun layer.
+*/
 export const addLayer = buildConfig.addLayer ? String(buildConfig.addLayer).trim() : null;
 
-// customPropsSelector: CSS selector wrapping the generated custom properties
-// block(s) (see formats/css.mjs buildCssBlock()), instead of the default
-// `:root`. Applies uniformly to a single-source build and to a sourceModes
-// build (the base mode's top-level block and every other mode's block
-// nested under its own `@media (prefers-color-scheme: <mode>)` rule all use
-// the same selector). Falsy or blank values fall back to ':root'.
+/*
+  customPropsSelector: selettore CSS che racchiude i blocchi di custom properties
+  generati (vedi formats/css.mjs buildCssBlock()), al posto del default
+  `:root`. Si applica in modo uniforme a una build a sorgente singola e a una build
+  con sourceModes (il blocco di primo livello della modalità base e il blocco di ogni altra modalità,
+  annidato nella propria regola `@media (prefers-color-scheme: <modalità>)`, usano
+  lo stesso selettore). Valori falsy o vuoti ripiegano su ':root'.
+*/
 export const customPropsSelector = typeof buildConfig.customPropsSelector === 'string'
   && buildConfig.customPropsSelector.trim()
   ? buildConfig.customPropsSelector.trim()
   : ':root';
 
-// useLightDarkFunc: with sourceModes set (see below) and defining both a
-// `light` and a `dark` key, custom properties present in both are written
-// once as `--name: light-dark(<light>, <dark>);` instead of being split
-// across the base mode's block and a
-// `@media (prefers-color-scheme: dark) { ... }` rule (see light-dark.mjs).
-// Ignored when sourceModes is not set, or does not define both a light and a
-// dark mode. Default: true.
+/*
+  useLightDarkFunc: con sourceModes impostato (vedi sotto) e che definisce sia una
+  chiave `light` sia una `dark`, le custom properties presenti in entrambe vengono scritte
+  una sola volta come `--name: light-dark(<light>, <dark>);` invece di essere divise
+  tra il blocco della modalità base e una regola
+  `@media (prefers-color-scheme: dark) { ... }` (vedi light-dark.mjs).
+  Ignorata quando sourceModes non è impostato o non definisce sia una modalità light sia una
+  dark. Default: true.
+*/
 export const useLightDarkFunc = buildConfig.useLightDarkFunc !== false;
 
-// customPropsGroups: custom properties whose first hyphen-separated name
-// segment matches one of a group's prefixes are pulled out, labelled with
-// that group's name and moved to the beginning of the generated CSS file, in
-// group-list order (see formats/css.mjs). Each entry: { name, prefixes }.
-// Default: [].
+/*
+  customPropsGroups: le custom properties il cui primo segmento del nome (separato
+  da trattini) corrisponde a uno dei prefissi di un gruppo vengono estratte, etichettate con
+  il nome del gruppo e spostate all'inizio del file CSS generato, nell'ordine
+  dell'elenco dei gruppi (vedi formats/css.mjs). Ogni voce: { name, prefixes }.
+  Default: [].
+*/
 export const customPropsGroups = Array.isArray(buildConfig.customPropsGroups)
   ? buildConfig.customPropsGroups
   : [];
 
-// ---------------------------------------------------------------------------
-// Source: resolve patterns relative to the config directory and normalise to
-// forward-slash absolute paths (fast-glob, used internally by Style Dictionary,
-// requires forward slashes even on Windows). See resolve-source-paths.mjs.
-//
-// WARNING: in the project config file, avoid building glob patterns with
-// path.join() — it may corrupt the pattern syntax. Use template literals:
-//   OK:  `${minimo_path}/**/*.{json,mjs}`
-//   NO:  path.join(minimo_path, '/**/*.{json,mjs}')
-//
-// sourceModes: alternative to `source`, for a light/dark (or other) custom
-// properties split — see build-tokens-src/build-source-modes.mjs. When set
-// (buildConfig.sourceModes is a non-null object), `source` is ignored and
-// each mode's own array of source patterns is resolved the same way.
-//
-// Entries of `source` / of each mode can also be `{ src, prefix, transform }`
-// objects, to render the custom properties of those files with a prefix
-// (see source-prefixes.mjs) and/or to rename token nodes within those files
-// (see source-transforms.mjs). They are flattened here into plain patterns
-// for Style Dictionary; the prefixed/transformed ones are also collected in
-// `prefixedSources`/`transformedSources`, to be registered by
-// build-tokens.mjs.
-// ---------------------------------------------------------------------------
+/*
+  ---------------------------------------------------------------------------
+  Source: risolve i pattern relativi alla directory della config e li normalizza in
+  percorsi assoluti con forward slash (fast-glob, usato internamente da Style Dictionary,
+  richiede i forward slash anche su Windows). Vedi resolve-source-paths.mjs.
+
+  ATTENZIONE: nel file di configurazione del progetto, evitare di costruire i pattern glob con
+  path.join() — può corrompere la sintassi del pattern. Usare i template literal:
+    OK:  `${minimo_path}/**\/*.{json,mjs}`
+    NO:  path.join(minimo_path, '/**\/*.{json,mjs}')
+
+  sourceModes: alternativa a `source`, per una suddivisione light/dark (o altra) delle
+  custom properties — vedi build-tokens-src/build-source-modes.mjs. Quando è impostato
+  (buildConfig.sourceModes è un oggetto non null), `source` viene ignorato e
+  l'array di pattern sorgente di ogni modalità viene risolto allo stesso modo.
+
+  Le voci di `source` / di ogni modalità possono essere anche oggetti `{ src, prefix, transform }`,
+  per rendere le custom properties di quei file con un prefisso
+  (vedi source-prefixes.mjs) e/o per rinominare i nodi dei token al loro interno
+  (vedi source-transforms.mjs). Qui vengono appiattite in semplici pattern
+  per Style Dictionary; quelle con prefisso/transform vengono raccolte anche in
+  `prefixedSources`/`transformedSources`, da registrare in
+  build-tokens.mjs.
+  ---------------------------------------------------------------------------
+*/
 const sourceModesRaw = buildConfig.sourceModes ?? null;
 
 /** @type {import('./source-prefixes.mjs').PrefixedSource[]} */
@@ -186,11 +208,13 @@ export const sourceModes = sourceModesRaw
   )
   : null;
 
-// sourceModesBase: the mode whose declarations are written to the top-level
-// `:root { ... }` block (the others are nested under
-// `@media (prefers-color-scheme: <mode>) { ... }`). Default: the first key
-// of sourceModes (insertion order), e.g. 'light'. Ignored when sourceModes
-// is not set.
+/*
+  sourceModesBase: la modalità le cui dichiarazioni vengono scritte nel blocco
+  `:root { ... }` di primo livello (le altre sono annidate in
+  `@media (prefers-color-scheme: <modalità>) { ... }`). Default: la prima chiave
+  di sourceModes (ordine di inserimento), ad es. 'light'. Ignorata quando sourceModes
+  non è impostato.
+*/
 export const sourceModesBase = sourceModes
   ? (Object.prototype.hasOwnProperty.call(sourceModes, buildConfig.sourceModesBase)
     ? buildConfig.sourceModesBase

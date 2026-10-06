@@ -1,4 +1,4 @@
-/* decomment if you want to use layers. see https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/At-rules/@layer */
+/* decommentare per usare i layer. Vedi https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/At-rules/@layer */
 /* @layer reset, base, components, utilities, project, overrides; */
 
 @import '@minimoSrc/css/reset.css';
@@ -36,13 +36,13 @@
 @import '@minimoSrc/css/sizes.css';
 @import '@minimoSrc/css/display.css';
 @import '@minimoSrc/css/margin-padding.css';
-/* @import '@minimoSrc/css/margin-padding-media.css';  responsive version */
+/* @import '@minimoSrc/css/margin-padding-media.css';  versione responsive */
 
 @import '@minimoSrc/css/overflow.css';
 @import '@minimoSrc/css/position.css';
 @import '@minimoSrc/css/visibility.css';
 
 
-/* spinner: include the css of the choosen spinner only */
+/* spinner: includere solo il css dello spinner scelto */
 @import '@minimoSrc/components/spinner/spinner-circle-basic.css';
 

@@ -1,75 +1,79 @@
-// build-tokens-src/legacy-tokens-parser.mjs
-// Registers a Style Dictionary parser that bridges "legacy" token files
-// (Style Dictionary v3/v4-style syntax: no `$` prefix on `value`/`type`,
-// references written as `{group.token.value}`) into the W3C DTCG syntax
-// (`$value`/`$type`, references as `{group.token}`) required by Style
-// Dictionary v5.
-//
-// Why this is needed: Style Dictionary v5 decides whether a build "usesDtcg"
-// ONCE per build, from whichever source file is processed first (see
-// detectDtcgSyntax() called inside combineJSON.js in style-dictionary) — it
-// is a single global flag, not a per-file check. Mixing a legacy-syntax file
-// (e.g. a file exported from Open Props, or from an old Style Dictionary
-// v3/v4 project) together with DTCG sources therefore causes the legacy
-// file's tokens to be silently dropped regardless of file order: they never
-// carry the `$value` key combineJSON's own tagging (and the rest of the
-// pipeline) expects.
-//
-// This parser intercepts every `.json` source file (not `.jsonc` — that
-// extension is reserved in this project for hand-authored DTCG sources,
-// already handled correctly by Style Dictionary's own built-in loader) and
-// converts, node by node:
-//   value -> $value, type -> $type, comment/description -> $description
-//   "{group.token.value}" -> "{group.token}" inside reference strings
-// Nodes that already use `$value` (DTCG v5 syntax) are left untouched, so
-// the parser is a safe no-op for files that don't need conversion — no
-// config flag or file list is required, detection is fully automatic.
-//
-// "Hybrid" nodes (a token with its own value that is also a group with
-// nested children, e.g. Open Props' other.ease.out) can't be represented in
-// DTCG v5, where a node with $value is a leaf. The own value is moved to a
-// child token named `default` (or `base` if `default` is already a child
-// name; the build fails if both are taken) — see collectHybridNodes().
-//
-// Limitation: `.json` files handled by this parser are parsed with plain
-// JSON.parse (no comments, no trailing commas), unlike Style Dictionary's
-// own built-in loader (which uses JSON5 for .json/.jsonc/.json5). This keeps
-// the builder dependency-free — legacy token exports (Open Props, old Style
-// Dictionary v3/v4 projects) are virtually always strict JSON anyway. Use
-// `.jsonc` or `.mjs` for hand-authored DTCG sources that need comments.
+/*
+  build-tokens-src/legacy-tokens-parser.mjs
+  Registra un parser di Style Dictionary che fa da ponte tra i file di token "legacy"
+  (sintassi in stile Style Dictionary v3/v4: nessun prefisso `$` su `value`/`type`,
+  riferimenti scritti come `{group.token.value}`) e la sintassi W3C DTCG
+  (`$value`/`$type`, riferimenti come `{group.token}`) richiesta da Style
+  Dictionary v5.
+
+  Perché serve: Style Dictionary v5 decide se una build "usesDtcg"
+  UNA SOLA VOLTA per build, a partire dal primo file sorgente elaborato (vedi
+  detectDtcgSyntax() chiamata in combineJSON.js di style-dictionary) — è
+  un unico flag globale, non un controllo per file. Mescolare un file in sintassi
+  legacy (ad es. un file esportato da Open Props, o da un vecchio progetto
+  Style Dictionary v3/v4) con sorgenti DTCG fa quindi sì che i token del
+  file legacy vengano scartati in silenzio, qualunque sia l'ordine dei file: non hanno mai
+  la chiave `$value` che il tagging di combineJSON (e il resto della
+  pipeline) si aspetta.
+
+  Questo parser intercetta ogni file sorgente `.json` (non `.jsonc` — quell'
+  estensione è riservata in questo progetto alle sorgenti DTCG scritte a mano,
+  già gestite correttamente dal loader integrato di Style Dictionary) e
+  converte, nodo per nodo:
+    value -> $value, type -> $type, comment/description -> $description
+    "{group.token.value}" -> "{group.token}" dentro le stringhe di riferimento
+  I nodi che usano già `$value` (sintassi DTCG v5) restano intatti, quindi
+  il parser è un no-op sicuro per i file che non richiedono conversione — non serve
+  alcun flag di config né elenco di file, il rilevamento è completamente automatico.
+
+  I nodi "ibridi" (un token con un valore proprio che è anche un gruppo con
+  figli annidati, ad es. other.ease.out di Open Props) non possono essere rappresentati in
+  DTCG v5, dove un nodo con $value è una foglia. Il valore proprio viene spostato in un
+  token figlio chiamato `default` (oppure `base` se `default` è già il nome di un
+  figlio; la build fallisce se entrambi sono occupati) — vedi collectHybridNodes().
+
+  Limitazione: i file `.json` gestiti da questo parser vengono letti con un semplice
+  JSON.parse (niente commenti, niente trailing comma), a differenza del loader
+  integrato di Style Dictionary (che usa JSON5 per .json/.jsonc/.json5). Così il builder
+  resta privo di dipendenze — le esportazioni di token legacy (Open Props, vecchi progetti
+  Style Dictionary v3/v4) sono comunque quasi sempre JSON rigoroso. Usare
+  `.jsonc` o `.mjs` per le sorgenti DTCG scritte a mano che richiedono commenti.
+*/
 
 import StyleDictionary from 'style-dictionary';
 
 export const LEGACY_TOKENS_PARSER_NAME = 'minimo/legacy-tokens';
 
-// Matches "{some.token.path.value}" -> captures "some.token.path"
+// Corrisponde a "{some.token.path.value}" -> cattura "some.token.path"
 const LEGACY_REF = /\{([^}]+)\.value\}/g;
 
-// Name of the child token that receives the own value of a "hybrid" node
-// (see collectHybridNodes()); FALLBACK_LEAF is used when a child with the
-// preferred name already exists.
+/*
+  Nome del token figlio che riceve il valore proprio di un nodo "ibrido"
+  (vedi collectHybridNodes()); FALLBACK_LEAF viene usato quando esiste già un figlio
+  con il nome preferito.
+*/
 const PREFERRED_LEAF = 'default';
 const FALLBACK_LEAF = 'base';
 
 /** @param {unknown} node @returns {node is Record<string, unknown>} */
 const isPlainObject = (node) => node !== null && typeof node === 'object' && !Array.isArray(node);
 
-// True if the node is (or contains, at any depth) a token, legacy or DTCG.
+// True se il nodo è (o contiene, a qualsiasi profondità) un token, legacy o DTCG.
 /** @param {unknown} node @returns {boolean} */
 const hasTokenDescendant = (node) => isPlainObject(node)
   && (Object.hasOwn(node, 'value') || Object.hasOwn(node, '$value')
     || Object.values(node).some(hasTokenDescendant));
 
 /*
- * A "hybrid" legacy node is a token (own `value`) that is also a group, i.e.
- * has children that are tokens or groups of tokens (e.g. Open Props'
- * other.ease.out, with its own value plus out.1 ... out.5). The own value is
- * moved to a child token: `default`, or `base` if `default` is already a
- * child name. If both are taken the build fails. Returns a map
- * dot.path -> chosen child name, used to convert the node itself and to
- * rewrite references pointing to it (references are only rewritten within
- * the same file: a reference from another file to a hybrid node must use the
- * child name explicitly).
+ * Un nodo legacy "ibrido" è un token (con `value` proprio) che è anche un gruppo, cioè
+ * ha figli che sono token o gruppi di token (ad es. other.ease.out di Open Props,
+ * con un valore proprio più out.1 ... out.5). Il valore proprio viene
+ * spostato in un token figlio: `default`, oppure `base` se `default` è già il nome
+ * di un figlio. Se entrambi sono occupati la build fallisce. Restituisce una mappa
+ * dot.path -> nome del figlio scelto, usata per convertire il nodo stesso e per
+ * riscrivere i riferimenti che puntano a esso (i riferimenti vengono riscritti solo
+ * all'interno dello stesso file: un riferimento da un altro file a un nodo ibrido deve
+ * usare esplicitamente il nome del figlio).
  */
 /**
  * @param {unknown} node
@@ -130,7 +134,7 @@ const convertLegacyRefs = (value, hybrids) => {
 const convertLegacyNode = (node, path, hybrids) => {
   if (!isPlainObject(node)) return node;
 
-  // Already DTCG v5 syntax: leave untouched.
+  // Già sintassi DTCG v5: lascia intatto.
   if (Object.hasOwn(node, '$value')) return node;
 
   if (Object.hasOwn(node, 'value')) {
@@ -145,7 +149,7 @@ const convertLegacyNode = (node, path, hybrids) => {
     const hybridLeaf = hybrids.get(path.join('.'));
     if (hybridLeaf === undefined) return token;
 
-    // Hybrid node: becomes a group, its own value moves to a child token.
+    // Nodo ibrido: diventa un gruppo, il suo valore proprio si sposta in un token figlio.
     return {
       ...Object.fromEntries(
         Object.entries(rest).map(([key, child]) => [key, convertLegacyNode(child, [...path, key], hybrids)])
@@ -154,26 +158,29 @@ const convertLegacyNode = (node, path, hybrids) => {
     };
   }
 
-  // Group node: recurse into children.
+  // Nodo gruppo: ricorre nei figli.
   return Object.fromEntries(
     Object.entries(node).map(([key, child]) => [key, convertLegacyNode(child, [...path, key], hybrids)])
   );
 };
 
-// Exported for reuse by token-rename-parser.mjs, which needs the same
-// legacy-or-DTCG .json loading (hybrid-node handling included) for the
-// subset of files that also have a `transform` rename map registered.
+/*
+  Esportata per il riutilizzo da token-rename-parser.mjs, che richiede lo stesso
+  caricamento .json legacy-o-DTCG (gestione dei nodi ibridi inclusa) per il
+  sottoinsieme di file che hanno anche una mappa di rinomina `transform` registrata.
+*/
 /** @param {string} contents @param {string} filePath @returns {unknown} */
 export const parseLegacyFile = (contents, filePath) => {
   const tree = JSON.parse(contents);
   return convertLegacyNode(tree, [], collectHybridNodes(tree, [], filePath));
 };
 
-// Registers the parser globally on the StyleDictionary class. To actually
-// run it, a Style Dictionary instance must also opt in via
-// `parsers: [LEGACY_TOKENS_PARSER_NAME]` in its config (registering alone
-// does not activate it for every instance — see Style Dictionary's parser
-// hooks docs).
+/*
+  Registra il parser globalmente sulla classe StyleDictionary. Per eseguirlo
+  effettivamente, anche un'istanza di Style Dictionary deve aderire tramite
+  `parsers: [LEGACY_TOKENS_PARSER_NAME]` nella propria config (la sola registrazione
+  non lo attiva per ogni istanza — vedi la documentazione degli hook parser di Style Dictionary).
+*/
 export const registerLegacyTokensParser = () => {
   StyleDictionary.registerParser({
     name: LEGACY_TOKENS_PARSER_NAME,

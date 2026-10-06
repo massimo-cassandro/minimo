@@ -3,7 +3,7 @@
 /* eslint-disable no-console */
 /* eslint-env node */
 
-// run npm update for all packeges inside `node_modules/@massimo-cassandro` folder
+// esegue npm update per tutti i pacchetti presenti nella cartella `node_modules/@massimo-cassandro`
 
 import * as fs from 'fs';
 import {execSync} from 'child_process';

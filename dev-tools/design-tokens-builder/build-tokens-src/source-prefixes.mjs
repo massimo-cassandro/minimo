@@ -1,29 +1,31 @@
-// build-tokens-src/source-prefixes.mjs
-// Supports per-source custom property prefixes: an entry of `source` (or of a
-// `sourceModes` mode) can be an object `{ src, prefix }` instead of a plain
-// string, e.g.
-//
-//   { src: 'node_modules/open-props/open-props.style-dictionary-tokens.json', prefix: 'op' }
-//
-// so that every token defined by those files is rendered as `--op-<name>`.
-//
-// How it works: the prefix is applied to the token NAME only (see the
-// name/kebab-prefixed transform in transforms.mjs), never to its path.
-// {references} are resolved through the token path and rendered with the
-// already-prefixed name, so a token of another source referencing e.g.
-// {gray.5} becomes `var(--op-gray-5)` with no change to the token files. The
-// JSON output keeps the original (unprefixed) tree structure.
-//
-// The name transform only knows the concrete file a token comes from
-// (token.filePath), while `src` may contain glob patterns: registerSourcePrefixes()
-// expands them (through Style Dictionary itself, so the result matches
-// token.filePath exactly) into a file path -> prefix map.
-//
-// The same entry object can also carry a `transform` map (renaming/moving
-// token nodes within the file's tree, e.g. { primary: 'primary.100' }) — see
-// source-transforms.mjs / token-rename-parser.mjs. splitSourceEntries() below
-// extracts both `prefix` and `transform` from the same `{ src, ... }` shape,
-// since they share the same source-matching syntax.
+/*
+  build-tokens-src/source-prefixes.mjs
+  Supporta i prefissi delle custom properties per sorgente: una voce di `source` (o di una
+  modalità di `sourceModes`) può essere un oggetto `{ src, prefix }` invece di una semplice
+  stringa, ad es.
+
+    { src: 'node_modules/open-props/open-props.style-dictionary-tokens.json', prefix: 'op' }
+
+  in modo che ogni token definito da quei file venga reso come `--op-<nome>`.
+
+  Come funziona: il prefisso viene applicato solo al NOME del token (vedi la
+  transform name/kebab-prefixed in transforms.mjs), mai al suo percorso.
+  I {riferimenti} vengono risolti tramite il percorso del token e resi con il nome
+  già prefissato, quindi un token di un'altra sorgente che referenzia ad es.
+  {gray.5} diventa `var(--op-gray-5)` senza modificare i file dei token. L'output
+  JSON mantiene la struttura ad albero originale (senza prefisso).
+
+  La transform del nome conosce solo il file concreto da cui proviene un token
+  (token.filePath), mentre `src` può contenere pattern glob: registerSourcePrefixes()
+  li espande (tramite lo stesso Style Dictionary, così che il risultato corrisponda
+  esattamente a token.filePath) in una mappa percorso file -> prefisso.
+
+  La stessa voce può anche avere una mappa `transform` (che rinomina/sposta i
+  nodi dei token nell'albero del file, ad es. { primary: 'primary.100' }) — vedi
+  source-transforms.mjs / token-rename-parser.mjs. splitSourceEntries() più sotto
+  estrae sia `prefix` sia `transform` dalla stessa forma `{ src, ... }`,
+  dato che condividono la stessa sintassi di individuazione dei sorgenti.
+*/
 
 import StyleDictionary from 'style-dictionary';
 import { LEGACY_TOKENS_PARSER_NAME } from './legacy-tokens-parser.mjs';
@@ -33,18 +35,18 @@ import { normalizeTransformMap } from './source-transforms.mjs';
 
 /**
  * @typedef {object} PrefixedSource
- * @property {string[]} src     Source paths/globs, already resolved (see resolveSourcePaths)
- * @property {string}   prefix  Normalised prefix, without leading `--` or trailing `-`
+ * @property {string[]} src     Percorsi/glob sorgente, già risolti (vedi resolveSourcePaths)
+ * @property {string}   prefix  Prefisso normalizzato, senza `--` iniziale né `-` finale
  */
 
 /** @type {Map<string, string>} */
 let prefixByFile = new Map();
 
 /**
- * Normalises a user-provided prefix: 'op', 'op-' and '--op-' all become 'op'.
+ * Normalizza un prefisso fornito dall'utente: 'op', 'op-' e '--op-' diventano tutti 'op'.
  * @param {unknown} prefix
  * @returns {string}
- * @throws {Error} if the result is not a valid custom property name segment
+ * @throws {Error} se il risultato non è un segmento valido di nome di custom property
  */
 export const normalizePrefix = (prefix) => {
   const value = String(prefix).trim().replace(/^-+/, '').replace(/-+$/, '');
@@ -56,16 +58,16 @@ export const normalizePrefix = (prefix) => {
 
 /**
  * @typedef {object} TransformedSource
- * @property {string[]} src               Source paths/globs, already resolved
- * @property {Record<string,string>} transform  Validated rename map (see source-transforms.mjs)
+ * @property {string[]} src               Percorsi/glob sorgente, già risolti
+ * @property {Record<string,string>} transform  Mappa di rinomina validata (vedi source-transforms.mjs)
  */
 
 /**
- * Splits a `source` (or `sourceModes[mode]`) array, whose entries can be
- * strings or `{ src, prefix, transform }` objects, into the flat list of
- * patterns to pass to Style Dictionary, the list of the prefixed entries and
- * the list of the transformed (renamed) entries. Patterns are resolved
- * relative to baseDir (see resolveSourcePaths).
+ * Suddivide un array `source` (o `sourceModes[mode]`), le cui voci possono essere
+ * stringhe od oggetti `{ src, prefix, transform }`, nell'elenco piatto di
+ * pattern da passare a Style Dictionary, nell'elenco delle voci con prefisso e
+ * nell'elenco delle voci trasformate (rinominate). I pattern vengono risolti
+ * rispetto a baseDir (vedi resolveSourcePaths).
  * @param {(string|{src: string|string[], prefix?: string, transform?: Record<string,string>})[]} entries
  * @param {string} baseDir
  * @returns {{patterns: string[], prefixed: PrefixedSource[], transformed: TransformedSource[]}}
@@ -109,12 +111,12 @@ export const splitSourceEntries = (entries, baseDir) => {
 };
 
 /**
- * Expands the `src` patterns of every prefixed entry into concrete file paths
- * and stores the file path -> prefix map used by getSourcePrefix().
- * Must be called after registerLegacyTokensParser() and before any build.
+ * Espande i pattern `src` di ogni voce con prefisso in percorsi di file concreti
+ * e memorizza la mappa percorso file -> prefisso usata da getSourcePrefix().
+ * Va chiamata dopo registerLegacyTokensParser() e prima di qualsiasi build.
  * @param {PrefixedSource[]} prefixedSources
  * @returns {Promise<void>}
- * @throws {Error} if the same file is given two different prefixes
+ * @throws {Error} se allo stesso file vengono assegnati due prefissi diversi
  */
 export const registerSourcePrefixes = async (prefixedSources) => {
   /** @type {Map<string, string>} */
@@ -144,6 +146,6 @@ export const registerSourcePrefixes = async (prefixedSources) => {
 
 /**
  * @param {string|undefined} filePath  token.filePath
- * @returns {string|undefined} the prefix registered for that file, if any
+ * @returns {string|undefined} il prefisso registrato per quel file, se presente
  */
 export const getSourcePrefix = (filePath) => (filePath ? prefixByFile.get(filePath) : undefined);

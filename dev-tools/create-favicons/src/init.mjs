@@ -9,7 +9,7 @@ import { remove_homedir_string } from './remove-homedir-string.mjs';
 
 export function init() {
   // const __filename = new URL('', import.meta.url).pathname;
-  // Will contain trailing slash
+  // conterrà lo slash finale
   const src_dir = new URL('.', import.meta.url).pathname,
     cfg_sample_file = process.cwd() + '/create-favicons-cfg.mjs';
 

@@ -10,8 +10,8 @@ export async function createIco(params) {
     `${params.output_dir}/favicon.ico`,
     {
       sizes: [16, 32],
-      // sizes: "default", // equal to [256, 128, 64, 48, 32, 24, 16]
-      resizeOptions: {}, // sharp resize optinos
+      // sizes: "default", // equivale a [256, 128, 64, 48, 32, 24, 16]
+      resizeOptions: {}, // opzioni di resize di sharp
     }
   );
 

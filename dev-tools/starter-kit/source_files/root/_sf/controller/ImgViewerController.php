@@ -23,7 +23,7 @@ class ImgViewerController extends AbstractController
    *              es: crop=10,10,100,100 -> ritaglia un quadrato di 100px a partire dal punto 10,10
    * @param bb: bounding box dell'area che deve contenere l'immagine ridimensionata
    * @param fd: (bool) forza dimensioni (utilizzato in coppia con bb)
-   * @param q: compression quality
+   * @param q: qualità di compressione
    * @param alpha: mantiene la trasparenza nelle png (default 0)
    * @param bg: in combinazione con alpha=1 definisce il bg color della png
    * @param refresh: (bool) forza la rigenerazione dell'immagine
@@ -76,7 +76,7 @@ class ImgViewerController extends AbstractController
     // formati accettati dal browser
     $accept = $request->server->get('HTTP_ACCEPT');
 
-    // format 'auto' default
+    // formato 'auto' di default
     if(!isset($get['f'])) $get['f'] = 'auto';
 
     // format 'auto' -> sceglie il formato migliore per il browser, se disponibile
@@ -164,7 +164,7 @@ class ImgViewerController extends AbstractController
         $img = new \Imagick();
         $img->readImage($filePath);
 
-        $img->stripImage(); // Strips an image of all profiles and comments
+        $img->stripImage(); // Rimuove dall'immagine tutti i profili e i commenti
 
         if(isset($params['crop']) or isset($params['bb'])) {
           // dimensioni originali

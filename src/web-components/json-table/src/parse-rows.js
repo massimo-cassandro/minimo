@@ -6,22 +6,22 @@ import { getNestedValue } from './content-utils.js';
 /** @typedef {import('./parse-cols.js').ParsedCol} ParsedCol */
 
 /**
- * A data row with the values precomputed for sorting and searching.
+ * Una riga di dati con i valori precalcolati per ordinamento e ricerca.
  * @typedef {Object} ParsedRow
- * @property {number} idx - Index of the row in the original data set
- * @property {Object} row - The original row object
- * @property {Object<string, *>} sortValues - Sort value of every sortable column, keyed by column key
- * @property {string} searchText - Lowercased concatenation of the search values of the searchable columns
+ * @property {number} idx - Indice della riga nell'insieme di dati originale
+ * @property {Object} row - L'oggetto riga originale
+ * @property {Object<string, *>} sortValues - Valore di ordinamento di ogni colonna ordinabile, indicizzato per chiave della colonna
+ * @property {string} searchText - Concatenazione in minuscolo dei valori di ricerca delle colonne ricercabili
  */
 
 /**
- * Resolves the sort/search value of a cell: column-level value or function `row => value`
- * (when defined) → data type function `(value, row, params) => value` → raw value.
- * @param {*} colValue - Column `sortValue`/`searchValue` (undefined = not set)
- * @param {((value: *, row: Object, params: JsonTableParams) => *)|undefined} typeFn - Data type function
- * @param {*} value - Raw cell value
- * @param {Object} row - Row object
- * @param {JsonTableParams} params - Resolved params
+ * Risolve il valore di ordinamento/ricerca di una cella: valore a livello di colonna o funzione `row => value`
+ * (se definito) → funzione del data type `(value, row, params) => value` → valore grezzo.
+ * @param {*} colValue - `sortValue`/`searchValue` della colonna (undefined = non impostato)
+ * @param {((value: *, row: Object, params: JsonTableParams) => *)|undefined} typeFn - Funzione del data type
+ * @param {*} value - Valore grezzo della cella
+ * @param {Object} row - Oggetto riga
+ * @param {JsonTableParams} params - Parametri risolti
  * @returns {*}
  */
 function resolveValue(colValue, typeFn, value, row, params) {
@@ -36,12 +36,12 @@ function resolveValue(colValue, typeFn, value, row, params) {
 
 
 /**
- * Precomputes, for every row, the values used by sorting and searching, so that they are
- * calculated once and not on every sort/search operation (see `sorting.js` and `search.js`).
+ * Precalcola, per ogni riga, i valori usati da ordinamento e ricerca, così che vengano
+ * calcolati una sola volta e non a ogni operazione di ordinamento/ricerca (vedi `sorting.js` e `search.js`).
  *
- * @param {Array<Object>} rows - Raw data rows
- * @param {ParsedCol[]} cols - Parsed columns (see `parse-cols.js`)
- * @param {JsonTableParams} params - Resolved params
+ * @param {Array<Object>} rows - Righe di dati grezze
+ * @param {ParsedCol[]} cols - Colonne analizzate (vedi `parse-cols.js`)
+ * @param {JsonTableParams} params - Parametri risolti
  * @returns {ParsedRow[]}
  *
  * @example

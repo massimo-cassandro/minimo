@@ -127,7 +127,7 @@ export default {
         $value: '#fff'
       },
 
-      // =>> settings for confirm button
+      // =>> impostazioni del pulsante di conferma
       btn: {
         bg: {
           $value: '{malert.confirm.bg}',

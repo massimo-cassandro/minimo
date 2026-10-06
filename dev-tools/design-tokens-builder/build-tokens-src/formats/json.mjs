@@ -1,69 +1,75 @@
-// build-tokens-src/formats/json.mjs
-// Registers the 'json/tokens' format and exports buildJsonFiles() and
-// collectConcreteFilePaths().
-//
-// The format produces a W3C DTCG nested JSON(C) file, independent of any
-// specific consuming tool (usable in Penpot, Figma via plugin, Token Studio,
-// Supernova, or any other DTCG-compatible tool).
-//
-// Output format is controlled by the jsonFormat option in the project config:
-//   'jsonc' -> .jsonc extension + generated-file disclaimer header
-//   'json'  -> plain .json, no disclaimer
-//
-// buildJsonFiles() builds the `files` array for the json platform:
-//   jsonDestFile set  -> single aggregated file
-//   jsonDestFile null -> one file per concrete source file, all placed flat
-//                        in jsonBuildPath (no subdirectories) — see the
-//                        collision check in buildJsonFiles()
-//
-// ── Expression handling (jsonExpression option) ─────────────────────────────
-//
-// Dimension tokens may carry math expressions in their $value, e.g.:
-//   { $type: "dimension", $value: "{size.base} * .25" }
-//
-// The jsonExpression config option controls how these are handled:
-//
-//   'keep'    (default) — write the expression as-is; the consuming tool is
-//                         expected to evaluate it.
-//   'calc'    — wrap in a CSS calc(): "calc({size.base} * .25)"
-//                         aliases are left as {references} for the consuming
-//                         tool to resolve.
-//   'resolve' — evaluate the expression numerically and write a concrete value.
-//                         The unit is inherited from the first dimension token
-//                         referenced in the expression (e.g. {size.base} = 16px
-//                         -> 16 * .25 = 4 -> "4px"). If evaluation fails the
-//                         original expression is kept with a warning.
+/*
+  build-tokens-src/formats/json.mjs
+  Registra il format 'json/tokens' ed esporta buildJsonFiles() e
+  collectConcreteFilePaths().
+
+  Il format produce un file JSON(C) annidato W3C DTCG, indipendente da qualsiasi
+  strumento specifico (utilizzabile in Penpot, Figma tramite plugin, Token Studio,
+  Supernova o qualsiasi altro strumento compatibile con DTCG).
+
+  Il formato di output è controllato dall'opzione jsonFormat nella config del progetto:
+    'jsonc' -> estensione .jsonc + intestazione che segnala il file generato
+    'json'  -> .json semplice, senza intestazione
+
+  buildJsonFiles() costruisce l'array `files` per la platform json:
+    jsonDestFile impostato -> singolo file aggregato
+    jsonDestFile null      -> un file per ogni file sorgente concreto, tutti nella stessa
+                              cartella jsonBuildPath (senza sottocartelle) — vedi il
+                              controllo delle collisioni in buildJsonFiles()
+
+  ── Gestione delle espressioni (opzione jsonExpression) ─────────────────────
+
+  I token dimension possono avere espressioni matematiche nel proprio $value, ad es.:
+    { $type: "dimension", $value: "{size.base} * .25" }
+
+  L'opzione di config jsonExpression controlla come vengono gestite:
+
+    'keep'    (default) — scrive l'espressione così com'è; si presume che lo
+                          strumento che la usa la valuti.
+    'calc'    — la racchiude in un calc() CSS: "calc({size.base} * .25)"
+                          gli alias restano come {riferimenti} che lo strumento
+                          che li usa dovrà risolvere.
+    'resolve' — valuta l'espressione numericamente e scrive un valore concreto.
+                          L'unità è ereditata dal primo token dimension
+                          referenziato nell'espressione (ad es. {size.base} = 16px
+                          -> 16 * .25 = 4 -> "4px"). Se la valutazione fallisce
+                          l'espressione originale viene mantenuta con un warning.
+*/
 
 import StyleDictionary from 'style-dictionary';
 import path from 'node:path';
 
-// Disclaimer prepended to every generated file when jsonFormat is 'jsonc'
+// Intestazione anteposta a ogni file generato quando jsonFormat è 'jsonc'
 const DISCLAIMER = [
   '// -----------------------------------------------------------------------',
-  '// Generated file — do not edit manually.',
-  '// This file is produced by the design-token build pipeline.',
-  '// Source of truth: the token files in the project source directory.',
-  '// Re-generate with: node build-tokens.mjs --config <path/to/config>',
+  '// File generato — non modificare a mano.',
+  '// Questo file è prodotto dalla pipeline di build dei design token.',
+  '// Fonte di verità: i file dei token nella directory sorgente del progetto.',
+  '// Per rigenerarlo: node build-tokens.mjs --config <path/to/config>',
   '// -----------------------------------------------------------------------',
   '',
 ].join('\n');
 
-// ── Expression helpers ────────────────────────────────────────────────────────
+// ── Helper per le espressioni ─────────────────────────────────────────────────
 
-// Returns true if the string contains a math expression — i.e. it has at least
-// one operator (+, -, *, /) outside of a token reference ({...}).
-// Negative values like "-0.5rem" or "-8px" are NOT expressions.
+/*
+  Restituisce true se la stringa contiene un'espressione matematica — cioè ha almeno
+  un operatore (+, -, *, /) fuori da un riferimento a token ({...}).
+  I valori negativi come "-0.5rem" o "-8px" NON sono espressioni.
+*/
 const isExpression = (str) => {
   if (typeof str !== 'string') return false;
-  // Strip token references, then check for operators
+  // Rimuove i riferimenti ai token, poi cerca gli operatori
   const stripped = str.replace(/\{[^}]+\}/g, '0');
-  // Remove leading minus (negative number) before testing for operators.
-  // An operator is only meaningful when it appears between two operands,
-  // i.e. it is preceded by a digit, closing paren, or word character.
+  /*
+    Rimuove il meno iniziale (numero negativo) prima di cercare gli operatori.
+    Un operatore ha significato solo quando compare tra due operandi,
+    cioè è preceduto da una cifra, una parentesi chiusa o un carattere di parola.
+  */
   return /[\d)]\s*[+\-*/]/.test(stripped) || /[+*/]/.test(stripped.replace(/^-/, ''));
 };
 
-// Builds a token lookup map (dot-path -> token) from the dictionary.
+// Costruisce una mappa di lookup dei token (dot-path -> token) dal dizionario.
 const makeTokenMap = (dictionary) => {
   const map = {};
   for (const token of dictionary.allTokens) {
@@ -72,23 +78,25 @@ const makeTokenMap = (dictionary) => {
   return map;
 };
 
-// Resolves a dimension expression to a concrete value string (e.g. "4px").
-//
-// Strategy:
-//   1. Find the first {reference} in the expression.
-//   2. Look it up in the token map to obtain its resolved numeric value and unit.
-//   3. Replace ALL {references} in the expression with their numeric values.
-//   4. Evaluate the resulting arithmetic expression with Function().
-//   5. Reattach the unit from step 2.
-//
-// Returns null if resolution fails (caller falls back to the original string).
+/*
+  Risolve un'espressione dimension in una stringa di valore concreto (ad es. "4px").
+
+  Strategia:
+    1. Trova il primo {riferimento} nell'espressione.
+    2. Lo cerca nella mappa dei token per ottenerne il valore numerico risolto e l'unità.
+    3. Sostituisce TUTTI i {riferimenti} nell'espressione con i loro valori numerici.
+    4. Valuta con Function() l'espressione aritmetica risultante.
+    5. Riattacca l'unità del passo 2.
+
+  Restituisce null se la risoluzione fallisce (il chiamante ripiega sulla stringa originale).
+*/
 const resolveExpression = (orig, tokenMap) => {
-  // Collect all {reference} keys in order of appearance
+  // Raccoglie tutte le chiavi {reference} in ordine di comparsa
   const refPattern = /\{([^}]+)\}/g;
   const refs = [...orig.matchAll(refPattern)];
   if (refs.length === 0) return null;
 
-  // Determine unit from the first referenced dimension token
+  // Determina l'unità dal primo token dimension referenziato
   const firstRef  = tokenMap[refs[0][1]];
   if (!firstRef) return null;
 
@@ -98,7 +106,7 @@ const resolveExpression = (orig, tokenMap) => {
   const baseNum   = parseFloat(firstVal);
   if (isNaN(baseNum)) return null;
 
-  // Replace every {ref} with its numeric value
+  // Sostituisce ogni {ref} con il suo valore numerico
   let expr = orig;
   for (const match of refs) {
     const refKey = match[1];
@@ -109,13 +117,13 @@ const resolveExpression = (orig, tokenMap) => {
     expr = expr.replace(match[0], String(refVal));
   }
 
-  // Evaluate — only allow digits, whitespace and arithmetic operators
+  // Valuta — consente solo cifre, spazi e operatori aritmetici
   if (!/^[\d\s+\-*/.()]+$/.test(expr)) return null;
 
   try {
     const result = Function(`"use strict"; return (${expr})`)();
     if (typeof result !== 'number' || !isFinite(result)) return null;
-    // Round to a reasonable precision to avoid floating-point noise
+    // Arrotonda a una precisione ragionevole per evitare il rumore della virgola mobile
     const rounded = parseFloat(result.toPrecision(10));
     return unit ? `${rounded}${unit}` : String(rounded);
   } catch {
@@ -123,7 +131,7 @@ const resolveExpression = (orig, tokenMap) => {
   }
 };
 
-// Wraps a dimension expression in CSS calc(), leaving {references} intact.
+// Racchiude un'espressione dimension in calc() CSS, lasciando intatti i {riferimenti}.
 const toCalc = (orig) => `calc(${orig})`;
 
 // ── Format ───────────────────────────────────────────────────────────────────
@@ -136,11 +144,11 @@ StyleDictionary.registerFormat({
     const tokenMap = (expressionMode === 'resolve') ? makeTokenMap(dictionary) : null;
 
     for (const token of dictionary.allTokens) {
-      // Tokens loaded via `include` (sourceModes: base-mode tokens made
-      // available to other modes for reference resolution) are not output.
+      // I token caricati tramite `include` (sourceModes: token della modalità base resi
+      // disponibili alle altre modalità per la risoluzione dei riferimenti) non vengono emessi.
       if (token.isSource === false) continue;
 
-      // Rebuild the nested tree from the token path
+      // Ricostruisce l'albero annidato dal percorso del token
       let node = root;
       for (let i = 0; i < token.path.length - 1; i++) {
         const segment = token.path[i];
@@ -152,7 +160,7 @@ StyleDictionary.registerFormat({
       const type    = token.$type ?? token.type;
       const orig    = token.original?.$value ?? token.original?.value;
 
-      // ── Value resolution ────────────────────────────────────────────────────
+      // ── Risoluzione del valore ──────────────────────────────────────────────
       let value;
 
       if (
@@ -160,29 +168,31 @@ StyleDictionary.registerFormat({
         typeof orig === 'string' &&
         isExpression(orig)
       ) {
-        // The original $value is a math expression
+        // Il $value originale è un'espressione matematica
         if (expressionMode === 'resolve') {
           const resolved = resolveExpression(orig, tokenMap);
           if (resolved !== null) {
             value = resolved;
           } else {
-            // Resolution failed — keep the original and emit a warning
+            // Risoluzione fallita — mantiene l'originale ed emette un warning
             // eslint-disable-next-line no-console
             console.warn(`[build-tokens] json: could not resolve expression "${orig}" for token "${token.path.join('.')}". Keeping original.`);
             value = orig;
           }
         } else if (expressionMode === 'calc') {
-          // Replace {refs} with their alias notation and wrap in calc()
+          // Sostituisce i {riferimenti} con la loro notazione alias e racchiude in calc()
           value = toCalc(orig);
         } else {
-          // 'keep' — write the expression unchanged
+          // 'keep' — scrive l'espressione invariata
           value = orig;
         }
       } else {
-        // Non-expression value: preserve {references} wherever they appear.
-        //   - Pure alias:   "{some.token}"           → kept as-is to preserve token links
-        //   - CSS function: "color-mix(in srgb, {some.token} 60%, #000)" → kept as-is
-        //   - Plain value:  "#ff0000", "16px", …     → use the resolved $value
+        /*
+          Valore non espressione: conserva i {riferimenti} ovunque compaiano.
+            - Alias puro:      "{some.token}"           → mantenuto così com'è per preservare i collegamenti tra token
+            - Funzione CSS:    "color-mix(in srgb, {some.token} 60%, #000)" → mantenuta così com'è
+            - Valore semplice: "#ff0000", "16px", …     → usa il $value risolto
+        */
         const containsRef = typeof orig === 'string' && orig.includes('{');
         value = containsRef ? orig : (token.$value ?? token.value);
       }
@@ -201,9 +211,8 @@ StyleDictionary.registerFormat({
 });
 
 // ── collectConcreteFilePaths ──────────────────────────────────────────────────
-//
-// Extracts the unique concrete file paths from a Style Dictionary instance.
-// Must be called AFTER `await sd.hasInitialized`.
+// Estrae i percorsi di file concreti univoci da un'istanza di Style Dictionary.
+// Va chiamata DOPO `await sd.hasInitialized`.
 
 export const collectConcreteFilePaths = async (sd) => {
   await sd.hasInitialized;
@@ -215,16 +224,17 @@ export const collectConcreteFilePaths = async (sd) => {
 };
 
 // ── buildJsonFiles ──────────────────────────────────────────────────────────
-//
-// @param {string[]}                       concreteFilePaths  From collectConcreteFilePaths()
-// @param {string|null}                    jsonDestFile       Aggregated file base name, or null
-// @param {'json'|'jsonc'}                 jsonFormat         Output format
-// @param {'keep'|'calc'|'resolve'}        jsonExpression     Expression handling mode
-// @param {string}                         [suffix]           Appended to every destination
-//   filename, before the extension — used by the sourceModes build
-//   (build-source-modes.mjs) to produce one set of files per mode, e.g.
-//   "-light" -> "tokens-light.jsonc" / "size-light.jsonc" (default: '')
-// @returns {object[]}  File descriptors for the Style Dictionary platform
+/*
+  @param {string[]}                       concreteFilePaths  Da collectConcreteFilePaths()
+  @param {string|null}                    jsonDestFile       Nome base del file aggregato, oppure null
+  @param {'json'|'jsonc'}                 jsonFormat         Formato di output
+  @param {'keep'|'calc'|'resolve'}        jsonExpression     Modalità di gestione delle espressioni
+  @param {string}                         [suffix]           Aggiunto a ogni nome di file di
+    destinazione, prima dell'estensione — usato dalla build sourceModes
+    (build-source-modes.mjs) per produrre un set di file per modalità, ad es.
+    "-light" -> "tokens-light.jsonc" / "size-light.jsonc" (default: '')
+  @returns {object[]}  Descrittori di file per la platform di Style Dictionary
+*/
 
 export const buildJsonFiles = (
   concreteFilePaths,
@@ -244,11 +254,13 @@ export const buildJsonFiles = (
     }];
   }
 
-  // One file per source, all placed flat in jsonBuildPath — no subdirectories
-  // mirroring the source tree. Since source files can share a basename across
-  // different directories (e.g. two components each with their own
-  // <name>.minimo.tokens.mjs), fail loudly on collisions instead of letting
-  // one silently overwrite the other.
+  /*
+    Un file per sorgente, tutti nella stessa cartella jsonBuildPath — senza sottocartelle
+    che replicano l'albero dei sorgenti. Dato che i file sorgente possono condividere il nome base in
+    directory diverse (ad es. due componenti ciascuno con il proprio
+    <name>.minimo.tokens.mjs), in caso di collisioni fallisce in modo esplicito invece di lasciare
+    che uno sovrascriva l'altro in silenzio.
+  */
   const pathsByDestName = new Map();
   for (const filePath of concreteFilePaths) {
     const destName = path.basename(filePath).replace(/\.[^.]+$/, '') + suffix + ext;

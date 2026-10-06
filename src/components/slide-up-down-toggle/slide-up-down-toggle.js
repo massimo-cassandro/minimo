@@ -6,27 +6,27 @@ import * as styles from './slide-up-down-toggle.module.css';
 /**
  * @module slide-up-down-toggle
  *
- * Collapse/expand animation driven by CSS — JS only toggles a data attribute
- * and manages a lightweight wrapper element. No pixel measurement anywhere.
+ * Animazione di chiusura/apertura gestita via CSS — il JS si limita a commutare un attributo data
+ * e a gestire un leggero elemento wrapper. Nessuna misurazione in pixel.
  *
- * ─── How it works ─────────────────────────────────────────────────────────────
+ * ─── Come funziona ────────────────────────────────────────────────────────────
  *
- * The CSS module uses `interpolate-size: allow-keywords` (height: auto
- * transitions), `allow-discrete` (display: none transition), and
- * `@starting-style` (entry animation from display: none). See the CSS file
- * for a full explanation of each feature.
+ * Il CSS module usa `interpolate-size: allow-keywords` (transizioni verso height: auto),
+ * `allow-discrete` (transizione di display: none) e
+ * `@starting-style` (animazione di ingresso da display: none). Vedi il file CSS
+ * per una spiegazione completa di ciascuna funzionalità.
  *
  * ─── wrap: true (default) ─────────────────────────────────────────────────────
  *
- * JS wraps the target in a generated <div class="slide"> and animates that
- * wrapper. The target element is completely untouched and can have any
- * display value, padding, margin, or flex/grid layout.
+ * Il JS racchiude il target in un <div class="slide"> generato e anima quel
+ * wrapper. L'elemento target resta del tutto intatto e può avere qualsiasi
+ * valore di display, padding, margin o layout flex/grid.
  *
- *   // target is free to be flex, have padding, etc.
+ *   // il target può essere flex, avere padding, ecc.
  *   slideToggle(document.querySelector('#panel'));
  *
- * Initial collapsed state — add data-slide="closed" to the TARGET in HTML
- * before any JS call. The first call transfers it to the generated wrapper:
+ * Stato iniziale chiuso — aggiungere data-slide="closed" al TARGET nell'HTML
+ * prima di qualsiasi chiamata JS. La prima chiamata lo trasferisce al wrapper generato:
  *
  *   <div id="panel" data-slide="closed">
  *     <div class="d-flex p-3">…content…</div>
@@ -34,39 +34,39 @@ import * as styles from './slide-up-down-toggle.module.css';
  *
  * ─── wrap: false ──────────────────────────────────────────────────────────────
  *
- * JS adds the .slide class directly to the target. The target must be a plain
- * block container with no padding, flex or grid of its own. All layout must
- * live on an inner child element.
+ * Il JS aggiunge la classe .slide direttamente al target. Il target deve essere un semplice
+ * contenitore block, senza padding, flex o grid propri. Tutto il layout deve
+ * stare su un elemento figlio interno.
  *
- *   <!-- target: plain wrapper, no padding -->
+ *   <!-- target: semplice wrapper, senza padding -->
  *   <div id="panel" data-slide="closed">
- *     <!-- inner: all layout here -->
+ *     <!-- interno: tutto il layout va qui -->
  *     <div class="d-flex p-3">…content…</div>
  *   </div>
  *
  *   slideToggle(document.querySelector('#panel'), { wrap: false });
  *
- * ─── Options ──────────────────────────────────────────────────────────────────
+ * ─── Opzioni ──────────────────────────────────────────────────────────────────
  *
  * @typedef {{ wrap?: boolean, duration?: number, callback?: (() => void) | null }} SlideOptions
  *
- *   wrap     {boolean}          default true  — auto-generate wrapper (see above)
- *   duration {number}           ms            — overrides --slide-duration CSS var;
- *                                               if omitted the CSS value is used
- *   callback {() => void|null}  default null  — invoked after the transition ends
+ *   wrap     {boolean}          default true  — genera automaticamente il wrapper (vedi sopra)
+ *   duration {number}           ms            — sovrascrive la variabile CSS --slide-duration;
+ *                                               se omesso viene usato il valore CSS
+ *   callback {() => void|null}  default null  — invocata al termine della transizione
  *
- * Kept here for reference: the three exported functions below re-declare these same properties
- * as dotted `@param` entries with base type `object` instead of `SlideOptions`, since TypeScript
- * only expands dotted `@param` properties (needed for editor IntelliSense to list each property)
- * when the base type is the literal `object`; a named typedef there would error (TS8032).
+ * Mantenuto qui come riferimento: le tre funzioni esportate qui sotto ridichiarano queste stesse proprietà
+ * come voci `@param` con notazione puntata e tipo base `object` invece di `SlideOptions`, dato che TypeScript
+ * espande le proprietà `@param` con notazione puntata (necessarie perché IntelliSense dell'editor elenchi
+ * ogni proprietà) solo quando il tipo base è il letterale `object`; un typedef con nome darebbe errore (TS8032).
  *
- * ─── Return value ─────────────────────────────────────────────────────────────
+ * ─── Valore restituito ────────────────────────────────────────────────────────
  *
- * All three functions return a Promise<void> that resolves when the transition ends.
+ * Tutte e tre le funzioni restituiscono una Promise<void> che si risolve al termine della transizione.
  */
 
 /**
- * Default option values — single source of truth used in every slide function.
+ * Valori di default delle opzioni — unica fonte di verità usata in ogni funzione slide.
  * @type {Required<SlideOptions>}
  */
 const DEFAULT_OPTIONS = {
@@ -76,27 +76,27 @@ const DEFAULT_OPTIONS = {
 };
 
 /**
- * Maps each target element to its slide element (generated wrapper or the
- * target itself). Checked on every call so the setup runs only once per target.
+ * Associa ogni elemento target al proprio elemento slide (wrapper generato o il
+ * target stesso). Controllato a ogni chiamata così che il setup venga eseguito una sola volta per target.
  * @type {WeakMap<HTMLElement, HTMLElement>}
  */
 const registry = new WeakMap();
 
 /**
- * Returns the slide element for `target`, creating it on the first call.
+ * Restituisce l'elemento slide per `target`, creandolo alla prima chiamata.
  *
- * wrap: true  — inserts a <div class="slide"> before the target, moves the
- *               target inside it, and transfers any existing data-slide value.
- *               Resolves after a requestAnimationFrame so the browser paints
- *               the wrapper's initial state before any transition-triggering
- *               attribute change. (offsetHeight forces layout but not a paint —
- *               only rAF guarantees a rendered frame as the transition origin.)
- * wrap: false — adds the .slide class directly to the target. Resolves immediately
- *               since the element was already in the DOM.
+ * wrap: true  — inserisce un <div class="slide"> prima del target, sposta il
+ *               target al suo interno e trasferisce l'eventuale valore data-slide esistente.
+ *               Si risolve dopo un requestAnimationFrame così che il browser disegni
+ *               lo stato iniziale del wrapper prima di qualsiasi cambio di
+ *               attributo che attivi la transizione. (offsetHeight forza il layout ma non il paint —
+ *               solo rAF garantisce un frame renderizzato come origine della transizione.)
+ * wrap: false — aggiunge la classe .slide direttamente al target. Si risolve subito
+ *               dato che l'elemento era già nel DOM.
  *
  * @param {HTMLElement} target
  * @param {boolean} wrap
- * @returns {Promise<HTMLElement>} the element that carries .slide and data-slide
+ * @returns {Promise<HTMLElement>} l'elemento che porta .slide e data-slide
  */
 async function getSlideEl(target, wrap) {
   if (registry.has(target)) return /** @type {HTMLElement} */ (registry.get(target));
@@ -105,30 +105,34 @@ async function getSlideEl(target, wrap) {
   if (wrap) {
     el = document.createElement('div');
     el.classList.add(styles.slide);
-    // transfer only 'closed' state to the wrapper; 'open' is the default for
-    // visible elements and must NOT be set — it would trigger @starting-style
-    // on insertion, causing an unwanted height:0 entry animation
+    /*
+      trasferisce al wrapper solo lo stato 'closed'; 'open' è il default per gli
+      elementi visibili e NON va impostato — attiverebbe @starting-style
+      all'inserimento, causando un'animazione di ingresso indesiderata da height:0
+    */
     if ('slide' in target.dataset) {
       if (target.dataset.slide === 'closed') el.dataset.slide = 'closed';
       delete target.dataset.slide;
     }
     target.replaceWith(el);
     el.appendChild(target);
-    // two nested rAFs are required: the outer one fires before the first paint
-    // (wrapper inserted but not yet rendered), the inner one fires after that
-    // paint — only then does the browser have a committed "previous style" to
-    // use as the transition origin. A single rAF or offsetHeight is not enough
-    // because both still execute before the first paint completes.
+    /*
+      servono due rAF annidati: quello esterno scatta prima del primo paint
+      (wrapper inserito ma non ancora renderizzato), quello interno scatta dopo quel
+      paint — solo allora il browser ha uno "stile precedente" consolidato da
+      usare come origine della transizione. Un solo rAF o offsetHeight non basta
+      perché entrambi vengono comunque eseguiti prima del completamento del primo paint.
+    */
     await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
   } else {
-    // read computed display BEFORE adding .slide, which would alter it
+    // legge il display calcolato PRIMA di aggiungere .slide, che lo altererebbe
     const startsHidden = window.getComputedStyle(target).display === 'none';
     target.classList.add(styles.slide);
     el = target;
 
     if (startsHidden && !('slide' in target.dataset)) {
-      // remove inline display: none so .slide and its [data-slide] rules own visibility;
-      // CSS-based display: none from other rules may still conflict — wrap: true avoids this
+      // rimuove il display: none inline così che .slide e le sue regole [data-slide] gestiscano la visibilità;
+      // un display: none basato su CSS da altre regole potrebbe comunque confliggere — wrap: true lo evita
       if (target.style.display === 'none') {
         target.style.removeProperty('display');
       }
@@ -141,10 +145,10 @@ async function getSlideEl(target, wrap) {
 }
 
 /**
- * Waits for the `height` transition on `el` to complete.
- * Called AFTER the state attribute has been set so the transition is already
- * running; transitionend fires at the end of the animation duration.
- * Optionally sets --slide-duration to override the CSS default.
+ * Attende il completamento della transizione di `height` su `el`.
+ * Chiamata DOPO l'impostazione dell'attributo di stato, così che la transizione sia già
+ * in corso; transitionend scatta alla fine della durata dell'animazione.
+ * Facoltativamente imposta --slide-duration per sovrascrivere il default CSS.
  *
  * @param {HTMLElement} el
  * @param {number | undefined} duration
@@ -167,14 +171,14 @@ async function awaitHeight(el, duration) {
 }
 
 /**
- * Tears down the slide setup for `target`.
+ * Smonta il setup slide per `target`.
  *
- * wrap was true  — removes the generated wrapper and restores the target
- *                  to its original position in the DOM.
- * wrap was false — removes the .slide class and the data-slide attribute
- *                  from the target.
+ * wrap era true  — rimuove il wrapper generato e riporta il target
+ *                  nella sua posizione originale nel DOM.
+ * wrap era false — rimuove la classe .slide e l'attributo data-slide
+ *                  dal target.
  *
- * In both cases --slide-duration is removed from the slide element.
+ * In entrambi i casi --slide-duration viene rimosso dall'elemento slide.
  *
  * @param {HTMLElement} target
  */
@@ -185,7 +189,7 @@ export function disposeSliding(target) {
   el.style.removeProperty('--slide-duration');
 
   if (el !== target) {
-    el.replaceWith(target); // remove wrapper, put target back
+    el.replaceWith(target); // rimuove il wrapper, rimette il target al suo posto
   } else {
     target.classList.remove(styles.slide);
     delete target.dataset.slide;
@@ -195,14 +199,14 @@ export function disposeSliding(target) {
 }
 
 /**
- * Collapses `target`.
- * CSS animates height to 0, then snaps display to none.
+ * Chiude `target`.
+ * Il CSS anima height fino a 0, poi imposta di scatto display su none.
  *
  * @param {HTMLElement} target
  * @param {object} [options] (default: {})
- * @param {boolean} [options.wrap=true] - auto-generates a wrapper `<div class="slide">` around `target` (see module docs above); when `false`, the `.slide` class is added directly to `target`. (default: true)
- * @param {number} [options.duration] - overrides the `--slide-duration` CSS var (ms); if omitted, the CSS value is used.
- * @param {(() => void) | null} [options.callback] - invoked after the transition ends. (default: null)
+ * @param {boolean} [options.wrap=true] - genera automaticamente un wrapper `<div class="slide">` attorno a `target` (vedi la documentazione del modulo sopra); se `false`, la classe `.slide` viene aggiunta direttamente a `target` (default: true)
+ * @param {number} [options.duration] - sovrascrive la variabile CSS `--slide-duration` (ms); se omesso viene usato il valore CSS.
+ * @param {(() => void) | null} [options.callback] - invocata al termine della transizione (default: null)
  * @returns {Promise<void>}
  */
 export async function slideUp(target, options = {}) {
@@ -214,14 +218,14 @@ export async function slideUp(target, options = {}) {
 }
 
 /**
- * Expands `target`.
- * display snaps to block, then CSS animates height from 0 (via @starting-style) to auto.
+ * Apre `target`.
+ * display passa di scatto a block, poi il CSS anima height da 0 (tramite @starting-style) ad auto.
  *
  * @param {HTMLElement} target
  * @param {object} [options] (default: {})
- * @param {boolean} [options.wrap=true] - auto-generates a wrapper `<div class="slide">` around `target` (see module docs above); when `false`, the `.slide` class is added directly to `target`. (default: true)
- * @param {number} [options.duration] - overrides the `--slide-duration` CSS var (ms); if omitted, the CSS value is used.
- * @param {(() => void) | null} [options.callback] - invoked after the transition ends. (default: null)
+ * @param {boolean} [options.wrap=true] - genera automaticamente un wrapper `<div class="slide">` attorno a `target` (vedi la documentazione del modulo sopra); se `false`, la classe `.slide` viene aggiunta direttamente a `target` (default: true)
+ * @param {number} [options.duration] - sovrascrive la variabile CSS `--slide-duration` (ms); se omesso viene usato il valore CSS.
+ * @param {(() => void) | null} [options.callback] - invocata al termine della transizione (default: null)
  * @returns {Promise<void>}
  */
 export async function slideDown(target, options = {}) {
@@ -233,14 +237,14 @@ export async function slideDown(target, options = {}) {
 }
 
 /**
- * Toggles the collapsed/expanded state of `target`.
- * Reads the current data-slide value on the slide element to decide direction.
+ * Commuta lo stato chiuso/aperto di `target`.
+ * Legge il valore data-slide corrente sull'elemento slide per decidere la direzione.
  *
  * @param {HTMLElement} target
  * @param {object} [options] (default: {})
- * @param {boolean} [options.wrap=true] - auto-generates a wrapper `<div class="slide">` around `target` (see module docs above); when `false`, the `.slide` class is added directly to `target`. (default: true)
- * @param {number} [options.duration] - overrides the `--slide-duration` CSS var (ms); if omitted, the CSS value is used.
- * @param {(() => void) | null} [options.callback] - invoked after the transition ends. (default: null)
+ * @param {boolean} [options.wrap=true] - genera automaticamente un wrapper `<div class="slide">` attorno a `target` (vedi la documentazione del modulo sopra); se `false`, la classe `.slide` viene aggiunta direttamente a `target` (default: true)
+ * @param {number} [options.duration] - sovrascrive la variabile CSS `--slide-duration` (ms); se omesso viene usato il valore CSS.
+ * @param {(() => void) | null} [options.callback] - invocata al termine della transizione (default: null)
  * @returns {Promise<void>}
  */
 export async function slideToggle(target, options = {}) {

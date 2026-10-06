@@ -1,20 +1,20 @@
 # Update Version
 
-Reads the version stored in `package.json`, updates it, and maintains a log file.
+Legge la versione memorizzata in `package.json`, la aggiorna e mantiene un file di log.
 
-Each update adds a line to the `changelog.md` file located at the project root. Each line contains the date, the updated version, and optionally, a descriptive text.
+Ogni aggiornamento aggiunge una riga al file `changelog.md` presente nella root del progetto. Ogni riga contiene la data, la versione aggiornata e, facoltativamente, un testo descrittivo.
 
-The updated version number and descriptive text are copied to the clipboard to speed up commenting for any subsequent commits.
+Il numero di versione aggiornato e il testo descrittivo vengono copiati negli appunti per velocizzare la scrittura del messaggio dei commit successivi.
 
-Usage:
+Utilizzo:
 
 ```bash
 npx update-version <options>
 ```
 
-Options:
+Opzioni:
 
-* `--pkg`: Path to the `package.json` file relative to the current directory (default: `./package.json`)
-* `--log-file`: Path to the log file relative to the current directory (default: `./changelog.md`). If the file name ends with `.txt`, the log type is assumed to be the previous version of `update-version`, where each line is in the form `timestamp | version | description`
-* `--log-patch`: If present, patch changes are also recorded in the log.
-* `--no-log-v0`: If `true` (default), the log is not written when the major version is `0`, except for the initial log entry created when the changelog file is first initialized. Pass `--no-log-v0` to enable it explicitly, or `--no-log-v0=false` to disable it from the command line.
+* `--pkg`: Percorso del file `package.json` relativo alla directory corrente (default: `./package.json`)
+* `--log-file`: Percorso del file di log relativo alla directory corrente (default: `./changelog.md`). Se il nome del file termina con `.txt`, si assume il formato di log della versione precedente di `update-version`, in cui ogni riga ha la forma `timestamp | version | description`
+* `--log-patch`: Se presente, vengono registrate nel log anche le modifiche di tipo patch.
+* `--no-log-v0`: Se `true` (default), il log non viene scritto quando la versione major è `0`, tranne per la voce iniziale creata alla prima inizializzazione del file changelog. Passare `--no-log-v0` per abilitarlo esplicitamente, oppure `--no-log-v0=false` per disabilitarlo da riga di comando.

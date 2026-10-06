@@ -6,7 +6,7 @@ import demoData from './demo-data.js';
 import * as styles from './json-table-demo.module.css';
 
 
-/** larger data set for the pagination demos: the 30 demo records repeated with unique ids */
+/** set di dati più ampio per le demo di paginazione: i 30 record demo ripetuti con id univoci */
 function bigData(times) {
   const rows = [];
   for (let i = 0; i < times; i++) {
@@ -22,9 +22,11 @@ export function jsonTableDemo(){
 
   const root = /** @type {HTMLElement} */ (document.getElementById('root'));
 
-  // project-wide defaults: must be set before the instances are created.
-  // Precedence: init() > HTML attribute > setDefaults() > built-in default.
-  // `classes` and `labels` are merged with the built-in ones: only the keys to override are needed
+  /*
+    valori di default a livello di progetto: vanno impostati prima di creare le istanze.
+    Precedenza: init() > attributo HTML > setDefaults() > default predefinito.
+    `classes` e `labels` vengono uniti a quelli predefiniti: servono solo le chiavi da sovrascrivere
+  */
   JsonTable.setDefaults({
     labels: { searchPlaceholder: 'Cerca… (placeholder impostato con JsonTable.setDefaults)' },
     classes: { searchInput: 'form-control' }
@@ -35,7 +37,7 @@ export function jsonTableDemo(){
 
   domBuilder([
 
-    // =>> 1. HTML attributes only (js-free)
+    // =>> 1. Solo attributi HTML (senza JS)
     'h2 1. Configurazione solo da attributi HTML (senza JS)',
     'p Tutto da attributi (via domBuilder <code>attrs</code>): <code>data</code>, <code>cols</code>, <code>labels</code>, <code>tfoot</code> e <code>perpage</code> serializzati. Il render della colonna "Testo" usa la sintassi mustache-like <code>[[key]]</code>, la colonna "Importo" ha <code>tfootRender: "@sum"</code>. Ordinamento e ricerca sono lato client; con <code>perpage="5"</code> la navigazione pagine compare nella barra sotto la tabella, a destra della caption.',
     {
@@ -58,7 +60,7 @@ export function jsonTableDemo(){
       }
     },
 
-    // =>> 2. init() + jsonUrl + cols with functions
+    // =>> 2. init() + jsonUrl + cols con funzioni
     'h2 2. init() da script + jsonUrl: colonne con funzioni, tipi custom, tfoot, nessuna paginazione',
     'p Dati via fetch (<code>jsonUrl</code>, servito dal devServer come file statico: funziona solo in sviluppo), <code>debug: true</code> (vedi console), <code>perPage: 0</code> (tutte le righe, nessuna navigazione). Colonne: <code>rowHeading</code>, <code>render(row, tr, td)</code> che restituisce un array domBuilder, <code>render</code> che decora solo la cella (restituisce <code>undefined</code> → rendering di default), tipo custom <code>km</code> (<code>dataTypes</code> con <code>inheritsFrom</code>), <code>headerClass</code> propagato a <code>cellClass</code>, colonna con <code>condition: false</code>, <code>tfootRender</code> come funzione, aggregato e stringa statica, <code>trCallback</code>, <code>renderZeroAs</code>, <code>infoText</code> da funzione, evento <code>jt:update</code> in console.',
     {
@@ -85,7 +87,7 @@ export function jsonTableDemo(){
           infoText: (start, end, totRec, filteredRec) =>
             `<strong>${filteredRec}</strong> record visualizzati (righe ${start}–${end} di ${totRec}, infoText da init)`,
           dataTypes: {
-            // new type based on the built-in `num`: same classes, sort/search values and NaN/zero handling
+            // nuovo tipo basato sul tipo predefinito `num`: stesse classi, stessi valori di sort/search e stessa gestione di NaN/zero
             km: {
               inheritsFrom: 'num',
               render: (value, row, params) => `${Number(value).toLocaleString(params.locale, params.numbersLocaleOpts)} km`
@@ -111,7 +113,7 @@ export function jsonTableDemo(){
               key: 'boolCustomized',
               title: 'Bool con null',
               dataType: 'bool',
-              // decorates the cell only: returning `undefined` keeps the data type rendering
+              // decora solo la cella: restituendo `undefined` resta il rendering del data type
               render: (row, tr, td) => {
                 if (row.boolCustomized === null && td) {
                   td.title = 'Valore null (render → renderNullAs)';
@@ -194,7 +196,7 @@ export function jsonTableDemo(){
           attrs: { type: 'button' },
           content: 'init() dopo destroy()',
           callback: el => el.addEventListener('click', () => {
-            reloadableTable.init({ caption: 'Dopo destroy() + init()' }); // data and cols from the attributes
+            reloadableTable.init({ caption: 'Dopo destroy() + init()' }); // data e cols dagli attributi
           })
         }
       ]
@@ -238,7 +240,7 @@ export function jsonTableDemo(){
         jsonUrl: '/demo-api/json-table',
         serverSide: true,
         perPage: 15,
-        tfoot: true, // ignored in server-side mode (console warning)
+        tfoot: true, // ignorato in modalità server-side (warning in console)
         caption: 'Tabella server-side',
         infoText: 'Righe {start}–{end} di {filteredRec} ({totRec} totali) — pagina {page} di {totPages}',
         initialSort: { key: 'id', dir: 'asc' },

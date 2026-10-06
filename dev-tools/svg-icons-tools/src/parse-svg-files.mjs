@@ -51,7 +51,7 @@ export function parseSvgFiles(parseModeKey, callback) {
       throw new Error( `“${parseModeKey}” type is not mapped. It must be one of 'symbols', 'jsx' or 'optimize'` );
     }
 
-    // source_folders is an array and not an object? (not used in the current version)
+    // source_folders è un array e non un oggetto? (non usato nella versione attuale)
     if(Array.isArray(cfg[parseModeKey].source_folders) ) {
 
       cfg[parseModeKey].source_folders.forEach(folder => {

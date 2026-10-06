@@ -1,8 +1,10 @@
-// Smoke tests for the dom-builder module (dom-builder.js, parseDomString.js,
-// domBuilderBasicSetup.js). Run with: node --test test/
-//
-// Uses jsdom (devDependency) to provide document/Element/DocumentFragment,
-// since domBuilder relies on those as browser globals rather than importing them.
+/*
+  Smoke test del modulo dom-builder (dom-builder.js, parseDomString.js,
+  domBuilderBasicSetup.js). Esecuzione: node --test test/
+
+  Usa jsdom (devDependency) per fornire document/Element/DocumentFragment,
+  dato che domBuilder li usa come globali del browser invece di importarli.
+*/
 
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

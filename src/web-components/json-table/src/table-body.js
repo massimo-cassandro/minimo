@@ -10,21 +10,21 @@ import { cellContent } from './cell-content.js';
 /** @typedef {import('./parse-rows.js').ParsedRow} ParsedRow */
 
 /**
- * domBuilder item of a body row.
+ * Elemento domBuilder di una riga del body.
  *
- * Cells are created empty by domBuilder (tag, classes, attributes) and filled in the `<tr>`
- * callback, so that the column `render` functions receive both the `tr` and the `td` elements.
- * `trCallback` is invoked last.
+ * Le celle vengono create vuote da domBuilder (tag, classi, attributi) e riempite nella
+ * callback del `<tr>`, così che le funzioni `render` delle colonne ricevano sia l'elemento `tr` sia `td`.
+ * `trCallback` viene invocata per ultima.
  *
- * Generated structure:
+ * Struttura generata:
  * ```
  * tr[data-jt-idx]
  *   td[data-key][cellClass][internalCellClass]           ← cellContent()
- *   th[scope=row][data-key]…                             ← when col.rowHeading is true
+ *   th[scope=row][data-key]…                             ← quando col.rowHeading è true
  * ```
  *
- * @param {ParsedRow} parsed - Parsed row (see `parse-rows.js`)
- * @param {JsonTable} jt - The component instance (`params`, `cols`)
+ * @param {ParsedRow} parsed - Riga analizzata (vedi `parse-rows.js`)
+ * @param {JsonTable} jt - L'istanza del componente (`params`, `cols`)
  * @returns {DomBuilderItem}
  *
  * @example
@@ -69,15 +69,15 @@ export function rowItem(parsed, jt) {
 
 
 /**
- * Renders the rows of the current page (`state.pageRows`) inside `elements.tbody`, replacing
- * the previous content. When there are no rows, a single cell spanning every column shows
- * `labels.noResults` (search active) or `labels.noRows`.
+ * Renderizza le righe della pagina corrente (`state.pageRows`) dentro `elements.tbody`, sostituendo
+ * il contenuto precedente. Quando non ci sono righe, una singola cella che si estende su tutte le colonne mostra
+ * `labels.noResults` (ricerca attiva) oppure `labels.noRows`.
  *
- * @param {JsonTable} jt - The component instance
+ * @param {JsonTable} jt - L'istanza del componente
  * @returns {void}
  *
  * @example
- * renderTbody(jt); // after `jt.state` has been updated
+ * renderTbody(jt); // dopo l'aggiornamento di `jt.state`
  */
 export function renderTbody(jt) {
 

@@ -5,20 +5,20 @@ import autoComplete from '@tarekraafat/autocomplete.js';
 
 export const ac_default_params = {
   placeholder: 'Inserisci tre o più caratteri',
-  ac_url: null, // search URL; must have leading and trailing slashes
+  ac_url: null, // URL di ricerca; deve avere slash iniziale e finale
 
-  // when true, the search query string is not appended to the URL (useful with a static JSON)
+  // se true, la stringa di ricerca non viene accodata all'URL (utile con un JSON statico)
   test_mode: false,
 
   /*
-      Function that receives the fetch result and returns an array of objects in the form:
+      Funzione che riceve il risultato del fetch e restituisce un array di oggetti nella forma:
       {
-        id             <== element id
-        val            <== value shown as the selection result
-        list_display   <== string shown in the results list
+        id             <== id dell'elemento
+        val            <== valore mostrato come risultato della selezione
+        list_display   <== stringa mostrata nell'elenco dei risultati
       }
 
-      example:
+      esempio:
       data => data.map(item => {
         return {
           id: item.id,
@@ -26,78 +26,90 @@ export const ac_default_params = {
           list_display: `#${item.id} ${item.agenzia} (${item.network})`+
             (item.ragioneSociale? `<br><small>${item.ragioneSociale}</small>` : '—')
 
-          // optional:
-          __xxx__: item (or other custom data)
+          // opzionale:
+          __xxx__: item (o altri dati personalizzati)
         };
       });
     */
-  // @ts-ignore — parameter type inferred from library callback
+  // @ts-ignore — tipo del parametro dedotto dalla callback della libreria
   fetch_result_function: data => data,
 
-  // field element or function returning the element
+  // elemento del campo o funzione che restituisce l'elemento
   autocomplete_field: null,
 
-  // selector of the container element that wraps autocomplete_field and related elements
+  // selettore dell'elemento contenitore che racchiude autocomplete_field e gli elementi correlati
   autocomplete_parent_selector: '.form-group',
 
-  // extra query parameters to append to the search URL (GET mode)
-  // values can be a single string/number or an array
-  // e.g. {param1: 'val1', param2: ['val2', 'val3']}
+  /*
+    parametri di query extra da accodare all'URL di ricerca (modalità GET)
+    i valori possono essere una singola stringa/numero oppure un array
+    es. {param1: 'val1', param2: ['val2', 'val3']}
+  */
   extra_query_params: {},
 
-  // name and id of the hidden input that stores the selected id
-  // `name` is ignored if the element already exists
-  // if none of hidden_id, hidden_field, or select_id is set, the selected id is not managed
+  /*
+    name e id dell'input hidden che memorizza l'id selezionato
+    `name` viene ignorato se l'elemento esiste già
+    se non è impostato nessuno tra hidden_id, hidden_field o select_id, l'id selezionato non viene gestito
+  */
   hidden_name: null,
   hidden_id: null,
 
-  // hidden field element; when set, `hidden_name` and `hidden_id` are ignored
+  // elemento del campo hidden; se impostato, `hidden_name` e `hidden_id` vengono ignorati
   hidden_field: null,
 
-  // uses an existing <select> element with the given id
-  // when set, `hidden_name` and `hidden_id` are ignored
-  // treated as multiple if `select_multiple === true`
-  // in multiple mode, duplicate ids are not allowed
+  /*
+    usa un elemento <select> esistente con l'id indicato
+    se impostato, `hidden_name` e `hidden_id` vengono ignorati
+    trattato come multiplo se `select_multiple === true`
+    in modalità multipla non sono ammessi id duplicati
+  */
   select_id: null,
   select_multiple: true,
 
-  // id of the element used to render selected-option badges
-  // only applies when `select_id` is set (multiple mode)
-  // if absent, badge rendering must be handled externally
+  /*
+    id dell'elemento usato per mostrare i badge delle opzioni selezionate
+    si applica solo quando `select_id` è impostato (modalità multipla)
+    se assente, il rendering dei badge va gestito esternamente
+  */
   badges_container_id: null,
 
-  // callback invoked when a badge is removed;
-  // receives the id and label text of the removed item
+  // callback invocata quando un badge viene rimosso;
+  // riceve l'id e il testo dell'etichetta dell'elemento rimosso
   badges_remove_callback: null,
 
-  // custom function for building badge markup
-  // receives `event.detail.selection.value` and the `params` object
-  // if null, the default markup is used
-  // NB: for pre-registered items the first argument only contains `id` and `val`
-  // NB: the badge must have class `ac-badge` and attribute `data-id`; must return complete badge HTML
+  /*
+    funzione personalizzata per costruire il markup dei badge
+    riceve `event.detail.selection.value` e l'oggetto `params`
+    se null, viene usato il markup predefinito
+    NB: per gli elementi preregistrati il primo argomento contiene solo `id` e `val`
+    NB: il badge deve avere la classe `ac-badge` e l'attributo `data-id`; deve restituire l'HTML completo del badge
+  */
   badges_builder: null,
 
-  // class assigned to the span containing the badge label
+  // classe assegnata allo span che contiene l'etichetta del badge
   badge_label_class: 'ac-badge-label',
 
-  // class assigned to the badge remove button
+  // classe assegnata al pulsante di rimozione del badge
   badge_btn_class: 'ac-badge-btn',
 
 
-  // autocomplete callback
-  // when present, called with 5 arguments: id, val, autocomplete field element, list_display (outerHTML), and row
-  // NB: row is only available after an option has been selected
+  /*
+    callback dell'autocomplete
+    se presente, viene chiamata con 5 argomenti: id, val, elemento del campo autocomplete, list_display (outerHTML) e row
+    NB: row è disponibile solo dopo la selezione di un'opzione
+  */
   callback: null,
 
-  // optional extra class for the results list
+  // classe extra opzionale per l'elenco dei risultati
   resultList_extra_class: null,
 
-  // optional extra class for the outer wrapper
+  // classe extra opzionale per il wrapper esterno
   wrapper_extra_class: null
 };
 
 /**
- * Initialises an autocomplete field using @tarekraafat/autocomplete.js.
+ * Inizializza un campo autocomplete usando @tarekraafat/autocomplete.js.
  * @param {Record<string, any>} [params={}] (default: {})
  * @returns {void}
  */
@@ -107,7 +119,7 @@ export default function (params = {}) {
 
     params = {...ac_default_params, ...params};
 
-    // @ts-ignore — circular reference: bparams defaults to params
+    // @ts-ignore — riferimento circolare: il default di bparams è params
     params.badges_builder ??= (result_obj, bparams = params) => `<span class="ac-badge badge rounded-pill text-bg-secondary" data-id="${result_obj.id}">` +
       `<span class="${bparams.badge_label_class}">${result_obj.val}</span>` +
         `<button type="button" class="${bparams.badge_btn_class}">&times;</button>` +
@@ -120,7 +132,7 @@ export default function (params = {}) {
         params.autocomplete_field = params.autocomplete_field();
       }
 
-      // set autocomplete field attributes
+      // imposta gli attributi del campo autocomplete
       params.autocomplete_field.type = 'search';
       ['spellcheck=false', 'autocorrect=off', 'autocomplete=off', 'autocapitalize=off'].forEach(item => {
         const [attr, val] = item.split('=');
@@ -138,7 +150,7 @@ export default function (params = {}) {
       let extra_query_params = [];
       for(const i in params.extra_query_params) {
         if(Array.isArray(params.extra_query_params[i])) {
-          // @ts-ignore — extra_query_params values are untyped (string, number, or array)
+          // @ts-ignore — i valori di extra_query_params non sono tipizzati (stringa, numero o array)
           params.extra_query_params[i].forEach(item => {
             extra_query_params.push(`${i}[]=${item}`);
           });
@@ -160,7 +172,7 @@ export default function (params = {}) {
         }
 
       } else {
-        // hidden field — created if not already present
+        // campo hidden — creato se non già presente
         if(params.hidden_field) {
           hidden_field = params.hidden_field;
 
@@ -181,16 +193,16 @@ export default function (params = {}) {
         diacritics: true,
         threshold: 3,
         data: {
-          // @ts-ignore — library callback; query type defined by autoComplete.js
+          // @ts-ignore — callback della libreria; tipo di query definito da autoComplete.js
           src: async (query) => {
             const ac_url = params.ac_url +
               (params.test_mode? '' : encodeURIComponent(query)) + extra_query_params_string;
 
 
             try {
-              // Fetch Data from external Source
+              // Recupera i dati da una sorgente esterna
               const source = await fetch(ac_url);
-              // Data is array of `Objects` | `Strings`
+              // I dati sono un array di `Objects` | `Strings`
               const data = await source.json();
 
               return params.fetch_result_function(data);
@@ -199,7 +211,7 @@ export default function (params = {}) {
               return error;
             }
           },
-          // Data 'Object' key to be searched
+          // Chiave dell'oggetto dati in cui cercare
           keys:['list_display'],
           cache: false
         },
@@ -207,16 +219,16 @@ export default function (params = {}) {
           class: params.resultList_extra_class,
 
           destination: '#' + params.autocomplete_field.id,
-          // @ts-ignore — library callback; types defined by autoComplete.js
+          // @ts-ignore — callback della libreria; tipi definiti da autoComplete.js
           element: (list, data) => {
             if (!data.results.length) {
-              // Create "No Results" message element
+              // Crea l'elemento del messaggio "Nessun risultato"
               const message = document.createElement('div');
-              // Add class to the created element
+              // Aggiunge la classe all'elemento creato
               message.setAttribute('class', 'no-result');
-              // Add message text content
+              // Aggiunge il testo del messaggio
               message.innerHTML = `<span>Nessun risultato per <strong>"${data.query}"</strong></span>`;
-              // Append message element to the results list
+              // Accoda l'elemento del messaggio all'elenco dei risultati
               list.prepend(message);
             }
           },
@@ -228,7 +240,7 @@ export default function (params = {}) {
         events: {
 
           input: {
-            // @ts-ignore — library event; type defined by autoComplete.js
+            // @ts-ignore — evento della libreria; tipo definito da autoComplete.js
             selection: (event) => {
               // console.log(event.detail.selection.value);
 
@@ -241,7 +253,7 @@ export default function (params = {}) {
                 const option_element = new Option(selected_text, selected_id, true, true);
 
                 if(params.select_multiple) {
-                  // prevent duplicate entries
+                  // evita le voci duplicate
                   const registered_option = select_field.querySelector(`option[value="${selected_id}"]`),
                     new_badge = params.badges_builder(event.detail.selection.value, params);
 
@@ -254,7 +266,7 @@ export default function (params = {}) {
                       badges_container.insertAdjacentHTML('beforeend', new_badge);
                     }
 
-                  // replace the existing badge to always show the latest version
+                  // sostituisce il badge esistente per mostrare sempre l'ultima versione
                   } else {
                     registered_option.replaceWith(option_element);
                     if(badges_container) {
@@ -265,7 +277,7 @@ export default function (params = {}) {
                     }
                   }
 
-                } else { // single select
+                } else { // select singola
                   select_field.innerHTML = '';
                   select_field.appendChild(option_element);
                 }
@@ -284,9 +296,9 @@ export default function (params = {}) {
         }
       }); // end autoComplete
 
-      // TODO improve and make the callback invocation more efficient
+      // TODO migliorare e rendere più efficiente l'invocazione della callback
 
-      // reset hidden field when the autocomplete value is cleared or mismatched
+      // azzera il campo hidden quando il valore dell'autocomplete viene cancellato o non corrisponde
       const check_ac = () => {
         if(params.autocomplete_field.value === '' ||
           (params.autocomplete_field.dataset.sel !== undefined &&
@@ -317,7 +329,7 @@ export default function (params = {}) {
         check_ac();
       }, false);
 
-      // badge click listener
+      // listener click dei badge
       badges_container?.addEventListener('click', e => {
         const target = /** @type {HTMLElement} */ (e.target);
         const btn = target.closest(`.${params.badge_btn_class}`);
@@ -337,11 +349,11 @@ export default function (params = {}) {
         }
       }, false);
 
-      // render badges for any pre-registered select options
+      // mostra i badge per le eventuali opzioni preregistrate della select
       if(select_field) {
 
         if(params.select_multiple && badges_container) {
-          // any data attributes on the option are forwarded to `badges_builder` under the `dataset` key
+          // gli eventuali attributi data dell'option vengono passati a `badges_builder` sotto la chiave `dataset`
 
           select_field.querySelectorAll('option[selected]').forEach(option => {
             const opt = /** @type {HTMLOptionElement} */ (option);
