@@ -24,6 +24,13 @@ export function getCliParams() {
       if (!params.toLog.includes('patch')) params.toLog.push('patch');
     }
 
+    // testo default per i log patch
+    if (arg.startsWith('--default-patch-log=')) {
+      // slice, non split: il testo può contenere a sua volta il carattere '='
+      const value = arg.slice('--default-patch-log='.length).trim();
+      if (value) params.defaultPatchLog = value;
+    }
+
     // Disabilita il log per major version 0
     if (arg === '--no-log-v0') {
       params.noLogV0 = true;

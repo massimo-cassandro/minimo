@@ -39,7 +39,7 @@ export async function chooser() {
       default: answer === 'init'
         ? 'Setup'
         : answer === 'patch'
-          ? 'Fix / Dependencies upd'
+          ? params.defaultPatchLog
           : ''
     });
     params.logRow.descr = descr.trim() || null;

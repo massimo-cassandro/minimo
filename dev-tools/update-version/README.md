@@ -17,4 +17,5 @@ Opzioni:
 * `--pkg`: Percorso del file `package.json` relativo alla directory corrente (default: `./package.json`)
 * `--log-file`: Percorso del file di log relativo alla directory corrente (default: `./changelog.md`). Se il nome del file termina con `.txt`, si assume il formato di log della versione precedente di `update-version`, in cui ogni riga ha la forma `timestamp | version | description`
 * `--log-patch`: Se presente, vengono registrate nel log anche le modifiche di tipo patch.
+* `--default-patch-log="testo"`: Testo di default usato per il log delle patch (default: `Fix / Upd`).
 * `--no-log-v0`: Se `true` (default), il log non viene scritto quando la versione major è `0`, tranne per la voce iniziale creata alla prima inizializzazione del file changelog. Passare `--no-log-v0` per abilitarlo esplicitamente, oppure `--no-log-v0=false` per disabilitarlo da riga di comando.
