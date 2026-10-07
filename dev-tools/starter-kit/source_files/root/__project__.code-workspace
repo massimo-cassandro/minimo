@@ -45,6 +45,10 @@
       {
         "filePath": "node_modules/@massimo-cassandro/minimo/src/css",
         "group": "Default"
+      },
+      {
+        "filePath": "node_modules/@massimo-cassandro/minimo/src/web-components/json-table/jt-docs.md",
+        "group": "Default"
       }
     ],
 

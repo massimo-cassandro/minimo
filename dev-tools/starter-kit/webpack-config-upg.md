@@ -10,6 +10,18 @@ Le versioni precedenti sono conservate in `archived/webpack-config-v2/` del repo
 
 ## Fix e upg da verificare e applicare a tutte le versioni
 * WebpackManifestPlugin: impostare `removeKeyHash: /\?.*$/, // /([a-f0-9]{32}\.?)/gi, // /(\?as_asset)$/,`, sostituendo eventuali impostazione `removeKeyHash: true` se presente
+* cacheGroup `shared` (solo con `useSharedChunk: true`): escludere `unsplash-page` e `blurhash` dal chunk condiviso, in modo che js e css restino nella entry che li importa. In `webpack.config.mjs`, nella funzione `shared_chunk_paths`, prima del `return` aggiungere:
+  ```js
+  const excluded_paths = [
+    'minimo/src/components/unsplash-page',
+    'node_modules/blurhash', // peer dep usata solo da unsplash-page
+  ];
+  const excludedRegexp = new RegExp(
+    excluded_paths.map(p => `${sep}${p.replace(/\//g, sep)}${sep}`).join('|')
+  );
+  const modulePath = module.nameForCondition?.() ?? '';
+  ```
+  e sostituire il `return` con `return !excludedRegexp.test(modulePath) && pathsRegexp.test(modulePath);`. Aggiungere anche al commento sopra il cacheGroup la nota sull'esclusione.
 
 
 ## Da v2 a v3

@@ -161,6 +161,9 @@ const { CustomPropsPurgeCssPlugin } = runCustomPropsPlugin
 // - `enforce: true` garantisce che `shared.js` e `shared.css` siano sempre
 //   generati (senza, splitChunks non crea il chunk se i moduli sono sotto la
 //   soglia `minSize`, e il link nel template punterebbe a un file inesistente)
+// - i moduli di `unsplash-page` (js e css module) e la sua dipendenza `blurhash`
+//   sono esclusi dal chunk condiviso (`excluded_paths` in `shared_chunk_paths`):
+//   restano nel js/css della entry che li importa
 // - i template (twig/altro) devono linkare (preload + link) sia `shared.css` che il
 //   css della propria entry, con `shared.css` PRIMA del css della entry per
 //   rispettare l'ordine della cascata (vedi _sf/templates/_main-tpl.html.twig)
@@ -181,7 +184,18 @@ const shared_chunk_paths = (module) => {
     'app/src/components',
   ].map(p => `${sep}${p.replace(/\//g, sep)}${sep}`).join('|'));
 
-  return pathsRegexp.test(module.nameForCondition?.() ?? '');
+  // path dei moduli esclusi dal chunk `shared` (restano nella entry che li importa)
+  const excluded_paths = [
+    'minimo/src/components/unsplash-page',
+    'node_modules/blurhash', // peer dep usata solo da unsplash-page
+  ];
+  const excludedRegexp = new RegExp(
+    excluded_paths.map(p => `${sep}${p.replace(/\//g, sep)}${sep}`).join('|')
+  );
+
+  const modulePath = module.nameForCondition?.() ?? '';
+
+  return !excludedRegexp.test(modulePath) && pathsRegexp.test(modulePath);
 };
 
 
