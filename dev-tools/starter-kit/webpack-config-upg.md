@@ -10,18 +10,6 @@ Le versioni precedenti sono conservate in `archived/webpack-config-v2/` del repo
 
 ## Fix e upg da verificare e applicare a tutte le versioni
 * WebpackManifestPlugin: impostare `removeKeyHash: /\?.*$/, // /([a-f0-9]{32}\.?)/gi, // /(\?as_asset)$/,`, sostituendo eventuali impostazione `removeKeyHash: true` se presente
-* cacheGroup `shared` (solo con `useSharedChunk: true`): escludere `unsplash-page` e `blurhash` dal chunk condiviso, in modo che js e css restino nella entry che li importa. In `webpack.config.mjs`, nella funzione `shared_chunk_paths`, prima del `return` aggiungere:
-  ```js
-  const excluded_paths = [
-    'minimo/src/components/unsplash-page',
-    'node_modules/blurhash', // peer dep usata solo da unsplash-page
-  ];
-  const excludedRegexp = new RegExp(
-    excluded_paths.map(p => `${sep}${p.replace(/\//g, sep)}${sep}`).join('|')
-  );
-  const modulePath = module.nameForCondition?.() ?? '';
-  ```
-  e sostituire il `return` con `return !excludedRegexp.test(modulePath) && pathsRegexp.test(modulePath);`. Aggiungere anche al commento sopra il cacheGroup la nota sull'esclusione.
 
 
 ## Da v2 a v3
@@ -255,3 +243,37 @@ Con `useSharedChunk = false` i template **non** devono referenziare `shared.css`
 1. `NODE_ENV=production npx webpack --config ./webpack.config.mjs --stats minimal`: nessun errore o warning del plugin.
 2. Nel css con le definizioni non compaiono props di web components non importati (es. `--jt-*`, `--sdt-*`); per un componente importato con `?raw` le sue props sono presenti.
 3. Con `useSharedChunk = false`: in `build/` non esistono `shared.*` né `runtime.*` e le definizioni sono nel solo css di `mainEntry`.
+
+### 6. Fix da applicare (solo con `useSharedChunk: true`)
+
+* cacheGroup `shared` (solo con `useSharedChunk: true`): escludere `unsplash-page` e `blurhash` dal chunk condiviso, in modo che js e css restino nella entry che li importa. In `webpack.config.mjs`, nella funzione `shared_chunk_paths`, prima del `return` aggiungere:
+  ```js
+  const excluded_paths = [
+    'minimo/src/components/unsplash-page',
+    'node_modules/blurhash', // peer dep usata solo da unsplash-page
+  ];
+  const excludedRegexp = new RegExp(
+    excluded_paths.map(p => `${sep}${p.replace(/\//g, sep)}${sep}`).join('|')
+  );
+  const modulePath = module.nameForCondition?.() ?? '';
+  ```
+  e sostituire il `return` con `return !excludedRegexp.test(modulePath) && pathsRegexp.test(modulePath);`. Aggiungere anche al commento sopra il cacheGroup la nota sull'esclusione.
+
+
+## Da v3.1 a v3.2
+
+Novità della v3.2: nessuna modifica di comportamento, solo riorganizzazione per rendere più agevole l'uso del config. Il blocco delle entry del progetto è spostato in cima al file (subito dopo gli import, prima di `// --- config ---`) e rinominato da `projectEntries` a `entries`; la costante `entries` che conteneva le entry elaborate per il dev (con il file master delle custom properties) è rinominata `parsedEntries`. Così le entry, che sono la parte da personalizzare in ogni progetto, si trovano subito e non vanno cercate a metà file. I moduli in `webpack-config-modules/` non cambiano.
+
+Prompt per aggiornare un progetto esistente:
+
+```text
+Aggiorna il mio webpack.config.mjs dalla v.3.1 alla v.3.2 con queste modifiche, senza toccare altro:
+
+1. Riga 2: `// v.3.1` → `// v.3.2`.
+2. Rinomina l'attuale costante `entries` (quella con la logica `useCustomPropsPlugin && isDevelopment && !purgeCssInDev`, che aggiunge `customPropsFile` come primo modulo delle entry non `.critical`) in `parsedEntries`. Aggiorna i riferimenti: `entry: entries` → `entry: parsedEntries` nella config e i commenti che citano `entries` in questo senso (es. nel commento sopra `purgeCssInDev`: "vedi `entries`" → "vedi `parsedEntries`").
+3. Rinomina `projectEntries` in `entries` in tutto il file (definizione, uso in `parsedEntries`, `cssEntries`, `criticalEntries` e commenti).
+4. Sposta l'intero blocco `// =>> entries` + `const entries = { ... };` (con le entry già presenti nel progetto, che vanno mantenute così come sono) in cima al file, subito dopo gli import e prima di `// --- config ---`, lasciando due righe vuote prima del blocco e una dopo.
+5. Verifica con `grep -n "projectEntries" webpack.config.mjs` (nessun risultato) e con `NODE_ENV=production npx webpack --config ./webpack.config.mjs --stats minimal` (nessun errore).
+
+Mostrami il diff prima di salvare.
+```

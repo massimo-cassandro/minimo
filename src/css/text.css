@@ -29,6 +29,12 @@ em, .italic {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+.text-upper {
+  text-transform: uppercase;
+}
+.text-lower {
+  text-transform: lowercase;
+}
 
 /* .text-nowrap-dskt {
 @media (--media-large-viewport-up) {

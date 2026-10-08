@@ -1,5 +1,5 @@
 // webpack.config.mjs __project_name__
-// v.3.2
+// v.3.1
 import path from 'path';
 import { fileURLToPath } from 'url';
 import webpack from 'webpack';
@@ -29,20 +29,6 @@ import { getJsConfigAliases } from './webpack-config-modules/get-jsConfig-aliase
 import { svgRules } from './webpack-config-modules/svg-rules.mjs';
 // import { InlineCriticalCssPlugin } from './webpack-config-modules/inline-critical-css.mjs';
 
-
-// =>> entries
-// NB: percorsi dalla root del progetto
-const entries = {
-  'index': './app/index.js',
-
-  'error-pages': './app/error-pages/error-pages.js',
-
-  // css critici da includere inline nei template html: il suffisso `.critical` nel nome
-  // della entry attiva l'istanza PurgeCSS dedicata con purge stretto
-  // (vedi purgecss-setup.mjs) e la regola dedicata in css-rules.mjs
-  'layout.critical': './app/css/layout.critical.css'
-
-};
 
 // --- config ---
 const __filename = fileURLToPath(import.meta.url)
@@ -146,7 +132,7 @@ const isDevelopment = process.env.NODE_ENV === 'development'
   // PurgeCSS e plugin custom properties lavorano sugli asset css finali:
   // in dev, con `false`, sono entrambi disattivati (build più veloce, css
   // iniettato con style-loader; se `useCustomPropsPlugin` è true le definizioni
-  // vengono aggiunte per intero alle entry, vedi `parsedEntries`).
+  // vengono aggiunte per intero alle entry, vedi `entries`).
   // Con `true` (a scopo di test) sono attivi come in produzione (secondo i
   // rispettivi flag `usePurgeCss` / `useCustomPropsPlugin`) e `inlineCssInDevMode`
   // viene forzato a false
@@ -270,18 +256,31 @@ const CopyWebpackPluginPatterns = [
 /******************************/
 /** CONFIG **/
 
+// =>> entries
+// NB: percorsi dalla root del progetto
+const projectEntries = {
+  'index': './app/index.js',
+
+  'error-pages': './app/error-pages/error-pages.js',
+
+  // css critici da includere inline nei template html: il suffisso `.critical` nel nome
+  // della entry attiva l'istanza PurgeCSS dedicata con purge stretto
+  // (vedi purgecss-setup.mjs) e la regola dedicata in css-rules.mjs
+  'layout.critical': './app/css/layout.critical.css'
+
+};
 
 // dev senza plugin custom properties (`purgeCssInDev: false`, css iniettato con
 // style-loader, quindi nessun asset css in cui il plugin possa inserire le
 // definizioni): il file master con TUTTE le custom properties viene aggiunto come
 // primo modulo di ogni entry (escluse le `.critical`). Non serve nessuna
 // modifica ai template
-const parsedEntries = (useCustomPropsPlugin && isDevelopment && !purgeCssInDev)
-  ? Object.fromEntries(Object.entries(entries).map(([name, entry]) => [
+const entries = (useCustomPropsPlugin && isDevelopment && !purgeCssInDev)
+  ? Object.fromEntries(Object.entries(projectEntries).map(([name, entry]) => [
     name,
     /\.critical/.test(name) ? entry : [customPropsFile, ...[entry].flat()]
   ]))
-  : entries;
+  : projectEntries;
 
 
 // regexp per gli asset css compilati di una entry: corrisponde a `nome.css` (dev con
@@ -292,9 +291,9 @@ const cssAssetRegexp = (entryName) =>
   new RegExp(`^${entryName.replace(/[.+?^${}()|[\]\\]/g, '\\$&')}(\\.[^./]+)?\\.css$`);
 
 // set del CustomPropsPurgeCssPlugin (vedi `sets` nei `plugins`). L'elenco delle entry
-// css è derivato da `entries`: aggiungere una entry lì è sufficiente
-const cssEntries = Object.keys(entries).filter(name => !/\.critical/.test(name))
-  ,criticalEntries = Object.keys(entries).filter(name => /\.critical/.test(name))
+// css è derivato da `projectEntries`: aggiungere una entry lì è sufficiente
+const cssEntries = Object.keys(projectEntries).filter(name => !/\.critical/.test(name))
+  ,criticalEntries = Object.keys(projectEntries).filter(name => /\.critical/.test(name))
   ,customPropsSets = [
 
     // i critical css sono inline nei template: restano autosufficienti
@@ -344,7 +343,7 @@ const config = {
 
   devtool: isDevelopment ? 'inline-source-map' : false,
 
-  entry: parsedEntries,
+  entry: entries,
 
   output: {
     path: output_dir,
@@ -688,7 +687,7 @@ const config = {
         // NB: evitare i wildcard `*`: 'index.*.css' non corrisponde a 'index.css'
         // (dev con WEBPACK_SERVE) e corrisponde invece a 'index.critical.<hash>.css'.
         // I set sono costruiti in `customPropsSets` (sopra) a partire da
-        // `entries`, in base a `useSharedChunk`: aggiungendo una entry
+        // `projectEntries`, in base a `useSharedChunk`: aggiungendo una entry
         // non serve modificare nulla qui
         sets: customPropsSets,
 
