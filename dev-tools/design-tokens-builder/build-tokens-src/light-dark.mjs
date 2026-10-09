@@ -24,7 +24,9 @@
   `color-scheme` effettivo, indipendentemente dal fatto che la dichiarazione stessa
   si trovi dentro una regola `@media (prefers-color-scheme: ...)` o meno.
 
-  Interazione con `mergeCustomProps`: qui non serve nulla di speciale — il merge
+  Interazione con `mergeCustomProps`: le dichiarazioni preesistenti `light-dark(X, Y)` vengono
+  scomposte in X (light) e Y (dark) già in fase di lettura (vedi loadExistingCustomPropsScoped()
+  in ../merge-css.mjs), così da non essere ricombinate annidate. Per il resto il merge
   per modalità con le custom properties preesistenti (vedi ../merge-css.mjs)
   viene già eseguito prima, dentro computeFinalProps() (formats/css.mjs), prima che
   questo modulo veda le proprietà. Quindi un file preesistente scritto con la

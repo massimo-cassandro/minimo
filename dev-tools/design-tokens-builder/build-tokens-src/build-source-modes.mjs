@@ -83,7 +83,7 @@ export const buildSourceModes = async ({
   // Legge il destFile preesistente (se c'è) PRIMA che venga eseguita qualsiasi istanza
   // di Style Dictionary, dato che la prima a scrivere lo sovrascriverebbe.
   if (mergeCustomProps) {
-    loadExistingCustomPropsScoped(path.join(buildPath, destFile), baseMode, mergeCustomProps, customPropsSelector);
+    loadExistingCustomPropsScoped(path.join(buildPath, destFile), baseMode, mergeCustomProps, customPropsSelector, modeNames);
   }
 
   const cssTransforms = pxToRem

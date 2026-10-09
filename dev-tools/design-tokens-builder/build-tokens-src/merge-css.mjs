@@ -205,6 +205,41 @@ export const loadExistingCustomProps = (absDestPath, sources = true) => {
   return existingCustomProps;
 };
 
+/*
+  Se la coda di una dichiarazione (valore + `;` + eventuale commento finale) è interamente
+  una chiamata `light-dark(X, Y)`, restituisce le due metà con il commento finale; altrimenti
+  null. La virgola di primo livello è individuata contando la profondità delle parentesi,
+  così che argomenti come `var(--a, red)` non vengano spezzati.
+*/
+/** @param {string} tail @returns {{light:string, dark:string}|null} */
+const splitLightDarkTail = (tail) => {
+  const match = /^light-dark\(/.exec(tail);
+  if (!match) return null;
+  let depth = 0;
+  let commaIdx = -1;
+  let closeIdx = -1;
+  for (let i = match[0].length - 1; i < tail.length; i++) {
+    const ch = tail[i];
+    if (ch === '(') depth++;
+    else if (ch === ')') {
+      depth--;
+      if (depth === 0) { closeIdx = i; break; }
+    } else if (ch === ',' && depth === 1) {
+      if (commaIdx !== -1) return null;
+      commaIdx = i;
+    }
+  }
+  if (commaIdx === -1 || closeIdx === -1) return null;
+  const rest = tail.slice(closeIdx + 1);
+  if (!/^\s*;\s*(\/\*.*\*\/)?\s*$/.test(rest)) return null;
+  const suffix = rest.trim();
+  const open = match[0].length;
+  return {
+    light: `${tail.slice(open, commaIdx).trim()}${suffix}`,
+    dark: `${tail.slice(commaIdx + 1, closeIdx).trim()}${suffix}`,
+  };
+};
+
 /**
  * Equivalente sourceModes di loadExistingCustomProps(): legge il file CSS di
  * destinazione (se esiste) e memorizza una mappa nome → valore per modalità,
@@ -217,9 +252,12 @@ export const loadExistingCustomProps = (absDestPath, sources = true) => {
  *   array solo i file sorgente dei token corrispondenti a una delle sue voci (default: true)
  * @param {string} [selector] il customPropsSelector con cui è stato generato il file
  *   preesistente (default: ':root' — vedi config.mjs)
+ * @param {string[]} [modeNames] chiavi di sourceModes: se includono sia `light` sia `dark`, le
+ *   dichiarazioni preesistenti `light-dark(X, Y)` vengono scomposte in X (light) e Y (dark),
+ *   per evitare che vengano ricombinate annidate (default: [])
  * @returns {Record<string, Record<string,string>>|null}
  */
-export const loadExistingCustomPropsScoped = (absDestPath, baseMode, sources = true, selector = ':root') => {
+export const loadExistingCustomPropsScoped = (absDestPath, baseMode, sources = true, selector = ':root', modeNames = []) => {
   mergeSources = sources;
   if (!existsSync(absDestPath)) {
     scopedExistingCustomProps = null;
@@ -233,6 +271,24 @@ export const loadExistingCustomPropsScoped = (absDestPath, baseMode, sources = t
   for (const [mode, body] of Object.entries(scopes)) {
     if (mode === '__base__') continue;
     scopedExistingCustomProps[mode] = parseCustomProps(body);
+  }
+
+  if (modeNames.includes('light') && modeNames.includes('dark')) {
+    const baseProps = scopedExistingCustomProps[baseMode] ?? {};
+    for (const [name, tail] of Object.entries(baseProps)) {
+      const halves = splitLightDarkTail(tail);
+      if (!halves) continue;
+      scopedExistingCustomProps.light ??= {};
+      scopedExistingCustomProps.dark ??= {};
+      // una voce esplicita già presente nel blocco della modalità ha la precedenza
+      scopedExistingCustomProps.light[name] ??= halves.light;
+      scopedExistingCustomProps.dark[name] ??= halves.dark;
+      // se la base è light/dark, la voce è stata appena riassegnata sopra: va comunque
+      // allineata alla propria metà
+      if (baseMode === 'light') scopedExistingCustomProps.light[name] = halves.light;
+      else if (baseMode === 'dark') scopedExistingCustomProps.dark[name] = halves.dark;
+      else delete baseProps[name];
+    }
   }
   return scopedExistingCustomProps;
 };
