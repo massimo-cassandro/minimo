@@ -14,7 +14,7 @@ import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import CssMinimizerPlugin from 'css-minimizer-webpack-plugin';
 import TerserPlugin from 'terser-webpack-plugin';
 
-import { cssRules } from '../../dev-tools/starter-kit/webpack-modules/css-rules.mjs';
+import { cssRules } from '../../dev-tools/starter-kit/source_files/root/webpack-config-modules/css-rules.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const rootDir = path.resolve(__dirname, '../..');
@@ -38,7 +38,7 @@ if (applyFix) {
 
 export default {
   mode: 'production',
-  entry: path.resolve(__dirname, './fixture-entry.js'),
+  entry: path.resolve(__dirname, process.env.ENTRY ?? './fixture-entry.js'),
   context: __dirname,
   output: {
     path: path.resolve(__dirname, `./dist/${variant}`),

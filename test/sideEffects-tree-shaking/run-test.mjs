@@ -1,5 +1,5 @@
 // Verifica se aggiungere `sideEffects: true` alla rule dei CSS Modules in
-// dev-tools/starter-kit/webpack-modules/css-rules.mjs riesuma il problema
+// dev-tools/starter-kit/source_files/root/webpack-config-modules/css-rules.mjs riesuma il problema
 // (già risolto in passato) per cui importare un solo componente da index.js
 // portava con sé il JS/CSS di TUTTI i componenti del barrel.
 //
@@ -31,12 +31,12 @@ const demoNodeModules = path.resolve(rootDir, 'demo/node_modules');
 
 // dev-tools/starter-kit non ha un proprio node_modules (è solo un template,
 // vedi starter-install.sh): senza un node_modules raggiungibile risalendo da
-// dev-tools/starter-kit/webpack-modules/css-rules.mjs, i suoi `import` bare
+// dev-tools/starter-kit/source_files/root/webpack-config-modules/css-rules.mjs, i suoi `import` bare
 // (mini-css-extract-plugin, ecc.) falliscono. Lo stesso vale per il nostro
 // webpack.config.mjs in questa cartella. Creiamo qui i symlink verso
 // demo/node_modules (già installato) solo per la durata del test.
 const TEMP_SYMLINKS = [
-  path.resolve(rootDir, 'dev-tools/node_modules'),
+  path.resolve(rootDir, 'dev-tools/starter-kit/source_files/root/node_modules'),
   path.resolve(__dirname, 'node_modules'),
 ];
 
@@ -64,7 +64,7 @@ const MARKERS = {
   slideToggle: '/*! minimo - Slide Up/Down Toggle */',
 };
 
-function build(variant, sideEffectsFix) {
+function build(variant, sideEffectsFix, entry) {
   console.log(`\n--- build variante "${variant}" (SIDE_EFFECTS_FIX=${sideEffectsFix ? '1' : '0'}) ---`);
   execFileSync(webpackBin, ['--config', configPath], {
     cwd: __dirname,
@@ -72,6 +72,7 @@ function build(variant, sideEffectsFix) {
       ...process.env,
       SIDE_EFFECTS_FIX: sideEffectsFix ? '1' : '0',
       VARIANT: variant,
+      ...(entry ? { ENTRY: entry } : {}),
     },
     stdio: 'inherit',
   });
@@ -102,6 +103,23 @@ function check(variant, css) {
   return results.every(r => r.pass);
 }
 
+// Verifica che un side-effect import di dev-tools/layout-tools (nessun binding
+// usato) non venga eliminato dal tree-shaking: dipende dal pattern
+// "**/layout-tools/**/*" in `sideEffects` di package.json.
+function checkLayoutTools(css) {
+  const js = readFileSync(path.resolve(__dirname, './dist/layout-tools/bundle.js'), 'utf-8');
+  const results = [
+    { label: 'layout-tools: JS incluso (crea il div mediaMonitor)', pass: js.includes('insertAdjacentElement') },
+    { label: 'layout-tools: CSS incluso', pass: css.trim().length > 0 },
+  ];
+
+  console.log('\nRisultati "layout-tools":');
+  for (const r of results) {
+    console.log(`  [${r.pass ? 'PASS' : 'FAIL'}] ${r.label}`);
+  }
+  return results.every(r => r.pass);
+}
+
 let allPass = true;
 
 createTempSymlinks();
@@ -111,6 +129,9 @@ try {
 
   const fixedCss = build('fixed', true);
   allPass = check('fixed', fixedCss) && allPass;
+
+  const layoutToolsCss = build('layout-tools', false, './fixture-layout-tools.js');
+  allPass = checkLayoutTools(layoutToolsCss) && allPass;
 } finally {
   removeTempSymlinks();
 }

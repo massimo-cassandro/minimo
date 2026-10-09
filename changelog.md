@@ -19,3 +19,4 @@
 * 1.39.0 (29 set 2026) - token builder: token renaming
 * 1.40.0 (02 ott 2026) - orphan classes finder
 * 1.41.0 (05 ott 2026) - betterTextWithPlaces function
+* 1.42.0 (09 ott 2026) - nuovo layout-tools

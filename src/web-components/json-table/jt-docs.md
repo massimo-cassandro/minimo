@@ -11,18 +11,7 @@
 
 È sufficiente importare il file del componente (registra il custom element):
 
-```javascriptcacheGroup `shared` (solo con `useSharedChunk: true`): escludere `unsplash-page` e `blurhash` dal chunk condiviso, in modo che js e css restino nella entry che li importa. In `webpack.config.mjs`, nella funzione `shared_chunk_paths`, prima del `return` aggiungere:
-  ```js
-  const excluded_paths = [
-    'minimo/src/components/unsplash-page',
-    'node_modules/blurhash', // peer dep usata solo da unsplash-page
-  ];
-  const excludedRegexp = new RegExp(
-    excluded_paths.map(p => `${sep}${p.replace(/\//g, sep)}${sep}`).join('|')
-  );
-  const modulePath = module.nameForCondition?.() ?? '';
-  ```
-  e sostituire il `return` con `return !excludedRegexp.test(modulePath) && pathsRegexp.test(modulePath);`. Aggiungere anche al commento sopra il cacheGroup la nota sull'esclusione.
+```javascript
 // solo registrazione del tag
 import '@massimo-cassandro/minimo/json-table';
 

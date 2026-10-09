@@ -12,7 +12,6 @@ Progettato per essere usato con **webpack** (configurazione starter inclusa in `
 
 ```
 minimo/
-├── index.js                        # entry point principale (export JS)
 ├── _wrk/                           # repo vecchi in lavorazione, da integrare in minimo (non pubblicato)
 │   ├── spinner/                    # componente spinner
 │   ├── popup-page/                 # pagina popup
@@ -23,6 +22,7 @@ minimo/
 │   ├── print-icon.js
 │   └── __snippets/                 # snippet di codice da vari progetti (style-dictionary, utilities varie)
 ├── src/
+│   ├── index.js                    # entry point principale (export JS)
 │   ├── minimo.css                  # entry point CSS principale
 │   ├── custom-properties.css       # CSS custom properties
 │   ├── custom-media.css            # media query custom (gestite da PostCSS)
@@ -116,7 +116,6 @@ minimo/
 ## File pubblicati su npm
 
 Dal `files` di `package.json`:
-- `./index.js`
 - `src/**/*.{js,mjs,css,svg,md}`
 - `types/**/*.d.ts`
 - `design-tokens/README.md`

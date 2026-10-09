@@ -1,4 +1,4 @@
-import { domBuilder } from '../index.js';
+import { domBuilder } from '../src/index.js';
 
 const icon_file = document.body.dataset.icons;
 
