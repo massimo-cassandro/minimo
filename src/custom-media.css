@@ -21,7 +21,7 @@ tablet alt:
 53.75rem : 860px  medium (tablet)
 */
 
-/* @custom-media --media-xxlarge-viewport-up (width >= 90rem); */
+@custom-media --media-xxlarge-viewport-up (width >= 90rem);
 @custom-media --media-xlarge-viewport-up (width >= 80rem);
 @custom-media --media-large-viewport-up (width >= 64rem);
 @custom-media --media-medium-viewport-up (width >= 47.5rem);
@@ -37,4 +37,4 @@ tablet alt:
 @custom-media --media-xlarge-viewport-down (max-width: 80rem);
 @custom-media --media-large-viewport-down (max-width: 64rem);
 @custom-media --media-medium-viewport-down (max-width: 47.5rem);
-/* @custom-media --media-small-viewport-down (max-width: 25rem); */
+@custom-media --media-small-viewport-down (max-width: 25rem);

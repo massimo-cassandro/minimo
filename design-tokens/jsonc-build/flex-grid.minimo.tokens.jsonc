@@ -10,15 +10,5 @@
       "$type": "dimension",
       "$value": "1.5rem"
     }
-  },
-  "grid": {
-    "cols": {
-      "$type": "number",
-      "$value": 3
-    },
-    "min-col-width": {
-      "$type": "dimension",
-      "$value": "6rem"
-    }
   }
 }

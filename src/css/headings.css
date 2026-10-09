@@ -1,6 +1,7 @@
 
 h1, h2, h3, .h3, h4, .h4 {
-  line-height: 1.2;
+  font-family: var(--headings-font-family);
+  line-height: var(--headings-font-weight);
   color: var(--headings-color);
   text-align: var(--headings-text-align);
 }

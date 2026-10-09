@@ -205,9 +205,6 @@
   --form-validation-outline-offset: -3px;
   --form-validation-outline-width: 3px;
 
-  --grid-cols: 3;
-  --grid-min-col-width: 6rem;
-
   --headings-color: var(--text-color);
   --headings-font-family: var(--font-family);
   --headings-font-weight: var(--font-weight-semibold);

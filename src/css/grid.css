@@ -2,10 +2,10 @@
 
 .grid {
   --_cols: 1;
-  /* --_min-col-width: calc((100% - calc(var(--_cols) * var(--flex-grid-gap))) / var(--grid-cols)); */
+  /* --_min-col-width: calc((100% - calc(var(--_cols) * var(--flex-grid-gap))) / var(--grid-cols));  NB custom prop rimossa */
 
   display: grid;
-  /* grid-template-columns: repeat(var(--_cols), minmax(var(--grid-min-col-width), 1fr)); */
+  /* grid-template-columns: repeat(var(--_cols), minmax(var(--grid-min-col-width), 1fr)); NB custom prop rimossa */
   grid-template-columns: repeat(var(--_cols), minmax(0, 1fr));
   grid-auto-flow: row;
   gap: var(--flex-grid-gap);
