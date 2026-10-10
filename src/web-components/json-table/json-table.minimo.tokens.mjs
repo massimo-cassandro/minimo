@@ -22,7 +22,7 @@ export default {
       },
       color: {
         $type: 'color',
-        $value: '{text.muted}'
+        $value: '{text.color}'
       },
       outer: {
         padding: {

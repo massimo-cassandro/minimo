@@ -1,5 +1,18 @@
 # Svg Icons Tools
 
+## Quick start
+
+```bash
+## SVG Icons Tools
+npx svgIconsTools --config ./path/to/svg-icons-tools.config.mjs
+
+# create favicons
+npx create-favicons init
+npx create-favicons [--dir=./path/to/dir]
+```
+
+## Panoramica
+
 Svg Icons Tools fornisce alcune utilità per gestire e ottimizzare le icone SVG:
 
 * ottimizza tutti i file con [SVGO](https://svgo.dev/)

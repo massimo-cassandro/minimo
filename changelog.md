@@ -1,22 +1,22 @@
 # Changelog
 
-* 0.1.0 (20 set 2025) - Setup
-* 1.0.0 (17 mag 2026) - First production release
-* 1.25.0 (24 ago 2026) - domBuilder: ability to use Node fragments for `content`
-* 1.26.0 (25 ago 2026) - DomBuilder: ability to add Nodes to `children` element
-* 1.27.0 (25 ago 2026) - domBuilder: buildButton utility
-* 1.28.0 (26 ago 2026) - sf-macro: preDelCallback option
-* 1.29.0 (01 set 2026) - s-datatable: collapse data mode
-* 1.30.0 (08 set 2026) - hbar chart
-* 1.31.0 (08 set 2026) - modalPopup update
-* 1.32.0 (09 set 2026) - starter-kit upd
-* 1.33.0 (12 set 2026) - Stylelint config dev tool
-* 1.34.0 (22 set 2026) - light-dark tokens builder
-* 1.35.0 (23 set 2026) - Non-DTCG Design Token parsing
-* 1.36.0 (24 set 2026) - Design tokens builder: fix and merge props improvements
-* 1.37.0 (26 set 2026) - build tokens improvements (optional custom-props prefix)
-* 1.38.0 (27 set 2026) - Build Tokens: use oflight-dark function
-* 1.39.0 (29 set 2026) - token builder: token renaming
-* 1.40.0 (02 ott 2026) - orphan classes finder
-* 1.41.0 (05 ott 2026) - betterTextWithPlaces function
-* 1.42.0 (09 ott 2026) - nuovo layout-tools
+* 0.1 (20 set 2025) - Setup
+* 1.0 (17 mag 2026) - First production release
+* 1.25 (24 ago 2026) - domBuilder: ability to use Node fragments for `content`
+* 1.26 (25 ago 2026) - DomBuilder: ability to add Nodes to `children` element
+* 1.27 (25 ago 2026) - domBuilder: buildButton utility
+* 1.28 (26 ago 2026) - sf-macro: preDelCallback option
+* 1.29 (01 set 2026) - s-datatable: collapse data mode
+* 1.30 (08 set 2026) - hbar chart
+* 1.31 (08 set 2026) - modalPopup update
+* 1.32 (09 set 2026) - starter-kit upd
+* 1.33 (12 set 2026) - Stylelint config dev tool
+* 1.34 (22 set 2026) - light-dark tokens builder
+* 1.35 (23 set 2026) - Non-DTCG Design Token parsing
+* 1.36 (24 set 2026) - Design tokens builder: fix and merge props improvements
+* 1.37 (26 set 2026) - build tokens improvements (optional custom-props prefix)
+* 1.38 (27 set 2026) - Build Tokens: use oflight-dark function
+* 1.39 (29 set 2026) - token builder: token renaming
+* 1.40 (02 ott 2026) - orphan classes finder
+* 1.41 (05 ott 2026) - betterTextWithPlaces function
+* 1.42 (09 ott 2026) - nuovo layout-tools
