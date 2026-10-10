@@ -8,8 +8,7 @@
     "moduleResolution": "bundler",
     "paths": {
       "@installSourceFiles/*": ["../dev-tools/starter-kit/source_files/*"],
-      "@src/*": ["../src/*"],
-      "@minimo/*": ["../src/*"],
+      "@minimoSrc/*": ["../src/*"],
       "@minimoCharts/*": ["../charts/*"]
     }
   },

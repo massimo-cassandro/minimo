@@ -1,6 +1,6 @@
 //@ts-nocheck
-import { domBuilder } from '@src/utilities/dom-builder/dom-builder.js';
-import { modalPopup } from '@src/components/modal-popup/modal-popup.js';
+import { domBuilder } from '@minimoSrc/utilities/dom-builder/dom-builder.js';
+import { modalPopup } from '@minimoSrc/components/modal-popup/modal-popup.js';
 
 
 export function modalPopupDemo(){

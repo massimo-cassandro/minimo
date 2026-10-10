@@ -1,6 +1,5 @@
-/*! minimo - json-table: thead */
+import * as styles from './thead.module.css';
 
-import * as styles from '../json-table-component.module.css';
 import { classnames } from '../../../utilities/classnames.js';
 import { setContent } from './content-utils.js';
 import { iconContent } from './icons.js';
@@ -117,7 +116,7 @@ export function setSortListener(jt) {
 
 
 /**
- * Elemento domBuilder del `<thead>`.
+ * Elemento domBuilder per `<thead>`.
  *
  * Generated structure:
  * ```

@@ -1,4 +1,3 @@
-/*! minimo - json-table: columns parsing */
 
 /** @typedef {import('./defaults.js').JsonTableParams} JsonTableParams */
 /** @typedef {import('./defaults.js').ColDefinition} ColDefinition */

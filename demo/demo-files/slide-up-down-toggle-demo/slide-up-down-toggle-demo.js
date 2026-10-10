@@ -1,5 +1,5 @@
-import { domBuilder } from '@src/utilities/dom-builder/dom-builder.js';
-import { slideToggle, slideUp, slideDown } from '@src/components/slide-up-down-toggle/slide-up-down-toggle.js';
+import { domBuilder } from '@minimoSrc/utilities/dom-builder/dom-builder.js';
+import { slideToggle, slideUp, slideDown } from '@minimoSrc/components/slide-up-down-toggle/slide-up-down-toggle.js';
 import * as styles from './slide-up-down-toggle-demo.module.css';
 
 export function slideUpDownToggleDemo(){

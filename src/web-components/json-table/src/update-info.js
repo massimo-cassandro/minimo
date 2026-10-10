@@ -1,4 +1,3 @@
-/*! minimo - json-table: info text update */
 
 import { setContent } from './content-utils.js';
 

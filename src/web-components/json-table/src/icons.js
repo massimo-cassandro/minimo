@@ -1,4 +1,3 @@
-/*! minimo - json-table: icons */
 
 import checkBold from '../../../icons/check-bold.svg?inline';
 import xBold from '../../../icons/x-bold.svg?inline';

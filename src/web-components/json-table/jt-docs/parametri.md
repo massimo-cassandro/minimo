@@ -52,36 +52,39 @@ Tutti i parametri sono impostabili sia da attributo HTML che come oggetto in `in
 
 ## `classes`
 
-Nomi delle classi assegnate agli elementi generati. Le classi interne di layout (CSS module)
-vengono **sempre** applicate in aggiunta a queste; ogni valore sostituisce interamente il
-default della stessa chiave.
+Nomi delle classi assegnate agli elementi generati. Le classi interne di layout (CSS module) vengono **sempre** applicate in aggiunta a queste; gli eventuali valori inseriti sostituiscono quelli di default.
 
 ```javascript
-classes: {
-  wrapper: null,                    // contenitore principale (<section>: info + tabella)
-  infoOuter: null,                  // contenitore esterno della sezione info
-  info: null,                       // sezione info (testo + ricerca)
-  resultInfo: null,                 // contenitore del testo info
-  search: null,                     // wrapper dell'input di ricerca
-  searchInput: 'form-control form-control-sm', // input di ricerca
-  tableWrapper: 'table-responsive', // div che racchiude la tabella
-  table: 'table table-bordered',    // tag <table>
-  tableFooter: null,                // barra sotto la tabella (caption + paginazione)
-  caption: null,                    // contenitore della caption
-  pagination: null,                 // <nav> della paginazione
-  paginationBtn: 'btn-reset',       // pulsanti della paginazione
-  sortBtn: 'btn-reset',             // pulsanti di ordinamento nei <th>
-  empty: null,                      // cella unica mostrata in assenza di righe
-  textStart: null,                  // allineamento inline-start (le celle minimo lo sono già)
-  textCenter: 'text-center',        // allineamento al centro
-  textEnd: 'text-end',              // allineamento inline-end
-  nowrap: 'text-nowrap',            // no-wrap
-  numeric: 'text-numeric',          // cifre tabulari (tipi numerici)
-  boolCell: null,                   // classe aggiuntiva per tutte le celle di tipo bool
-  boolTrue: null,                   // classe aggiuntiva per le celle bool con valore true
-  boolFalse: null                   // classe aggiuntiva per le celle bool con valore false
+{
+  classes: {...}
 }
 ```
+
+| Parametro | Default | Descrizione |
+|---|---|---|
+| `wrapper` | `null` | contenitore principale (`<section>`: info + tabella) |
+| `infoOuter` | `null` | contenitore esterno della sezione info |
+| `info` | `null` | sezione info (testo + ricerca) |
+| `resultInfo` | `null` | contenitore del testo info |
+| `search` | `null` | wrapper dell'input di ricerca |
+| `searchInput` | `'form-control form-control-sm'` | input di ricerca |
+| `tableWrapper` | `'table-responsive'` | div che racchiude la tabella |
+| `table` | `'table table-bordered'` | tag `<table>` |
+| `tableFooter` | `null` | barra sotto la tabella (caption + paginazione) |
+| `caption` | `null` | contenitore della caption |
+| `pagination` | `null` | `<nav>` della paginazione |
+| `paginationBtn` | `'btn-reset'` | pulsanti della paginazione |
+| `sortBtn` | `'btn-reset'` | pulsanti di ordinamento nei `<th>` |
+| `empty` | `null` | cella unica mostrata in assenza di righe |
+| `textStart` | `null` | allineamento inline-start (con css `table` di *minimo* il default è `start`) |
+| `textCenter` | `'text-center'` | allineamento al centro |
+| `textEnd` | `'text-end'` | allineamento inline-end |
+| `nowrap` | `'text-nowrap'` | no-wrap |
+| `numeric` | `'text-numeric'` | cifre tabulari (tipi numerici) |
+| `boolCell` | `null` | classe aggiuntiva per tutte le celle di tipo bool |
+| `boolTrue` | `null` | classe aggiuntiva per le celle bool con valore true |
+| `boolFalse` | `null` | classe aggiuntiva per le celle bool con valore false |
+
 
 Le classi di allineamento (`textEnd`, `textCenter`, `nowrap`, `numeric`) sono quelle usate dai
 tipi di dato predefiniti: modificandole si cambiano le classi di tutte le colonne di quel tipo.
@@ -89,28 +92,31 @@ tipi di dato predefiniti: modificandole si cambiano le classi di tutte le colonn
 ## `labels`
 
 ```javascript
-labels: {
-  loading: 'Caricamento dati…',            // segnaposto di caricamento (visually hidden)
-  searchPlaceholder: 'Cerca...',           // placeholder dell'input di ricerca
-  searchTitle: 'Cerca nella tabella',      // attributo title dell'input
-  searchAriaLabel: 'Filtra risultati',     // aria-label dell'input
-  info: 'Stai visualizzando le righe da {start} a {end}, su un totale di {filteredRec} record trovati',
-                                           // template del testo info (vedi `infoText`)
-  noRows: 'Nessun record trovato',         // testo info e cella unica con set di dati vuoto
-  noResults: 'Nessun risultato per la ricerca', // idem, con ricerca senza risultati
-  sortAsc: 'Ordina questa colonna in senso ascendente (A → Z)',   // title/aria-label del
-  sortDesc: 'Ordina questa colonna in senso discendente (Z → A)', // pulsante di ordinamento:
-  sortNone: 'Rimuovi l’ordinamento a questa colonna',             // descrivono l'azione del
-                                                                  // prossimo click
-  paginationAriaLabel: 'Navigazione pagine', // aria-label del <nav>
-  prevPage: 'Pagina precedente',           // title/aria-label del pulsante precedente
-  nextPage: 'Pagina successiva',           // idem, successivo
-  pageTitle: 'Vai a pagina {page}',        // idem, pulsanti pagina
-  currentPage: 'Pagina {page}, corrente'   // idem, pagina corrente
+{
+  labels: {...}
 }
 ```
 
-I segnaposto di `labels.info` / `infoText`:
+| Parametro | Default | Descrizione |
+|---|---|---|
+| `loading` | `'Caricamento dati…'` | segnaposto di caricamento (visually hidden) |
+| `searchPlaceholder` | `'Cerca...'` | placeholder dell'input di ricerca |
+| `searchTitle` | `'Cerca nella tabella'` | attributo `title` dell'input di ricerca |
+| `searchAriaLabel` | `'Filtra risultati'` | `aria-label` dell'input di ricerca |
+| `info` | `'Stai visualizzando le righe da {start} a {end}, su un totale di {filteredRec} record trovati'` | template del testo info (vedi `infoText`) |
+| `noRows` | `'Nessun record trovato'` | testo info e cella unica con set di dati vuoto |
+| `noResults` | `'Nessun risultato per la ricerca'` | testo info e cella unica con ricerca senza risultati |
+| `sortAsc` | `'Ordina questa colonna in senso ascendente (A → Z)'` | `title`/`aria-label` del pulsante di ordinamento: descrive l'azione del prossimo click |
+| `sortDesc` | `'Ordina questa colonna in senso discendente (Z → A)'` | `title`/`aria-label` del pulsante di ordinamento: descrive l'azione del prossimo click |
+| `sortNone` | `'Rimuovi l’ordinamento a questa colonna'` | `title`/`aria-label` del pulsante di ordinamento: descrive l'azione del prossimo click |
+| `paginationAriaLabel` | `'Navigazione pagine'` | `aria-label` del `<nav>` |
+| `prevPage` | `'Pagina precedente'` | `title`/`aria-label` del pulsante precedente |
+| `nextPage` | `'Pagina successiva'` | `title`/`aria-label` del pulsante successivo |
+| `pageTitle` | `'Vai a pagina {page}'` | `title`/`aria-label` dei pulsanti pagina |
+| `currentPage` | `'Pagina {page}, corrente'` | `title`/`aria-label` del pulsante della pagina corrente |
+
+
+### Segnaposto di `labels.info` / `infoText`:
 
 | Segnaposto | Valore |
 |---|---|

@@ -1,4 +1,3 @@
-/*! minimo - json-table: data types */
 
 import * as styles from '../json-table-component.module.css';
 import { classnames } from '../../../utilities/classnames.js';

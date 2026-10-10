@@ -1,4 +1,3 @@
-/*! minimo - json-table: content utilities */
 
 import { domBuilder } from '../../../utilities/dom-builder/dom-builder.js';
 

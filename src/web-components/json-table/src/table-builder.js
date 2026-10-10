@@ -1,8 +1,7 @@
-/*! minimo - json-table: parte tabella (tabella, caption e barra del footer) */
 
 import * as styles from '../json-table-component.module.css';
 import { classnames } from '../../../utilities/classnames.js';
-import { theadPart } from './table-thead.js';
+import { theadPart } from './thead.js';
 
 /** @typedef {import('./defaults.js').JsonTableParams} JsonTableParams */
 /** @typedef {import('../json-table-component.js').JsonTable} JsonTable */

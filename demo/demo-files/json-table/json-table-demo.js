@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
-import { JsonTable } from '@src/web-components/json-table/json-table-component.js';
-import { domBuilder } from '@src/utilities/dom-builder/dom-builder.js';
+import { JsonTable } from '@minimoSrc/web-components/json-table/json-table-component.js';
+import { domBuilder } from '@minimoSrc/utilities/dom-builder/dom-builder.js';
 
 import demoData from './demo-data.js';
 import * as styles from './json-table-demo.module.css';

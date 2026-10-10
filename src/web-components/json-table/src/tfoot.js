@@ -1,4 +1,3 @@
-/*! minimo - json-table: tfoot rendering */
 
 import { domBuilder } from '../../../utilities/dom-builder/dom-builder.js';
 import { classnames } from '../../../utilities/classnames.js';

@@ -1,4 +1,3 @@
-/*! minimo - json-table: client-side search */
 
 /** @typedef {import('../json-table-component.js').JsonTable} JsonTable */
 /** @typedef {import('./parse-rows.js').ParsedRow} ParsedRow */

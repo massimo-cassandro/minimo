@@ -1,4 +1,3 @@
-/*! minimo - json-table: rows parsing (sort & search values) */
 
 import { getNestedValue } from './content-utils.js';
 

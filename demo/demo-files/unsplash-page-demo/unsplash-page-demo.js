@@ -2,7 +2,7 @@
 
 import { homeLink } from '../../demo.js';
 
-import { unsplashPage } from '@src/components/unsplash-page/unsplash-page.js';
+import { unsplashPage } from '@minimoSrc/components/unsplash-page/unsplash-page.js';
 
 export async function unsplashPageDemo(){
 

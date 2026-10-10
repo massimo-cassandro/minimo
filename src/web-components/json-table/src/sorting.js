@@ -1,4 +1,3 @@
-/*! minimo - json-table: client-side sorting */
 
 /** @typedef {import('./parse-rows.js').ParsedRow} ParsedRow */
 /** @typedef {'asc'|'desc'} SortDir */

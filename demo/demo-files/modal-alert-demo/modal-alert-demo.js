@@ -1,5 +1,5 @@
-import { modalAlert } from '@src/components/modal-alert/modal-alert.js';
-import { domBuilder } from '@src/utilities/dom-builder/dom-builder.js';
+import { modalAlert } from '@minimoSrc/components/modal-alert/modal-alert.js';
+import { domBuilder } from '@minimoSrc/utilities/dom-builder/dom-builder.js';
 
 import * as styles from './modal-alert-demo.module.css';
 

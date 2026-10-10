@@ -1,4 +1,4 @@
-import { domBuilder } from '@src/utilities/dom-builder/dom-builder.js';
+import { domBuilder } from '@minimoSrc/utilities/dom-builder/dom-builder.js';
 
 export function domBuilderDemo(){
 

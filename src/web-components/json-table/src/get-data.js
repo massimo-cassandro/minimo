@@ -1,4 +1,3 @@
-/*! minimo - json-table: data acquisition */
 
 /** @typedef {import('./defaults.js').JsonTableParams} JsonTableParams */
 /** @typedef {import('./defaults.js').SortDef} SortDef */

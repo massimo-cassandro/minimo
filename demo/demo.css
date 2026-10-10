@@ -1,6 +1,6 @@
 /* rimosso da minimo.css perché gestito di default da postcss-css.jit-props */
-@import '@src/custom-properties.css';
-@import '@minimo/minimo.css';
+@import '@minimoSrc/custom-properties.css';
+@import '@minimoSrc/minimo.css';
 
 body {
   padding: 2rem;

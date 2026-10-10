@@ -1,5 +1,5 @@
-import { domBuilder } from '@src/utilities/dom-builder/dom-builder.js';
-import { snackbar } from '@src/components/snackbar/snackbar.js';
+import { domBuilder } from '@minimoSrc/utilities/dom-builder/dom-builder.js';
+import { snackbar } from '@minimoSrc/components/snackbar/snackbar.js';
 
 export function snackbarsDemo(){
   const root = document.getElementById('root'),

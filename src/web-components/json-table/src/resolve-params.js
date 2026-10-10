@@ -1,4 +1,3 @@
-/*! minimo - json-table: params resolution */
 
 import { defaults, mergedParams, jqDatatableModeDefaults } from './defaults.js';
 

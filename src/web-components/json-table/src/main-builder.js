@@ -1,4 +1,3 @@
-/*! minimo - json-table: main structure builder */
 
 import * as styles from '../json-table-component.module.css';
 import { domBuilder } from '../../../utilities/dom-builder/dom-builder.js';

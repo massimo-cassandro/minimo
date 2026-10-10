@@ -1,4 +1,3 @@
-/*! minimo - json-table: defaults */
 
 import {
   boolTrueIcon, boolFalseIcon, sortAscArrowIcon, sortDescArrowIcon, sortNoneArrowIcon,

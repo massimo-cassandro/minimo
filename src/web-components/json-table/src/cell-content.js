@@ -1,5 +1,3 @@
-/*! minimo - json-table: cell & footer content */
-
 import { getNestedValue, resolveMustache } from './content-utils.js';
 import { toNumber } from './data-types.js';
 

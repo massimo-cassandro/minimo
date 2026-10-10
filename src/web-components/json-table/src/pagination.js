@@ -1,6 +1,6 @@
-/*! minimo - json-table: pagination */
 
-import * as styles from '../json-table-component.module.css';
+import * as styles from './pagination.module.css';
+
 import { domBuilder } from '../../../utilities/dom-builder/dom-builder.js';
 import { classnames } from '../../../utilities/classnames.js';
 import { iconContent } from './icons.js';
