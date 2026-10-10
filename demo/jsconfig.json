@@ -9,6 +9,8 @@
     "paths": {
       "@installSourceFiles/*": ["../dev-tools/starter-kit/source_files/*"],
       "@minimoSrc/*": ["../src/*"],
+      "@minimoCss/*": ["../src/css/*"],
+      "@minimoComponents/*": ["../src/components/*"],
       "@minimoCharts/*": ["../charts/*"]
     }
   },
