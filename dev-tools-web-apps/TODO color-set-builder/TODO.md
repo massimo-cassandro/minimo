@@ -9,7 +9,8 @@ Applicazione web per generare una scala di colori parnedo da un colore base inse
 * l'utente inserisce un colore, con possibilità di tuning tramite il picker nativo del browser e stabilisci quando valori nella gradazione chiara e quanti nella scura
 * al set si deve poter stabilire un nome (ad esempio primary)
 * possibilità di aggiungere ulteriori set di colori partendo da un nuovo colore base. Ogni set avraà il proprio nome
-* l'insieme di set (uno o più) corrsipinde ad un progetto, con un proprio nome. Al suo salvataggio (nellp storage o nel config json, vedi dopo) vengono registrate automaticamente alcune info, data di creazione, data ultima modifica,ecc...? Possibilità inserimento descrizione facoltativa. Aggiunta automatica id univoco (decidere come generarlo)
+* l'insieme di set (uno o più) corrsipinde ad un progetto, con un proprio nome. Al suo salvataggio (nello storage o nel config json, vedi dopo) vengono registrate automaticamente alcune info, data di creazione, data ultima modifica,ecc...? Possibilità inserimento descrizione facoltativa. Aggiunta automatica id univoco (decidere come generarlo)
+* impostazione background, foreground, light e mono?
 
 * per ognuna delle due scale può variare tinta, luninosità e saturazione, le modifiche si applicano a tutti i colori ella relativa scala
 * per ogni colore deve essere possibile impostare un nome. 

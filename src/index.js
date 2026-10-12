@@ -23,6 +23,7 @@ export { ValidationError } from './utilities/validation-error-class.js';
 // domBuilder helpers
 export { buildPictureTag } from './utilities/dom-builder-helpers/picture-tag.js';
 export { buildInput, buildCheckbox, buildTextarea, buildFakeField, buildSelect, buildButton } from './utilities/dom-builder-helpers/form-tags.js';
+export { buildTableTag } from './utilities/dom-builder-helpers/table-tag.js';
 
 // components
 export { dismissAlerts } from './components/dismiss-alerts.js';

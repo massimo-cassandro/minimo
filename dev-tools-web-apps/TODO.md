@@ -1,0 +1,1 @@
+Configurare il publicPath della web app di dev-tools-web-apps su /minimo/tools in produzione (come già fatto per la demo con /minimo). Senza questo, gli asset vengono cercati in /minimo/... e danno 404.

@@ -2,6 +2,8 @@
 
 Il mio framework leggero + utilità
 
+Demo: <https://massimo-cassandro.github.io/minimo/>
+
 ## Installazione
 
 ```bash

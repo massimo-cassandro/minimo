@@ -33,12 +33,20 @@ jobs:
         uses: actions/checkout@v4
       - name: Setup Pages
         uses: actions/configure-pages@v5
+      - name: Assemble site
+        # demo alla radice, dev-tools-web-apps su /tools
+        run: |
+          mkdir -p _site/tools
+          cp -R demo/build/. _site/
+          if [ -d dev-tools-web-apps/build ]; then
+            cp -R dev-tools-web-apps/build/. _site/tools/
+          fi
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
           # Upload entire repository
           # path: '.'
-          path: './demo/build'
+          path: './_site'
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v5

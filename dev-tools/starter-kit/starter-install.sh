@@ -39,6 +39,21 @@ if [ -z "$ZSH_VERSION" ]; then
   exit 1
 fi
 
+# Package manager da utilizzare per l'installazione dei pacchetti: 1 = pnpm
+# (default), 2 = npm. Il valore viene usato più sotto (sezione NODE MODULES)
+# per scegliere il comando di installazione.
+read "PM_INPUT?Package manager da utilizzare (1 = pnpm, 2 = npm) [1]: "
+PM_INPUT=${PM_INPUT:-1}
+case "$PM_INPUT" in
+  1) PKG_MANAGER="pnpm" ;;
+  2) PKG_MANAGER="npm" ;;
+  *)
+    printf "${RED}Errore: inserire 1 (pnpm) oppure 2 (npm).${NC}\n" >&2
+    exit 1
+    ;;
+esac
+echo -e "${DIM}Package manager: ${PKG_MANAGER}${NC}"
+
 # Porta da utilizzare: l'utente inserisce un numero da 0 a 99 (default 0), che
 # viene normalizzato a due cifre e usato come suffisso delle porte 80xx e 57xx.
 # I valori sostituiscono i segnaposto [[port8000]] e [[port5700]] presenti in
@@ -65,9 +80,10 @@ echo -e "${DIM}Porte: ${PORT_8000} (server), ${PORT_5700} (webpack dev server)${
 # La colonna <pacchetto> può contenere più pacchetti separati da spazio: in tal
 # caso vengono proposti con un'unica domanda e, se confermati, installati tutti
 # (uno per uno) con la stessa modalità indicata dalla colonna <dev>.
-# La colonna <dev> vale "dev" se il pacchetto va installato con `npm i -D`
-# (devDependency), stringa vuota se va installato con `npm i -S` (dependency
-# vera, es. peer dependency di minimo usata a runtime).
+# La colonna <dev> vale "dev" se il pacchetto va installato come
+# devDependency (`npm i -D` / `pnpm add -D`), stringa vuota se va installato
+# come dependency vera (`npm i -S` / `pnpm add`, es. peer dependency di minimo
+# usata a runtime).
 optionalPackages=(
   "dotenv-webpack                                    | dev | gestione variabili d'ambiente (.env) nel bundle webpack"
   "@principalstudio/html-webpack-inject-preload      | dev | injection dei tag <link rel=preload> nell'html generato"
@@ -286,7 +302,7 @@ echo -e "${GREEN}Files will be installed in: '${FRONTEND_INSTALL_PATH}'${NC}"
 
 
 # package.json va creato dal template PRIMA di installare qualunque pacchetto:
-# se non esistesse ancora, i comandi `npm i` più sotto ne genererebbero uno
+# se non esistesse ancora, i comandi di installazione più sotto ne genererebbero uno
 # "al volo" privo di scripts/metadati del template, e le dipendenze verrebbero
 # registrate lì; alla successiva install_tree su source_files/root (più sotto)
 # quel package.json risulterebbe diverso dal template e verrebbe spostato in
@@ -352,14 +368,24 @@ if [ "$DEBUG" = "TRUE" ]; then
   devDependencies=()
 fi
 
+# comandi di installazione in base al package manager scelto a inizio script:
+# pnpm add -D / pnpm add (dependency), npm i -D / npm i -S
+if [ "$PKG_MANAGER" = "pnpm" ]; then
+  INSTALL_DEV_CMD=(pnpm add -D)
+  INSTALL_DEP_CMD=(pnpm add)
+else
+  INSTALL_DEV_CMD=(npm i -D)
+  INSTALL_DEP_CMD=(npm i -S)
+fi
+
 for pkg in "${devDependencies[@]}"; do
   echo -e "${DIM}...installing "$pkg"${NC}"
-  npm i -D "$pkg"
+  "${INSTALL_DEV_CMD[@]}" "$pkg"
 done
 
 for pkg in "${dependencies[@]}"; do
   echo -e "${DIM}...installing "$pkg"${NC}"
-  npm i -S "$pkg"
+  "${INSTALL_DEP_CMD[@]}" "$pkg"
 done
 
 

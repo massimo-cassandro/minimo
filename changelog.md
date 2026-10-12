@@ -20,3 +20,4 @@
 * 1.40 (02 ott 2026) - orphan classes finder
 * 1.41 (05 ott 2026) - betterTextWithPlaces function
 * 1.42 (09 ott 2026) - nuovo layout-tools
+* 1.43 (12 ott 2026) - Passaggio a  monorepo
