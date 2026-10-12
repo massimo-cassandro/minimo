@@ -227,7 +227,7 @@
   --jt-caption-font-size: var(--font-size-sm);
   --jt-empty-color: var(--text-muted);
   --jt-empty-padding-block: var(--size-sm);
-  --jt-info-color: var(--text-muted);
+  --jt-info-color: var(--text-color);
   --jt-info-font-size: var(--font-size-sm);
   --jt-info-gap: var(--size-sm);
   --jt-info-outer-padding-block-end: var(--size-xs);
@@ -240,7 +240,7 @@
   --jt-pagination-current-font-weight: var(--font-weight-semibold);
   --jt-pagination-disabled-opacity: .5;
   --jt-pagination-font-size: var(--font-size-sm);
-  --jt-pagination-hover-background-color: var(--table-body-tr-hover-bg-color);
+  --jt-pagination-hover-background-color: var(--table-tbody-tr-hover-bg-color);
   --jt-pagination-icon-size: 1em;
   --jt-pagination-line-height: var(--table-cell-line-height);
   --jt-pagination-radius: var(--radius-xxs);
@@ -420,18 +420,21 @@
   --status-warning-color: #fc0;
   --status-warning-fg: #4f2900;
 
-  --table-body-border-width: 1px;
-  --table-body-tr-alt-bg-color: #efefef;
-  --table-body-tr-hover-bg-color: #cbcbcb;
   --table-border-color: #333;
   --table-cell-line-height: 1.3;
   --table-cell-padding-block: .3rem;
   --table-cell-padding-inline: .6rem;
+  --table-tbody-border-width: 1px;
+  --table-tbody-tr-alt-bg-color: #efefef;
+  --table-tbody-tr-hover-bg-color: #cbcbcb;
+  --table-tbody-vertical-align: middle;
   --table-tfoot-background-color: var(--table-thead-background-color);
   --table-tfoot-border-width: var(--table-thead-border-width);
   --table-tfoot-font-weight: var(--font-weight-semibold);
+  --table-tfoot-vertical-align: middle;
   --table-thead-background-color: #ddd;
   --table-thead-border-width: 3px;
+  --table-thead-vertical-align: middle;
 
   --text-color: #000;
   --text-dim: var(--text-muted);

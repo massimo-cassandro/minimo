@@ -20,6 +20,7 @@
 # frontend
 node_modules
 _private
+_reports/**/*.html
 public/_dev
 unresolved-unused-props.md
 orphan-classes.md

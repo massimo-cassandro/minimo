@@ -878,7 +878,6 @@ export type MinimoClass =
   | 'text-upper'
   | 'text-warning'
   | 'text-xs'
-  | 'valign-middle'
   | 'visibility-hidden'
   | 'visually-hidden'
   | 'w-100'

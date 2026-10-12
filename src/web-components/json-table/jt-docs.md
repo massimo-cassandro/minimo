@@ -506,7 +506,7 @@ Definite in `json-table.minimo.tokens.mjs` (namespace `--jt-*`):
 | `--jt-pagination-icon-size` | `1em` |
 | `--jt-pagination-current-background-color` | `{table.thead.background.color}` |
 | `--jt-pagination-current-font-weight` | `{font.weight.semibold}` |
-| `--jt-pagination-hover-background-color` | `{table.body.tr.hover-bg-color}` |
+| `--jt-pagination-hover-background-color` | `{table.tbody.tr.hover-bg-color}` |
 | `--jt-pagination-disabled-opacity` | `.5` |
 | `--jt-bool-icon-size` | `1.1em` |
 | `--jt-bool-true-color` | `{status.success.color}` |

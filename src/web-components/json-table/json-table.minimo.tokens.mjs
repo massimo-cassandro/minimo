@@ -214,7 +214,7 @@ export default {
         background: {
           color: {
             $type: 'color',
-            $value: '{table.body.tr.hover-bg-color}'
+            $value: '{table.tbody.tr.hover-bg-color}'
           }
         }
       },

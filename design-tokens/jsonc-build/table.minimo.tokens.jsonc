@@ -18,6 +18,10 @@
           "$type": "dimension",
           "$value": "3px"
         }
+      },
+      "vertical-align": {
+        "$type": "string",
+        "$value": "middle"
       }
     },
     "tfoot": {
@@ -38,14 +42,22 @@
           "$type": "fontWeight",
           "$value": "{font.weight.semibold}"
         }
+      },
+      "vertical-align": {
+        "$type": "string",
+        "$value": "middle"
       }
     },
-    "body": {
+    "tbody": {
       "border": {
         "width": {
           "$type": "dimension",
           "$value": "1px"
         }
+      },
+      "vertical-align": {
+        "$type": "string",
+        "$value": "middle"
       },
       "tr": {
         "alt-bg-color": {

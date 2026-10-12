@@ -24,6 +24,10 @@
     tr:last-child {
       border-width: var(--table-thead-border-width);
     }
+
+    th {
+      vertical-align: var(--table-thead-vertical-align, top);
+    }
   }
 
   tfoot {
@@ -33,18 +37,22 @@
     }
     th, td {
       font-weight: var(--table-tfoot-font-weight);
+      vertical-align: var(--table-tfoot-vertical-align, top);
     }
   }
 
   tbody {
     tr:nth-child(even) {
-      background-color: var(--table-body-tr-alt-bg-color);
+      background-color: var(--table-tbody-tr-alt-bg-color);
     }
 
     @media (hover: hover) {
       tr:hover {
-        background-color: var(--table-body-tr-hover-bg-color);
+        background-color: var(--table-tbody-tr-hover-bg-color);
       }
+    }
+    th {
+      vertical-align: var(--table-tbody-vertical-align, top);
     }
   }
 
@@ -52,12 +60,7 @@
   th, td {
     padding: var(--table-cell-padding-block) var(--table-cell-padding-inline);
     line-height: var(--table-cell-line-height);
-    vertical-align: top;
     text-align: start;
-
-    .valign-middle &, &.valign-middle {
-      vertical-align: middle;
-    }
   }
 
   &.table-bordered {
@@ -76,8 +79,8 @@
 @media (prefers-color-scheme: dark) {
 .table {
   --table-border-color: var(--_stone-8);
-  --table-body-tr-alt-bg-color: color-mix(in srgb, var(--_stone-12) 60%, transparent);
-  --table-body-tr-hover-bg-color: color-mix(in srgb, var(--_blue-12) 60%, transparent);
+  --table-tbody-tr-alt-bg-color: color-mix(in srgb, var(--_stone-12) 60%, transparent);
+  --table-tbody-tr-hover-bg-color: color-mix(in srgb, var(--_blue-12) 60%, transparent);
 }
 }
 */

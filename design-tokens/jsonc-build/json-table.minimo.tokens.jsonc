@@ -27,7 +27,7 @@
       },
       "color": {
         "$type": "color",
-        "$value": "{text.muted}"
+        "$value": "{text.color}"
       },
       "outer": {
         "padding": {
@@ -205,7 +205,7 @@
         "background": {
           "color": {
             "$type": "color",
-            "$value": "{table.body.tr.hover-bg-color}"
+            "$value": "{table.tbody.tr.hover-bg-color}"
           }
         }
       },

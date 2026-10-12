@@ -42,13 +42,13 @@ fi
 # Package manager da utilizzare per l'installazione dei pacchetti: 1 = pnpm
 # (default), 2 = npm. Il valore viene usato più sotto (sezione NODE MODULES)
 # per scegliere il comando di installazione.
-read "PM_INPUT?Package manager da utilizzare (1 = pnpm, 2 = npm) [1]: "
+read "PM_INPUT?Package manager da utilizzare (1 = npm, 2 = pnpm) [1]: "
 PM_INPUT=${PM_INPUT:-1}
 case "$PM_INPUT" in
-  1) PKG_MANAGER="pnpm" ;;
-  2) PKG_MANAGER="npm" ;;
+  1) PKG_MANAGER="npm" ;;
+  2) PKG_MANAGER="pnpm" ;;
   *)
-    printf "${RED}Errore: inserire 1 (pnpm) oppure 2 (npm).${NC}\n" >&2
+    printf "${RED}Errore: inserire 1 (npm) oppure 2 (pnpm).${NC}\n" >&2
     exit 1
     ;;
 esac

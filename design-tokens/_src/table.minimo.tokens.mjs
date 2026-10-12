@@ -12,7 +12,11 @@ export default {
           $type: 'dimension',
           $value: '3px'
         }
-      }
+      },
+      'vertical-align': {
+        $type: 'string',
+        $value: 'middle',
+      },
     },
     tfoot: {
       background: {
@@ -32,10 +36,15 @@ export default {
           $type: 'fontWeight',
           $value: '{font.weight.semibold}',
         }
+      },
+      'vertical-align': {
+        $type: 'string',
+        $value: 'middle',
+
       }
     },
 
-    body: {
+    tbody: {
       background: {
         color: null
       },
@@ -44,6 +53,11 @@ export default {
           $type: 'dimension',
           $value: '1px'
         }
+      },
+      'vertical-align': {
+        $type: 'string',
+        $value: 'middle',
+
       },
       tr: {
         'alt-bg-color': {
