@@ -2,6 +2,8 @@
 
 La versione della configurazione in uso è indicata dal commento `// v.N` alla riga 2 di `webpack.config.mjs` e di ogni file in `webpack-config-modules/`.
 
+Dove non esiste il commento, si intende una configurazione v2 o precedente.
+
 Le versioni precedenti sono conservate in `archived/webpack-config-v2/` del repository di minimo.
 
 > **Alternativa rapida:** rilanciare `starter-install.sh` (è idempotente): i file diversi dai sorgenti vengono rinominati `OLD-<nome>` e sostituiti dalla nuova versione. Poi si riportano nel nuovo `webpack.config.mjs` le personalizzazioni del progetto (entry, glob dei contenuti, safelist, template html, regole custom) copiandole da `OLD-webpack.config.mjs`. Le istruzioni seguenti servono per aggiornare a mano un progetto già esistente.
@@ -30,6 +32,8 @@ Riepilogo delle modifiche:
 
 ### 1. Moduli in `webpack-config-modules/`
 
+- aggiornare tutti i moduli con versione precedente a quella presente nello starter-kit
+- cssnano non è più utilizzato, se presente effettuare un `npm uninstall`  
 - **Aggiungere** `custom-props-purgecss-plugin.mjs`.
 - **Sostituire** `purgecss-setup.mjs` con la versione v3 (non gestisce più `variables` né `variablesSafelist`; la firma di `createPurgeCSSPlugins` non accetta più `variablesSafelist` e `variables`).
 - **Eliminare** `purgecss-variables-safelist.mjs` (sostituito dal plugin).

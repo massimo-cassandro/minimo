@@ -200,7 +200,7 @@ export function buildPictureTag({
       searchParams.set('f', fmt);
 
       srcsetSizes.forEach(([w, h]) => {
-        // TODO senza altezza `bb=<w>x` vale per questo viewer: prevedere altre convenzioni (es. imgix)
+        // TODO senza altezza `bb=<w>x` vale per il viewer di default: prevedere altre convenzioni (es. imgix)
         searchParams.set('bb', `${w}x${h ?? ''}`);
         base_url.search = searchParams.toString();
         srcsetArray.push(`${base_url.toString()} ${w}w`);

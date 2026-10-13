@@ -2,11 +2,7 @@
 	"folders": [
 		{
 			"path": "."
-		},
-		{
-      "name": "starter-kit",
-			"path": "./dev-tools/starter-kit"
-		},
+		}
 
   ],
   "settings": {
@@ -26,6 +22,14 @@
     "favorites.resources": [
       {
         "filePath": "node_modules/@massimo-cassandro",
+        "group": "Default"
+      },
+      {
+        "filePath": "/Users/mazz/Sites/minimo/dev-tools/starter-kit/source_files/root/webpack.config-tpl.mjs",
+        "group": "Default"
+      },
+      {
+        "filePath": "/Users/mazz/Sites/minimo/dev-tools/starter-kit/source_files/root/package-tpl.json",
         "group": "Default"
       }
     ],
