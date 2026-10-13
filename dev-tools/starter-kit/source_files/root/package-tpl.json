@@ -40,7 +40,8 @@
     "npm-upd": "npm update --save"
   },
   "allowScripts": {
-    "@parcel/watcher": false
+    "@parcel/watcher": false,
+    "fsevents@2.3.3": true
   },
   "devDependencies": {},
   "dependencies": {}

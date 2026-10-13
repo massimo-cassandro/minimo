@@ -103,21 +103,27 @@ const isDevelopment = process.env.NODE_ENV === 'development'
   ,minimo_path = './node_modules/@massimo-cassandro/minimo' // fromProjectRoot('node_modules/@massimo-cassandro/minimo')
 
   ,usePurgeCss = true // false per disattivare PurgeCSS (debug rapido di problemi legati al purge)
+  ,purgeCssInDev = false
   ,purgeCSSOptions = {
     keyframes: true, // rimuove i @keyframes non referenziati
     debug: false // true per loggare i selettori rimossi da PurgeCSS a fine build
   }
 
-  // plugin per l'estrazione ottimizzata delle custom properties (vedi
-  // webpack-config-modules/custom-props-purgecss-plugin.mjs): dopo la
-  // minificazione inietta nei css compilati SOLO le definizioni di custom
-  // properties effettivamente usate, prese dal file master. I css del progetto
-  // contengono quindi solo usi `var(--nome)`, mai definizioni (custom-properties.css
-  // NON va importato nelle entry css). Se false il plugin non viene nemmeno
-  // caricato e la gestione delle custom properties resta a carico del progetto
+  /*
+    plugin per l'estrazione ottimizzata delle custom properties (vedi
+    webpack-config-modules/custom-props-purgecss-plugin.mjs): dopo la
+    minificazione inietta nei css compilati SOLO le definizioni di custom
+    properties effettivamente usate, prese dal file master. I css del progetto
+    contengono quindi solo usi `var(--nome)`, mai definizioni (custom-properties.css
+    NON va importato nelle entry css). Se false il plugin non viene nemmeno
+    caricato e la gestione delle custom properties resta a carico del progetto
+  */
   ,useCustomPropsPlugin = true
-  // file master con TUTTE le definizioni di custom properties disponibili
-  // (copiato da minimo da starter-install.sh, generato da `npm run 'build tokens'`)
+
+  /*
+    file master con TUTTE le definizioni di custom properties disponibili
+    (copiato da minimo da starter-install.sh, generato da `npm run 'build tokens'`)
+  */
   ,customPropsFile = path.resolve(__dirname, './app/css/custom-properties.css')
 
   /*
@@ -143,14 +149,15 @@ const isDevelopment = process.env.NODE_ENV === 'development'
   */
   ,standaloneEntries = []
 
-  // PurgeCSS e plugin custom properties lavorano sugli asset css finali:
-  // in dev, con `false`, sono entrambi disattivati (build più veloce, css
-  // iniettato con style-loader; se `useCustomPropsPlugin` è true le definizioni
-  // vengono aggiunte per intero alle entry, vedi `parsedEntries`).
-  // Con `true` (a scopo di test) sono attivi come in produzione (secondo i
-  // rispettivi flag `usePurgeCss` / `useCustomPropsPlugin`) e `inlineCssInDevMode`
-  // viene forzato a false
-  ,purgeCssInDev = false
+  /*
+    PurgeCSS e plugin custom properties lavorano sugli asset css finali:
+    in dev, con `false`, sono entrambi disattivati (build più veloce, css
+    iniettato con style-loader; se `useCustomPropsPlugin` è true le definizioni
+    vengono aggiunte per intero alle entry, vedi `parsedEntries`).
+    Con `purgeCssInDev = true` (a scopo di test) sono attivi come in produzione (secondo i
+    rispettivi flag `usePurgeCss` / `useCustomPropsPlugin`) e `inlineCssInDevMode`
+    viene forzato a false
+  */
   ,runCustomPropsPlugin = useCustomPropsPlugin && (!isDevelopment || purgeCssInDev)
   // ,manifest_shared_seed = {}
 ;

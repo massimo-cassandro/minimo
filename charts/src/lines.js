@@ -274,6 +274,17 @@ export async function lines(params) {
       .viewbox(0, 0, params.width, params.height)
       .attr({...params.svgAttrs});
 
+    /*
+      L'ultimo punto di ogni linea cade sul limite destro della chart area:
+      se il padding è inferiore al raggio massimo dei punti, il cerchio verrebbe tagliato dal bordo dell'svg.
+      In tal caso il padding destro viene portato al raggio massimo.
+    */
+    const radii = Array.isArray(params.data_points_attrs.r)
+      ? params.data_points_attrs.r
+      : [params.data_points_attrs.r];
+    const maxPointRadius = Math.max(0, ...radii.map(r => Number(r) || 0));
+    const paddingRight = Math.max(params.padding, maxPointRadius);
+
     // pre-elaborazione e calcolo di alcuni elementi (chartArea)
     // nuove variabili definite da parseStdAxisOpts
     const {
@@ -291,6 +302,7 @@ export async function lines(params) {
       values: flatValues,
       legenda: params.legenda,
       padding: params.padding,
+      padding_right: paddingRight,
       width: params.width,
       height: params.height,
       eti_asseX_height: params.xAxisLabelHeight,

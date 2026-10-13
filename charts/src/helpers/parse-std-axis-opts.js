@@ -25,6 +25,7 @@ export function parseStdAxisOpts(params = {} ) {
       values: [], // array flat dei valori per il calcolo di maxValues e minValues, qualora fossero null
       legenda: null,
       padding: 0, // spazio intorno ai bordi del grafico
+      padding_right: null, // padding del solo lato destro; se null viene usato `padding`
       width: null, // width e height non possono essere null, vanno verificate prima
       height: null,
       eti_asseX_height: null, // non può essere null, va verificato prima
@@ -96,7 +97,7 @@ export function parseStdAxisOpts(params = {} ) {
     // i lati sx e inferiore corrispondono agli assi
     parsed.chart_area = {
       top       : legenda_height + gap_legenda + params.padding, // coordinata y superiore
-      right     : params.width - params.padding, // coordinata x dx
+      right     : params.width - (params.padding_right?? params.padding), // coordinata x dx
       bottom    : params.height - params.eti_asseX_height - params.ticksLength - params.padding, // coordinata y inferiore
       left      : params.eti_asseY_width + params.ticksLength + params.padding // coordinata x sx
     };
