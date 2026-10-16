@@ -5,6 +5,7 @@ import fs from 'fs';
 import path from 'path';
 import process from 'process';
 import { pathToFileURL } from 'url';
+import { styleText } from 'util';
 
 /**
  * Genera il file css delle @custom-media.
@@ -30,6 +31,7 @@ export async function buildCustomMedia({
   const srcPath = path.resolve(src),
     destPath = path.resolve(dest ?? srcPath.replace(/\.m?js$/, '.css'));
 
+
   const { default: customMedia } = await import(pathToFileURL(srcPath).href);
 
   if (!customMedia || typeof customMedia !== 'object') {
@@ -44,7 +46,7 @@ export async function buildCustomMedia({
   });
 
   const content = '/* File generato da custom-media-builder.mjs a partire da ' +
-    `${path.basename(srcPath)}. Eventuali modifich andranno perdute */\n\n` +
+    `${path.basename(srcPath)}.\nEVENTUALI MODIFICHE ANDRANNO PERDUTE */\n\n` +
     rows.join('\n') + '\n';
 
   if (fs.existsSync(destPath) && fs.readFileSync(destPath, 'utf8') === content) {
@@ -56,7 +58,7 @@ export async function buildCustomMedia({
 }
 
 // esecuzione da riga di comando
-if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href) {
+if (process.argv[1] && import.meta.url === pathToFileURL(fs.realpathSync(process.argv[1])).href) {
   const args = Object.fromEntries(
     process.argv.slice(2)
       .map(arg => arg.match(/^--(src|dest)=(.+)$/))
@@ -66,7 +68,9 @@ if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.ar
 
   try {
     const written = await buildCustomMedia(args);
-    console.log(written ? 'custom media: file aggiornato' : 'custom media: nessuna modifica');
+
+    console.log(styleText('yellow', written ? 'custom media: file aggiornato' : 'custom media: nessuna modifica'));
+
   } catch (err) {
     console.error(err.message);
     process.exit(1);
