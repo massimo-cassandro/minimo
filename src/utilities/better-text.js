@@ -9,7 +9,7 @@
   che nulla di tutto ciò dipende dagli argomenti della funzione e in precedenza veniva
   ricostruito a ogni singola chiamata di betterText().
 */
-const PARTICELLE = [
+export const PARTICELLE = [
   'e', 'ed',
   'di', 'a', 'da', 'in', 'per', 'con', 'su', 'per', 'tra', 'fra',
   'il', 'lo', 'la', 'i', 'gli', 'le',

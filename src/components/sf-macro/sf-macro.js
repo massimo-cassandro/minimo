@@ -4,6 +4,7 @@ import './sf-macro.css';
 // TODO[epic=v2] in una v. 2 di minimo, rinominare wrapper_selector e row_selector in
 // wrapperClass e rowClass (NB: classi, non selettori, per uniformità con closeBtnClass/addBtnClass/containerClass
 // aggiunti sotto) e rendere tutti i parametri camelCase.
+// TODO[epic=v2] rendere tutti i parametri camelCase, predisporre script di conversione automatica
 // TODO[epic=v2] valutare se rendere opzionale, tramite parametro, l'importazione statica
 // di sf-macro.css qui sopra (questione lasciata in sospeso).
 
@@ -20,6 +21,21 @@ import './sf-macro.css';
  * @param {((row: Element | null, closeBtn: Element | null) => void) | null} [options.del_callback=null] - Chiamata dopo la rimozione di una riga; riceve la riga rimossa (ormai scollegata) e il pulsante di chiusura. (default: null)
  * @param {boolean} [options.insertAtTop=false] - Se true, le nuove righe vengono inserite in cima. (default: false)
  * @returns {void}
+ *
+ * @example
+ * sf_macro({
+ *   wrapper_selector: '.sf-macro-wrapper',
+ *   row_selector: '.sf-macro-riga',
+ *   closeBtnClass: 'sf-macro-close-btn',
+ *   addBtnClass: 'sf-macro-riga-add',
+ *   containerClass: 'sf-macro-container',
+ *   insertAtTop: false,
+ *   // addBtn è il pulsante di aggiunta (action_btn) su cui è avvenuto il click
+ *   add_callback: (newRow, addBtn) => {},
+ *   // closeBtn è il pulsante di rimozione (action_btn) su cui è avvenuto il click
+ *   preDelCallback: async (row, closeBtn) => true,
+ *   del_callback: (row, closeBtn) => {}
+ * });
  */
 export function sf_macro({
   wrapper_selector = '.sf-macro-wrapper',

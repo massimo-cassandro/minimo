@@ -1,7 +1,7 @@
 // @ts-check
 /*! minimo - Better Text with places */
 
-import { betterText, NBSP_AFTER_PARTICLE_REGEX } from './better-text.js';
+import { betterText, NBSP_AFTER_PARTICLE_REGEX, PARTICELLE } from './better-text.js';
 
 const places = [
   // EUROPA
@@ -467,6 +467,19 @@ function buildPlacesMatcher(list) {
 
 const defaultMatcher = buildPlacesMatcher(places);
 
+/*
+  Corrisponde agli spazi (normali o non separabili) NON seguiti da una particella:
+  usata con l'opzione `addNbsp` per unire le parole dei nomi composti, lasciando
+  separabile lo spazio prima di una particella (es. "Lago di Como" → spazio normale
+  tra "Lago" e "di", mentre quello tra "di" e "Como" è già gestito da betterText())
+*/
+const SPACE_BEFORE_NON_PARTICLE_REGEX = new RegExp(
+  '[ \\u00A0]+(?!(?:' +
+    PARTICELLE.map(p => p.replace(/[.*+?^${}()|[\]\\/]/g, '\\$&')).join('|') +
+  ')(?![\\p{L}\\p{N}]))',
+  'giu'
+);
+
 /**
  * Versione di betterText() che normalizza anche le occorrenze di luoghi noti
  * (paesi, città, fiumi, monti, località turistiche) presenti nel testo:
@@ -480,18 +493,33 @@ const defaultMatcher = buildPlacesMatcher(places);
  * ovunque compaiano.
  *
  * @param {string} str - stringa da elaborare
- * @param {string[]} [custom_words] - elenco di parole di cui va mantenuta la capitalizzazione esatta (es. `['iPhone', 'macOS']`) (default: [])
- * @param {string[]} [extra_places] - luoghi aggiuntivi, uniti all'elenco predefinito (default: [])
+ * @param {object} [options] - opzioni (default: {})
+ * @param {string[]} [options.custom_words] - elenco di parole di cui va mantenuta la capitalizzazione esatta (es. `['iPhone', 'macOS']`) (default: [])
+ * @param {string[]} [options.extra_places] - luoghi aggiuntivi, uniti all'elenco predefinito (default: [])
+ * @param {boolean} [options.addNbsp] - se `true`, nei nomi di luogo composti da più parole gli spazi vengono
+ * sostituiti da spazi non separabili, tranne quelli che precedono una particella
+ * (es. in "Monte Bianco" lo spazio diventa non separabile, in "Lago di Como" solo quello dopo "di") (default: false)
  * @returns {string} stringa elaborata, oppure stringa vuota se l'input è falsy
  *
  * @example
  * betterTextWithPlaces("vacanza a  new york e  nel lago di como ,l'avana");
  * // → "vacanza a New York e nel Lago di Como, L’Avana"
  *
- * betterTextWithPlaces('gita a monte cervino', ['iPhone'], ['Monte Cervino']);
+ * betterTextWithPlaces('gita a monte cervino', { custom_words: ['iPhone'], extra_places: ['Monte Cervino'] });
  * // → 'gita a Monte Cervino'
+ *
+ * // opzioni con i valori di default
+ * betterTextWithPlaces('monte bianco e lago di como', {
+ *   custom_words: [],
+ *   extra_places: [],
+ *   addNbsp: false
+ * });
+ * // → 'Monte Bianco e Lago di Como' (spazio non separabile solo dopo "di")
+ *
+ * betterTextWithPlaces('monte bianco e lago di como', { addNbsp: true });
+ * // → 'Monte Bianco e Lago di Como' (spazi non separabili tra "Monte" e "Bianco" e dopo "di")
  */
-export function betterTextWithPlaces(str, custom_words = [], extra_places = []) {
+export function betterTextWithPlaces(str, { custom_words = [], extra_places = [], addNbsp = false } = {}) {
 
   str = betterText(str, custom_words);
 
@@ -503,7 +531,12 @@ export function betterTextWithPlaces(str, custom_words = [], extra_places = []) 
     ? buildPlacesMatcher([...places, ...extra_places])
     : defaultMatcher;
 
-  return matcher
-    ? str.replace(matcher.regex, match => matcher.canonical.get(placeKey(match)) ?? match)
-    : str;
+  if (!matcher) {
+    return str;
+  }
+
+  return str.replace(matcher.regex, match => {
+    const place = matcher.canonical.get(placeKey(match)) ?? match;
+    return addNbsp ? place.replace(SPACE_BEFORE_NON_PARTICLE_REGEX, '\u00A0') : place;
+  });
 }

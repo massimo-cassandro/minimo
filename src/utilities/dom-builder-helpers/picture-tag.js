@@ -1,6 +1,42 @@
 /*! minimo - buildPictureTag */
 import { classnames } from '../classnames.js';
 
+/*
+ * TODO valori di `sizes` in rem/em: permettere di indicare `from` e `size` anche in unità relative
+ * (es. `'40rem'`), oltre ai px numerici, sia nell'attributo `sizes` sia nelle condizioni media.
+ * Da definire come calcolare le dimensioni in px dei candidati `srcset` (es. base font-size configurabile).
+ *
+ *
+ * TODO rivedere e semplificare l'intera funzione (parametri, normalizzazione di `sizes`, calcolo dei
+ * candidati) e ampliare gli esempi iniziali del JSDoc, coprendo un numero maggiore di casi d'uso.
+ *
+ *
+ * TODO URL autonomo per singola size (override di `baseSrc`) — da valutare
+ *
+ * Obiettivo: permettere che ogni candidato dello `srcset` (per entry di `sizes`) ignori `baseSrc`
+ * e usi un URL completamente autonomo.
+ *
+ * Ipotesi A (array parallelo): nuovo parametro `baseSrcset`, array di stringhe o `{src, isViewer}`;
+ * per ogni entry di `sizes` si usa `baseSrcset[i]` al posto di `baseSrc`; se manca o è null, si usa `baseSrc`.
+ * Se `isViewer` è true (default) si aggiungono i parametri `bb`/`q`/`f`, altrimenti l'URL è usato tal quale.
+ *
+ * Ipotesi B (consigliata): proprietà `src` direttamente nella entry di `sizes`,
+ * `{ from, size, src: string | {src, isViewer} }`, senza array parallelo.
+ * Contro: le entry con override non possono usare la scorciatoia numerica.
+ *
+ * Dubbi da sciogliere:
+ * - A vs B: in A `sizes` viene riordinato per breakpoint, quindi `baseSrcset[i]` richiede di tracciare
+ *   l'indice originale prima del sort (fragile).
+ * - `isViewer: false` e `formats`: un URL non gestito dal viewer non può essere convertito in
+ *   avif/webp/pjpg. Proposta: usarlo tal quale in tutti gli `srcset` (`source` e `img`), con il formato
+ *   a carico di chi lo passa. Alternative: solo nell'`img` di fallback, oppure omettere i `source`.
+ * - `dpr`: un URL non-viewer non è ridimensionabile, quindi un solo candidato per entry
+ *   (descrittore `w` = larghezza della size) invece di uno per densità.
+ * - `baseSrc` obbligatorio solo se almeno una entry non ha override (oggi `null` se manca).
+ * - Una stringa semplice vale come `{src, isViewer: true}`: per un URL non-viewer serve sempre l'oggetto.
+ * - Aggiornare JSDoc (typedef, `@param baseSrc`, `@example` con caso misto).
+ */
+
 /**
  * @typedef {Object} PictureSizeEntry
  * @property {number} [from] - Breakpoint (px) da cui si applica la size (condizione media `width >=`); omesso nell'(unica) entry predefinita mobile-first.
@@ -68,7 +104,7 @@ import { classnames } from '../classnames.js';
  * });
  *
  * @param {Object} args
- * @param {string} args.baseSrc - URL base dell'immagine (endpoint del viewer); i suoi parametri di query vengono conservati.
+ * @param {string} args.baseSrc - URL base dell'immagine (endpoint del viewer); i suoi parametri di query vengono conservati. Un URL relativo (es. `/img/abc123`) viene risolto rispetto alla location corrente; se relativo alla root (inizia con `/`, ma non con `//`), resta tale anche negli URL generati.
  * @param {(number | [number, number] | PictureSizeEntry)[]} [args.sizes=[250]] - Dimensioni renderizzate dell'immagine, in qualsiasi ordine. Ogni entry è un oggetto `{from, size}` (vedi {@link PictureSizeEntry}); un numero semplice o una coppia `[width, height]` è la scorciatoia per l'entry predefinita mobile-first (quella senza `from`), attesa esattamente una volta (default: [250])
  * @param {number|null} [args.ratio=null] - Aspect ratio predefinito (larghezza / altezza, come nella proprietà CSS `aspect-ratio`) usato per calcolare l'altezza delle size numeriche. Se null, l'altezza non viene calcolata: gli output legati all'altezza (attributo `height`, altezza nel parametro `bb`) vengono omessi e il viewer mantiene il ratio originale dell'immagine (default: null)
  * @param {number} [args.dpr=2] - Densità di pixel massima (intero): i candidati di `srcset` vengono generati per ogni densità da 1 a `dpr` (default: 2)
@@ -143,8 +179,12 @@ export function buildPictureTag({
     console.warn('[buildPictureTag] `sizes` must contain exactly one entry without `from` (the mobile-first default)');
   }
 
-  const base_url = new URL(baseSrc)
+  // gli URL relativi (es. `/img/abc123`) vengono risolti rispetto alla location corrente
+  const base_url = new URL(baseSrc, globalThis.location?.href)
     ,searchParams = new URLSearchParams(base_url.search)
+
+    // baseSrc relativo alla root: negli URL generati viene omessa l'origine aggiunta per la risoluzione
+    ,isRootRelative = baseSrc.startsWith('/') && !baseSrc.startsWith('//')
 
     // dimensioni dei candidati srcset (una per ogni densità da 1 a `dpr`),
     // senza duplicati (per larghezza), in ordine crescente
@@ -203,7 +243,7 @@ export function buildPictureTag({
         // TODO senza altezza `bb=<w>x` vale per il viewer di default: prevedere altre convenzioni (es. imgix)
         searchParams.set('bb', `${w}x${h ?? ''}`);
         base_url.search = searchParams.toString();
-        srcsetArray.push(`${base_url.toString()} ${w}w`);
+        srcsetArray.push(`${isRootRelative? base_url.pathname + base_url.search : base_url.toString()} ${w}w`);
       });
 
       if(is_default_fmt) {

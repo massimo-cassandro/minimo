@@ -1,8 +1,8 @@
 {#
-  Bootstrap 5 Symfony form layout
+  minimo form layout (ex bs5)
   =======================================
   Massimo Cassandro
-  https://github.com/massimo-cassandro/symfony-bootstrap-form-theme
+  v. 2.1
 #}
 
 {#
@@ -112,11 +112,17 @@
     {% set params = {} %}
   {%- endif -%}
   {%- if params.container_attr is not defined %}
-    {% set params = params|merge({container_attr: {}}) %}
+    {% set params = params|merge({container_attr: {} }) %}
   {%- endif -%}
 
   {% set params = params|merge({
-    container_attr: params.container_attr|merge({ class: (params.container_attr.class|default('') ~ (compound|default()? ' form-collection-fset form-group' : ' form-group'))|trim })
+    container_attr: params.container_attr
+      |merge({
+        class: (
+          container_class|default('') ~ ' ' ~
+          params.container_attr.class|default('') ~
+            (compound|default()? ' form-collection-fset form-group' : ' form-group')
+        )|trim })
   }) %}
 
   {%- if disabled is defined and disabled %}

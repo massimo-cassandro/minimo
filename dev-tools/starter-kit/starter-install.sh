@@ -458,6 +458,7 @@ done
 MINIMO_PKG_DIR=./node_modules/@massimo-cassandro/minimo
 
 force_cat "${MINIMO_PKG_DIR}/src/custom-properties.css" "${FRONTEND_INSTALL_PATH}/css/minimo-custom-properties.css"
+force_cat "${MINIMO_PKG_DIR}/src/custom-media.js" "${FRONTEND_INSTALL_PATH}/css/custom-media.js"
 force_cat "${MINIMO_PKG_DIR}/src/custom-media.css" "${FRONTEND_INSTALL_PATH}/css/custom-media.css"
 
 # entry css principale del progetto: copia diretta di minimo.css

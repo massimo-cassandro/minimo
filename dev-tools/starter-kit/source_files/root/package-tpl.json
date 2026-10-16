@@ -31,6 +31,7 @@
     "create-favicons": "npx create-favicons --dir=./app/favicons",
     "python server": "python3 -m http.server [[port8000]] # --directory __dirname__ # 8000 = default port",
     "node server": "node serve # richiede ‘npm i serve’",
+    "build custom media": "npx custom-media-builder --src=./app/css/custom-media.js",
     "build tokens": "npx buildTokens --config ./app/css/tokens-config.mjs",
     "check unresolved props": "npx checkUnresolvedProps --config ./app/css/tokens-config.mjs",
     "find orphan css classes": "npx findOrphanCssClasses --config ./app/css/orphan-css-classes.config.mjs",

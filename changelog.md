@@ -21,3 +21,5 @@
 * 1.41 (05 ott 2026) - betterTextWithPlaces function
 * 1.42 (09 ott 2026) - nuovo layout-tools
 * 1.43 (12 ott 2026) - Passaggio a  monorepo
+* 1.44 (14 ott 2026) - Miglioramenti per BetterTextWithPlaces
+* 1.45 (16 ott 2026) - Custom media builder

@@ -1,6 +1,6 @@
 {
   "name": "@massimo-cassandro/minimo",
-  "version": "1.43.2",
+  "version": "1.45.0",
   "description": "Light css framework & utilities",
   "type": "module",
   "main": "./src/index.js",
@@ -34,6 +34,7 @@
     "upd@m": "dev-tools/upd@m/index.mjs",
     "svgIconsTools": "dev-tools/svg-icons-tools/index.mjs",
     "create-favicons": "dev-tools/create-favicons/index.mjs",
+    "custom-media-builder": "dev-tools/custom-media-builder/custom-media-builder.mjs",
     "starter-kit": "dev-tools/starter-kit/starter-install.sh"
   },
   "repository": {
@@ -47,6 +48,7 @@
     "build-margin-padding-css": "node ./scripts/build-margin-padding-css.mjs",
     "generate:types": "node ./scripts/generate-class-types.mjs",
     "prepublishOnly": "npm run generate:types",
+    "build custom media": "node ./dev-tools/custom-media-builder/custom-media-builder.mjs --src=./src/custom-media.js",
     "check unresolved props": "node ./dev-tools/design-tokens-builder/check-unresolved-custom-props.mjs --config ./design-tokens/tokens-config.mjs",
     "test": "node --test \"test/**/*.test.mjs\"",
     "test sideEffects tree-shaking": "node ./test/sideEffects-tree-shaking/run-test.mjs",
