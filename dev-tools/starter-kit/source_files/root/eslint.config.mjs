@@ -12,20 +12,12 @@ export default [
   // })),
 
   ...eslint_config,
-  // {
-  //   files: ['src/**/*.js'],
-  //   ignores: [
-  //     'dist/',
-  //     'build/',
-  //     '**/vendor/'
-  //   ],
-  // }
-  // {
-  //   languageOptions: {
-  //     globals: {
-  //       jQuery: 'readonly',
-  //       $: 'readonly',
-  //     },
-  //   },
-  // },
+  {
+    files: ['app/**/*.js'],
+    languageOptions: {
+      globals: {
+        process: 'readonly'
+      }
+    }
+  }
 ];

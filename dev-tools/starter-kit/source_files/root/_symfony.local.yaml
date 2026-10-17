@@ -1,0 +1,29 @@
+# .symfony.local.yaml
+#
+# Worker Messenger avviato insieme a `symfony serve`.
+# Si ferma con il server (Ctrl+C, oppure `symfony server:stop` se avviato con -d).
+#
+# SE IL WORKER RESTA ATTIVO DOPO LO SPEGNIMENTO DEL SERVER
+# (terminale chiuso bruscamente, `kill -9`, crash del server):
+#
+#   1. Verificare se esiste un processo orfano:
+#        ps aux | grep messenger:consume | grep -v grep
+#
+#   2. Fermarlo (SIGTERM: Messenger termina il messaggio in corso prima di uscire):
+#        pkill -f messenger:consume
+#
+#   3. Se dopo qualche secondo è ancora presente, forzare l'arresto:
+#        pkill -9 -f messenger:consume
+#
+# Fare il controllo anche prima di riavviare il server, per evitare due
+# consumer sulla stessa coda (quello vecchio non è più monitorato da `watch`
+# e userebbe codice non aggiornato).
+#
+# Per avviare il server senza worker: symfony serve --no-workers
+
+# workers:
+#     messenger:
+#         cmd: ['symfony', 'console', 'messenger:consume', 'async', '--time-limit=3600', '--memory-limit=256M', '-vv']
+#         watch: ['config', 'src', 'templates']
+    # webpack:
+    #     cmd: ['npm', 'run', 'webpack DEV']

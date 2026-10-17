@@ -20,7 +20,7 @@ import CopyWebpackPlugin from 'copy-webpack-plugin';
 import RemoveEmptyScriptsPlugin from 'webpack-remove-empty-scripts';
 // import HtmlWebpackInjectAttributesPlugin from 'html-webpack-inject-attributes-plugin';
 
-// NB: symfony -> decommentare WebpackManifestPlugin
+// SETUP symfony -> decommentare WebpackManifestPlugin
 // import { WebpackManifestPlugin } from 'webpack-manifest-plugin';
 
 import { cssRules } from './webpack-config-modules/css-rules.mjs';
@@ -506,7 +506,7 @@ const config = {
     // SETUP symfony (decommentare)
     // =>> plugins: WebpackManifestPlugin
     // new WebpackManifestPlugin({
-    //   fileName: path.join(output_dir, 'manifest.json'), // NB: symfony -> fileName: 'manifest.json', // scrive in output.path
+    //   fileName: path.join(output_dir, 'manifest.json'), // SETUP symfony -> fileName: 'manifest.json', // scrive in output.path
     //   // basePath: item.source_dirname
     //   // removeKeyHash: /\?.*$/, // /([a-f0-9]{32}\.?)/gi, // /(\?as_asset)$/,
     //   // rimuove dal manifest i font non woff2 (non necessari, rendono il file inutilmente grande);

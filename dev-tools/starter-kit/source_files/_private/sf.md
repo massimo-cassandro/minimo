@@ -8,5 +8,6 @@
 ## svuota cache
 ```bash
 cd /path/to/project/dir
-sudo php bin/console cache:clear --env=prod
+sudo php bin/console cache:clear # solo cache dell'ambiente configurato
+sudo php bin/console cache:clear --env=prod # solo cache prod
 ```
