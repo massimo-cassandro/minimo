@@ -331,3 +331,202 @@ test('domBuilder: `text` shorthand respects insertMode before/after', () => {
   assert.equal(parentEl.childNodes[1], anchor);
   assert.equal(parentEl.childNodes[2].textContent, '-after');
 });
+
+// --- namespace SVG / MathML ---
+
+const NS_HTML = 'http://www.w3.org/1999/xhtml';
+const NS_SVG = 'http://www.w3.org/2000/svg';
+const NS_MATH = 'http://www.w3.org/1998/Math/MathML';
+
+test('domBuilder: svg with title and use children are all in the SVG namespace', () => {
+  const container = document.createElement('div');
+  const svg = domBuilder([{
+    tag: 'svg',
+    className: 'icon',
+    children: [
+      { tag: 'title', content: 'Carica' },
+      { tag: 'use', attrs: { href: 'icons.svg#cloud' } }
+    ]
+  }], container);
+
+  assert.equal(svg.namespaceURI, NS_SVG);
+  assert.equal(svg.getAttribute('class'), 'icon');
+  assert.equal(svg.children[0].namespaceURI, NS_SVG);
+  assert.equal(svg.children[0].localName, 'title');
+  assert.equal(svg.children[1].namespaceURI, NS_SVG);
+  assert.equal(svg.children[1].getAttribute('href'), 'icons.svg#cloud');
+
+  // anche senza genitore
+  const detached = domBuilder([{ tag: 'svg', children: [{ tag: 'use' }] }]);
+  assert.equal(detached.namespaceURI, NS_SVG);
+  assert.equal(detached.firstElementChild.namespaceURI, NS_SVG);
+});
+
+test('domBuilder: title outside svg stays HTML', () => {
+  const title = domBuilder([{ tag: 'title', content: 'x' }]);
+  assert.equal(title.namespaceURI, NS_HTML);
+  assert.ok(title instanceof dom.window.HTMLElement);
+});
+
+test('domBuilder: children of foreignObject are HTML', () => {
+  const svg = domBuilder([{
+    tag: 'svg',
+    children: [{ tag: 'foreignObject', children: [{ tag: 'div', className: 'inner' }] }]
+  }]);
+  const fo = svg.firstElementChild;
+  assert.equal(fo.namespaceURI, NS_SVG);
+  assert.equal(fo.localName, 'foreignObject');
+  assert.equal(fo.firstElementChild.namespaceURI, NS_HTML);
+  assert.ok(fo.firstElementChild instanceof dom.window.HTMLDivElement);
+});
+
+test('domBuilder: math with mi, HTML element inside mi, mglyph/malignmark exceptions', () => {
+  const math = domBuilder([{
+    tag: 'math',
+    children: [{ tag: 'mi', children: ['span.x', 'mglyph', 'malignmark'] }]
+  }]);
+  const mi = math.firstElementChild;
+  assert.equal(math.namespaceURI, NS_MATH);
+  assert.equal(mi.namespaceURI, NS_MATH);
+  assert.equal(mi.children[0].namespaceURI, NS_HTML);
+  assert.equal(mi.children[1].namespaceURI, NS_MATH);
+  assert.equal(mi.children[2].namespaceURI, NS_MATH);
+});
+
+test('domBuilder: annotation-xml children are HTML only with an HTML encoding', () => {
+  const math = domBuilder([{
+    tag: 'math',
+    children: [{
+      tag: 'semantics',
+      children: [
+        { tag: 'annotation-xml', attrs: { encoding: 'TEXT/HTML' }, children: ['div.a'] },
+        { tag: 'annotation-xml', attrs: { encoding: 'application/xhtml+xml' }, children: ['div.b'] },
+        { tag: 'annotation-xml', children: ['mi.c'] },
+        { tag: 'annotation-xml', children: [{ tag: 'svg' }] }
+      ]
+    }]
+  }]);
+  const [html1, html2, plain, withSvg] = math.firstElementChild.children;
+  assert.equal(html1.firstElementChild.namespaceURI, NS_HTML);
+  assert.equal(html2.firstElementChild.namespaceURI, NS_HTML);
+  assert.equal(plain.firstElementChild.namespaceURI, NS_MATH);
+  assert.equal(withSvg.firstElementChild.namespaceURI, NS_SVG);
+});
+
+test('domBuilder: tag chain [svg.icon, g, use] is entirely SVG', () => {
+  const container = document.createElement('div');
+  const use = domBuilder([{ tag: ['svg.icon', 'g', 'use'], attrs: { href: '#a' } }], container);
+  const svg = container.firstElementChild;
+  assert.equal(svg.namespaceURI, NS_SVG);
+  assert.equal(svg.getAttribute('class'), 'icon');
+  assert.equal(svg.firstElementChild.namespaceURI, NS_SVG);
+  assert.equal(use.namespaceURI, NS_SVG);
+  assert.equal(use.parentNode, svg.firstElementChild);
+  assert.equal(use.getAttribute('href'), '#a');
+});
+
+test('domBuilder: explicit namespace without parent is inherited by children', () => {
+  const g = domBuilder([{ tag: 'g', namespace: 'svg', children: ['path.p', { tag: 'use' }] }]);
+  assert.equal(g.namespaceURI, NS_SVG);
+  assert.equal(g.children[0].namespaceURI, NS_SVG);
+  assert.equal(g.children[1].namespaceURI, NS_SVG);
+
+  const byUri = domBuilder([{ tag: 'use', namespace: NS_SVG }]);
+  assert.equal(byUri.namespaceURI, NS_SVG);
+});
+
+test('domBuilder: explicit namespace on a tag chain applies to the first element', () => {
+  const g = domBuilder([{ tag: ['g', 'use'], namespace: 'svg' }]);
+  assert.equal(g.namespaceURI, NS_SVG);
+  assert.equal(g.parentNode.namespaceURI, NS_SVG);
+  assert.equal(g.parentNode.localName, 'g');
+});
+
+test('domBuilder: options.namespace is the initial namespace without parent', () => {
+  const container = document.createElement('div');
+
+  const path = domBuilder(['path.a'], null, { namespace: 'svg' });
+  assert.equal(path.namespaceURI, NS_SVG);
+  assert.equal(path.getAttribute('class'), 'a');
+
+  // con un genitore HTML, options.namespace non si applica
+  const div = domBuilder(['div'], container, { namespace: 'svg' });
+  assert.equal(div.namespaceURI, NS_HTML);
+});
+
+test('domBuilder: invalid namespace logs an error and falls back to HTML', t => {
+  const errorMock = t.mock.method(console, 'error', () => {});
+  const el = domBuilder([{ tag: 'use', namespace: 'foo' }]);
+  assert.equal(el.namespaceURI, NS_HTML);
+  assert.equal(errorMock.mock.callCount(), 1);
+
+  const el2 = domBuilder(['use'], null, { namespace: 'bar' });
+  assert.equal(el2.namespaceURI, NS_HTML);
+  assert.equal(errorMock.mock.callCount(), 2);
+});
+
+test('domBuilder: className as string and array on SVG elements', () => {
+  const svg = domBuilder([{ tag: 'svg', className: 'icon big' }]);
+  assert.equal(svg.getAttribute('class'), 'icon big');
+
+  const svg2 = domBuilder([{ tag: 'svg', className: ['icon', null, false, 'small'], id: 'ico' }]);
+  assert.equal(svg2.getAttribute('class'), 'icon small');
+  assert.equal(svg2.id, 'ico');
+});
+
+test('domBuilder: mixed-case SVG tags keep their spelling', () => {
+  const svg = domBuilder([{
+    tag: 'svg',
+    children: [
+      { tag: 'linearGradient', id: 'g1' },
+      'clipPath#c1'
+    ]
+  }]);
+  assert.equal(svg.children[0].localName, 'linearGradient');
+  assert.equal(svg.children[1].localName, 'clipPath');
+  assert.equal(svg.children[1].id, 'c1');
+  assert.equal(parseDomString('feGaussianBlur').tag, 'feGaussianBlur');
+});
+
+test('domBuilder: string content with markup inside svg is parsed as SVG', () => {
+  const svg = domBuilder([{ tag: 'svg', content: '<circle r="5"></circle>' }]);
+  const circle = svg.firstElementChild;
+  assert.equal(circle.localName, 'circle');
+  assert.equal(circle.namespaceURI, NS_SVG);
+});
+
+test('domBuilder: insertMode before/after resolve the namespace from anchor.parentNode', () => {
+  const svg = domBuilder([{ tag: 'svg', children: ['g.anchor'] }]);
+  const anchor = svg.firstElementChild;
+
+  domBuilder(['path.before'], anchor, { insertMode: 'before' });
+  domBuilder(['path.after'], anchor, { insertMode: 'after' });
+
+  assert.deepEqual([...svg.children].map(el => el.getAttribute('class')), ['before', 'anchor', 'after']);
+  [...svg.children].forEach(el => assert.equal(el.namespaceURI, NS_SVG));
+});
+
+test('domBuilder: tag chain respects insertMode before/after', () => {
+  const parentEl = document.createElement('div');
+  const anchor = document.createElement('div');
+  anchor.className = 'anchor';
+  parentEl.appendChild(anchor);
+
+  domBuilder([{ tag: ['ul.b', 'li'] }], anchor, { insertMode: 'before' });
+  domBuilder([{ tag: ['ul.a1', 'li'] }, { tag: ['ul.a2', 'li'] }], anchor, { insertMode: 'after' });
+
+  assert.equal(anchor.children.length, 0, 'the chain must not be appended inside the anchor');
+  assert.deepEqual([...parentEl.children].map(el => el.className), ['b', 'anchor', 'a1', 'a2']);
+  [...parentEl.children].filter(el => el !== anchor)
+    .forEach(ul => assert.equal(ul.firstElementChild.localName, 'li'));
+});
+
+test('domBuilder: HTML elements are still HTMLElement in the XHTML namespace', () => {
+  const container = document.createElement('div');
+  domBuilder(['p.a', { tag: 'span', className: ['b', 'c'] }, { tag: ['section', 'a'] }], container);
+  [...container.querySelectorAll('*')].forEach(el => {
+    assert.equal(el.namespaceURI, NS_HTML);
+    assert.ok(el instanceof dom.window.HTMLElement);
+  });
+  assert.equal(container.children[1].className, 'b c');
+});

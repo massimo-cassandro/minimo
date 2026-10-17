@@ -308,8 +308,8 @@ Da affrontare con calma in futuro (eventualmente con una utility condivisa che r
 
 | File | Riga | Tipo | Nota |
 |---|---|---|---|
-| [src/utilities/dom-builder/dom-builder.js](src/utilities/dom-builder/dom-builder.js#L4) | 4–5 | TODO | Sintassi stringa multi-riga e nidificazione con indent |
-| [src/utilities/dom-builder/dom-builder.js](src/utilities/dom-builder/dom-builder.js#L169) | 169 | TODO | Callback con azioni su children potrebbero non essere eseguiti in assenza di parent |
+| [src/utilities/dom-builder/dom-builder.js](src/utilities/dom-builder/dom-builder.js#L6) | 6–7 | TODO | Sintassi stringa multi-riga e nidificazione con indent |
+| [src/utilities/dom-builder/dom-builder.js](src/utilities/dom-builder/dom-builder.js#L442) | 442 | TODO | Callback con azioni su children potrebbero non essere eseguiti in assenza di parent |
 
 ### JS — componenti
 

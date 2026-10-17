@@ -1,13 +1,14 @@
 /*! minimo - DOM Builder */
 import { domBuilderBasicSetup } from './domBuilderBasicSetup.js';
 import { parseDomString } from './parseDomString.js';
+import { createDomElement, normalizeNamespace } from './resolveNamespace.js';
 
 // TODO sintassi stringa multi-riga in cui ogni riga corrisponde a un elemento
 // TODO come sopra, con nidificazione opzionale tramite indentazione
 
 /**
  * @typedef {Object} DomBuilderItem
- * @property {string | string[]} [tag='div'] - Nome del tag HTML o array di tag annidati (ciascuno è il genitore del successivo). Anche `tagName` (default: 'div')
+ * @property {string | string[]} [tag='div'] - Nome del tag o array di tag annidati (ciascuno è il genitore del successivo). Anche `tagName`. La grafia viene conservata, necessaria per i tag SVG come `linearGradient` (default: 'div')
  * @property {string | string[]} [tagName='div'] - Alias di `tag` (default: 'div')
  * @property {string | string[]} [className] - Classe/i CSS: una singola stringa o un array (i valori falsy vengono scartati).
  * @property {string | string[]} [class] - Alias di `className`.
@@ -20,12 +21,20 @@ import { parseDomString } from './parseDomString.js';
  *   (`Element.setHTML`) dove supportata, con ripiego su `innerHTML` grezzo nei browser che non la hanno.
  *   Un `Node` (un `Element`, un `DocumentFragment`, ...) viene aggiunto così com'è, direttamente o
  *   restituito da una funzione.
+ *   Il markup viene letto nel contesto dell'elemento: dentro un `svg` diventa SVG. Attenzione: la Sanitizer API
+ *   rimuove `<use>` anche con `sanitizer: {}` (fa parte della baseline di sicurezza del browser), quindi per le
+ *   icone SVG va usata la sintassi a oggetto (`{ tag: 'use', attrs: { href: '...' } }`), non una stringa di markup.
+ * @property {'html' | 'svg' | 'math' | string} [namespace] - Namespace dell'elemento: un alias (`'html'`, `'svg'`, `'math'`)
+ *   o un URI completo. Se presente ha la precedenza sulla risoluzione automatica; i figli lo ereditano tramite il
+ *   namespace del genitore. Con `tag` array si applica al primo elemento della catena (gli altri lo ereditano).
+ *   Un valore non valido produce un `console.error` e l'elemento viene creato in HTML.
+ *   Non disponibile nella sintassi abbreviata a stringa (default: assente, risoluzione automatica)
  * @property {string | number} [text] - Scorciatoia per un nodo di testo letterale: inserisce un nodo `Text` semplice (mai
  *   interpretato come markup) al posto di un elemento, così da poter essere fratello dei tag negli array
  *   `children`/`content`. Mutuamente esclusivo con `tag`/`content`/`children`: quando è impostato (e `tag` è assente),
  *   ogni altra proprietà tranne `condition` e `callback` viene ignorata.
  * @property {boolean} [condition=true] - Se false, l'elemento (o il nodo di testo) viene saltato (default: true)
- * @property {((el: HTMLElement|Text) => void) | null} [callback] - Callback invocata dopo la creazione dell'elemento (o del nodo di testo).
+ * @property {((el: Element|Text) => void) | null} [callback] - Callback invocata dopo la creazione dell'elemento (o del nodo di testo).
  * @property {Array<DomBuilderItem|string|Node>} [children] - Array di configurazione degli elementi figli. Accetta stringhe (scorciatoia secondo `parseDomString`), oggetti di configurazione e/o `Node` (un `Element`, un `DocumentFragment`, ...) inseriti così come sono.
  */
 
@@ -85,6 +94,23 @@ import { parseDomString } from './parseDomString.js';
  * Quando la stringa abbreviata e le proprietà a livello di oggetto sono in conflitto (classi, id o attributi),
  * le proprietà a livello di oggetto hanno la precedenza.
  *
+ * **Namespace (SVG / MathML)**
+ *
+ * Gli elementi vengono creati nel namespace corretto, così che SVG e MathML vengano disegnati dal browser.
+ * Per ogni elemento, nell'ordine:
+ * 1. `item.namespace`, se presente;
+ * 2. `svg` usa sempre il namespace SVG e `math` sempre quello MathML, qualunque sia il genitore;
+ * 3. gli altri elementi prendono il namespace del genitore effettivo (nessuna lista di tag: `a`, `title`, `script`,
+ *    `style` esistono sia in HTML sia in SVG e conta solo il contesto), tranne nei punti che riportano all'HTML:
+ *    figli di `foreignObject`, figli di `mi`/`mo`/`mn`/`ms`/`mtext` (tranne `mglyph` e `malignmark`) e figli di
+ *    `annotation-xml` con `encoding` `text/html` o `application/xhtml+xml`;
+ * 4. senza genitore, `options.namespace` se presente, altrimenti HTML.
+ *
+ * Il genitore effettivo è `parent` (con `insertMode` `before`/`after` è `parent.parentNode`), l'elemento precedente
+ * nella catena `tag: [...]` e l'elemento stesso per `children` e `content` array.
+ * Gli elementi HTML vengono creati con `document.createElement`, gli altri con `document.createElementNS`.
+ * La sintassi abbreviata a stringa non supporta `namespace`: usa solo la risoluzione automatica.
+ *
  * @function domBuilder
  * @param {Array<DomBuilderItem|string|Node>} [structureArray=[]] - Array di configurazione. Accetta stringhe (scorciatoia secondo `parseDomString`), oggetti di configurazione e/o `Node` (un `Element`, un `DocumentFragment`, ...) inseriti così come sono; ogni oggetto di configurazione supporta:
  * - `tag` / `tagName` {string | string[]} - Nome del tag HTML, o array di tag annidati (ciascuno è il genitore del successivo). Default `'div'`.
@@ -92,18 +118,59 @@ import { parseDomString } from './parseDomString.js';
  * - `id` {string | null} - ID univoco dell'elemento.
  * - `attrs` {[string, *] | [string, *][] | Object<string, *>} - Attributi: una coppia `[name, value]`, un array di coppie o un oggetto `{name: value}`.
  * - `content` {string | number | Function | Node | DomBuilderItem[] | null} - Contenuto dell'elemento. Una stringa/numero viene impostato come `textContent`, a meno che contenga `<`: in tal caso viene sanificato e inserito come markup (`Element.setHTML`, con ripiego su `innerHTML`). Un `Node` (`Element`, `DocumentFragment`, ...), passato direttamente o restituito da una funzione, viene aggiunto così com'è.
+ * - `namespace` {'html' | 'svg' | 'math' | string} - Namespace esplicito (alias o URI completo), con precedenza sulla risoluzione automatica; ereditato dai figli. Default: assente (risoluzione automatica).
  * - `text` {string | number} - Scorciatoia per un nodo di testo letterale: inserisce un nodo `Text` semplice (mai interpretato come markup) come fratello degli altri elementi, al posto di un elemento. Mutuamente esclusivo con `tag`/`content`/`children`.
  * - `condition` {boolean} - Se false, l'elemento (o il nodo di testo) viene saltato. Default `true`.
  * - `callback` {(function(HTMLElement|Text): void) | null} - Invocata dopo la creazione dell'elemento (o del nodo di testo).
  * - `children` {Array<DomBuilderItem|string|Node>} - Array di configurazione degli elementi figli (stesso formato, annidato; accetta anche `Node` inseriti così come sono).
  *
  * ID e classi possono essere indicati come chiavi di primo livello dell'oggetto o dentro `attrs`; le proprietà di primo livello hanno la precedenza (default: [])
- * @param {HTMLElement} [parent] - Elemento genitore a cui viene agganciata la struttura (vedi `options.insertMode`).
+ * @param {Element | null} [parent] - Elemento genitore a cui viene agganciata la struttura (vedi `options.insertMode`).
  * @param {Object} [options={}] - Opzioni di configurazione (default: {})
  * @param {boolean} [options.emptyParent=false] - Se true, l'elemento genitore viene svuotato prima della costruzione (default: false)
  * @param {'append'|'prepend'|'before'|'after'} [options.insertMode='append'] - Come ogni elemento radice di `structureArray` viene agganciato a `parent`: `append` lo inserisce come ultimo figlio (default), `prepend` come primo figlio, `before`/`after` lo inseriscono come fratello precedente/successivo di `parent`. In ogni modalità l'ordine di `structureArray` viene mantenuto. Si applica solo agli elementi prodotti da questa chiamata — le chiamate annidate a `domBuilder` (`content`, `children`) fanno sempre append (default: 'append')
  * @param {boolean} [options.debug=false] - Se true, scrive `structureArray` in console dopo che ogni elemento stringa è stato analizzato con `parseDomString` (cioè l'array elaborato effettivamente usato per costruire il DOM) (default: false)
- * @returns {HTMLElement|null} Il primo elemento creato, oppure null se non è stato creato nulla.
+ * @param {'html'|'svg'|'math'|string} [options.namespace] - Namespace iniziale (alias o URI completo) usato quando manca il genitore effettivo, ad esempio per costruire più fratelli SVG senza genitore. Non si applica quando il genitore c'è, né agli elementi `svg`/`math` o con `namespace` esplicito (default: assente, cioè HTML)
+ * @returns {HTMLElement|null} Il primo elemento creato, oppure null se non è stato creato nulla. Il tipo dichiarato è `HTMLElement` per comodità, ma per gli elementi SVG o MathML il valore restituito è un `SVGElement` o un `MathMLElement`.
+ *
+ * @example
+ * // riepilogo dei parametri con i valori di default
+ * domBuilder([
+ *   {
+ *     tag: 'div',             // default: 'div'
+ *     className: undefined,
+ *     id: undefined,
+ *     attrs: undefined,
+ *     content: undefined,
+ *     namespace: undefined,   // default: risoluzione automatica
+ *     condition: true,        // default: true
+ *     callback: undefined,
+ *     children: undefined
+ *   }
+ * ], parent, {
+ *   emptyParent: false,       // default: false
+ *   insertMode: 'append',     // default: 'append'
+ *   debug: false,             // default: false
+ *   namespace: undefined      // default: HTML in assenza di genitore
+ * });
+ *
+ * @example
+ * // icona SVG con `use`: `svg` è sempre nel namespace SVG, `title` e `use` lo ereditano
+ * domBuilder([{
+ *   tag: 'svg',
+ *   className: 'icon',
+ *   children: [
+ *     { tag: 'title', content: 'Carica' },
+ *     { tag: 'use', attrs: { href: 'icons.svg#cloud' } }
+ *   ]
+ * }], container);
+ *
+ * @example
+ * // frammento SVG senza genitore e senza `svg` come radice
+ * const use = domBuilder([{ tag: 'use', namespace: 'svg', attrs: { href: 'icons.svg#cloud' } }]);
+ *
+ * // più fratelli SVG senza genitore
+ * domBuilder(['path.a', 'circle.b'], null, { namespace: 'svg' });
  */
 
 
@@ -129,18 +196,27 @@ export function domBuilder(/** @type {Array<DomBuilderItem|string|Node>} */ stru
   */
   const useFragment = !!parent && (options.insertMode === 'append' || options.insertMode === 'prepend');
 
-  /** @type {HTMLElement | DocumentFragment | null} */
+  /** @type {Element | DocumentFragment | null} */
   let target = useFragment ? document.createDocumentFragment() : (parent ?? null);
 
-  /** @type {Map<HTMLElement | DocumentFragment, Node>} tiene traccia, per `insertMode: 'after'`, dell'ultimo fratello inserito per ogni nodo genitore */
+  /*
+    Genitore effettivo degli elementi radice, usato per risolverne il namespace: non `target`, che può essere
+    il DocumentFragment di raggruppamento (privo di namespace), ma `parent`, oppure il suo genitore con
+    `before`/`after`, dove gli elementi diventano fratelli di `parent`
+  */
+  const rootParent = !parent ? null
+    : (options.insertMode === 'before' || options.insertMode === 'after') ? parent.parentNode : parent;
+
+  // namespace iniziale in assenza di genitore effettivo
+  const fallbackNs = normalizeNamespace(options.namespace, 'options.namespace');
+
+  /** @type {Map<Element | DocumentFragment, Node>} tiene traccia, per `insertMode: 'after'`, dell'ultimo fratello inserito per ogni nodo genitore */
   const afterAnchors = new Map();
 
   /** @type {HTMLElement | null} */
   let mainElement = null;
   /** @type {HTMLElement} */
   let el;
-  /** @type {HTMLElement | DocumentFragment | null} */
-  let grand_parent = null;
 
   /** @type {Array<DomBuilderItem|null>} */
   const elaboratedStructureArray = [];
@@ -217,11 +293,22 @@ export function domBuilder(/** @type {Array<DomBuilderItem|string|Node>} */ stru
         return;
       }
 
+      // namespace esplicito dell'elemento (con `tag` array, del primo elemento della catena)
+      const itemNs = normalizeNamespace(safeItem.namespace, 'item.namespace');
+
+      /*
+        Con `tag` array: primo elemento della catena (inserito in `target` secondo `insertMode` al posto di `el`)
+        ed elemento che deve contenere `el`
+      */
+      /** @type {Element | null} */
+      let chainRoot = null;
+      /** @type {Element | null} */
+      let chainParent = null;
+
       // quando tag è un array, crea una serie di elementi annidati;
       // l'ultimo riceve le restanti proprietà dell'oggetto
       if (Array.isArray(safeItem.tag)) {
 
-        grand_parent = target;
         const tags = /** @type {string[]} */ (safeItem.tag);
 
         tags.forEach((tagItem, idx) => {
@@ -234,22 +321,34 @@ export function domBuilder(/** @type {Array<DomBuilderItem|string|Node>} */ stru
             safeItem.attrs = {...parsedItem.attrs ?? {}, ...safeItem.attrs ?? {}};
           }
           el = domBuilderBasicSetup(
-            document.createElement(parsedItem.tag || 'div'),
+            /** @type {HTMLElement} */ (createDomElement(
+              parsedItem.tag || 'div',
+              idx === 0 ? rootParent : chainParent,
+              idx === 0 ? itemNs : null,
+              fallbackNs
+            )),
             {...parsedItem, ...(isLast ? safeItem : {})}
           );
 
           if (!isLast) { // l'ultimo elemento viene gestito dal percorso standard qui sotto
-            if (target) {
-              target.appendChild(el);
+            if (chainParent) {
+              chainParent.appendChild(el);
+            } else {
+              chainRoot = el;
             }
-            target = el;
+            chainParent = el;
           }
 
         });
 
       } else {
         el = domBuilderBasicSetup(
-          document.createElement(/** @type {string} */ (safeItem.tag) ?? 'div'),
+          /** @type {HTMLElement} */ (createDomElement(
+            /** @type {string} */ (safeItem.tag) ?? 'div',
+            rootParent,
+            itemNs,
+            fallbackNs
+          )),
           safeItem
         );
       }
@@ -319,28 +418,30 @@ export function domBuilder(/** @type {Array<DomBuilderItem|string|Node>} */ stru
         mainElement = el;
       }
 
+      // con `tag` array, `el` va dentro la catena e in `target` viene inserito il primo elemento della catena
+      if (chainParent) {
+        chainParent.appendChild(el);
+      }
+      const rootNode = chainRoot ?? el;
+
       if (target) {
         if (options.insertMode === 'before') {
           const anchor = /** @type {HTMLElement} */ (target);
-          anchor.parentNode?.insertBefore(el, anchor);
+          anchor.parentNode?.insertBefore(rootNode, anchor);
 
         } else if (options.insertMode === 'after') {
           const anchor = afterAnchors.get(/** @type {HTMLElement} */ (target)) ?? /** @type {HTMLElement} */ (target);
-          anchor.parentNode?.insertBefore(el, anchor.nextSibling);
-          afterAnchors.set(/** @type {HTMLElement} */ (target), el);
+          anchor.parentNode?.insertBefore(rootNode, anchor.nextSibling);
+          afterAnchors.set(/** @type {HTMLElement} */ (target), rootNode);
 
         } else {
-          target.appendChild(el);
+          target.appendChild(rootNode);
         }
       }
 
       // TODO le callback che agiscono sui figli dell'elemento potrebbero non essere eseguite quando non è impostato alcun parent
       if (safeItem.callback && typeof safeItem.callback === 'function') {
         safeItem.callback(el);
-      }
-
-      if (grand_parent) {
-        target = grand_parent;
       }
     }
 

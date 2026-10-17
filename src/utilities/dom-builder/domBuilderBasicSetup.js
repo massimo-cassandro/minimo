@@ -34,7 +34,7 @@ const boolAttrs = new Set([
 
 /**
  * Applica a un elemento la configurazione di base di domBuilder: classi, id e attributi.
- * @param {HTMLElement} element - L'elemento da configurare.
+ * @param {HTMLElement} element - L'elemento da configurare (anche SVG o MathML).
  * @param {DomBuilderItem} domBuilderItem - L'oggetto di configurazione di domBuilder.
  * @returns {HTMLElement}
  */
@@ -64,13 +64,14 @@ export function domBuilderBasicSetup (element, domBuilderItem) {
   });
 
   // assegna classi e id dopo attrs così che le proprietà a livello di oggetto abbiano la precedenza
+  // setAttribute invece di `className`/`id`: sugli elementi SVG `className` è un SVGAnimatedString di sola lettura
   if(domBuilderItem.className) {
-    element.className = Array.isArray(domBuilderItem.className)
+    element.setAttribute('class', Array.isArray(domBuilderItem.className)
       ? domBuilderItem.className.filter(Boolean).join(' ')
-      : domBuilderItem.className;
+      : domBuilderItem.className);
   }
   if(domBuilderItem.id) {
-    element.id = domBuilderItem.id;
+    element.setAttribute('id', domBuilderItem.id);
   }
 
   return element;

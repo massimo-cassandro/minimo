@@ -14,7 +14,7 @@ const DOM_STRING_REGEX = new RegExp(
  * `tag#id.class1.class2.classN(attr1: val1, attr2=val2) text content`
  *
  * Dove:
- * * `tag` è il nome dell'elemento; se omesso vale `div`
+ * * `tag` è il nome dell'elemento, con la grafia originale (es. `linearGradient`); se omesso vale `div`
  * * `#id` è l'id opzionale dell'elemento, preceduto da `#`
  * * `.class1, .class2...` sono classi CSS opzionali, ciascuna preceduta da `.`
  * * i token `#id` e `.class` possono comparire in qualsiasi ordine e alternati (es. `.class1#id.class2`)
@@ -52,7 +52,7 @@ export function parseDomString(domString) {
     idMatch = idAndClasses.match(/#([a-zA-Z0-9_-]+)/),
     classMatches = [...idAndClasses.matchAll(/\.([a-zA-Z0-9_-]+)/g)];
 
-  const tag = (matches[1] || 'div').toLowerCase(),
+  const tag = matches[1] || 'div', // grafia conservata: createElementNS distingue maiuscole e minuscole (linearGradient, clipPath, ...)
     id = idMatch?.[1] || null,
     classes = classMatches.map(m => m[1]),
     rawAttrs = matches[3]?.trim() || null,

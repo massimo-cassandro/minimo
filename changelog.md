@@ -23,3 +23,4 @@
 * 1.43 (12 ott 2026) - Passaggio a  monorepo
 * 1.44 (14 ott 2026) - Miglioramenti per BetterTextWithPlaces
 * 1.45 (16 ott 2026) - Custom media builder
+* 1.46 (17 ott 2026) - domBuilder: supporto SVG
