@@ -23,7 +23,11 @@ import { createDomElement, normalizeNamespace } from './resolveNamespace.js';
  *   restituito da una funzione.
  *   Il markup viene letto nel contesto dell'elemento: dentro un `svg` diventa SVG. Attenzione: la Sanitizer API
  *   rimuove `<use>` anche con `sanitizer: {}` (fa parte della baseline di sicurezza del browser), quindi per le
- *   icone SVG va usata la sintassi a oggetto (`{ tag: 'use', attrs: { href: '...' } }`), non una stringa di markup.
+ *   icone SVG va usata la sintassi a oggetto (`{ tag: 'use', attrs: { href: '...' } }`), oppure `sanitizeContent: false`.
+ * @property {boolean} [sanitizeContent=true] - Se false, il `content` stringa con markup viene inserito con `innerHTML`
+ *   senza sanificazione (conserva anche `<use>`). Da usare solo con contenuto sicuro: gli `<script>` inseriti non vengono
+ *   eseguiti, ma gli attributi di evento (`onerror`, `onload`, ...) sì. Vale solo per l'elemento su cui è impostato,
+ *   non viene ereditato dai figli (default: true)
  * @property {'html' | 'svg' | 'math' | string} [namespace] - Namespace dell'elemento: un alias (`'html'`, `'svg'`, `'math'`)
  *   o un URI completo. Se presente ha la precedenza sulla risoluzione automatica; i figli lo ereditano tramite il
  *   namespace del genitore. Con `tag` array si applica al primo elemento della catena (gli altri lo ereditano).
@@ -118,6 +122,7 @@ import { createDomElement, normalizeNamespace } from './resolveNamespace.js';
  * - `id` {string | null} - ID univoco dell'elemento.
  * - `attrs` {[string, *] | [string, *][] | Object<string, *>} - Attributi: una coppia `[name, value]`, un array di coppie o un oggetto `{name: value}`.
  * - `content` {string | number | Function | Node | DomBuilderItem[] | null} - Contenuto dell'elemento. Una stringa/numero viene impostato come `textContent`, a meno che contenga `<`: in tal caso viene sanificato e inserito come markup (`Element.setHTML`, con ripiego su `innerHTML`). Un `Node` (`Element`, `DocumentFragment`, ...), passato direttamente o restituito da una funzione, viene aggiunto così com'è.
+ * - `sanitizeContent` {boolean} - Se false, il markup di `content` viene inserito con `innerHTML` senza sanificazione (solo con contenuto sicuro; non ereditato dai figli). Default `true`.
  * - `namespace` {'html' | 'svg' | 'math' | string} - Namespace esplicito (alias o URI completo), con precedenza sulla risoluzione automatica; ereditato dai figli. Default: assente (risoluzione automatica).
  * - `text` {string | number} - Scorciatoia per un nodo di testo letterale: inserisce un nodo `Text` semplice (mai interpretato come markup) come fratello degli altri elementi, al posto di un elemento. Mutuamente esclusivo con `tag`/`content`/`children`.
  * - `condition` {boolean} - Se false, l'elemento (o il nodo di testo) viene saltato. Default `true`.
@@ -142,6 +147,7 @@ import { createDomElement, normalizeNamespace } from './resolveNamespace.js';
  *     id: undefined,
  *     attrs: undefined,
  *     content: undefined,
+ *     sanitizeContent: true,  // default: true
  *     namespace: undefined,   // default: risoluzione automatica
  *     condition: true,        // default: true
  *     callback: undefined,
@@ -385,6 +391,10 @@ export function domBuilder(/** @type {Array<DomBuilderItem|string|Node>} */ stru
             if (!content.includes('<')) {
               // testo semplice: non serve il parsing HTML, textContent è più veloce e sicuro per costruzione
               el.textContent = content;
+
+            } else if (safeItem.sanitizeContent === false) {
+              // sanificazione disattivata esplicitamente: contenuto ritenuto sicuro (es. SVG con <use>)
+              el.innerHTML = content;
 
             } else if (typeof el.setHTML === 'function') {
               /* markup: sanifica tramite la Sanitizer API nativa, eliminando <script>, attributi

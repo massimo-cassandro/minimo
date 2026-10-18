@@ -24,3 +24,4 @@
 * 1.44 (14 ott 2026) - Miglioramenti per BetterTextWithPlaces
 * 1.45 (16 ott 2026) - Custom media builder
 * 1.46 (17 ott 2026) - domBuilder: supporto SVG
+* 1.47 (18 ott 2026) - domBuilder opzione per sanificazione `content`

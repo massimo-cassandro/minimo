@@ -530,3 +530,61 @@ test('domBuilder: HTML elements are still HTMLElement in the XHTML namespace', (
   });
   assert.equal(container.children[1].className, 'b c');
 });
+
+// --- sanitizeContent ---
+
+test('domBuilder: sanitizeContent:false skips setHTML and keeps <use> via innerHTML', () => {
+  let setHTMLCalls = 0;
+  Element.prototype.setHTML = function () {
+    setHTMLCalls++;
+  };
+  try {
+    const container = document.createElement('div');
+    domBuilder([{
+      tag: 'span',
+      sanitizeContent: false,
+      content: '<svg class="icon"><use href="icons.svg#cloud"></use></svg>'
+    }], container);
+
+    assert.equal(setHTMLCalls, 0, 'setHTML must not be called with sanitizeContent:false');
+    const use = container.querySelector('use');
+    assert.ok(use, '<use> must be kept');
+    assert.equal(use.namespaceURI, NS_SVG);
+    assert.equal(use.getAttribute('href'), 'icons.svg#cloud');
+  } finally {
+    delete Element.prototype.setHTML;
+  }
+});
+
+test('domBuilder: sanitizeContent defaults to true (setHTML is still used)', () => {
+  let setHTMLCalls = 0;
+  Element.prototype.setHTML = function () {
+    setHTMLCalls++;
+  };
+  try {
+    domBuilder([{ tag: 'p', content: 'Testo <strong>x</strong>' }]);
+    domBuilder([{ tag: 'p', sanitizeContent: true, content: 'Testo <strong>x</strong>' }]);
+    assert.equal(setHTMLCalls, 2);
+  } finally {
+    delete Element.prototype.setHTML;
+  }
+});
+
+test('domBuilder: sanitizeContent:false is not inherited by children', () => {
+  let setHTMLCalls = 0;
+  Element.prototype.setHTML = function () {
+    setHTMLCalls++;
+  };
+  try {
+    const parentEl = domBuilder([{
+      tag: 'div',
+      sanitizeContent: false,
+      content: '<b>trusted</b>',
+      children: [{ tag: 'p', content: 'Testo <strong>x</strong>' }]
+    }]);
+    assert.ok(parentEl.querySelector('b'), 'parent content inserted via innerHTML');
+    assert.equal(setHTMLCalls, 1, 'child content still goes through setHTML');
+  } finally {
+    delete Element.prototype.setHTML;
+  }
+});
