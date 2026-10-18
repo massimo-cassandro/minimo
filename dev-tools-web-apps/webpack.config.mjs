@@ -1,3 +1,4 @@
+// @ts-nocheck
 // webpack.config.mjs __project_name__
 // v.3.2
 import path from 'path';
@@ -25,24 +26,31 @@ import { getJsConfigAliases } from './webpack-config-modules/get-jsConfig-aliase
 import { svgRules } from './webpack-config-modules/svg-rules.mjs';
 // import { InlineCriticalCssPlugin } from './webpack-config-modules/inline-critical-css.mjs';
 
+const __filename = fileURLToPath(import.meta.url)
+  ,__dirname = path.dirname(__filename)
+  ,isDevelopment = process.env.NODE_ENV === 'development';
 
 // =>> entries
 // NB: percorsi dalla root del progetto
 const entries = {
-  'index': './app/index.js',
-
-  'error-pages': './app/error-pages/error-pages.js',
-
-  // css critici da includere inline nei template html: il suffisso `.critical` nel nome
-  // della entry attiva l'istanza PurgeCSS dedicata con purge stretto
-  // (vedi purgecss-setup.mjs) e la regola dedicata in css-rules.mjs
-  'layout.critical': './app/css/layout.critical.css'
+  'index': './index.css',
+  'home': './home/home.js',
 
 };
 
+const htmlWebpackPluginsItems = [
+  {
+    filename: 'index.html',
+    template: path.resolve(__dirname, './index.ejs'),
+    inject: 'body',
+    title: 'Home | Minimo Web Tools',
+    minify: !isDevelopment,
+    base: isDevelopment ? '/' : '/tools/',
+    chunks: ['index', 'home']
+  }
+];
+
 // --- config ---
-const __filename = fileURLToPath(import.meta.url)
-  ,__dirname = path.dirname(__filename);
 
 // Risolve un percorso a partire dalla root del progetto, che coincide con la dir
 // di questo file solo se il frontend NON è in una sottodirectory (es. ./app):
@@ -52,8 +60,7 @@ const __filename = fileURLToPath(import.meta.url)
 //   return candidates.find(p => fs.existsSync(p)) ?? candidates[0];
 // };
 
-const isDevelopment = process.env.NODE_ENV === 'development'
-  ,devServerPort = 5708
+const devServerPort = 5708
   // ,apiPort = 8008
   ,useSass = false
 
@@ -77,7 +84,7 @@ const isDevelopment = process.env.NODE_ENV === 'development'
   // il path assoluto serve a CopyWebpackPlugin/HtmlWebpackPlugin (i path
   // relativi sarebbero risolti dal cwd, non da questo file), mentre la regexp
   // resta relativa perché viene confrontata con i path dei moduli
-  ,favicons_path = path.resolve(__dirname, '../demo/favicons') // commentare se non usato
+  ,favicons_path = path.resolve(__dirname, '../demo/favicons/output') // commentare se non usato
   ,favicons_path_regexp = /favicons\/output/ // source pattern per le favicons (regexp o null)
 
 
@@ -85,11 +92,12 @@ const isDevelopment = process.env.NODE_ENV === 'development'
   // NB: jsconfig.json va tenuto in questa stessa dir (gli alias sono risolti
   // a partire dalla sua posizione)
   ,jsConfigAliases = getJsConfigAliases(path.resolve(__dirname, './jsconfig.json'))
-  ,packageJson = JSON.parse(fs.readFileSync('./package.json', 'utf-8')) //JSON.parse(fs.readFileSync(fromProjectRoot('package.json'), 'utf-8'))
+  ,packageJson = JSON.parse(fs.readFileSync('../package.json', 'utf-8')) //JSON.parse(fs.readFileSync(fromProjectRoot('package.json'), 'utf-8'))
 
   // path del pacchetto minimo (il suo js genera markup con classi proprie e il
   // suo css dichiara custom properties: entrambi vanno visti da PurgeCSS)
-  ,minimo_path = './node_modules/@massimo-cassandro/minimo' // fromProjectRoot('node_modules/@massimo-cassandro/minimo')
+  // NB: qui siamo nel repo stesso di minimo, i sorgenti sono nella dir superiore
+  ,minimo_path = path.resolve(__dirname, '..')
 
   ,usePurgeCss = true // false per disattivare PurgeCSS (debug rapido di problemi legati al purge)
   ,purgeCssInDev = false
@@ -113,7 +121,7 @@ const isDevelopment = process.env.NODE_ENV === 'development'
     file master con TUTTE le definizioni di custom properties disponibili
     (copiato da minimo da starter-install.sh, generato da `npm run 'build tokens'`)
   */
-  ,customPropsFile = path.resolve(__dirname, './app/css/custom-properties.css')
+  ,customPropsFile = path.resolve(__dirname, '../src/custom-properties.css')
 
   /*
     chunk `shared` (splitChunks + runtimeChunk 'single'): true = js e css comuni
@@ -125,7 +133,7 @@ const isDevelopment = process.env.NODE_ENV === 'development'
     NB: con `false` i template NON devono più linkare shared.js, shared.css e
     runtime.js (vedi _sf/templates/_main-tpl.html.twig e la pagina di errore)
   */
-  ,useSharedChunk = true
+  ,useSharedChunk = false
   /*
     entry principale, sempre caricata: con `useSharedChunk: false` riceve le
     definizioni delle custom properties per tutti i css delle altre entry
@@ -188,17 +196,11 @@ const shared_chunk_paths = (module) => {
   // path delle directory da utilizzare nel chunk `shared`
   const sep = '[\\\\/]'; // stringa che produce [\\/] nel pattern
   const pathsRegexp = new RegExp([
-    'node_modules',
-    'app/src/js',
-    'app/src/web-components',
-    'app/src/components',
+    '../node_modules'
   ].map(p => `${sep}${p.replace(/\//g, sep)}${sep}`).join('|'));
 
   // path dei moduli esclusi dal chunk `shared` (restano nella entry che li importa)
-  const excluded_paths = [
-    'minimo/src/components/unsplash-page',
-    'node_modules/blurhash', // peer dep usata solo da unsplash-page
-  ];
+  const excluded_paths = [];
   const excludedRegexp = new RegExp(
     excluded_paths.map(p => `${sep}${p.replace(/\//g, sep)}${sep}`).join('|')
   );
@@ -326,7 +328,6 @@ const config = {
       '**/.git/**',
       '**/_private/**',
       '**/node_modules/**',
-      '!**/node_modules/@massimo-cassandro/**'
     ],
     // poll: 1000, // se necessario, risolve il problema `Error: EMFILE: too many open files, watch`
   },
@@ -467,14 +468,7 @@ const config = {
     }),
 
     // =>> plugins: HtmlWebpackPlugin
-    new HtmlWebpackPlugin({
-      filename: 'index.html',
-      template: path.resolve(__dirname, './index.ejs'),
-      inject: 'body',
-      title: 'Minimo Web Tools',
-      minify: !isDevelopment,
-      base: isDevelopment ? '/' : '/tools/',
-    }),
+    ...htmlWebpackPluginsItems.map( item => new HtmlWebpackPlugin(item)),
 
     // =>> plugins: HtmlWebpackInjectAttributesPlugin
     // new HtmlWebpackInjectAttributesPlugin({
@@ -556,12 +550,8 @@ const config = {
         // SOLO file che generano markup o classi (twig, php, js);
         // i file di stile vengono comunque scartati dal plugin
         contentGlobs: [
-          path.resolve(__dirname, './templates/**/*.twig'),
-          path.resolve(__dirname, './app/**/*.php'),
-          path.resolve(__dirname, './app/index.js'), // entry js di default
-          path.resolve(__dirname, './app/src/**/*.{js,mjs,jsx}'),
-          path.resolve(__dirname, './app/src/**/*.ejs'), // template html di webpack
-          path.resolve(__dirname, './app/error-pages/**/*.js'),
+          path.resolve(__dirname, './index.ejs'), // template html di webpack
+          path.resolve(__dirname, './home/**/*.{js,mjs}'),
           // il js di minimo genera markup con classi proprie (snackbar, unsplash-page, ecc.)
           `${minimo_path}/src/**/*.{js,mjs}`,
         ],

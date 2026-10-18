@@ -1,0 +1,5 @@
+@import '@minimoSrc/minimo.css';
+
+.container {
+  padding-block: var(--size-md);
+}

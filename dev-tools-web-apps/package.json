@@ -3,8 +3,8 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "webpack DEMO dev": "NODE_ENV=development webpack serve --config ./webpack.config.mjs",
-    "webpack DEMO prod": "NODE_ENV=production webpack --config ./webpack.config.mjs"
+    "webpack WEB TOOLS dev": "NODE_ENV=development webpack serve --config ./webpack.config.mjs",
+    "webpack WEB TOOLS prod": "NODE_ENV=production webpack --config ./webpack.config.mjs"
   },
   "devDependencies": {
     "@babel/core": "^8.0.7",
@@ -26,6 +26,7 @@
     "postcss-loader": "^8.2.1",
     "postcss-preset-env": "^11.6.1",
     "process": "^0.11.10",
+    "purgecss-webpack-plugin": "^8.0.0",
     "style-dictionary": "^5.7.0",
     "style-loader": "^4.0.0",
     "svg-url-loader": "^8.1.0",
@@ -35,8 +36,7 @@
     "terser-webpack-plugin": "^5.6.1",
     "webpack": "^5.112.0",
     "webpack-cli": "^7.2.3",
-    "webpack-dev-server": "^6.0.0"
-  },
-  "dependencies": {}
-
+    "webpack-dev-server": "^6.0.0",
+    "webpack-remove-empty-scripts": "^1.1.1"
+  }
 }

@@ -1,3 +1,4 @@
+// v.3
 // import path from 'path';
 // import { fileURLToPath } from 'url';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
@@ -57,6 +58,15 @@ export function cssRules({
       exclude: /\.module\.(sass|scss|css)$/i,
       sideEffects: true,
       oneOf: [
+
+        {
+          // `import url from './file.css?as_url'`: il file viene emesso così com'è e ne viene restituito l'URL
+          resourceQuery: /as_url/,
+          type: 'asset/resource',
+          generator: {
+            filename: 'css/[name].[contenthash][ext]'
+          }
+        },
 
         // raw content per web-components
         {
@@ -147,7 +157,12 @@ function css_loaders({
         modules: css_modules
           ? {
             auto: true,
-            localIdentName: isDevelopment ? '[local]_[hash:base64:6]' : '[hash:base64:10]',
+            // il prefisso fisso `m_`, presente in ENTRAMBE le modalità, consente
+            // il safelist delle classi dei css modules in PurgeCSS (safelist.deep
+            // [/^m_/], vedi webpack.config.mjs): le classi hashate non possono
+            // comparire nei file di contenuto scansionati, e il purge è attivo
+            // anche in dev
+            localIdentName: isDevelopment ? 'm_[local]_[hash:base64:6]' : 'm_[hash:base64:8]',
             exportLocalsConvention: 'as-is',
 
             // namedExport: false,
@@ -169,6 +184,11 @@ function css_loaders({
           sassOptions: {
             quietDeps: true,
             silenceDeprecations: [ 'legacy-js-api', 'mixed-decls', 'color-functions', 'global-builtin', 'import' ],
+            // charset:false evita che sass anteponga @charset/BOM all'output di ogni
+            // singolo modulo quando la sorgente contiene caratteri non-ASCII (anche solo
+            // in un commento): con più moduli concatenati da MiniCssExtractPlugin, quel
+            // BOM finirebbe a metà del bundle finale invece che in testa al file.
+            charset: false,
           }
         }
       } ]

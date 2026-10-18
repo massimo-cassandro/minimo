@@ -1,0 +1,17 @@
+{
+  "__help": "https://code.visualstudio.com/docs/languages/jsconfig",
+  "compilerOptions": {
+    "checkJs": true,
+    "target": "ES2023",
+    "module": "ESNext",
+    "allowSyntheticDefaultImports": true,
+    "moduleResolution": "bundler",
+    "paths": {
+      "@minimoSrc/*": ["../src/*"],
+      "@minimoCss/*": ["../src/css/*"],
+      "@minimoComponents/*": ["../src/components/*"],
+      "@minimoCharts/*": ["../charts/*"]
+    }
+  },
+  "exclude": ["../node_modules", "node_modules"]
+}
