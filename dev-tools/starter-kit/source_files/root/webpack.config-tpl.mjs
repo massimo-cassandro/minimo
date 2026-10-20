@@ -1,5 +1,5 @@
 // webpack.config.mjs __project_name__
-// v.3.2
+// v.3.3
 import path from 'path';
 import { fileURLToPath } from 'url';
 import webpack from 'webpack';
@@ -29,6 +29,9 @@ import { getJsConfigAliases } from './webpack-config-modules/get-jsConfig-aliase
 import { svgRules } from './webpack-config-modules/svg-rules.mjs';
 // import { InlineCriticalCssPlugin } from './webpack-config-modules/inline-critical-css.mjs';
 
+const isDevelopment = process.env.NODE_ENV === 'development'
+  ,__filename = fileURLToPath(import.meta.url)
+  ,__dirname = path.dirname(__filename);
 
 // =>> entries
 // NB: percorsi dalla root del progetto
@@ -44,9 +47,21 @@ const entries = {
 
 };
 
+// SETUP symfony (rimuovere)
+const htmlWebpackPluginsItems = [
+  {
+    filename: 'index.html',
+    template: path.resolve(__dirname, './index.ejs'),
+    inject: 'body',
+    title: 'xxxx',
+    minify: !isDevelopment,
+    // base: isDevelopment ? '/' : '/tools/',
+    // chunks: ['index', 'home']
+  }
+];
+
+
 // --- config ---
-const __filename = fileURLToPath(import.meta.url)
-  ,__dirname = path.dirname(__filename);
 
 // Risolve un percorso a partire dalla root del progetto, che coincide con la dir
 // di questo file solo se il frontend NON è in una sottodirectory (es. ./app):
@@ -56,8 +71,7 @@ const __filename = fileURLToPath(import.meta.url)
 //   return candidates.find(p => fs.existsSync(p)) ?? candidates[0];
 // };
 
-const isDevelopment = process.env.NODE_ENV === 'development'
-  ,devServerPort = [[port5700]]
+const devServerPort = [[port5700]]
   // SETUP symfony
   // ,apiPort = [[port8000]]
   ,useSass = false
@@ -543,14 +557,7 @@ const config = {
 
     // SETUP symfony (rimuovere)
     // =>> plugins: HtmlWebpackPlugin
-    new HtmlWebpackPlugin({
-      filename: 'index.html',
-      template: path.resolve(__dirname, './app/tpl/index.ejs'),
-      inject: 'body',
-      title: 'XXXXX',
-      minify: !isDevelopment
-      // base: isDevelopment ? '/' : '/xxxxx/',
-    }),
+    ...htmlWebpackPluginsItems.map( item => new HtmlWebpackPlugin(item)),
 
     // SETUP symfony (rimuovere)
     // =>> plugins: HtmlWebpackInjectAttributesPlugin
