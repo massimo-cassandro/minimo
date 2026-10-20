@@ -25,3 +25,4 @@
 * 1.45 (16 ott 2026) - Custom media builder
 * 1.46 (17 ott 2026) - domBuilder: supporto SVG
 * 1.47 (18 ott 2026) - domBuilder opzione per sanificazione `content`
+* 1.48 (20 ott 2026) - arrayShuffle utility
