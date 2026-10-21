@@ -336,7 +336,7 @@ const config = {
     di Style Dictionary sui sorgenti dei token per risalire, quando possibile, al
     file sorgente .mjs di ogni proprietà non usata. Default: false.
   */
-  checkUnused: true,
+  checkUnused: false,
 
   /*
     Quando checkUnused è true: se true (default), le custom properties provenienti

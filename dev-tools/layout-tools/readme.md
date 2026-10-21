@@ -7,6 +7,7 @@ Mostra un piccolo indicatore del breakpoint corrente.
 In uno script condiviso da tutto il progetto:
 
 ```javascript
+/* global process */
 if (process.env.NODE_ENV === 'development') {
   import('@massimo-cassandro/minimo/layout-tools')
     .then(({ layoutTools }) => layoutTools()); // framework di default (minimo)
@@ -16,6 +17,7 @@ if (process.env.NODE_ENV === 'development') {
 Con Bootstrap 5:
 
 ```javascript
+/* global process */
 if (process.env.NODE_ENV === 'development') {
   import('@massimo-cassandro/minimo/layout-tools')
     .then(({ layoutTools }) => layoutTools({ framework: 'bs5' })); 
