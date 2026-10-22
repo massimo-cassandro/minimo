@@ -10,7 +10,7 @@
   height: 100%;
 } */
 
-  .grid & {
+  .grid > & {
     padding-block-end: 0;
   }
 }

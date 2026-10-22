@@ -1,0 +1,40 @@
+# Ambiente di sviluppo locale Assicorporate (Mac + Docker Desktop).
+# MySQL resta sul Mac: i container lo raggiungono come "host.docker.internal".
+# Le email finiscono in Mailpit (servizio "mailpit" qui sotto).
+# Guida: docs/docker_locale.md
+
+x-app: &app
+  build: .
+  image: assicorporate-dev
+  restart: unless-stopped
+  volumes:
+    - .:/var/www/html
+  # Sovrascrive DATABASE_URL e MAILER_DSN di .env.local (le variabili reali vincono sui file .env)
+  env_file: .env.docker.local
+  extra_hosts:
+    - "host.docker.internal:host-gateway"
+
+services:
+  app:
+    <<: *app
+    ports:
+      # http://localhost:8005 (stessa porta di "symfony serve": il proxy del webpack dev server punta qui)
+      - "8005:80"
+
+  # Coda della chat e dei job brevi (sostituisce l'agente launchd)
+  worker:
+    <<: *app
+    command: php bin/console messenger:consume async --time-limit=3600 --memory-limit=256M --sleep=1 --no-interaction -vv
+
+  # Coda separata per l'indicizzazione dei chiarimenti (job lunghi)
+  worker-indexing:
+    <<: *app
+    command: php bin/console messenger:consume chiarimenti_indexing --time-limit=3600 --memory-limit=256M --sleep=1 --no-interaction -vv
+
+  # Cattura le email inviate dall'app (MAILER_DSN=smtp://mailpit:1025), interfaccia su http://localhost:8026
+  # Porta 8026 e non 8025: la 8025 è del MailHog di MAMP PRO
+  mailpit:
+    image: axllent/mailpit:v1.31.4
+    restart: unless-stopped
+    ports:
+      - "8026:8025"

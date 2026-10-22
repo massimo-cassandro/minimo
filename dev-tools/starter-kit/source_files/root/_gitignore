@@ -18,6 +18,9 @@
 .phpunit.result.cache
 ###< symfony/framework-bundle ###
 
+# docker e compose locali: override delle variabili per i container
+.env.docker.local
+compose.override.yaml
 
 # frontend
 node_modules

@@ -1,0 +1,24 @@
+# template per personalizzazioni locali di compose.yaml, valide solo su questa macchina.
+# Per usarla: copia compose.override.yaml.dist in compose.override.yaml
+# docker compose carica compose.override.yaml da solo, il file è escluso da git.
+#
+# Qui si aggiunge o si sovrascrive, non si toglie: le liste (ports, volumes...)
+# vengono unite a quelle di compose.yaml. Per sostituire una lista usare !override
+# (es. "ports: !override").
+#
+# Guida: docs/docker_locale.md
+
+services:
+  # Esempio: Mailpit su un'altra porta, se la 8026 è già occupata
+  # mailpit:
+  #   ports: !override
+  #     - "8027:8025"
+
+  # Esempio: Xdebug o altre impostazioni PHP solo per sé
+  # app:
+  #   volumes:
+  #     - ./docker/php/xdebug.local.ini:/usr/local/etc/php/conf.d/zz-xdebug.ini
+
+  # Esempio: non avviare il worker dell'indicizzazione
+  # worker-indexing:
+  #   profiles: [disabled]
