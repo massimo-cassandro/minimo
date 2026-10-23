@@ -28,3 +28,4 @@
 * 1.48 (20 ott 2026) - arrayShuffle utility
 * 1.49 (20 ott 2026) - Layout-tools: bs5
 * 1.50 (23 ott 2026) - form-check
+* 1.51 (23 ott 2026) - overlay

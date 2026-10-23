@@ -36,6 +36,7 @@ export { overlay, removeOverlay } from './components/overlay/overlay.js';
 export { sf_macro } from './components/sf-macro/sf-macro.js';
 export { slideToggle, slideUp, slideDown } from './components/slide-up-down-toggle/slide-up-down-toggle.js';
 export { snackbar } from './components/snackbar/snackbar.js';
+export { spinner } from './components/spinner/spinner.js';
 export { unsplashPage } from './components/unsplash-page/unsplash-page.js';
 
 // web components

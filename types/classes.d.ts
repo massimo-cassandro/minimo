@@ -498,8 +498,6 @@ export type MinimoClass =
   | 'no-border'
   | 'no-result'
   | 'overflow-hidden'
-  | 'overlay'
-  | 'overlay-inverted'
   | 'p'
   | 'p-0'
   | 'p-0-dsk'
