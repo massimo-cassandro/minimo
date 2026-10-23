@@ -2,7 +2,7 @@
   minimo form layout (ex bs5)
   =======================================
   Massimo Cassandro
-  v. 2.1
+  v. 2.1.1
 #}
 
 {#
@@ -119,8 +119,8 @@
     container_attr: params.container_attr
       |merge({
         class: (
-          container_class|default('') ~ ' ' ~
-          params.container_attr.class|default('') ~
+          container_class|default('')  ~
+          (params.container_attr.class|default('')? ' ' ~ params.container_attr.class : '') ~
             (compound|default()? ' form-collection-fset form-group' : ' form-group')
         )|trim })
   }) %}

@@ -59,6 +59,7 @@ export type MinimoClass =
   | 'font-semibold'
   | 'form-check'
   | 'form-check-input'
+  | 'form-check-reverse'
   | 'form-check-top-label'
   | 'form-collection'
   | 'form-collection-fset'

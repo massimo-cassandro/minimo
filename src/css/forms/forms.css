@@ -8,8 +8,16 @@
 
 .form-group:has([required]):not(:has([disabled])) {
 
-  /* `>` esclude le label all'interno delle form-collection  */
-  > .form-label {
+  /*
+    `>` esclude le label all'interno delle form-collection
+    il secondo selettore gestisce il checkbox singolo (es. consenso privacy):
+    la label è dentro `.form-check`, che deve essere l'unica del gruppo
+    per non mostrare l'asterisco su ogni opzione di un gruppo radio/checkbox
+  */
+  /* stylelint-disable selector-max-class */
+  > .form-label,
+  > .form-check:not(.form-check ~ .form-check,
+  :has(~ .form-check)) > .form-label {
     position: relative;
     padding-inline-start: var(--form-control-required-label-padding-inline-start);
     &::before {
@@ -22,6 +30,7 @@
       content: var(--form-control-required-flag-content);
     }
   }
+  /* stylelint-enable selector-max-class */
 }
 
 /* le singole checkbox e radio sono centrate verticalmente */
@@ -143,22 +152,29 @@ input[type='checkbox'] {
 }
 
 /* da bs5 */
-/* versione con label a destra */
-/* TODO rivedere. sostituire float con flex? */
+/*
+  versione con label a destra, `.form-check-reverse` per label a sinistra
+  l'input è allineato alla prima riga della label (anche se su più righe)
+*/
 /* TODO eliminare necessità di stare dentro un `.form-group` */
 /* TODO aggiungere esempi di uso */
 .form-check {
-  display: block;
-  padding-left: 1.5em;
+  display: flex;
+  column-gap: var(--size-xs);
+  align-items: flex-start;
   margin-block-start: var(--size-sm);
   break-inside: avoid;
 
   .form-check-input {
-    float: left;
-    display: inline-block;
+    flex: none;
     width: auto;
-    margin: 4px 0 0 -1.5em;
+    margin: calc((1lh - 1em) / 2) 0 0;
   }
+}
+
+.form-check-reverse {
+  flex-direction: row-reverse;
+  justify-content: flex-end;
 }
 
 /* fix per safari */

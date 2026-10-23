@@ -49,7 +49,11 @@
       {
         "filePath": "node_modules/@massimo-cassandro/minimo/src/web-components/json-table/jt-docs.md",
         "group": "Default"
-      }
+      },
+      {
+        "filePath": "/Users/mazz/Sites/_config/docker-quickstart.md",
+        "group": "Default"
+      },
     ],
 
     "bootstrapIntelliSense": {

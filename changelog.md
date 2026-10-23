@@ -27,3 +27,4 @@
 * 1.47 (18 ott 2026) - domBuilder opzione per sanificazione `content`
 * 1.48 (20 ott 2026) - arrayShuffle utility
 * 1.49 (20 ott 2026) - Layout-tools: bs5
+* 1.50 (23 ott 2026) - form-check
