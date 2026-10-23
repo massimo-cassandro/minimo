@@ -1,11 +1,16 @@
 /*! minimo - Overlay */
 
 .overlay {
-  position: fixed;
+  position: absolute;
   inset: 0;
   z-index: var(--overlay-z-index);
   display: grid;
   place-items: center;
   pointer-events: none;
   background-color: var(--overlay-color);
+}
+
+/* overlay a tutta pagina (context = document.body) */
+.inBody {
+  position: fixed;
 }

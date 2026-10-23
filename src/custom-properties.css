@@ -331,7 +331,8 @@
   --mpopup-min-width: 400px;
   --mpopup-width: max-content;
 
-  --overlay-color: rgb(0 0 0 / .6);
+  --overlay-color: color-mix(in srgb, var(--text-color) 20%, transparent);
+  --overlay-z-index: var(--z-index-overlay);
 
   --radius-base: var(--size-base);
   --radius-lg: var(--size-lg);
@@ -372,7 +373,7 @@
   --size-xs: .5rem;
   --size-xxs: .25rem;
 
-  --slide-duration: 500ms;
+  --slide-duration: .5s;
 
   --snackbar-background-color: var(--secondary-100);
   --snackbar-border-radius: var(--radius-xs);

@@ -8,7 +8,11 @@
   "overlay": {
     "color": {
       "$type": "color",
-      "$value": "rgb(0 0 0 / .6)"
+      "$value": "color-mix(in srgb, {text.color} 20%, transparent)"
+    },
+    "z-index": {
+      "$type": "number",
+      "$value": "{z-index.overlay}"
     }
   }
 }
