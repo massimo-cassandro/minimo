@@ -19,10 +19,10 @@
   composto in un unico `@layer`, anziché uno per modalità.
 
   Quando sourceModes definisce sia una chiave `light` sia una `dark` e
-  useLightDarkFunc è true (default), le custom properties condivise da entrambe vengono
-  riconciliate in un'unica dichiarazione `light-dark()` invece di essere divise
-  tra il blocco base e una regola `@media (prefers-color-scheme: dark)` —
-  vedi light-dark.mjs.
+  useLightDarkFunc è true (default), le custom properties di tipo colore condivise da
+  entrambe vengono riconciliate in un'unica dichiarazione `light-dark()` invece di essere
+  divise tra il blocco base e una regola `@media (prefers-color-scheme: dark)` — le
+  proprietà non di colore restano comunque divise — vedi light-dark.mjs.
 
   I token JSON (se jsonBuildPath è impostato) vengono prodotti per modalità: un set di
   file per modalità, con `-<modalità>` aggiunto a ogni nome di file (vedi
@@ -35,7 +35,7 @@ import StyleDictionary from 'style-dictionary';
 import * as path from 'node:path';
 import { mkdir, writeFile } from 'node:fs/promises';
 import { CSS_TRANSFORMS, JSON_TRANSFORMS } from './platforms.mjs';
-import { customPropsCount, lastFinalProps } from './formats/css.mjs';
+import { customPropsCount, lastFinalProps, lastPropTypes } from './formats/css.mjs';
 import { buildJsonFiles, collectConcreteFilePaths } from './formats/json.mjs';
 import { loadExistingCustomPropsScoped } from './merge-css.mjs';
 import { applyLightDarkFunc } from './light-dark.mjs';
@@ -58,7 +58,8 @@ import { applyLightDarkFunc } from './light-dark.mjs';
  * @param {string}                 opts.customPropsSelector  selettore CSS che racchiude i blocchi generati (default: ':root' — vedi config.mjs)
  * @param {string[]}               opts.parserNames  nomi dei parser di Style Dictionary a cui far aderire ogni istanza (bridge legacy, più il parser di rinomina dei token quando almeno una sorgente ha un `transform` — vedi build-tokens.mjs)
  * @param {string[]}               opts.preprocessorNames  nomi dei preprocessor di Style Dictionary a cui far aderire ogni istanza (il riscrittore dei riferimenti di rinomina dei token, quando almeno una sorgente ha un `transform` — vedi build-tokens.mjs)
- * @returns {Promise<{cssDestPath: string, totalCustomProps: number, jsonFilesByMode: Record<string, object[]>}>}
+ * @returns {Promise<{cssDestPath: string, totalCustomProps: number, jsonFilesByMode: Record<string, object[]>, lightDarkExcluded: string[]}>}
+ *   lightDarkExcluded: proprietà presenti sia in light sia in dark, con valori diversi, escluse da light-dark() perché non di colore (vedi light-dark.mjs)
  */
 export const buildSourceModes = async ({
   sourceModes,
@@ -104,6 +105,8 @@ export const buildSourceModes = async ({
   const modeCounts = {};
   /** @type {Record<string, Record<string,string>>} */
   const modeFinalProps = {};
+  /** @type {Record<string, Record<string,string>>} */
+  const modePropTypes = {};
   /** @type {Record<string, object[]>} */
   const jsonFilesByMode = {};
 
@@ -152,6 +155,7 @@ export const buildSourceModes = async ({
     // sincrono dalla funzione format chiamata qui sopra (vedi formats/css.mjs).
     modeCounts[mode] = customPropsCount;
     modeFinalProps[mode] = lastFinalProps;
+    modePropTypes[mode] = lastPropTypes;
 
     if (jsonBuildPath) {
       const concreteFilePaths = jsonDestFile ? [] : await collectConcreteFilePaths(sd);
@@ -182,9 +186,12 @@ export const buildSourceModes = async ({
     di props modificate — vedi light-dark.mjs. Non fa nulla (restituisce null) a meno che sourceModes
     definisca sia una chiave `light` sia una `dark`.
   */
+  /** @type {string[]} */
+  let lightDarkExcluded = [];
   if (useLightDarkFunc) {
     const reconciled = applyLightDarkFunc({
       modeFinalProps,
+      modePropTypes,
       modeNames,
       baseMode,
       selector: customPropsSelector,
@@ -193,6 +200,7 @@ export const buildSourceModes = async ({
     if (reconciled) {
       Object.assign(modeBlocks, reconciled.blocks);
       Object.assign(modeCounts, reconciled.counts);
+      lightDarkExcluded = reconciled.excluded;
     }
   }
 
@@ -225,5 +233,5 @@ export const buildSourceModes = async ({
   const cssDestPath = path.join(buildPath, destFile);
   await writeFile(cssDestPath, finalCss);
 
-  return { cssDestPath, totalCustomProps, jsonFilesByMode };
+  return { cssDestPath, totalCustomProps, jsonFilesByMode, lightDarkExcluded };
 };

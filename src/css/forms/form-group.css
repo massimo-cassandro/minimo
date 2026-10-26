@@ -1,3 +1,5 @@
+/* TODO classe grid specifica per i form ?? (.form-grid?) */
+
 .form-group {
   display: flex;
   flex-flow: column nowrap;
@@ -12,5 +14,40 @@
 
   .grid > & {
     padding-block-end: 0;
+  }
+}
+
+.form-group:has([required]):not(:has([disabled])) {
+
+  /*
+    `>` esclude le label all'interno delle form-collection
+    il secondo selettore gestisce il checkbox singolo (es. consenso privacy):
+    la label è dentro `.form-check`, che deve essere l'unica del gruppo
+    per non mostrare l'asterisco su ogni opzione di un gruppo radio/checkbox
+  */
+  /* stylelint-disable selector-max-class */
+  > .form-label,
+  > .form-check:not(.form-check ~ .form-check,
+  :has(~ .form-check)) > .form-label {
+    position: relative;
+    padding-inline-start: var(--form-control-required-label-padding-inline-start);
+    &::before {
+      position: absolute;
+      top: var(--form-control-required-flag-top);
+      left: var(--form-control-required-flag-left);
+      display: inline-block;
+      font-size: var(--form-control-required-flag-font-size);
+      color: var(--form-control-required-flag-color);
+      content: var(--form-control-required-flag-content);
+    }
+  }
+  /* stylelint-enable selector-max-class */
+}
+
+/* le singole checkbox e radio sono centrate verticalmente */
+.form-group:not(.form-collection-fset):has(.form-check:not(.form-check-top-label)) {
+  align-self: center;
+  .form-check {
+    margin-block-start: 0;
   }
 }

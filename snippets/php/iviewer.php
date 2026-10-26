@@ -42,12 +42,19 @@
  * CONFIGURAZIONE - da adattare all'ambiente in cui gira lo script
  * ================================================================== */
 
-/* cartella "pubblica" a cui è relativo il parametro src */
-define('PUBLIC_DIR', $_SERVER['DOCUMENT_ROOT']);
+/* cartella "pubblica" a cui è relativo il parametro src: la cartella
+   superiore a quella dello script (funziona anche se il sito è in una
+   sottocartella del document root) */
+define('PUBLIC_DIR', realpath(dirname(__DIR__)));
 
-/* cartella dove vengono salvati i file di cache (deve esistere ed
-   essere scrivibile dal webserver) */
-define('CACHE_DIR', __DIR__ . '/cache/');
+/* cartella dove vengono salvati i file di cache (se non esiste viene
+   creata al primo utilizzo: la cartella superiore deve essere
+   scrivibile dal webserver); in sviluppo (server integrato di PHP)
+   viene usata la cartella temporanea di sistema */
+define('CACHE_DIR', PHP_SAPI === 'cli-server'
+  ? sys_get_temp_dir() . '/iviewer-cache/'
+  : __DIR__ . '/img_cache/'
+);
 
 /* durata della cache dei file, in secondi (qui: 7 giorni) */
 define('CACHE_LIFETIME', 604800);
@@ -308,15 +315,23 @@ foreach ($params as $kg => $g) {
 }
 $cacheParamsStr = str_replace(',', '_', $cacheParamsStr);
 
-$filePath = PUBLIC_DIR . $src;
+/* il percorso risolto deve trovarsi all'interno di PUBLIC_DIR
+   (impedisce l'accesso a file esterni tramite "../") */
+$filePath = realpath(PUBLIC_DIR . '/' . ltrim($src, '/'));
 
-if (!is_file($filePath)) {
+if ($filePath === false || !str_starts_with($filePath, PUBLIC_DIR . DIRECTORY_SEPARATOR) || !is_file($filePath)) {
   http_response_code(404);
   exit('Immagine non trovata!');
 }
 
 $fileExt = strtolower(pathinfo($filePath, PATHINFO_EXTENSION));
 $fileCacheName = str_replace('/', '_', $src);
+
+/* nome del file inviato al browser: quello dell'originale, senza l'eventuale
+   hash aggiunto da webpack (".[contenthash]" di 20 caratteri esadecimali);
+   l'estensione viene corretta più avanti in base al formato di output */
+$baseName = preg_replace('/\.[0-9a-f]{20}$/', '', pathinfo($filePath, PATHINFO_FILENAME));
+$downloadName = $baseName . '.' . $fileExt;
 
 $disposition = isset($params['d']) ? 'attachment' : 'inline';
 
@@ -336,6 +351,8 @@ if (count($params) && in_array($fileExt, array_merge(ALLOWED_INPUT, array_keys(A
 
   $fileCacheName .= $cacheParamsStr . '.' . ($format === 'pjpeg' ? 'jpeg' : $format);
   $cacheFile = CACHE_DIR . $fileCacheName;
+
+  $downloadName = $baseName . '.' . (in_array($format, ['jpeg', 'pjpeg'], true) ? 'jpg' : $format);
 
   $compressionQuality = !empty($params['q']) ? (int) $params['q'] : DEFAULT_COMPRESSION_QUALITY;
 
@@ -441,6 +458,13 @@ if (count($params) && in_array($fileExt, array_merge(ALLOWED_INPUT, array_keys(A
       $img = flattenImageOnWhite($img);
     }
 
+    /* crea la cartella di cache se non esiste (il secondo is_dir evita
+       errori se un'altra richiesta concorrente l'ha appena creata) */
+    if (!is_dir(CACHE_DIR) && !mkdir(CACHE_DIR, 0755, true) && !is_dir(CACHE_DIR)) {
+      http_response_code(500);
+      exit('Impossibile creare la cartella di cache!');
+    }
+
     $mimeType = writeImage($img, $format, $cacheFile, $compressionQuality);
 
     imagedestroy($img);
@@ -460,7 +484,7 @@ if (count($params) && in_array($fileExt, array_merge(ALLOWED_INPUT, array_keys(A
 
 /* invio del file al browser */
 header('Content-Type: ' . $mimeType);
-header('Content-Disposition: ' . $disposition . '; filename="' . $fileCacheName . '"');
+header('Content-Disposition: ' . $disposition . '; filename="' . $downloadName . '"');
 header('Content-Length: ' . filesize($cacheFile));
 
 readfile($cacheFile);

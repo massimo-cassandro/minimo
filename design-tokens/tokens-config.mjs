@@ -20,11 +20,24 @@ const config = {
       OK:  `${minimo_path}/**\/*.{json,mjs}`
       NO:  path.join(minimo_path, '/**\/*.{json,mjs}')
   */
-  source: [
-    './_src/**/*.tokens.mjs',
-    '../src/**/*.tokens.mjs',
-
-  ],
+  /*
+    Suddivisione light/dark (al posto di `source`, che con sourceModes viene ignorato):
+    i file `*.tokens-dark.mjs` (es. `form.minimo.tokens-dark.mjs`) contengono solo i token
+    da ridefinire in dark mode, e non sono intercettati dal pattern `*.tokens.mjs` della
+    modalità light. Le proprietà di colore presenti in entrambe le modalità vengono scritte
+    con light-dark(), le altre in `@media (prefers-color-scheme: dark)`
+    (vedi `useLightDarkFunc` in dev-tools/design-tokens-builder/tokens-config-sample.mjs).
+  */
+  sourceModes: {
+    light: [
+      './_src/**/*.tokens.mjs',
+      '../src/**/*.tokens.mjs',
+    ],
+    dark: [
+      './_src/**/*.tokens-dark.mjs',
+      '../src/**/*.tokens-dark.mjs',
+    ],
+  },
 
   /*
     Se true (default), i valori dei token di tipo dimension espressi in px vengono convertiti

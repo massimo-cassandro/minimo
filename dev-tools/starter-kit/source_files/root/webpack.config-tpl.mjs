@@ -61,6 +61,50 @@ const htmlWebpackPluginsItems = [
 ];
 
 
+
+// =>> CopyWebpackPlugin patterns
+// (null o array vuoto per disattivare)
+// https://github.com/webpack/copy-webpack-plugin/tree/main?tab=readme-ov-file#copy-webpack-plugin
+const CopyWebpackPluginPatterns = [
+
+  // {
+  //   from: 'app/api',
+  //   to: 'api',
+  //   globOptions: {
+  //     dot: true,
+  //     gitignore: true,
+  //     ignore: [
+  //       '**/.DS_Store',
+  //       // config.php e config-prod.php sono
+  //       // gestiti a parte nei pattern successivi (config.php è sempre
+  //       // scritto a mano per ambiente, mai copiato dalla build)
+  //       // '**/config.php',
+  //       // '**/config-prod.php',
+  //     ]
+  //   }
+  // },
+  // {
+  //   from: 'app/api/config-prod.php',
+  //   to: 'api/config.php'
+  // },
+  // {
+  //   from: './app/assets/root_htaccess',
+  //   to: '.htaccess',
+  //   toType: 'file'
+  // },
+  // {
+  //   from: './app/assets/robots.txt',
+  //   to: 'robots.txt',
+  //   toType: 'file'
+  // },
+  // {
+  //   from: './app/assets/api_htaccess',
+  //   to: 'api/.htaccess',
+  //   toType: 'file',
+  //   // context: 'app/api'
+  // },
+];
+
 // --- config ---
 
 // Risolve un percorso a partire dalla root del progetto, che coincide con la dir
@@ -233,51 +277,6 @@ const shared_chunk_paths = (module) => {
   return !excludedRegexp.test(modulePath) && pathsRegexp.test(modulePath);
 };
 
-
-// hash: https://medium.com/@web_developer/hash-vs-chunkhash-vs-contenthash-e94d38a32208
-
-// =>> CopyWebpackPlugin patterns
-// (null o array vuoto per disattivare)
-// https://github.com/webpack/copy-webpack-plugin/tree/main?tab=readme-ov-file#copy-webpack-plugin
-const CopyWebpackPluginPatterns = [
-
-  // {
-  //   from: 'app/api',
-  //   to: 'api',
-  //   globOptions: {
-  //     dot: true,
-  //     gitignore: true,
-  //     ignore: [
-  //       '**/.DS_Store',
-  //       // config.php e config-prod.php sono
-  //       // gestiti a parte nei pattern successivi (config.php è sempre
-  //       // scritto a mano per ambiente, mai copiato dalla build)
-  //       // '**/config.php',
-  //       // '**/config-prod.php',
-  //     ]
-  //   }
-  // },
-  // {
-  //   from: 'app/api/config-prod.php',
-  //   to: 'api/config.php'
-  // },
-  // {
-  //   from: './app/assets/root_htaccess',
-  //   to: '.htaccess',
-  //   toType: 'file'
-  // },
-  // {
-  //   from: './app/assets/robots.txt',
-  //   to: 'robots.txt',
-  //   toType: 'file'
-  // },
-  // {
-  //   from: './app/assets/api_htaccess',
-  //   to: 'api/.htaccess',
-  //   toType: 'file',
-  //   // context: 'app/api'
-  // },
-];
 
 // =>> PurgeCSS
 // Istanze e opzioni sono in webpack-config-modules/purgecss-setup.mjs: qui restano
@@ -587,11 +586,11 @@ const config = {
               attributes: { as: 'font', type: 'font/woff2', crossorigin: true }
             },
             {
-              match: /.*\.css$/,
+              match: /^(?!.*\.critical).*\.css$/,
               attributes: { as: 'style' }
             },
             {
-              match: /.*\.js$/,
+              match: /^(?!.*\.critical).*\.js$/,
               attributes: { as: 'script' }
             }
           ]

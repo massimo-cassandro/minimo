@@ -173,6 +173,15 @@ export let customPropsCount = 0;
 */
 export let lastFinalProps = {};
 
+/*
+  Live binding esportato, compagno di lastFinalProps: mappa nome → `$type` del token
+  che ha generato la proprietà, per l'ultima chiamata al format 'css/variables-sorted'.
+  Le proprietà senza token di origine (ad es. quelle conservate da mergeCustomProps)
+  non compaiono nella mappa. Serve a build-tokens-src/light-dark.mjs per unire in
+  light-dark() solo le proprietà di tipo colore.
+*/
+export let lastPropTypes = {};
+
 /**
  * Calcola la mappa finale `nome -> coda della dichiarazione` per un dizionario di token:
  * risolve il valore CSS di ogni token (inclusi i builder dei tipi complessi qui sopra),
@@ -180,7 +189,9 @@ export let lastFinalProps = {};
  * (vedi ../merge-css.mjs e l'opzione di config `mergeCustomProps`).
  * @param {object} dictionary  dizionario dei token risolto di Style Dictionary (argomento `dictionary` di format())
  * @param {object} options     argomento `options` di format() — qui vengono lette solo `outputReferences` e `mode`
- * @returns {Record<string,string>} nome → coda della dichiarazione (valore + `;` finale + eventuale commento finale)
+ * @returns {{finalProps: Record<string,string>, propTypes: Record<string,string>}}
+ *   finalProps: nome → coda della dichiarazione (valore + `;` finale + eventuale commento finale);
+ *   propTypes: nome → `$type` del token di origine (solo per le proprietà generate da un token tipizzato)
  */
 export const computeFinalProps = (dictionary, options) => {
   const tokenByPath = {};
@@ -221,9 +232,13 @@ export const computeFinalProps = (dictionary, options) => {
     proprietà, ad es. la tipografia)
   */
   const sourceFileMap = {};
+  // nome della proprietà → $type del token di origine (vedi lastPropTypes)
+  const propTypes = {};
   const trackSource = (token, tokenLines) => {
+    const type = token.$type ?? token.type;
     for (const name of Object.keys(parseCustomProps(tokenLines.join('\n')))) {
       sourceFileMap[name] = token.filePath;
+      if (type) propTypes[name] = type;
     }
     return tokenLines;
   };
@@ -315,7 +330,10 @@ export const computeFinalProps = (dictionary, options) => {
     diversi tra le modalità non vengano mai confuse.
   */
   const generatedProps = parseCustomProps(lines.join('\n'));
-  return mergeCustomProps(generatedProps, options.mode ?? null, sourceFileMap);
+  return {
+    finalProps: mergeCustomProps(generatedProps, options.mode ?? null, sourceFileMap),
+    propTypes,
+  };
 };
 
 /**
@@ -440,8 +458,9 @@ export const buildCssBlock = ({
 StyleDictionary.registerFormat({
   name: 'css/variables-sorted',
   format: ({ dictionary, options }) => {
-    const finalProps = computeFinalProps(dictionary, options);
+    const { finalProps, propTypes } = computeFinalProps(dictionary, options);
     lastFinalProps = finalProps;
+    lastPropTypes = propTypes;
     customPropsCount = Object.keys(finalProps).length;
 
     return buildCssBlock({

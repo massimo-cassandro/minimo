@@ -29,7 +29,7 @@ minimo/
 │   ├── fonts.css
 │   ├── css/                        # moduli CSS
 │   │   ├── reset.css, layout-base.css, container.css
-│   │   ├── forms/                  # forms, fieldset, form-group, input-group, validation, ...
+│   │   ├── forms/                  # form-control, label, select, form-check, fieldset, form-group, input-group, validation, ...
 │   │   ├── buttons/                # buttons, status-buttons, btn-close, ...
 │   │   ├── badge.css, text.css, anchors.css, headings.css, alerts.css
 │   │   ├── icons.css, svg.css, table.css, flex.css, grid.css, details.css
@@ -299,7 +299,10 @@ Da affrontare con calma in futuro (eventualmente con una utility condivisa che r
 | [src/css/table.css](src/css/table.css#L10) | 10 | opzione per alternate row color |
 | [src/css/text.css](src/css/text.css#L7) | 7 | rivedere |
 | [src/css/forms/fieldset.css](src/css/forms/fieldset.css#L2) | 2 | da verificare |
-| [src/css/forms/forms.css](src/css/forms/forms.css#L1) | 1–6 | separare file; radio/checkbox groups; multiselect; `.form-grid`; customizable select; form-check come flex |
+| [src/css/forms/form-control.css](src/css/forms/form-control.css#L1) | 1 | abbreviare prefisso custom props |
+| [src/css/forms/select.css](src/css/forms/select.css#L1) | 1–5 | multiselect; con `appearance: base-select` più supportato passare a `select::picker-icon` + `light-dark()` |
+| [src/css/forms/form-check.css](src/css/forms/form-check.css#L1) | 1, 15–16 | gruppi radio/checkbox; eliminare necessità di `.form-group`; esempi d'uso |
+| [src/css/forms/form-group.css](src/css/forms/form-group.css#L1) | 1 | `.form-grid` |
 | [src/css/buttons/status-buttons.css](src/css/buttons/status-buttons.css#L1) | 1 | rivedere tutto |
 | [src/css/buttons/buttons.css](src/css/buttons/buttons.css#L1) | 1, 93 | dividere per variante; button solo-icona da completare o eliminare |
 | [src/css/buttons/btn-close.css](src/css/buttons/btn-close.css#L6) | 6 | controllare allineamento x interna |
@@ -340,7 +343,7 @@ Da affrontare con calma in futuro (eventualmente con una utility condivisa che r
 | File | Riga | Nota |
 |---|---|---|
 | [design-tokens/_src/btn-color-themes.minimo.tokens.mjs](design-tokens/_src/btn-color-themes.minimo.tokens.mjs#L1) | 1 | TODO: aggiungere temi neutral e accent |
-| [design-tokens/_src/form.minimo.tokens.mjs](design-tokens/_src/form.minimo.tokens.mjs#L292) | 292 | TODO: importazione automatica SVG (problemi con svgo) |
+| [design-tokens/_src/form.minimo.tokens.mjs](design-tokens/_src/form.minimo.tokens.mjs#L322) | 322 | icona select: passare dal data URI a `url()` del file SVG codificato in build (file sorgente indicato in `$description`) |
 
 ### TODO dai file TODO.md dei componenti
 
@@ -352,11 +355,4 @@ Da affrontare con calma in futuro (eventualmente con una utility condivisa che r
 
 ## Stile di lavoro
 
-- Conferma la comprensione prima di agire su richieste ambigue
-- Il progetto usa ES modules (import/export), evitare soluzioni che utilizzano commonJs
-- In linea di massima non proporre soluzioni che richiedano modifiche alla parte back-end, se presente, a meno che non sia esplicitamente richiesto
-- evitare SEMPRE neologismi come 'inlinare', 'parsare', 'committare' ecc., usare i termini corrispondenti in italiano o il termine originale in inglese dove non sia possibile un equivalente in italiano. Non coniugare mai secondo le regole dell'italiano verbi di altre lingue
-- nei commenti di 3 o più righe preferire `/* ... */` piuttosto che ripetere `//` ad igni inizio riga
-- a meno che non sia esplicitamente richiesto di eseguire subito una modifica, NON ESEGUIRE MAI nulla autonomamente ma mostra sempre un piano d'azione prima di procedere
-- nei commenti jsDoc aggiungere sempre dove possibile una sezione example che riepiloghi i vari parametri mostrando i valori di default
-- nei documenti markdown generati non andare a capo forzatamente alla fine di ogni riga: un paragrafo è una sola riga, così si usa il soft wrap dell'editor ed è più semplice fare correzioni
+Fai riferimento al paragrafo con lo stesso nome che trovi in `dev-tools/starter-kit/source_files/app/CLAUDE.md`

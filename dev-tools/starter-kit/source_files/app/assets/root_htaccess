@@ -1,3 +1,7 @@
+# AuthType Basic
+# AuthName "Restricted area"
+# AuthUserFile /home/mhd-01/www.mazx.it/htdocs/sarema/.htpasswd
+# Require valid-user
 
 # no cache
 # <IfModule mod_headers.c>
@@ -5,6 +9,17 @@
 #   Header set Pragma "no-cache"
 #   Header set Expires 0
 # </IfModule>
+
+
+
+# disabilita il listato dei file nelle directory
+Options -Indexes
+
+# blocco accesso a .htaccess, .htpasswd e altri file .ht*
+<FilesMatch "^\.ht">
+  Require all denied
+</FilesMatch>
+
 
 # blocco iframe
 # "deny" = tutti siti

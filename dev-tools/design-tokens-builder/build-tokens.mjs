@@ -272,6 +272,14 @@ if (jsonBuildPath) {
   ));
 }
 
+if (modeResult?.lightDarkExcluded.length) {
+  // Proprietà presenti sia in light sia in dark ma non di colore: divise con
+  // `@media (prefers-color-scheme: dark)` invece di light-dark() (vedi light-dark.mjs).
+  console.log(styleText(['yellow'],
+    `[build-tokens] escluse da light-dark() (non colori, divise con @media): ${modeResult.lightDarkExcluded.join(', ')}`
+  ));
+}
+
 console.log(styleText(['green'],
   `[build-tokens] ${sourceModes && modeResult ? modeResult.totalCustomProps : customPropsCount} custom properties processed`
 ));

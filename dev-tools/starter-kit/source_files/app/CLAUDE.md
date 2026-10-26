@@ -4,19 +4,6 @@
 
 
 
-## Stile di lavoro
+## Impostazioni condivise
 
-- Conferma la comprensione prima di agire su richieste ambigue
-- Il progetto usa ES modules (import/export), evitare soluzioni che utilizzano commonJs
-- In linea di massima non proporre soluzioni che richiedano modifiche alla parte back-end, se presente, a meno che non sia esplicitamente richiesto
-- evitare SEMPRE neologismi come 'inlinare', 'parsare', 'committare' ecc., usare i termini corrispondenti in italiano o il termine originale in inglese dove non sia possibile un equivalente in italiano. Non coniugare mai secondo le regole dell'italiano verbi di altre lingue
-- nei commenti di 3 o più righe preferire `/* ... */` piuttosto che ripetere `//` ad igni inizio riga
-- a meno che non sia esplicitamente richiesto di eseguire subito una modifica, NON ESEGUIRE MAI nulla autonomamente ma mostra sempre un piano d'azione prima di procedere
-- nei commenti jsDoc aggiungere sempre dove possibile una sezione example che riepiloghi i vari parametri mostrando i valori di default
-- commenti nel codice (inclusi TODO/FIX e jsDoc) e file README vanno scritti sempre in italiano; gli identificatori restano in inglese
-- nei documenti markdown generati non andare a capo forzatamente alla fine di ogni riga: un paragrafo è una sola riga, così si usa il soft wrap dell'editor ed è più semplice fare correzioni
-- Le tabelle nei file `.md` devono avere le celle allineate con spazi (colonne di larghezza uniforme, separatore `---` della stessa larghezza), in modo da essere leggibili anche in modalità editor.
-
-## Convenzioni d'uso e funzionalità standard di minimo
-
-- **Custom property locali**: le custom property non definite nel file globale delle custom property (`app/css/custom-properties.css`) hanno sempre il prefisso `_` (es. `--_gap`, `--_cols`), anche quando sono scritte dal JS con `style.setProperty`. Lo script che genera `app/css/unresolved-unused-props.md` ignora le variabili con `_`: senza prefisso finirebbero nel report come non risolte.
+Vedi `~/Sites/_config/CLAUDE.md`, paragrafo '## Impostazioni condivise'

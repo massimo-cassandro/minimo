@@ -1,0 +1,2 @@
+#DATABASE_URL="mysql://root:mysql8root@host.docker.internal:3306/___xxxx___?serverVersion=8.4.52&charset=utf8mb4"
+MAILER_DSN=smtp://host.docker.internal:1025

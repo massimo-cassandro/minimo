@@ -235,7 +235,10 @@ Non toccare: il repo originale `/Users/mazz/Sites/eslint-config`; LICENSE (minim
   * `table.css:10` — aggiungere opzione alternate row color
   * `text.css:7` — rivedere
   * `forms/fieldset.css:2` — da verificare
-  * `forms/forms.css` — separare file; radio/checkbox groups; multiselect; `.form-grid`; customizable select; form-check come flex
+  * `forms/form-control.css` — abbreviare prefisso custom props
+  * `forms/select.css` — multiselect; con `appearance: base-select` più supportato passare a `select::picker-icon` + `light-dark()`
+  * `forms/form-check.css` — gruppi radio/checkbox; esempi d'uso
+  * `forms/form-group.css` — `.form-grid`
   * `buttons/status-buttons.css` — rivedere tutto
   * `buttons/buttons.css` — dividere per variante; button solo-icona da completare o eliminare
   * `buttons/btn-close.css:6` — controllare allineamento `×` interna
@@ -245,7 +248,7 @@ Non toccare: il repo originale `/Users/mazz/Sites/eslint-config`; LICENSE (minim
 
 ## DESIGN TOKENS
   * `btn-color-themes.minimo.tokens.mjs` — aggiungere temi `neutral` e `accent`
-  * `form.minimo.tokens.mjs:292` — importazione automatica SVG (problemi con svgo)
+  * `form.minimo.tokens.mjs` — icona select: passare dal data URI a `url()` del file SVG, codificato in build (oggi il file sorgente è indicato nella `$description`)
 
 ## SPINNER
   * completare 

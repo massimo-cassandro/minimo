@@ -1,0 +1,22 @@
+// -----------------------------------------------------------------------
+// File generato — non modificare a mano.
+// Questo file è prodotto dalla pipeline di build dei design token.
+// Fonte di verità: i file dei token nella directory sorgente del progetto.
+// Per rigenerarlo: node build-tokens.mjs --config <path/to/config>
+// -----------------------------------------------------------------------
+{
+  "text": {
+    "color": {
+      "$type": "color",
+      "$value": "#fff"
+    },
+    "selected": {
+      "background": {
+        "color": {
+          "$type": "color",
+          "$value": "#222"
+        }
+      }
+    }
+  }
+}

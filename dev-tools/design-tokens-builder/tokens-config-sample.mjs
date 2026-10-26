@@ -173,6 +173,17 @@ const config = {
     essere divise tra il blocco di primo livello della modalità base e una regola
     `@media (prefers-color-scheme: dark) { ... }`.
 
+    Si applica solo ai colori: light-dark() accetta esclusivamente valori di colore, e con
+    qualsiasi altro valore la dichiarazione non sarebbe valida (il browser la ignora).
+    Il criterio è il `$type` del token (`color`); per le proprietà senza tipo (ad es.
+    quelle conservate da mergeCustomProps) si usa un controllo prudente sul valore, e in
+    caso di dubbio light-dark() non viene usata. Le proprietà non di colore presenti in
+    entrambe le modalità (ad es. un `url(...)` con un'icona diversa per il dark) restano
+    divise: valore light nel blocco della propria modalità, valore dark in
+    `@media (prefers-color-scheme: dark) { ... }`. Il loro elenco viene mostrato nel log
+    della build. Valori light e dark identici vengono sempre scritti una sola volta, come
+    valore semplice, qualunque sia il tipo.
+
     Non vengono toccati:
       - gli altri eventuali valori di sourceModes oltre a light/dark (ad es. una terza
         modalità personalizzata) — restano sempre sulla propria regola

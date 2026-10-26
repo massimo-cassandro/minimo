@@ -139,6 +139,9 @@ export const customPropsSelector = typeof buildConfig.customPropsSelector === 's
   una sola volta come `--name: light-dark(<light>, <dark>);` invece di essere divise
   tra il blocco della modalità base e una regola
   `@media (prefers-color-scheme: dark) { ... }` (vedi light-dark.mjs).
+  Si applica solo ai colori (`$type: 'color'`, oppure, per le proprietà senza tipo, valori
+  che sono sicuramente colori): light-dark() non accetta altri valori, quindi le proprietà
+  non di colore (url(), dimensioni, gradienti, ...) restano divise con la regola `@media`.
   Ignorata quando sourceModes non è impostato o non definisce sia una modalità light sia una
   dark. Default: true.
 */

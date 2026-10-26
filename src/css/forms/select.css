@@ -1,0 +1,29 @@
+/* TODO multiselect */
+
+/* TODO quando `appearance: base-select` avrà un supporto più ampio, passare a
+  `select::picker-icon` colorata con `color` / light-dark() ed eliminare il background-image
+*/
+
+select.form-control {
+
+  --_trigger-icon-padding-right: calc(var(--form-control-padding-inline) * 2);
+  --_bg-img-inline-size: 16px;
+
+  padding: var(--form-control-padding-block) var(--_trigger-icon-padding-right) var(--form-control-padding-block) var(--form-control-padding-inline);
+  appearance: none;
+  background-image: var(--form-control-select-trigger-icon);
+  background-repeat: no-repeat;
+  background-position: right calc(var(--_trigger-icon-padding-right) - var(--_bg-img-inline-size) - 2px) center;
+  background-size: var(--_bg-img-inline-size) 12px;
+
+  &[multiple],
+  &[size]:not([size='1']) {
+    padding-right: var(--form-control-padding-inline);
+    background-image: none;
+  }
+
+  &:-moz-focusring {
+    color: transparent;
+    text-shadow: 0 0 0 var(--form-control-text-color);
+  }
+}

@@ -2,12 +2,23 @@
   build-tokens-src/light-dark.mjs
   Supporta l'opzione di config `useLightDarkFunc` (vedi config.mjs): con una
   build sourceModes (vedi build-source-modes.mjs) che definisce sia una modalità `light`
-  sia una `dark`, le custom properties presenti in ENTRAMBE — individuate per nome —
-  vengono scritte una sola volta, come `--name: light-dark(<valore-light>, <valore-dark>);`,
+  sia una `dark`, le custom properties DI COLORE presenti in ENTRAMBE — individuate per
+  nome — vengono scritte una sola volta, come `--name: light-dark(<valore-light>, <valore-dark>);`,
   invece di essere divise tra il blocco `:root { ... }` di primo livello della modalità base
   e un blocco `@media (prefers-color-scheme: dark) { ... }`. Se i due
   valori sono identici, light-dark() sarebbe ridondante: viene scritto invece
-  il valore semplice, ad es. `--name: <valore>;`.
+  il valore semplice, ad es. `--name: <valore>;` (qualunque sia il tipo).
+
+  Solo colori: light-dark() accetta esclusivamente valori di colore, con qualsiasi altro
+  valore (ad es. `url(...)`, una dimensione, un gradiente) la dichiarazione non è valida
+  e il browser la ignora. Le proprietà non di colore, anche se presenti in entrambe le
+  modalità, restano quindi divise come con useLightDarkFunc disattivato: valore light
+  nel blocco della propria modalità, valore dark in `@media (prefers-color-scheme: dark)`.
+  Il criterio è il `$type` del token di origine (vedi lastPropTypes in formats/css.mjs):
+  `color` → light-dark(), qualsiasi altro tipo → divisione `@media`. Per le proprietà
+  senza tipo (ad es. quelle conservate da mergeCustomProps) si usa un controllo prudente
+  sul valore (vedi isColorValue()): in caso di dubbio non si usa light-dark(), così il
+  caso peggiore è una divisione `@media` in più, mai una dichiarazione non valida.
 
   Sono interessate solo `light` e `dark`:
     - una terza modalità (ad es. una chiave personalizzata `high-contrast` in sourceModes) resta
@@ -16,6 +27,9 @@
     - una proprietà presente in una sola tra `light`/`dark` resta nel blocco della
       propria modalità — sempre dietro la regola `@media` di quella modalità, a meno che quella
       modalità non sia la modalità base configurata
+    - una proprietà presente in entrambe ma non di colore (vedi sopra) è trattata esattamente
+      come una proprietà presente in una sola modalità: ognuna delle due resta nel blocco
+      della propria modalità
 
   Le dichiarazioni `light-dark()` condivise finiscono sempre nel blocco della modalità
   base configurata (il `sourceModesBase` di build-source-modes.mjs, qualunque sia tra
@@ -54,52 +68,96 @@ const splitTail = (tail) => {
   return { value: match[1].trim(), comment: match[2] ?? '' };
 };
 
+/*
+  Controllo di riserva per le proprietà senza `$type`: true solo per valori che sono
+  sicuramente un colore (esadecimale, funzioni di colore, `transparent`/`currentcolor`).
+  Esclusi esplicitamente immagini (url(), image-set(), *-gradient()) e numeri/dimensioni;
+  tutto il resto (incluso un semplice `var(--x)`, che potrebbe essere qualsiasi cosa)
+  è considerato dubbio e quindi non di colore.
+*/
+/** @param {string} value @returns {boolean} */
+const isColorValue = (value) => {
+  const v = value.trim().toLowerCase();
+  if (/url\(|image-set\(|gradient\(/.test(v)) return false;
+  if (/^[-+.\d]/.test(v)) return false;
+  return /^#[\da-f]{3,8}$/.test(v)
+    || /^(rgba?|hsla?|hwb|lab|lch|oklab|oklch|color|color-mix|light-dark)\(/.test(v)
+    || v === 'transparent'
+    || v === 'currentcolor';
+};
+
 /**
  * @param {object} opts
  * @param {Record<string, Record<string,string>>} opts.modeFinalProps  mappa modalità → (nome → coda della dichiarazione), una voce per ogni chiave di sourceModes — come catturata da computeFinalProps()/lastFinalProps (vedi formats/css.mjs) subito dopo ogni chiamata per modalità a sd.formatPlatform('css') in build-source-modes.mjs
+ * @param {Record<string, Record<string,string>>} [opts.modePropTypes]  mappa modalità → (nome → `$type` del token di origine), come catturata da lastPropTypes (vedi formats/css.mjs); le proprietà assenti vengono valutate in base al valore (default: {})
  * @param {string[]} opts.modeNames  tutte le chiavi di sourceModes, nell'ordine della config
  * @param {string}   opts.baseMode   modalità il cui blocco viene stampato come `:root` (o selettore personalizzato) di primo livello, senza condizioni — vedi sourceModesBase in config.mjs
  * @param {string}   [opts.selector] customPropsSelector — passato invariato a buildCssBlock() (default: ':root')
  * @param {{name:string,prefixes:string[]}[]} [opts.customPropsGroups]
- * @returns {{blocks: Record<string,string>, counts: Record<string,number>}|null}
+ * @returns {{blocks: Record<string,string>, counts: Record<string,number>, excluded: string[]}|null}
  *   Testo del blocco CSS ricostruito + conteggio delle custom props, indicizzato per modalità, per ogni modalità
  *   toccata dalla riconciliazione (`light`, `dark` e `baseMode`, che possono
- *   coincidere) — oppure null quando sourceModes non definisce sia `light` sia
- *   `dark` (useLightDarkFunc non ha allora alcun effetto, vedi config.mjs)
+ *   coincidere), più l'elenco delle proprietà presenti in entrambe le modalità ma escluse
+ *   da light-dark() perché non di colore — oppure null quando sourceModes non definisce
+ *   sia `light` sia `dark` (useLightDarkFunc non ha allora alcun effetto, vedi config.mjs)
  */
-export const applyLightDarkFunc = ({ modeFinalProps, modeNames, baseMode, selector, customPropsGroups }) => {
+export const applyLightDarkFunc = ({ modeFinalProps, modePropTypes = {}, modeNames, baseMode, selector, customPropsGroups }) => {
   if (!modeNames.includes('light') || !modeNames.includes('dark')) return null;
 
   const lightProps = modeFinalProps.light;
   const darkProps = modeFinalProps.dark;
+  const lightTypes = modePropTypes.light ?? {};
+  const darkTypes = modePropTypes.dark ?? {};
   const commonNames = Object.keys(lightProps).filter((name) => name in darkProps);
+
+  /*
+    Colore se il `$type` (di una o di entrambe le modalità) è `color` e nessuna delle due
+    indica un tipo diverso; senza tipo, entrambi i valori devono superare isColorValue().
+  */
+  /** @param {string} name @param {string} lightValue @param {string} darkValue */
+  const isColorProp = (name, lightValue, darkValue) => {
+    const types = [lightTypes[name], darkTypes[name]].filter(Boolean);
+    if (types.length) return types.every((type) => type === 'color');
+    return isColorValue(lightValue) && isColorValue(darkValue);
+  };
 
   /** @type {Record<string,string>} */
   const sharedProps = {};
+  /** @type {string[]} */
+  const excluded = [];
   for (const name of commonNames) {
     const light = splitTail(lightProps[name]);
     const dark = splitTail(darkProps[name]);
     // Preferisce il commento finale lato light (ad es. una $description del token);
     // ripiega su quello lato dark se light non ne ha.
     const comment = light.comment || dark.comment;
-    // Valori light/dark uguali: light-dark(x, x) sarebbe ridondante — usa
-    // direttamente il valore semplice.
-    const value = light.value === dark.value
-      ? light.value
-      : `light-dark(${light.value}, ${dark.value})`;
+    let value;
+    if (light.value === dark.value) {
+      // Valori light/dark uguali: light-dark(x, x) sarebbe ridondante — usa
+      // direttamente il valore semplice, qualunque sia il tipo.
+      value = light.value;
+    } else if (isColorProp(name, light.value, dark.value)) {
+      value = `light-dark(${light.value}, ${dark.value})`;
+    } else {
+      // Non di colore: resta divisa tra le due modalità, come se fosse presente
+      // in una sola di esse (non viene rimossa da light/dark qui sotto).
+      excluded.push(name);
+      continue;
+    }
     sharedProps[name] = `${value};${comment ? ` ${comment}` : ''}`;
   }
 
-  const stripCommon = (props) => {
+  const sharedNames = Object.keys(sharedProps);
+  const stripShared = (props) => {
     const copy = { ...props };
-    for (const name of commonNames) delete copy[name];
+    for (const name of sharedNames) delete copy[name];
     return copy;
   };
 
   /** @type {Record<string, Record<string,string>>} */
   const updatedFinalProps = { ...modeFinalProps };
-  updatedFinalProps.light = stripCommon(lightProps);
-  updatedFinalProps.dark = stripCommon(darkProps);
+  updatedFinalProps.light = stripShared(lightProps);
+  updatedFinalProps.dark = stripShared(darkProps);
   /*
     Le dichiarazioni condivise finiscono sempre nella mappa della modalità base — reinserendole
     se la modalità base è proprio `light` o `dark` (la cui mappa è appena stata ripulita
@@ -141,5 +199,5 @@ export const applyLightDarkFunc = ({ modeFinalProps, modeNames, baseMode, select
     counts[mode] = Object.keys(finalProps).length;
   }
 
-  return { blocks, counts };
+  return { blocks, counts, excluded };
 };

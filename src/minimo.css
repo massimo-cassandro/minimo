@@ -5,7 +5,10 @@
 @import '@minimoCss/layout-base.css';
 @import '@minimoCss/container.css';
 
-@import '@minimoCss/forms/forms.css';
+@import '@minimoCss/forms/form-control.css';
+@import '@minimoCss/forms/label.css';
+@import '@minimoCss/forms/select.css';
+@import '@minimoCss/forms/form-check.css';
 @import '@minimoCss/forms/fieldset.css';
 @import '@minimoCss/forms/form-collections.css';
 @import '@minimoCss/forms/form-group.css';

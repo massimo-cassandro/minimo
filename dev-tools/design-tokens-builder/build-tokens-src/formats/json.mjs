@@ -232,7 +232,9 @@ export const collectConcreteFilePaths = async (sd) => {
   @param {string}                         [suffix]           Aggiunto a ogni nome di file di
     destinazione, prima dell'estensione — usato dalla build sourceModes
     (build-source-modes.mjs) per produrre un set di file per modalità, ad es.
-    "-light" -> "tokens-light.jsonc" / "size-light.jsonc" (default: '')
+    "-light" -> "tokens-light.jsonc" / "size-light.jsonc". Se il nome base del file
+    sorgente termina già con il suffisso (ad es. "form.minimo.tokens-dark.mjs" con "-dark"),
+    non viene aggiunto di nuovo: "form.minimo.tokens-dark.jsonc" (default: '')
   @returns {object[]}  Descrittori di file per la platform di Style Dictionary
 */
 
@@ -261,9 +263,14 @@ export const buildJsonFiles = (
     <name>.minimo.tokens.mjs), in caso di collisioni fallisce in modo esplicito invece di lasciare
     che uno sovrascriva l'altro in silenzio.
   */
+  const destNameOf = (filePath) => {
+    const base = path.basename(filePath).replace(/\.[^.]+$/, '');
+    return (suffix && base.endsWith(suffix) ? base : base + suffix) + ext;
+  };
+
   const pathsByDestName = new Map();
   for (const filePath of concreteFilePaths) {
-    const destName = path.basename(filePath).replace(/\.[^.]+$/, '') + suffix + ext;
+    const destName = destNameOf(filePath);
     if (!pathsByDestName.has(destName)) pathsByDestName.set(destName, []);
     pathsByDestName.get(destName).push(filePath);
   }
@@ -281,7 +288,7 @@ export const buildJsonFiles = (
   return concreteFilePaths.map((filePath) => {
     const absPath = path.resolve(filePath);
     return {
-      destination: path.basename(filePath).replace(/\.[^.]+$/, '') + suffix + ext,
+      destination: destNameOf(filePath),
       format: 'json/tokens',
       options: { jsonc, jsonExpression },
       filter: (token) => {
