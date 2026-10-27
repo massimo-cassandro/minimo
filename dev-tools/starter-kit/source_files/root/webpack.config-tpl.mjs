@@ -1,9 +1,10 @@
 // webpack.config.mjs __project_name__
-// v.3.3
+// v.3.4
 import path from 'path';
 import { fileURLToPath } from 'url';
 import webpack from 'webpack';
 import fs from 'fs';
+import { spawn } from 'child_process';
 import * as process from 'process'; // Rende 'process' disponibile nel contesto ESM
 // import { styleText } from 'node:util';
 // import { createRequire } from 'node:module';
@@ -117,6 +118,12 @@ const CopyWebpackPluginPatterns = [
 const devServerPort = [[port5700]]
   // SETUP symfony
   // ,apiPort = [[port8000]]
+
+  /* profilo di Chrome aperto dal dev server: nome della dir del profilo
+  ('Default', 'Profile 1', ...), non il nome visualizzato. L'elenco è in
+  `~/Library/Application Support/Google/Chrome/Local State` (profile.info_cache).
+  Sovrascrivibile con la variabile d'ambiente CHROME_PROFILE; null o '' = profilo predefinito */
+  ,chromeProfile = process.env.CHROME_PROFILE ?? null //'Profile 1' = mbn / 'Profile 3' = mg2
   ,useSass = false
 
   // css in dev: true = iniettato con style-loader (veloce, nessun asset css);
@@ -438,7 +445,16 @@ const config = {
       directory: path.join(__dirname, '/'),
       serveIndex: true
     },
-    open: { app: { name: 'Google Chrome' } },
+    /* apertura automatica del browser all'avvio. Con un profilo specifico Chrome
+    viene lanciato in onListening con `open -n`: senza -n, se Chrome è già in
+    esecuzione macOS ignora gli argomenti (e lo schema di devServer.open non
+    accetta `newInstance`); il nuovo processo li passa all'istanza esistente */
+    open: chromeProfile ? false : { app: { name: 'Google Chrome' } },
+    onListening: chromeProfile
+      ? () => spawn('open', ['-n', '-a', 'Google Chrome', '--args',
+        `--profile-directory=${chromeProfile}`, `http://localhost:${devServerPort}/`
+      ], { stdio: 'ignore', detached: true }).unref()
+      : undefined,
     compress: true,
     hot: true,
     port: devServerPort,
@@ -465,10 +481,17 @@ const config = {
   //   // di servire una versione stale in cache su reload manuale
   //   headers: { 'Cache-Control': 'no-store' },
   //   hot: true,
-  //   open: {
-  //     app: { name: 'Google Chrome' }, // apertura automatica del browser all'avvio
+  //   // apertura automatica del browser all'avvio: con chromeProfile vedi il commento
+  //   // nel devServer precedente (`target` non è usato da onListening)
+  //   open: chromeProfile ? false : {
+  //     app: { name: 'Google Chrome' },
   //     // target: ['page1', 'page2'], // pafine da aprire all'avvio
   //   },
+  //   onListening: chromeProfile
+  //     ? () => spawn('open', ['-n', '-a', 'Google Chrome', '--args',
+  //       `--profile-directory=${chromeProfile}`, `http://localhost:${devServerPort}/`
+  //     ], { stdio: 'ignore', detached: true }).unref()
+  //     : undefined,
   //   static: false, // niente static serving proprio: tutto il resto passa dal proxy verso Symfony
   //   devMiddleware: { writeToDisk: true, },
   //   client: { overlay: true, },

@@ -1,0 +1,29 @@
+# Server PHP di sviluppo: immagine condivisa php-dev:8.3 (~/Sites/_config/docker/php-dev),
+# ma con il server integrato di PHP al posto di Apache.
+# Webpack dev server (porta 5700) inoltra le chiamate /api a questo container (porta 8000).
+#
+# Avvio: npm run "docker up"  ·  stop: npm run "docker stop"
+name: orario-giulia
+
+services:
+  php:
+    image: php-dev:8.3
+    # usata solo se l'immagine manca: la costruisce dal Dockerfile condiviso e la tagga php-dev:8.3
+    build: ~/Sites/_config/docker/php-dev
+    # Avvio automatico: "no" → come il vecchio "php -S", parte solo quando serve
+    # (`npm run "docker up"`), mai da solo all'avvio di Docker. Valori possibili: "no",
+    # "always" (riparte a ogni avvio di Docker, anche se fermato a mano), "unless-stopped"
+    # (riparte se non fermato a mano), "on-failure" (riparte solo se termina con errore).
+    # Vedi ~/Sites/_config/docs/docker-quickstart.md, "Avvio automatico dei container".
+    restart: "no"
+    ports:
+      - "8000:8000"
+    # si monta l'intero progetto e non solo build_dev: "webpack DEV" cancella e ricrea
+    # build_dev a ogni avvio, e un bind mount della sola cartella resterebbe agganciato
+    # a quella eliminata
+    volumes:
+      - .:/var/www/html
+    environment:
+      # il server integrato gestisce una richiesta alla volta: più worker per le chiamate in parallelo
+      PHP_CLI_SERVER_WORKERS: 4
+    command: sh -c "mkdir -p build_dev && php -S 0.0.0.0:8000 -t app app/router.php"
