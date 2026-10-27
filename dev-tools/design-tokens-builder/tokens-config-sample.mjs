@@ -106,6 +106,11 @@ const config = {
         già rinominato.
 
     Entrambe le opzioni funzionano allo stesso modo dentro sourceModes.
+
+    Token dark: i file con suffisso `-dark` (es. `form.minimo.tokens-dark.mjs`) sono
+    destinati alla modalità dark di sourceModes (vedi sotto) e vanno esclusi da `source`.
+    I pattern `*.tokens.{mjs,jsonc}` di minimo li escludono già; per i pattern più
+    generici (come quello dei token di progetto qui sotto) usare l'extglob `!(*-dark)`.
   */
   source: [
     `${minimo_path}/design-tokens/_src/**/*.tokens.{mjs,jsonc}`, // token principali
@@ -119,7 +124,7 @@ const config = {
       esportato da Figma/Penpot sulla nomenclatura `primary.100` di minimo
     */
     {
-      src: './design-tokens/*.{js,mjs,jsonc,json}',
+      src: './design-tokens/!(*-dark).{js,mjs,jsonc,json}',
       prefix: 'my-project',
       transform: { primary: 'primary.100' },
     }
@@ -150,17 +155,31 @@ const config = {
 
     L'output JSON (vedi OUTPUT JSON DEI TOKEN più sotto) viene prodotto una volta per
     modalità, con il nome della modalità aggiunto a ogni nome di file, ad es. con
-    jsonDestFile: 'tokens' -> "tokens-light.jsonc", "tokens-dark.jsonc".
+    jsonDestFile: 'tokens' -> "tokens-light.jsonc", "tokens-dark.jsonc"
+    (un file sorgente che termina già con il suffisso, es. `form.minimo.tokens-dark.mjs`,
+    produce `form.minimo.tokens-dark.jsonc`, senza ripeterlo).
+
+    Convenzione dei token dark: file con suffisso `-dark` (es. `form.minimo.tokens-dark.mjs`
+    in minimo, `colors-dark.mjs` nel progetto), che contengono solo i token da
+    ridefinire in dark mode. I pattern light escludono questi file (`*.tokens.{mjs,jsonc}`
+    non li intercetta, per i pattern generici serve l'extglob `!(*-dark)`), quelli dark
+    prendono solo loro.
 
     esempio:
     sourceModes: {
       light: [
         `${minimo_path}/design-tokens/_src/**\/*.tokens.{mjs,jsonc}`,
         `${minimo_path}/src/**\/*.tokens.{mjs,jsonc}`,
-        './project-tokens/light/*.{js,mjs,jsonc,json}',
+
+        // project tokens:
+        './design-tokens/!(*-dark).{js,mjs,jsonc,json}',
       ],
       dark: [
-        './project-tokens/dark/*.{js,mjs,jsonc,json}',
+        `${minimo_path}/design-tokens/_src/**\/*.tokens-dark.{mjs,jsonc}`,
+        `${minimo_path}/src/**\/*.tokens-dark.{mjs,jsonc}`,
+
+        // project tokens:
+        './design-tokens/*-dark.{js,mjs,jsonc,json}',
       ],
     },
   */

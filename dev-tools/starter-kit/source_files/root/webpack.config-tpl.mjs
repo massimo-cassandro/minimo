@@ -61,7 +61,6 @@ const htmlWebpackPluginsItems = [
 ];
 
 
-
 // =>> CopyWebpackPlugin patterns
 // (null o array vuoto per disattivare)
 // https://github.com/webpack/copy-webpack-plugin/tree/main?tab=readme-ov-file#copy-webpack-plugin

@@ -221,7 +221,7 @@ A questo scopo ogni cartella componente/web-component ha un proprio file `<nome-
 
 [postcss-jit-props](https://github.com/GoogleChromeLabs/postcss-jit-props) potrebbe essere integrato come PostCSS plugin per includere automaticamente solo le custom properties effettivamente usate nel CSS compilato. **Da valutare**: il repository non viene aggiornato da molto tempo, quindi la manutenzione futura è incerta.
 
-**Aggiornamento (config webpack v3):** lo starter-kit include ora un plugin webpack dedicato, `dev-tools/starter-kit/source_files/root/webpack-config-modules/custom-props-purgecss-plugin.mjs`, che opera sugli asset CSS finali (dopo la minificazione) e inietta solo le custom properties usate, partendo dal file master `custom-properties.css`. Attivabile con il flag `useCustomPropsPlugin` in `webpack.config.mjs`; vedi `dev-tools/starter-kit/webpack-config-upg.md`.
+**Aggiornamento (config webpack v3):** lo starter-kit include ora un plugin webpack dedicato, `dev-tools/starter-kit/source_files/root/webpack-config-modules/custom-props-purgecss-plugin.mjs`, che opera sugli asset CSS finali (dopo la minificazione) e inietta solo le custom properties usate, partendo dal file master `custom-properties.css`. Attivabile con il flag `useCustomPropsPlugin` in `webpack.config.mjs`; vedi `dev-tools/starter-kit/webpack-config-upg/` (un file per ogni salto di versione, più `readme-tutte le versioni.md`).
 
 ### PurgeCSS
 
