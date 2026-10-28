@@ -58,6 +58,17 @@ export function polarToCartesianString(degrees_angle, cx, cy, circleRadius) {
  * @param {number|null} options.center.y - Coordinata Y del centro.
  * @param {number|null} options.radius - Raggio dell'arco.
  * @param {boolean} [options.clockwise=true] - Direzione oraria se true. (default: true)
+ * @example
+ * // Tutti i parametri (valori di default dove previsti):
+ * calcArcCoords({
+ *   start_angle: 0, // angolo di partenza (gradi), FAC
+ *   percentage: 0.5, // lunghezza dell'arco (0–1), OBBL
+ *   max_arc: 360, // estensione massima dell'arco (gradi), FAC
+ *   center: { x: 0, y: 0 }, // coordinate del centro, OBBL
+ *   radius: 100, // raggio dell'arco, OBBL
+ *   clockwise: true, // direzione oraria, FAC
+ * });
+ *
  * @returns {{arc_length: number, start: {x: number, y: number}, end: {x: number, y: number}}} Coordinate di inizio, fine e lunghezza.
  */
 export function calcArcCoords(options) {

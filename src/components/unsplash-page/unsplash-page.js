@@ -20,6 +20,19 @@ import * as styles from './unsplash-page.module.css';
  * @param {string | null} [settings.text=null] - Testo opzionale del corpo (default: null)
  * @param {string | null} [settings.backLink=null] - HTML opzionale del link di ritorno (default: null)
  * @param {boolean} [settings.hidePhotoLink=true] - Se true, il link a Unsplash viene mostrato solo al passaggio del mouse (default: true)
+ * @example
+ * // Tutti i parametri (valori di default dove previsti):
+ * unsplashPage({
+ *   targetElement: el, // contenitore della foto, OBBL
+ *   className: null, // classi extra del contenitore, FAC
+ *   unsplashDataUrl: '...', // URL del JSON della foto, OBBL
+ *   utmSource: '...', // utm_source dei link di attribuzione, OBBL
+ *   title: '...', // titolo principale, OBBL
+ *   text: null, // testo del corpo, FAC
+ *   backLink: null, // HTML del link di ritorno, FAC
+ *   hidePhotoLink: true, // link a Unsplash solo al passaggio del mouse, FAC
+ * });
+ *
  * @returns {Promise<void>}
  */
 

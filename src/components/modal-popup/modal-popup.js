@@ -109,6 +109,34 @@ function getDomBuilderContentProps(value) {
  * @param {boolean} [params.addScrollbarPadding=false] - Aggiunge padding destro per compensare la scrollbar (default: false)
  * @param {string | DomBuilderItem | DomBuilderItem[] | Node | ((container: HTMLElement) => void) | null} [params.headerContent=null] - Contenuto dell'header: testo semplice, HTML, un oggetto domBuilder, un array domBuilder, un nodo DOM o una funzione invocata con l'elemento contenitore dell'header per popolarlo direttamente (default: null)
  * @param {string | DomBuilderItem | DomBuilderItem[] | Node | ((container: HTMLElement) => void) | null} [params.footerContent=null] - Contenuto del footer: stessi tipi accettati di `headerContent`, invocata con l'elemento contenitore del footer (default: null)
+ * @example
+ * // Tutti i parametri (valori di default dove previsti):
+ * // NB: è obbligatorio uno tra `content`, `ajaxUrl` + `ajaxCallback`, `iframeUrl`
+ * modalPopup({
+ *   dialogExtraClassName: null, // classi extra del dialog, FAC
+ *   content: null, // testo, HTML, domBuilder, Node o funzione(container), OBBL*
+ *   contentExtraClassName: null, // classi extra del wrapper del contenuto, FAC
+ *   triggerElement: null, // elemento che apre il popup (gestione aria-*), FAC
+ *   addFocus: true, // focus sul dialog all'apertura, FAC
+ *   headerExtraClassName: null, // classi extra dell'header, FAC
+ *   footerExtraClassName: null, // classi extra del footer, FAC
+ *   dialogWidth: null, // larghezza del dialog, FAC
+ *   dialogMinWidth: null, // larghezza minima, FAC
+ *   dialogMaxWidth: null, // larghezza massima, FAC
+ *   dialogHeight: null, // altezza del dialog, FAC
+ *   dialogMinHeight: null, // altezza minima, FAC
+ *   dialogMaxHeight: null, // altezza massima, FAC
+ *   dialogContentPadding: null, // padding del contenuto, FAC
+ *   iframeUrl: null, // URL da caricare in un iframe, OBBL*
+ *   ajaxUrl: null, // URL del contenuto Ajax, OBBL*
+ *   openCallback: null, // callback(dialogEl) dopo l'apertura, FAC
+ *   closeCallback: null, // callback(dialogEl) prima della rimozione, FAC
+ *   ajaxCallback: null, // callback(data, el) con la risposta Ajax, OBBL*
+ *   addScrollbarPadding: false, // padding destro per la scrollbar, FAC
+ *   headerContent: null, // contenuto dell'header, FAC
+ *   footerContent: null, // contenuto del footer, FAC
+ * });
+ *
  * @returns {HTMLDialogElement} L'elemento dialog.
  */
 

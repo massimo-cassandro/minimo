@@ -194,6 +194,16 @@ function buildSection(tag, sectionInput) {
  * @param {TableSectionInput | null} [args.tfoot=null] - Oggetto opzionale per il tag tfoot (default: null)
  *
  * @example
+ * // Tutti i parametri (valori di default dove previsti):
+ * buildTableTag({
+ *   classname: 'table', // classe del tag table, FAC
+ *   attrs: null, // attributi del tag table, FAC
+ *   thead: null, // celle/righe del thead, FAC
+ *   tbody: null, // celle/righe del tbody, FAC
+ *   tfoot: null, // celle/righe del tfoot, FAC
+ * });
+ *
+ * @example
  * buildTableTag({
  *   classname: 'table', // default: 'table'
  *   attrs: { id: 'my-table' }, // default: null

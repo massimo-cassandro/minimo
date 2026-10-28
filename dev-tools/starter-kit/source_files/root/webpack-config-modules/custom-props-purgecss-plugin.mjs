@@ -150,6 +150,17 @@ export class CustomPropsPurgeCssPlugin {
    *   (default: false)
    *
    * @example
+   * // Tutti i parametri (valori di default dove previsti):
+   * new CustomPropsPurgeCssPlugin({
+   *   definitionsFile: path.resolve(__dirname, '...'), // file master delle custom props, OBBL
+   *   sets: [{ sources: ['index.*.css'], target: undefined }], // set di asset css da elaborare, OBBL
+   *   selector: ':root', // selettore che sostituisce `:root` del master, FAC
+   *   extraUsageGlobs: [], // glob di css extra i cui var() contano come usati, FAC
+   *   seeds: [], // props da includere comunque, FAC
+   *   minify: false, // definizioni in forma compatta, FAC
+   * })
+   *
+   * @example
    * new CustomPropsPurgeCssPlugin({
    *   definitionsFile: path.resolve(__dirname, './app/css/custom-properties.css'),
    *   sets: [

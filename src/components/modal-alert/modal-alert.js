@@ -160,6 +160,34 @@ const defaults = {
  * @param {string} [params.cancelBtnText] - testo del pulsante 'cancel' (default: 'Annulla', solo tipo 'confirm')
  * @param {string} [params.cancelBtnClass] - classe alternativa per il pulsante 'cancel'. Sostituisce quella predefinita
  * @param {boolean} [params.cancelBtnFocus] - true se il pulsante cancel deve ricevere il focus all'apertura del dialog. Non ha effetto se è impostato un extraBtn (default: true, solo tipo 'confirm')
+ * @example
+ * // Tutti i parametri (valori di default dove previsti):
+ * // (i default indicati "per tipo" dipendono da `type`)
+ * modalAlert({
+ *   type: 'info', // 'success' | 'error' | 'warning' | 'info' | 'confirm', OBBL
+ *   extraClass: null, // classi extra del dialog, FAC
+ *   onOpen: null, // callback all'apertura, FAC
+ *   onClose: null, // callback alla chiusura, FAC
+ *   animation: true, // dialog animato, FAC
+ *   showMarks: true, // mostra le icone, FAC
+ *   callback: null, // callback dopo la scelta dell'utente, FAC
+ *   timer: null, // chiusura automatica in ms (per tipo: 4000 per success), FAC
+ *   title: null, // titolo (default: per tipo), FAC
+ *   mes: null, // messaggio (testo o HTML), FAC
+ *   headingClass: null, // classi extra del titolo, FAC
+ *   textClass: null, // classi extra del testo, FAC
+ *   icon: null, // markup dell'icona (default: per tipo), FAC
+ *   altIcon: null, // markup dell'icona alternativa (default: per tipo), FAC
+ *   useAltIcon: false, // usa altIcon al posto di icon, FAC
+ *   extraBtn: null, // pulsante extra (oggetto domBuilder), FAC
+ *   extraBtnFocus: true, // focus sul pulsante extra, FAC
+ *   okBtnText: 'OK', // testo del pulsante ok, FAC
+ *   okBtnClass: undefined, // classe del pulsante ok (default: per tipo), FAC
+ *   cancelBtnText: 'Annulla', // testo del pulsante cancel (solo confirm), FAC
+ *   cancelBtnClass: undefined, // classe del pulsante cancel (default: per tipo, solo confirm), FAC
+ *   cancelBtnFocus: true, // focus sul pulsante cancel (solo confirm), FAC
+ * });
+ *
  * @returns {Promise<string | boolean | undefined>} Si risolve alla chiusura del dialog. Se il
  *   pulsante che lo chiude ha un attributo `data-malert-result`, viene usata quella stringa; altrimenti, per i
  *   dialog `confirm`, si risolve con `true`/`false` per il pulsante OK/Annulla; altrimenti con `undefined`.

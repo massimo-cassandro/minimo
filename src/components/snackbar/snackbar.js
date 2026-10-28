@@ -27,6 +27,16 @@ Riferimenti
  * @param {boolean} [options.close_btn=true] - Se mostrare il pulsante di chiusura (default: true)
  * @param {Function | null} [options.action=null] - Callback dell'azione (default: null)
  * @param {string | null} [options.action_text=null] - Etichetta del pulsante di azione (default: null)
+ * @example
+ * // Tutti i parametri (valori di default dove previsti):
+ * snackbar('...', { // messaggio, OBBL
+ *   status: null, // 'danger' | 'warning' | 'info' | 'success', FAC
+ *   duration: 4000, // chiusura automatica in ms (false/null = mai), FAC
+ *   close_btn: true, // pulsante di chiusura, FAC
+ *   action: null, // callback dell'azione, FAC
+ *   action_text: null, // etichetta del pulsante di azione, FAC
+ * });
+ *
  * @returns {{ close: function(): void }}
  */
 export function snackbar(message, options = {}){

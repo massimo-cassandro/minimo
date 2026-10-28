@@ -57,6 +57,22 @@ function buildFormGroup({
  * @param {string | HTMLElement | null} args.help - Testo di aiuto opzionale.
  * @param {(function(HTMLElement|Text): void) | null} args.callback - Funzione callback opzionale.
  * @param {Record<string, any> | null}  [args.attrs={}] - Oggetto di attributi opzionale (default: {})
+ * @example
+ * // Tutti i parametri (valori di default dove previsti):
+ * buildInput({
+ *   label: '...', // label, OBBL
+ *   name: '...', // attributo name, OBBL
+ *   id: null, // attributo id, FAC
+ *   value: null, // attributo value, FAC
+ *   type: 'text', // attributo type, FAC
+ *   wrapperClass: null, // classi extra del .form-group, FAC
+ *   class: null, // classi extra (alias `classname`, `className`), FAC
+ *   condition: true, // se false restituisce null, FAC
+ *   help: null, // testo di aiuto, FAC
+ *   attrs: {}, // attributi extra, FAC
+ *   callback: null, // callback(el) dopo la creazione, FAC
+ * });
+ *
  * @returns {DomBuilderItem|null} L'elemento domBuilder `input`, oppure `null` quando `condition` è false.
  */
 export function buildInput({
@@ -122,6 +138,24 @@ export function buildInput({
  * @param {string | HTMLElement | null} args.help - Testo di aiuto opzionale.
  * @param {(function(HTMLElement|Text): void) | null} args.callback - Funzione callback opzionale.
  * @param {Record<string, any> | null}  [args.attrs={}] - Oggetto di attributi opzionale (default: {})
+ * @example
+ * // Tutti i parametri (valori di default dove previsti):
+ * buildSelect({
+ *   label: '...', // label, OBBL
+ *   name: '...', // attributo name, OBBL
+ *   id: null, // attributo id, FAC
+ *   selectedValue: null, // valore selezionato (confronto ==), FAC
+ *   options: null, // coppie [value, label], array di oggetti o oggetto, FAC
+ *   addEmptyOption: true, // option vuota in cima, FAC
+ *   wrapperClass: null, // classi extra del .form-group, FAC
+ *   class: null, // classi extra (alias `classname`, `className`), FAC
+ *   useBsClass: false, // usa `form-select` invece di `form-control`, FAC
+ *   condition: true, // se false restituisce null, FAC
+ *   help: null, // testo di aiuto, FAC
+ *   attrs: {}, // attributi extra, FAC
+ *   callback: null, // callback(el) dopo la creazione, FAC
+ * });
+ *
  * @returns {DomBuilderItem|null} L'elemento domBuilder `input`, oppure `null` quando `condition` è false.
  */
 export function buildSelect({
@@ -214,6 +248,23 @@ export function buildSelect({
  * @param {string | HTMLElement | null} args.help - Testo di aiuto opzionale.
  * @param {(function(HTMLElement|Text): void) | null} args.callback - Funzione callback opzionale.
  * @param {Record<string, any> | null}  [args.attrs={}] - Oggetto di attributi opzionale (default: {})
+ * @example
+ * // Tutti i parametri (valori di default dove previsti):
+ * buildCheckbox({
+ *   label: '...', // label, OBBL
+ *   name: '...', // attributo name, OBBL
+ *   id: null, // attributo id, FAC
+ *   value: 1, // attributo value, FAC
+ *   checked: false, // attributo checked, FAC
+ *   switch: false, // resa come switch, FAC
+ *   wrapperClass: null, // classi extra del .form-group, FAC
+ *   addFormGroup: true, // racchiude in un .form-group, FAC
+ *   condition: true, // se false restituisce null, FAC
+ *   help: null, // testo di aiuto, FAC
+ *   attrs: {}, // attributi extra, FAC
+ *   callback: null, // callback(el) dopo la creazione, FAC
+ * });
+ *
  * @returns {DomBuilderItem|null} L'elemento domBuilder `.form-check` (o racchiuso in `.form-group`), oppure `null` quando `condition` è false.
  */
 export function buildCheckbox({
@@ -305,6 +356,22 @@ export function buildCheckbox({
  * @param {string | HTMLElement | null} args.help - Testo di aiuto opzionale.
  * @param {(function(HTMLElement|Text): void) | null} args.callback - Funzione callback opzionale.
  * @param {Record<string, any> | null}  [args.attrs={}] - Oggetto di attributi opzionale (default: {})
+ * @example
+ * // Tutti i parametri (valori di default dove previsti):
+ * buildTextarea({
+ *   label: '...', // label, OBBL
+ *   name: '...', // attributo name, OBBL
+ *   id: null, // attributo id, FAC
+ *   value: null, // contenuto, FAC
+ *   autosize: true, // aggiunge la classe autosize, FAC
+ *   wrapperClass: null, // classi extra del .form-group, FAC
+ *   class: null, // classi extra (alias `classname`, `className`), FAC
+ *   condition: true, // se false restituisce null, FAC
+ *   help: null, // testo di aiuto, FAC
+ *   attrs: {}, // attributi extra, FAC
+ *   callback: null, // callback(el) dopo la creazione, FAC
+ * });
+ *
  * @returns {DomBuilderItem|null} L'elemento domBuilder `textarea`, oppure `null` quando `condition` è false.
  */
 export function buildTextarea({
@@ -363,6 +430,20 @@ export function buildTextarea({
  * @param {string | HTMLElement | null} args.help - Testo di aiuto opzionale.
  * @param {(function(HTMLElement|Text): void) | null} args.callback - Funzione callback opzionale.
  * @param {Record<string, any> | null}  [args.attrs={}] - Oggetto di attributi opzionale (default: {})
+ * @example
+ * // Tutti i parametri (valori di default dove previsti):
+ * buildFakeField({
+ *   label: '...', // label, OBBL
+ *   value: null, // contenuto testuale, FAC
+ *   wrapperClass: null, // classi extra del .form-group, FAC
+ *   noBorder: true, // aggiunge la classe no-border, FAC
+ *   class: null, // classi extra (alias `classname`, `className`), FAC
+ *   condition: true, // se false restituisce null, FAC
+ *   help: null, // testo di aiuto, FAC
+ *   attrs: {}, // attributi extra, FAC
+ *   callback: null, // callback(el) dopo la creazione, FAC
+ * });
+ *
  * @returns {DomBuilderItem|null} L'elemento domBuilder del campo finto, oppure `null` quando `condition` è false.
  */
 export function buildFakeField({
@@ -415,6 +496,18 @@ export function buildFakeField({
  * @param {boolean} [args.condition=true] - Se false, la funzione restituisce `null` senza costruire nulla (default: true)
  * @param {(function(HTMLElement|Text): void) | null} args.callback - Funzione callback opzionale.
  * @param {Record<string, any> | null}  [args.attrs={}] - Oggetto di attributi opzionale (default: {})
+ * @example
+ * // Tutti i parametri (valori di default dove previsti):
+ * buildButton({
+ *   content: '...', // contenuto (stringa, elemento o array domBuilder), OBBL
+ *   type: 'button', // attributo type, FAC
+ *   id: null, // attributo id, FAC
+ *   class: null, // classi extra (alias `classname`, `className`), FAC
+ *   condition: true, // se false restituisce null, FAC
+ *   attrs: {}, // attributi extra, FAC
+ *   callback: null, // callback(el) dopo la creazione, FAC
+ * });
+ *
  * @returns {DomBuilderItem|null} L'elemento domBuilder `button`, oppure `null` quando `condition` è false.
  */
 export function buildButton({

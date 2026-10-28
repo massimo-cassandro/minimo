@@ -60,6 +60,28 @@ import { classnames } from '../classnames.js';
  * condizione media `(width >= …)` (sintassi range).
  *
  * @example
+ * // Tutti i parametri (valori di default dove previsti):
+ * buildPictureTag({
+ *   baseSrc: 'path/to/viewer/...', // URL base del viewer, OBBL
+ *   sizes: [250], // size renderizzate (px, [w, h] o {from, size}), FAC
+ *   ratio: null, // aspect ratio w/h per le size numeriche, FAC
+ *   dpr: 2, // densità massima dei candidati srcset, FAC
+ *   img_params: [['q', '60']], // parametri query aggiunti agli URL, FAC
+ *   formats: ['avif', 'webp', 'pjpg'], // formati (l'ultimo per l'img), FAC
+ *   devMode: false, // esclude avif, FAC
+ *   lazy: true, // loading="lazy", FAC
+ *   fetchpriority: null, // 'high' | 'low' | null, FAC
+ *   onLoad: null, // callback(img) a caricamento completato, FAC
+ *   condition: true, // se false restituisce null, FAC
+ *   legacyMediaSyntax: false, // (min-width: …) invece di (width >= …), FAC
+ *   pictureExtraClass: null, // classi extra picture, FAC
+ *   pictureExtraAttrs: {}, // attributi extra picture, FAC
+ *   imgExtraClass: null, // classi extra img, FAC
+ *   imgExtraAttrs: {}, // attributi extra img, FAC
+ *   alt: '', // testo alt, FAC
+ * });
+ *
+ * @example
  * // thumb a larghezza fissa (250px, candidati 1x e 2x); senza `ratio` né altezze
  * // esplicite, il viewer riceve un resize solo in larghezza (bb=250x) e l'`img` non ha
  * // l'attributo `height`

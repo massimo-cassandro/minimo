@@ -41,6 +41,22 @@
  * @param {string} [options.locale] - Stringa locale per la formattazione di data/ora (default: 'it-IT')
  * @returns {string} Elemento HTML `<time>` come stringa
  *
+ * @example
+ * // Tutti i parametri (valori di default dove previsti):
+ * relativeDate(date, { // Date o stringa ISO, OBBL
+ *   useRelativeTime: true, // "tra xx minuti" / "adesso" vicino alla data, FAC
+ *   nowString: 'adesso', // stringa per "proprio adesso", FAC
+ *   relativeTimeMinutesBefore: 30, // minuti prima per "tra xx minuti", FAC
+ *   relativeTimeMinutesAfter: 30, // minuti dopo per "adesso", FAC
+ *   relativeTimeShowTime: true, // mostra l'orario nelle date relative, FAC
+ *   relativeTimeShowTimeMarkup: ' <span class="time-info">(alle @@time@@)</span>', // markup orario, FAC
+ *   firstLetterUpperCase: true, // prima lettera maiuscola, FAC
+ *   dateFormat: { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric', hour12: false, hour: '2-digit', minute: '2-digit' }, // formato date assolute, FAC
+ *   timeFormat: { hour12: false, hour: '2-digit', minute: '2-digit' }, // formato orario, FAC
+ *   relativeStrings: ['ieri alle', 'oggi alle', 'domani alle', 'dopodomani alle'], // etichette relative, FAC
+ *   locale: 'it-IT', // locale di formattazione, FAC
+ * });
+ *
  * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/RelativeTimeFormat
  */
 

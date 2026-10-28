@@ -139,25 +139,26 @@ import { createDomElement, normalizeNamespace } from './resolveNamespace.js';
  * @returns {HTMLElement|null} Il primo elemento creato, oppure null se non è stato creato nulla. Il tipo dichiarato è `HTMLElement` per comodità, ma per gli elementi SVG o MathML il valore restituito è un `SVGElement` o un `MathMLElement`.
  *
  * @example
- * // riepilogo dei parametri con i valori di default
- * domBuilder([
+ * // Tutti i parametri (valori di default dove previsti):
+ * domBuilder([ // array di configurazione, FAC
  *   {
- *     tag: 'div',             // default: 'div'
- *     className: undefined,
- *     id: undefined,
- *     attrs: undefined,
- *     content: undefined,
- *     sanitizeContent: true,  // default: true
- *     namespace: undefined,   // default: risoluzione automatica
- *     condition: true,        // default: true
- *     callback: undefined,
- *     children: undefined
+ *     tag: 'div', // tag o array di tag annidati (alias `tagName`), FAC
+ *     className: undefined, // classe/i (alias `class`, `classname`), FAC
+ *     id: undefined, // id dell'elemento, FAC
+ *     attrs: undefined, // attributi: coppia, array di coppie o oggetto, FAC
+ *     content: undefined, // testo, markup, Node, funzione o array domBuilder, FAC
+ *     sanitizeContent: true, // sanifica il markup di `content`, FAC
+ *     namespace: undefined, // 'html' | 'svg' | 'math' | URI (default: automatico), FAC
+ *     text: undefined, // nodo di testo letterale al posto dell'elemento, FAC
+ *     condition: true, // se false l'elemento viene saltato, FAC
+ *     callback: undefined, // callback(el) dopo la creazione, FAC
+ *     children: undefined, // array di configurazione dei figli, FAC
  *   }
- * ], parent, {
- *   emptyParent: false,       // default: false
- *   insertMode: 'append',     // default: 'append'
- *   debug: false,             // default: false
- *   namespace: undefined      // default: HTML in assenza di genitore
+ * ], parent, { // elemento genitore, FAC
+ *   emptyParent: false, // svuota il genitore prima della costruzione, FAC
+ *   insertMode: 'append', // 'append' | 'prepend' | 'before' | 'after', FAC
+ *   debug: false, // log in console dell'array elaborato, FAC
+ *   namespace: undefined, // namespace iniziale senza genitore (default: HTML), FAC
  * });
  *
  * @example

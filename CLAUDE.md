@@ -111,6 +111,21 @@ minimo/
  */
 ```
 
+**Esempio completo nei JSDoc per funzioni con più di 4 parametri**: nelle funzioni con più di 4 parametri effettivi (contando le singole proprietà di un oggetto opzioni/destrutturato, non l'oggetto in sé; gli alias di uno stesso parametro contano una volta sola), il JSDoc deve includere come primo `@example` una chiamata con **tutti** i parametri, ciascuno su una riga con il valore di default (o un segnaposto se obbligatorio) e un brevissimo commento descrittivo che termina con `OBBL` (obbligatorio) o `FAC` (facoltativo). Serve a copiare rapidamente la chiamata dal tooltip di VSCode. Va tenuto allineato quando si aggiungono, rimuovono o rinominano parametri. Esempio (da `src/utilities/dom-builder-helpers/picture-tag.js`):
+
+```js
+/**
+ * @example
+ * // Tutti i parametri (valori di default dove previsti):
+ * buildPictureTag({
+ *   baseSrc: 'path/to/viewer/...', // URL base del viewer, OBBL
+ *   dpr: 2, // densità massima dei candidati srcset, FAC
+ *   // … tutti gli altri parametri, nello stesso formato
+ *   alt: '', // testo alt, FAC
+ * });
+ */
+```
+
 ---
 
 ## File pubblicati su npm

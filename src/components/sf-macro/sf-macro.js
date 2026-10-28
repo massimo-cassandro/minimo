@@ -23,6 +23,20 @@ import './sf-macro.css';
  * @returns {void}
  *
  * @example
+ * // Tutti i parametri (valori di default dove previsti):
+ * sf_macro({
+ *   wrapper_selector: '.sf-macro-wrapper', // selettore del wrapper esterno, FAC
+ *   row_selector: '.sf-macro-riga', // selettore delle righe ripetibili, FAC
+ *   closeBtnClass: 'sf-macro-close-btn', // classe del pulsante di rimozione, FAC
+ *   addBtnClass: 'sf-macro-riga-add', // classe del pulsante di aggiunta, FAC
+ *   containerClass: 'sf-macro-container', // classe del contenitore delle righe, FAC
+ *   add_callback: null, // callback(newRow, addBtn) dopo l'aggiunta, FAC
+ *   preDelCallback: null, // callback(row, closeBtn) prima della rimozione (false = annulla), FAC
+ *   del_callback: null, // callback(row, closeBtn) dopo la rimozione, FAC
+ *   insertAtTop: false, // nuove righe in cima, FAC
+ * });
+ *
+ * @example
  * sf_macro({
  *   wrapper_selector: '.sf-macro-wrapper',
  *   row_selector: '.sf-macro-riga',
