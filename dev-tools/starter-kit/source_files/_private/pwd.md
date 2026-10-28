@@ -11,6 +11,14 @@ VALUES
     password = '$2y$13$woOLLKqTHGnCqlo8D6Iste50vipaXOn2uKPaxztUK8bfQMYPa2MXu';
 ```
 
-## genera pwd symfony
+## genera pwd symfony (v. 6 e succ)
 
-`php bin/console security:hash-password`
+```
+php bin/console security:hash-password
+```
+
+con docker: 
+
+```
+docker compose exec app php bin/console security:hash-password
+```

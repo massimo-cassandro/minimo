@@ -35,6 +35,8 @@ import { classnames } from '../classnames.js';
  * - `baseSrc` obbligatorio solo se almeno una entry non ha override (oggi `null` se manca).
  * - Una stringa semplice vale come `{src, isViewer: true}`: per un URL non-viewer serve sempre l'oggetto.
  * - Aggiornare JSDoc (typedef, `@param baseSrc`, `@example` con caso misto).
+ *
+ * TODO valutare implementazione `sizes=auto`: https://web.dev/blog/web-platform-09-2026?hl=en#sizesauto_for_lazy-loaded_images_becomes_baseline
  */
 
 /**

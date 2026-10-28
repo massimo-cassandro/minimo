@@ -1,0 +1,15 @@
+# Docker locale per la demo: serve solo gli script PHP usati da alcune demo
+# (es. demo-files/unsplash-page-demo/getUnsplashPhotosLocal.php).
+# Immagine condivisa php-dev (~/Sites/_config/docker/php-dev), vedi ~/Sites/_config/docs/switch a docker.md
+name: minimo-demo
+
+services:
+  app:
+    image: php-dev:8.3
+    # parte solo con `docker compose up -d`, mai da solo all'avvio di Docker
+    restart: "no"
+    ports:
+      - "8001:80"
+    volumes:
+      # la demo usa solo script PHP statici: montata in sola lettura sulla DocumentRoot dell'immagine
+      - .:/var/www/html/public:ro

@@ -31,7 +31,11 @@
       {
         "filePath": "/Users/mazz/Sites/minimo/dev-tools/starter-kit/source_files/root/package-tpl.json",
         "group": "Default"
-      }
+      },
+      {
+        "filePath": "/Users/mazz/Sites/_config/docs/docker-quickstart.md",
+        "group": "Default"
+      },
     ],
   }
 }

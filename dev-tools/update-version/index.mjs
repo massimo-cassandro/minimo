@@ -91,7 +91,12 @@ async function run() {
         styleText(['yellow'], '│'),
 
       outputString1 = `👍 Version updated: ${params.oldSemver} → ${params.newSemver}`,
-      outputString2 = params.logRow.fullText? `Log: ${params.logRow.fullText}` : '',
+      // testo del log abbreviato solo per l'output a console (il file di log resta inalterato)
+      maxLogLength = 30,
+      logText = params.logRow.fullText?.length > maxLogLength
+        ? params.logRow.fullText.slice(0, maxLogLength) + '...'
+        : params.logRow.fullText,
+      outputString2 = logText? `Log: ${logText}` : '',
       outputLenght = Math.max(outputString1.length, outputString2.length ) + 2, // 2 = spazi esterni
       frameLine = '─'.repeat(outputLenght);
 

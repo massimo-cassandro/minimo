@@ -8,7 +8,7 @@ export async function unsplashPageDemo(){
 
   const isLocal = window.location.origin.match('localhost') !== null,
     unsplashDataUrl = isLocal
-      ? 'http://localhost:8100/demo-files/unsplash-page-demo/getUnsplashPhotosLocal.php' // local test only
+      ? 'http://localhost:8001/demo-files/unsplash-page-demo/getUnsplashPhotosLocal.php' // local test only
       : 'https://primominuto.altervista.org/proxy/getUnsplashPhotos.php';
 
   /*
@@ -24,7 +24,7 @@ export async function unsplashPageDemo(){
         throw new Error('unexpected response from local PHP server');
       }
     } catch {
-      window.alert('Il server PHP su localhost:8100 non risulta attivo: avvialo per visualizzare questa demo.');
+      window.alert('Il server PHP su localhost:8001 non risulta attivo: avvialo per visualizzare questa demo.');
       return;
     }
   }
