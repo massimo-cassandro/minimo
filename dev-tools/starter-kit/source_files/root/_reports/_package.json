@@ -1,7 +1,7 @@
 {
   "scripts": {
-    "webpack PROD": "cd .. && NODE_ENV=production webpack --config ./webpack.config.mjs --stats minimal",
-    "server PROD": "cd .. && APP_ENV=prod APP_DEBUG=0 php -S 127.0.0.1:8100 -t public public/index.php # http://localhost:8100 (server integrato php: la CLI symfony ammette un solo server per progetto)",
+    "1 webpack PROD": "cd .. && NODE_ENV=production webpack --config ./webpack.config.mjs --stats minimal",
+    "2 server PROD": "cd .. && docker compose run --rm -p 8100:80 -e APP_ENV=prod -e APP_DEBUG=0 -e ASSETS_DIR=build app sh -c 'php bin/console cache:clear && chown -R www-data:www-data var/cache && exec apache2-foreground' # http://localhost:8100 (container Apache separato da quello di sviluppo su 8007)",
     "lighthouse mobile": "npx lighthouse http://localhost:8100/ --form-factor=mobile --output=html --output-path=./mobile.html --view",
     "lighthouse desktop": "npx lighthouse http://localhost:8100/ --preset=desktop --output=html --output-path=./desktop.html --view",
     "webhint": "npx hint http://localhost:8100/"

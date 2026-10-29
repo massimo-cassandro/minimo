@@ -1,7 +1,13 @@
 # Report Lighthouse / webhint
 
-Cartella ignorata da git. Gli script sono in `package.json` di questa cartella;
-`lighthouse` e `hint` sono devDependencies del progetto (root).
+Gli script sono nel `package.json` di questa cartella; `lighthouse` e `hint` sono devDependencies del progetto (root).
+
+## Uso
+
+1. avviare lo script "1 webpack PROD"
+2. avviare lo script "2 server PROD"
+3. avviare i test desiderati
+
 
 ## Installazione
 
@@ -14,8 +20,8 @@ npm i -D lighthouse hint
 Dalla root del progetto (o dentro `_reports`, senza `--prefix`):
 
 1. Build di produzione: `npm run --prefix _reports "webpack PROD"`
-2. Avvio PHP in prod (porta 8100): `npm run --prefix _reports "server PROD"`
-   (a fine test chiudere il terminale con il pulsante cestino di VS Code, per liberare la porta)
+2. Avvio del server in prod (porta 8100): `npm run --prefix _reports "server PROD"`
+   (a fine test `Ctrl+C`, o il pulsante cestino di VS Code: il container viene rimosso e la porta liberata)
 3. In un altro terminale:
    - `npm run --prefix _reports "lighthouse mobile"` → `mobile.html`
    - `npm run --prefix _reports "lighthouse desktop"` → `desktop.html`
@@ -33,13 +39,16 @@ Dalla root del progetto (o dentro `_reports`, senza `--prefix`):
 
 ## Caratteristiche del server
 
-Lo script prod usa il server integrato di PHP (`php -S`). Rispetto al server reale tenere presente che: 
+Lo script prod avvia con `docker compose run` un secondo container del servizio `app` (stessa immagine, stessi volumi, Apache + mod_php come in sviluppo), pubblicato su 8100 e rimosso alla chiusura (`--rm`). Può girare insieme al container di sviluppo su 8007: `run` non pubblica le porte del servizio, solo quella indicata con `-p`.
 
-* esegue un solo processo per volta, più richieste vanno in coda
-* non esegue compressione gzip/brotli
+Rispetto al server reale tenere presente che:
+
+* PHP è quello dell'immagine di sviluppo (`php-dev`, con `dev.ini` e `php.ini-development`), non la configurazione di produzione
+* la compressione gzip è quella di `mod_deflate` secondo `public/.htaccess`; niente brotli né CDN
 
 Note:
 
-- `APP_ENV=prod APP_DEBUG=0` sono variabili d'ambiente lette da Symfony (non dal server): con `php -S` vengono ereditate dal processo e hanno la precedenza sui file `.env` / `.env.local`.
-- `php -S` usa il `php.ini` della CLI, che può differire da quello di `php-cgi`.
-- Con richieste in coda i tempi di caricamento di asset e immagini possono risultare peggiori: i numeri di performance locali sono indicativi.
+- `APP_ENV=prod APP_DEBUG=0` sono passate al container con `-e`: le variabili reali hanno la precedenza sui file `.env` / `.env.local` (`variables_order = "EGPCS"` in `dev.ini` le rende visibili anche sotto Apache).
+- Lo script svuota la cache prod prima di avviare Apache: con `APP_DEBUG=0` Symfony non ricompila il container quando cambiano i sorgenti (es. un costruttore di servizio modificato), e una cache vecchia produce errori 500. La cache sta nel volume `symfony-cache` condiviso con il container di sviluppo, ma in `var/cache/prod`, separata da `var/cache/dev`; il `chown` successivo la rende scrivibile da Apache (`cache:clear` gira come root).
+- `ASSETS_DIR=build` è passato esplicitamente perché `.env.local` imposta `_dev`, e altrimenti la pagina caricherebbe gli asset della build di sviluppo.
+- I numeri di performance locali restano indicativi.

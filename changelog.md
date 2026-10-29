@@ -29,3 +29,4 @@
 * 1.49 (20 ott 2026) - Layout-tools: bs5
 * 1.50 (23 ott 2026) - form-check
 * 1.51 (23 ott 2026) - overlay
+* 1.53 (29 ott 2026) - markupToElement

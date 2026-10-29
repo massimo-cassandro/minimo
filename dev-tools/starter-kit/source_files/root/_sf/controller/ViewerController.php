@@ -4,10 +4,10 @@ namespace App\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\Mime\MimeTypes;
 use Doctrine\Persistence\ManagerRegistry;
 use App\Entity\Files\Files;
 use App\Entity\Files\MarchiFamiglie;
@@ -35,7 +35,7 @@ class ViewerController extends AbstractController
         $tipoBitmap =  $em->getRepository(MarchiTipologie::class)->find(1); // Bitmap
         $tipoSvg =  $em->getRepository(MarchiTipologie::class)->find(2); // Svg
 
-        $isSvg = false;
+        $file = null;
         if(isset($get['svg']) && $get['svg']) {
 
             # in prima battuta cerco l'svg predefinito
@@ -49,28 +49,10 @@ class ViewerController extends AbstractController
                 array()
             );
 
-            if($file !== null) {
+        }
 
-                $isSvg = true;
-
-            } else {
-
-                # se non trovo l'svg predefinito cerco il bitmap predefinito
-                $file = $em->getRepository(MarchiFiles::class)->findOneBy(
-                    array(
-                        'famiglia'    =>  $famiglia,
-                        'predefinito' =>  1,
-                        'cancellato'  =>  0,
-                        'tipologia'   =>  $tipoBitmap
-                    ),
-                    array()
-                );
-
-            }
-
-        } else {
-
-            # cerco il bitmap predefinito
+        # cerco il bitmap predefinito (se non è richiesto l'svg o se l'svg predefinito non esiste)
+        if($file === null) {
             $file = $em->getRepository(MarchiFiles::class)->findOneBy(
             array(
                 'famiglia'    =>  $famiglia,
@@ -80,23 +62,13 @@ class ViewerController extends AbstractController
             ),
             array()
             );
-
         }
 
         if($file !== null) {
 
-            if($isSvg) {
             $params = array(
                 'id' => $file->getFile()->getId()
             );
-            } else {
-
-            $params = array(
-                'id' => $file->getFile()->getId(),
-                'request' => $request
-            );
-
-            }
 
             # se non è richiesto un formato, lo forzo a png #
             if(!array_key_exists('f', $get)) {
@@ -129,17 +101,20 @@ class ViewerController extends AbstractController
    *              es: crop=10,10,100,100 -> ritaglia un quadrato di 100px a partire dal punto 10,10
    * @param bb: bounding box dell'area che deve contenere l'immagine ridimensionata (image magick)
    * @param fd: forza dimensioni (utilizzato in coppia con bb)
-   * @param q: qualità di compressione (ex jq)
+   * @param q: compression quality 1-100 (ex jq)
    * @param alpha: mantiene la trasparenza nelle png (default 0)
-   * @param bg: in combinazione con alpha=1 definisce il bkg color della png
-   * @param refresh: forza la rigenerazione dell'immagine
-   * @param f: definisce il formato dell'immagine: pjpeg (default), jpeg, gif, png, webp, ico
+   * @param bg: in combinazione con alpha=1 definisce il bkg color della png (esadecimale a 6 cifre)
+   * @param refresh: forza la rigenerazione dell'immagine (solo in ambiente dev)
+   * @param f: definisce il formato dell'immagine: auto (default), pjpeg, jpeg, gif, png, webp, avif, ico
    * @param ext: lascia inalterato il formato dell'immagine
    * @param d: forza il download dell'immagine
+   * @param og: immagine per structured data / open graph: q (quadrata 600x600), r (rettangolare 1000x500)
    */
 
   // parametri get del viewer accettati
-  const ALLOWED_PARAMS = array('raw', 'bb', 'fd', 'q', 'alpha', 'bg', 'refresh', 'f', 'ext', 'd', 'crop');
+  const ALLOWED_PARAMS = array('raw', 'bb', 'fd', 'q', 'alpha', 'bg', 'refresh', 'f', 'ext', 'd', 'crop', 'og');
+  // parametri senza valore significativo (la sola presenza attiva l'opzione)
+  const FLAG_PARAMS = array('raw', 'fd', 'alpha', 'ext', 'd');
   // formati output
   const ALLOWED_FORMATS = array(
     'avif'  =>  'image/avif',
@@ -157,53 +132,62 @@ class ViewerController extends AbstractController
   // (NB: devono essere uguali alle chiavi di ALLOWED_FORMATS)
   const PREFERRED_AUTO_FORMATS = ['avif', 'webp'];
 
+  // solo dev: true = le richieste f=avif vengono servite in WebP (test crash Chrome, vedi CLAUDE.md)
+  const DEV_NO_AVIF = true;
+
   // formati input accettati da Imagick (in aggiunta a quelli definiti in ALLOWED_FORMATS)
   const ALLOWED_INPUT = ['bmp', 'tiff', 'tif'];
+
+  // corrispondenza estensione file -> coder Imagick, dove diversi
+  const INPUT_CODERS = ['jpg' => 'jpeg', 'tif' => 'tiff'];
+
+  // limiti delle risorse di Imagick (protezione da immagini sovradimensionate / decompression bomb)
+  const IMAGICK_LIMITS = [
+    'memory' => 256 * 1024 * 1024,  // byte
+    'map'    => 512 * 1024 * 1024,  // byte
+    'area'   => 64 * 1000 * 1000,   // pixel
+    'width'  => 16000,              // pixel
+    'height' => 16000,              // pixel
+  ];
 
   // parametro compression quality di default
   const DEFAULT_COMPRESSION_QUALITY = 60;
 
+  // header CSP per i contenuti che il browser potrebbe eseguire (svg, html, ecc.)
+  const SANDBOX_CSP = "default-src 'none'; style-src 'unsafe-inline'; sandbox";
 
-  #[Route('/viewer/{id}')]
+
+  #[Route('/viewer/{id}', name: 'betogether_viewer')]
   public function index(Request $request, $id = null)
   {
     $em = $this->managerRegistry->getManager();
-
-    $get = $request->query->all();
 
     // formati supportati dall'istanza imageMagick
     $supported_formats = array_map("strtolower", \imagick::queryFormats());
 
     // formati accettati dal browser
-    $accept = $request->server->get('HTTP_ACCEPT');
+    $accept = (string) $request->headers->get('Accept', '');
 
-    // formato 'auto' di default
-    if(!isset($get['f'])) {
-      $get['f'] ='auto';
-    } else {
-      $get['f'] = strtolower($get['f']);
-    }
+    ## durata della cache di un file: 30gg ##
+    $cache_lifetime = 2592000;
 
-    // format 'auto' -> sceglie il formato migliore per il browser, se disponibile
-    if(isset($get['f']) && $get['f'] == 'auto') {
+    $params = $this->cleanParams($request->query->all());
+
+    // format 'auto' (default, o formato richiesto non valido) -> sceglie il formato migliore per il browser, se disponibile
+    $autoFormat = !isset($params['f']);
+    if($autoFormat) {
+
+      $params['f'] = 'jpeg';
 
       foreach(self::PREFERRED_AUTO_FORMATS as $f) {
         if(strpos($accept, self::ALLOWED_FORMATS[$f]) !== false &&
-          in_array($f, array_keys(self::ALLOWED_FORMATS)) &&
           in_array($f, $supported_formats)
         ) {
-          $get['f']=$f;
+          $params['f'] = $f;
           break;
         }
       }
     }
-
-    if($get['f'] == 'auto') $get['f'] = 'jpeg';
-
-    ## durata della cache di un file: 7gg ##
-    $cache_lifetime = 604800;
-
-    $params = $this->cleanParams($get);
 
     $cache_params_str = "";
 
@@ -227,6 +211,10 @@ class ViewerController extends AbstractController
       $folder = $this->getParameter('files_dir') . ((int)($dbfile->getId() / 1000));
       $file = $folder . '/' . $dbfile->getId() . '_' . $dbfile->getNome();
 
+      ## record presente nel db ma file mancante su disco ##
+      if(!is_file($file))
+        throw $this->createNotFoundException('Risorsa non disponibile!!');
+
       $string = $dbfile->getNome();
 
       $fileNm = substr($string, 0, strripos($string, '.'));
@@ -238,10 +226,6 @@ class ViewerController extends AbstractController
     if($dbfile->getIsImg()) {
 
       $disposition = isset($params['d']) ? 'attachment' : 'inline';
-
-      // if($this->getParameter('local_test') == true && isset($params['f']) && $params['f'] == 'webp') {
-      //   unset($params['f']);
-      // }
 
       $ext = strtolower(pathinfo($file, PATHINFO_EXTENSION));
 
@@ -262,22 +246,38 @@ class ViewerController extends AbstractController
           $format = 'pjpeg';
         }
 
+        ## se il formato non è supportato dall'istanza imagick o non è tra i formati di output uso jpeg ##
+        if (!in_array($format, $supported_formats) || !array_key_exists($format, self::ALLOWED_FORMATS)) {
+          $format = 'jpeg';
+        }
+
         $filename = $fileNm . $cache_params_str . '.' . ($format == 'pjpeg' ? 'jpeg' : $format);
 
         $cachefile = $this->getParameter('cache_dir') . $dbfile->getId() . '_' . $filename;
 
         ## definizione della qualità della compressione dell'immagine ##
-        $compressionQuality = isset($params['q']) && $params['q'] > 0 ? $params['q'] : self::DEFAULT_COMPRESSION_QUALITY;
+        $compressionQuality = $params['q'] ?? self::DEFAULT_COMPRESSION_QUALITY;
 
         ## elaborazione con imagick per i seguenti casi:
         ## 1) non esiste il file nella cartella cache
         ## 2) la cache è scaduta
-        ## 3) forzo il refresh
-        if(!file_exists($cachefile) || (filemtime($cachefile)+$cache_lifetime) < time() || isset($params['refresh'])) {
+        ## 3) il file originale è più recente della cache
+        ## 4) forzo il refresh
+        if(!file_exists($cachefile) ||
+          (filemtime($cachefile)+$cache_lifetime) < time() ||
+          filemtime($cachefile) < filemtime($file) ||
+          isset($params['refresh'])
+        ) {
+
+          ## il coder di lettura è forzato dall'estensione, così Imagick non sceglie il formato dal contenuto del file ##
+          $coder = self::INPUT_CODERS[$ext] ?? $ext;
+          if(!in_array($coder, $supported_formats))
+            throw $this->createNotFoundException('Formato non supportato!!');
 
           ## inizializzazione imagick ##
+          $this->setImagickLimits();
           $img = new \Imagick();
-          $img->readImage($file);
+          $img->readImage($coder . ':' . $file);
 
           $img->stripImage();
 
@@ -288,14 +288,8 @@ class ViewerController extends AbstractController
           }
 
           if(isset($params['crop'])) {
-            $crop_params = array_map( fn($val) => intval(trim($val)), explode(',', $params['crop']));
-
-            // devono essere presenti tutti e 4 i parametri e devono essere maggiori di zero
-            if(count($crop_params) != 4 or min($crop_params) < 0) {
-              throw $this->createNotFoundException('Errore di configurazione! (crop 1)');
-            }
-
-            [$x,$y,$crop_w,$crop_h] = $crop_params;
+            // formato già validato in cleanParams: x,y,w,h interi, w e h maggiori di zero
+            [$x,$y,$crop_w,$crop_h] = array_map('intval', explode(',', $params['crop']));
 
             // l'area ritagliata non può essere più grande dell'immagine
             if($x + $crop_w > $ow or $y + $crop_h > $oh) {
@@ -310,12 +304,12 @@ class ViewerController extends AbstractController
           }
 
           if(isset($params['bb'])) {
-            $bb_param = strtolower($params['bb']);
+            // formato già validato in cleanParams: [larghezza]x[altezza]
+            $bb_param = $params['bb'];
             $pox = strpos($bb_param, 'x');
 
             if($pox !== false) {
-              $b = ($pox > 0) ? substr($bb_param, 0, $pox) : 0;
-              $h = (($pox + 1) < strlen($bb_param)) ? substr($bb_param, $pox + 1) : 0;
+              [$b, $h] = array_map('intval', explode('x', $bb_param));
 
               $ob = $img->getImageWidth();
               $oh = $img->getImageHeight();
@@ -431,7 +425,7 @@ class ViewerController extends AbstractController
             } elseif ($format == 'png') {
 
                 // $mimeType = 'png';
-                if(isset($params['alpha']) && isset($params['bg']) && preg_match('/[0-9a-f]{6}/i', $params['bg'])) {
+                if(isset($params['alpha']) && isset($params['bg'])) {
                   $bgColor = '#' . $params['bg'];
                   ## elimino la trasparenza ##
                   //$img->setImageAlphaChannel(\imagick::COMPOSITE_CLEAR);
@@ -456,22 +450,20 @@ class ViewerController extends AbstractController
 
           } */
 
-          $img->writeImage($cachefile);
+          /* scrittura atomica: scrivo su un file temporaneo e poi lo rinomino,
+          così una richiesta concorrente non legge mai un file scritto a metà */
+          $tmpfile = $cachefile . '.' . bin2hex(random_bytes(4)) . '.tmp';
+          $img->writeImage($format . ':' . $tmpfile);
           $img->clear();
           $img->destroy();
 
+          if(!rename($tmpfile, $cachefile)) {
+            @unlink($tmpfile);
+            throw new \RuntimeException('Impossibile scrivere il file di cache');
+          }
+
         } else {
 
-          // $mimeTypeArray = array(
-          //   'pjpeg' =>  'image/jpeg',
-          //   'jpeg'  =>  'image/jpeg',
-          //   'jpg'   =>  'image/jpeg',
-          //   'png'   =>  'image/png',
-          //   'gif'   =>  'image/gif',
-          //   'webp'  =>  'image/webp',
-          //   'ico'   =>  'image/vnd.microsoft.icon'
-          // );
-          // $mimeType = $mimeTypeArray[$format];
           $mimeType = self::ALLOWED_FORMATS[$format];
         }
 
@@ -496,20 +488,62 @@ class ViewerController extends AbstractController
     }
 
     $response = new BinaryFileResponse($cachefile);
-    $response->trustXSendfileTypeHeader();
 
-    if(isset($mimeType)) {
-      $response->headers->set('Content-Type', $mimeType);
+    ## content type esplicito (ricavato dal contenuto del file se non già definito) ##
+    if(!isset($mimeType)) {
+      $mimeType = MimeTypes::getDefault()->guessMimeType($cachefile) ?? 'application/octet-stream';
+    }
+    $response->headers->set('Content-Type', $mimeType);
+
+    ## il browser non deve dedurre un content type diverso da quello dichiarato ##
+    $response->headers->set('X-Content-Type-Options', 'nosniff');
+
+    /* contenuti potenzialmente eseguibili (svg, html, ecc.) aperti in una sandbox senza script;
+    esclusi i pdf, perché in una sandbox il visualizzatore di Chrome non si apre */
+    if($mimeType !== 'application/pdf') {
+      $response->headers->set('Content-Security-Policy', self::SANDBOX_CSP);
     }
 
-    $response->headers->set('Content-Disposition', $disposition . '; filename = ' . $filename);
+    $filename = str_replace(['/', '\\'], '_', $filename);
+    $filenameFallback = preg_replace('/[^\x20-\x7e]|%/', '_', $filename);
+    $response->setContentDisposition($disposition, $filename, $filenameFallback);
+
+    ## cache http (browser e cdn) per le immagini, stessa durata della cache su disco ##
+    if($dbfile->getIsImg()) {
+      $response->setPublic();
+      $response->setMaxAge($cache_lifetime);
+
+      // con il formato automatico la risposta dipende dall'header Accept del browser
+      if($autoFormat) {
+        $response->setVary('Accept');
+      }
+    }
 
     return $response;
-
-    //return array();
   }
 
-  protected function cleanParams($params)
+  /**
+   * Filtra i parametri get del viewer: scarta quelli non ammessi e quelli con valori non validi,
+   * e normalizza i valori, così da usarli in sicurezza anche nel nome del file di cache.
+   *
+   * @param array $params parametri get grezzi
+   * @return array parametri validati
+   *
+   * @example
+   * $this->cleanParams([
+   *   'bb'      => '300x200',   // [larghezza]x[altezza], 0-4 cifre ciascuna
+   *   'crop'    => '0,0,100,100', // x,y,w,h interi, w e h > 0
+   *   'q'       => '70',        // 1-100, default DEFAULT_COMPRESSION_QUALITY (60)
+   *   'jq'      => '70',        // alias di q (compatibilità)
+   *   'bg'      => 'ffffff',    // esadecimale a 6 cifre
+   *   'f'       => 'webp',      // chiave di ALLOWED_FORMATS, default auto
+   *   'og'      => 'q',         // q | r
+   *   'refresh' => '1',         // solo in ambiente dev
+   *   'raw' => '', 'fd' => '', 'alpha' => '', 'ext' => '', 'd' => '', // flag: conta la sola presenza
+   * ]);
+   * // -> ['bb' => '300x200', 'crop' => '0,0,100,100', 'q' => 70, 'bg' => 'ffffff', 'f' => 'webp', 'og' => 'q', 'raw' => 1, ...]
+   */
+  protected function cleanParams(array $params): array
   {
 
     // compatibilità con vecchio parametro jq
@@ -517,33 +551,97 @@ class ViewerController extends AbstractController
       $params['q'] = $params['jq'];
     }
 
-    $array_filters = array('raw', 'bb', 'fd', 'jq', 'alpha', 'bg', 'refresh', 'f', 'd', 'ext', 'og');
-
-    #array_walk($params, create_function('&$val', '$val = trim($val);'));
-    // array_walk($params, function($val): string {
-    //     return trim($val);
-    // });
-
-    // foreach ($params as $key => $value)
-    // {
-    //   if (!(in_array($key, $array_filters) && $value)) {
-    //     unset($params[$key]);
-    //   }
-    // }
+    $clean = [];
 
     foreach ($params as $key => $value) {
-      if(!in_array($key, self::ALLOWED_PARAMS)) {
-        unset($params[$key]);
-      } else if($value) {
-        $params[$key] = trim($value);
+      if(!in_array($key, self::ALLOWED_PARAMS, true) || !is_scalar($value)) {
+        continue;
+      }
+
+      $value = strtolower(trim((string) $value));
+
+      if(in_array($key, self::FLAG_PARAMS, true)) {
+        $clean[$key] = 1;
+        continue;
+      }
+
+      switch ($key) {
+        case 'bb':
+          if(preg_match('/^\d{0,4}x\d{0,4}$/', $value)) {
+            $clean[$key] = $value;
+          }
+          break;
+
+        case 'crop':
+          if(preg_match('/^\d{1,5},\d{1,5},\d{1,5},\d{1,5}$/', $value)) {
+            $crop = array_map('intval', explode(',', $value));
+            if($crop[2] > 0 && $crop[3] > 0) {
+              $clean[$key] = implode(',', $crop);
+            }
+          }
+          break;
+
+        case 'q':
+          if(ctype_digit($value) && (int) $value >= 1 && (int) $value <= 100) {
+            $clean[$key] = (int) $value;
+          }
+          break;
+
+        case 'bg':
+          if(preg_match('/^[0-9a-f]{6}$/', $value)) {
+            $clean[$key] = $value;
+          }
+          break;
+
+        case 'f':
+          if(array_key_exists($value, self::ALLOWED_FORMATS)) {
+            // solo dev: AVIF sostituito da WebP (test crash Chrome, vedi CLAUDE.md)
+            if($value === 'avif' && $this->getParameter('kernel.environment') === 'dev' && self::DEV_NO_AVIF) {
+              $value = 'webp';
+            }
+            $clean[$key] = $value;
+          }
+          break;
+
+        case 'og':
+          if($value === 'q' || $value === 'r') {
+            $clean[$key] = $value;
+          }
+          break;
+
+        case 'refresh':
+          if($this->getParameter('kernel.environment') === 'dev') {
+            $clean[$key] = 1;
+          }
+          break;
       }
     }
 
-    if(isset($params['f'])) {
-      $params['f'] = strtolower($params['f']);
-    }
+    return $clean;
+  }
 
-    return $params;
+  /**
+   * Imposta i limiti delle risorse di Imagick (IMAGICK_LIMITS); i tipi di risorsa
+   * non disponibili nella versione installata vengono ignorati.
+   *
+   * @example
+   * $this->setImagickLimits(); // memory 256MB, map 512MB, area 64Mpx, width/height 16000px
+   */
+  private function setImagickLimits(): void
+  {
+    $types = [
+      'memory' => 'RESOURCETYPE_MEMORY',
+      'map'    => 'RESOURCETYPE_MAP',
+      'area'   => 'RESOURCETYPE_AREA',
+      'width'  => 'RESOURCETYPE_WIDTH',
+      'height' => 'RESOURCETYPE_HEIGHT',
+    ];
+
+    foreach ($types as $key => $const) {
+      if(defined('\Imagick::' . $const)) {
+        \Imagick::setResourceLimit(constant('\Imagick::' . $const), self::IMAGICK_LIMITS[$key]);
+      }
+    }
   }
 
 }

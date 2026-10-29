@@ -1,5 +1,5 @@
 // webpack.config.mjs __project_name__
-// v.3.4
+// v.3.5
 import path from 'path';
 import { fileURLToPath } from 'url';
 import webpack from 'webpack';
@@ -374,7 +374,8 @@ const config = {
 
   output: {
     path: output_dir,
-    filename: '[name].[contenthash].js',
+    // contenthash solo se non si usa Dev Server
+    filename: process.env.WEBPACK_SERVE ? '[name].js' : '[name].[contenthash].js',
     publicPath: '/',
     // publicPath: isDevelopment? '/' : './', // nel caso in cui l'output di produzione non sia sulla root
     clean: !isDevelopment
@@ -383,8 +384,8 @@ const config = {
   /* SETUP symfony
   output: {
     path: path.resolve(__dirname, `./public/${output_dir}` ),
-    // filename: '[name].js',
-    filename: '[name].[contenthash].js',
+    // contenthash solo se non si usa Dev Server
+    filename: process.env.WEBPACK_SERVE ? '[name].js' : '[name].[contenthash].js',
     publicPath: `/${output_dir}/`,
     clean: !isDevelopment || !!process.env.WEBPACK_SERVE,
   },

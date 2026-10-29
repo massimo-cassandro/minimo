@@ -7,7 +7,7 @@ import { classnames } from '../classnames.js';
  * Da definire come calcolare le dimensioni in px dei candidati `srcset` (es. base font-size configurabile).
  *
  *
- * TODO rivedere e semplificare l'intera funzione (parametri, normalizzazione di `sizes`, calcolo dei
+ * TODO rivedere e semplificare l'intera funzione (parametri, normalizzazione di `sizes` (???), calcolo dei
  * candidati) e ampliare gli esempi iniziali del JSDoc, coprendo un numero maggiore di casi d'uso.
  *
  *
@@ -37,6 +37,15 @@ import { classnames } from '../classnames.js';
  * - Aggiornare JSDoc (typedef, `@param baseSrc`, `@example` con caso misto).
  *
  * TODO valutare implementazione `sizes=auto`: https://web.dev/blog/web-platform-09-2026?hl=en#sizesauto_for_lazy-loaded_images_becomes_baseline
+ *
+ * TODO aggiungere compatibilità con immagini Unsplash basate su imgix
+ *
+ * TODO parametri viewer: le convenzioni attuali (`bb=WxH`, `bb=Wx` per il resize width-only,
+ * `q`, `fd`, `f`) sono legate al viewer interno; prevedere un meccanismo di astrazione
+ * per altri servizi con parametri diversi (es. imgix/Unsplash)
+ *
+ * TODO valutare parametri viewer (q, fd ecc per size), img_params rimarrebbe com edefault in mancanza di indicazioni specifiche
+ *
  */
 
 /**
@@ -44,11 +53,6 @@ import { classnames } from '../classnames.js';
  * @property {number} [from] - Breakpoint (px) da cui si applica la size (condizione media `width >=`); omesso nell'(unica) entry predefinita mobile-first.
  * @property {number | [number, number]} size - Larghezza renderizzata (px, altezza calcolata con `ratio`, se impostato) oppure coppia esplicita `[width, height]` (px).
  */
-
-// TODO aggiungere compatibilità con immagini Unsplash basate su imgix
-// TODO parametri viewer: le convenzioni attuali (`bb=WxH`, `bb=Wx` per il resize width-only,
-// `q`, `fd`, `f`) sono legate al viewer interno; prevedere un meccanismo di astrazione
-// per altri servizi con parametri diversi (es. imgix/Unsplash)
 
 /**
  * Crea un elemento domBuilder `picture` per un'immagine servita tramite il viewer.

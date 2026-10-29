@@ -12,6 +12,7 @@ export { escapeHTML, unescapeHTML } from './utilities/escape-html.js';
 export { generatePwd } from './utilities/generate-pwd.js';
 export { getCookie, setCookie } from './utilities/cookies.js';
 export { linkedDates } from './utilities/linked-dates.js';
+export { markupToElement } from './utilities/markup-to-element.js';
 export { parseFileSize } from './utilities/parse-file-size.js';
 export { randomId } from './utilities/random-id.js';
 export { relativeDate } from './utilities/relative-date.js';
