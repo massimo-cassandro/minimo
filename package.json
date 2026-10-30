@@ -1,6 +1,6 @@
 {
   "name": "@massimo-cassandro/minimo",
-  "version": "1.53.0",
+  "version": "1.54.0",
   "description": "Light css framework & utilities",
   "type": "module",
   "main": "./src/index.js",

@@ -30,3 +30,4 @@
 * 1.50 (23 ott 2026) - form-check
 * 1.51 (23 ott 2026) - overlay
 * 1.53 (29 ott 2026) - markupToElement
+* 1.54 (30 ott 2026) - buildPictureTag: src diverse per media query
