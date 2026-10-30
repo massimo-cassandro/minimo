@@ -31,7 +31,7 @@ const common = {
   alt: 'foto',
 };
 
-const altEntry = { media, size: [480, 720], src: '/viewer/alt.jpg' };
+const altEntry = { media, size: [480, 720], baseSrc: '/viewer/alt.jpg' };
 
 // esegue fn e restituisce il risultato con gli avvisi emessi
 const withWarnings = fn => {
@@ -43,7 +43,7 @@ const withWarnings = fn => {
   }
 };
 
-test('sizes senza src: source normali e img con srcset e sizes attesi', () => {
+test('sizes senza baseSrc: source normali e img con srcset e sizes attesi', () => {
   const { children } = buildPictureTag({ ...common, sizes: stdSizes });
 
   assert.deepEqual(children.map(c => c.tag), ['source', 'source', 'img']);
@@ -54,7 +54,7 @@ test('sizes senza src: source normali e img con srcset e sizes attesi', () => {
   assert.equal(children[2].attrs.height, 624);
 });
 
-test('entry con src e media: source proprie, per primi e per ogni formato tranne l\'ultimo', () => {
+test('entry con baseSrc e media: source proprie, per primi e per ogni formato tranne l\'ultimo', () => {
   const { result, warnings } = withWarnings(() => buildPictureTag({ ...common, sizes: [...stdSizes, altEntry] }));
   const { children } = result;
 
@@ -79,13 +79,13 @@ test('entry con src e media: source proprie, per primi e per ogni formato tranne
   assert.deepEqual(children.slice(2), buildPictureTag({ ...common, sizes: stdSizes }).children);
 });
 
-test('più entry con src: resta l\'ordine di scrittura, anche se mescolate alle altre', () => {
+test('più entry con baseSrc: resta l\'ordine di scrittura, anche se mescolate alle altre', () => {
   const { children } = buildPictureTag({
     ...common,
     sizes: [
-      { media: '(width: 2px)', size: 200, src: '/viewer/due.jpg' },
+      { media: '(width: 2px)', size: 200, baseSrc: '/viewer/due.jpg' },
       ...stdSizes,
-      { media: '(width: 1px)', size: 100, src: '/viewer/uno.jpg' },
+      { media: '(width: 1px)', size: 100, baseSrc: '/viewer/uno.jpg' },
     ],
   });
 
@@ -100,10 +100,10 @@ test('più entry con src: resta l\'ordine di scrittura, anche se mescolate alle 
   );
 });
 
-test('entry con src: valgono dpr, imgParams, formats, devMode e ratio', () => {
+test('entry con baseSrc: valgono dpr, imgParams, formats, devMode e ratio', () => {
   const { children } = buildPictureTag({
     baseSrc: '/viewer/base.jpg',
-    sizes: [100, { media: '(width: 1px)', size: 300, src: '/viewer/alt.jpg' }],
+    sizes: [100, { media: '(width: 1px)', size: 300, baseSrc: '/viewer/alt.jpg' }],
     ratio: 3/2,
     dpr: 3,
     imgParams: [['q', '10']],
@@ -117,10 +117,10 @@ test('entry con src: valgono dpr, imgParams, formats, devMode e ratio', () => {
   );
 });
 
-test('entry con src: URL relativi e assoluti risolti come baseSrc, con i parametri di query', () => {
-  const srcsetOf = src => buildPictureTag({
+test('entry con baseSrc: URL relativi e assoluti risolti come baseSrc, con i parametri di query', () => {
+  const srcsetOf = baseSrc => buildPictureTag({
     baseSrc: '/viewer/base.jpg',
-    sizes: [100, { media: '(width: 1px)', size: 300, src }],
+    sizes: [100, { media: '(width: 1px)', size: 300, baseSrc }],
     dpr: 1,
     imgParams: [['q', '10']],
   }).children[0].attrs.srcset;
@@ -130,11 +130,11 @@ test('entry con src: URL relativi e assoluti risolti come baseSrc, con i paramet
   assert.equal(srcsetOf('https://cdn.example.com/alt.jpg?v=1'), 'https://cdn.example.com/alt.jpg?v=1&q=10&f=avif&bb=300x 300w');
 });
 
-test('src nullo: entry ignorata senza avvisi, anche se ha media o è l\'unica senza from', () => {
+test('baseSrc nullo: entry ignorata senza avvisi, anche se ha media o è l\'unica senza from', () => {
   const expected = buildPictureTag({ ...common, sizes: stdSizes });
 
-  [null, undefined].forEach(src => {
-    [{ media, size: [480, 720], src }, { from: 800, size: 900, src }, { size: 900, src }].forEach(entry => {
+  [null, undefined].forEach(baseSrc => {
+    [{ media, size: [480, 720], baseSrc }, { from: 800, size: 900, baseSrc }, { size: 900, baseSrc }].forEach(entry => {
       const { result, warnings } = withWarnings(() => buildPictureTag({ ...common, sizes: [...stdSizes, entry] }));
       assert.deepEqual(warnings, []);
       assert.deepEqual(result, expected);
@@ -142,14 +142,14 @@ test('src nullo: entry ignorata senza avvisi, anche se ha media o è l\'unica se
   });
 });
 
-test('src senza media e media senza src: un avviso ed entry ignorata', () => {
+test('baseSrc senza media e media senza baseSrc: un avviso ed entry ignorata', () => {
   const expected = buildPictureTag({ ...common, sizes: stdSizes });
 
   [
-    { size: [480, 720], src: '/viewer/alt.jpg' },
-    { from: 800, size: [480, 720], src: '/viewer/alt.jpg' },
+    { size: [480, 720], baseSrc: '/viewer/alt.jpg' },
+    { from: 800, size: [480, 720], baseSrc: '/viewer/alt.jpg' },
     { media, size: [480, 720] },
-    { media: '', size: [480, 720], src: '/viewer/alt.jpg' },
+    { media: '', size: [480, 720], baseSrc: '/viewer/alt.jpg' },
   ].forEach(entry => {
     const { result, warnings } = withWarnings(() => buildPictureTag({ ...common, sizes: [...stdSizes, entry] }));
     assert.equal(warnings.length, 1);
@@ -173,7 +173,7 @@ test('nessuna entry utilizzabile: avviso e null, senza errori', () => {
 
 const imgixParams = [['q', '70'], ['fit', 'crop'], ['w', '{w}'], ['h', '{h}'], ['fm', '{f}']];
 
-test('imgParams dell\'entry con src: sostituisce quello generale, solo per le sue source', () => {
+test('imgParams dell\'entry con baseSrc: sostituisce quello generale, solo per le sue source', () => {
   const { children } = buildPictureTag({
     ...common,
     sizes: [...stdSizes, { ...altEntry, imgParams: imgixParams }],
@@ -227,7 +227,7 @@ test('segnaposto {h} senza altezza: omesso se è tutto il valore, vuoto dentro u
   assert.equal(srcsetOf([['size', '{w}x{h}']]), '/a.jpg?h=1&size=100x 100w');
 });
 
-test('imgParams su un\'entry senza src: un avviso, parametro ignorato ed entry valida', () => {
+test('imgParams su un\'entry senza baseSrc: un avviso, parametro ignorato ed entry valida', () => {
   const expected = buildPictureTag({ ...common, sizes: stdSizes });
   const { result, warnings } = withWarnings(() => buildPictureTag({
     ...common,
@@ -241,7 +241,7 @@ test('imgParams su un\'entry senza src: un avviso, parametro ignorato ed entry v
 test('imgParams su un\'entry ignorata: nessun avviso aggiuntivo', () => {
   const run = entry => withWarnings(() => buildPictureTag({ ...common, sizes: [...stdSizes, entry] })).warnings.length;
 
-  assert.equal(run({ ...altEntry, src: null, imgParams: imgixParams }), 0);
-  assert.equal(run({ size: 100, src: '/viewer/alt.jpg', imgParams: imgixParams }), 1);
+  assert.equal(run({ ...altEntry, baseSrc: null, imgParams: imgixParams }), 0);
+  assert.equal(run({ size: 100, baseSrc: '/viewer/alt.jpg', imgParams: imgixParams }), 1);
   assert.equal(run({ media, size: 100, imgParams: imgixParams }), 1);
 });

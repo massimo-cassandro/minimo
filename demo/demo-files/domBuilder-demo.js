@@ -33,10 +33,10 @@ export function domBuilderDemo(){
     '#id.classe1.classe2.classeN(attributo1: valore1, attributo2=valore2, attributo3) Lorem ipsum',
     {
       tag: 'p',
-      content: 'buildPictureTag: immagine alternativa con `src` e `media` (le immagini non esistono: la scelta si legge da `currentSrc` della `img`)'
+      content: 'buildPictureTag: immagine alternativa con `baseSrc` e `media` (le immagini non esistono: la scelta si legge da `currentSrc` della `img`)'
     },
     /*
-      su tablet in verticale viene scelta alt.jpg (con `src` null l'entry viene ignorata);
+      su tablet in verticale viene scelta alt.jpg (con `baseSrc` null l'entry viene ignorata);
       su smartphone in verticale alt-small.jpg, da un servizio con altre convenzioni per i parametri
     */
     buildPictureTag({
@@ -50,12 +50,12 @@ export function domBuilderDemo(){
         {
           media: '(min-width: 47.5rem) and (max-width: 63.99rem) and (orientation: portrait)',
           size: [480, 720],
-          src: '/viewer/alt.jpg'
+          baseSrc: '/viewer/alt.jpg'
         },
         {
           media: '(max-width: 37.5rem) and (orientation: portrait)',
           size: [430, 352],
-          src: '/imgix/alt-small.jpg',
+          baseSrc: '/imgix/alt-small.jpg',
           imgParams: [['q', '70'], ['fit', 'crop'], ['w', '{w}'], ['h', '{h}'], ['fm', '{f}']]
         },
       ],

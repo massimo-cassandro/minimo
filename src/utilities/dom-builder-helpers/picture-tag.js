@@ -8,8 +8,8 @@ import { classnames } from '../classnames.js';
  *
  * TODO URL non gestiti dal viewer (`isViewer`) — da valutare
  *
- * `src: string | {src, isViewer}` nelle entry di `sizes`: se `isViewer` è true (default) si aggiungono i parametri
- * `bb`/`q`/`f`, altrimenti l'URL è usato tal quale. Una stringa semplice vale come `{src, isViewer: true}`.
+ * `baseSrc: string | {baseSrc, isViewer}` nelle entry di `sizes`: se `isViewer` è true (default) si aggiungono i parametri
+ * `bb`/`q`/`f`, altrimenti l'URL è usato tal quale. Una stringa semplice vale come `{baseSrc, isViewer: true}`.
  *
  * Dubbi da sciogliere:
  * - `formats`: un URL non gestito dal viewer non può essere convertito in avif/webp/pjpg. Proposta: usarlo tal
@@ -19,7 +19,7 @@ import { classnames } from '../classnames.js';
  *
  *
  * TODO `baseSrcset` — da valutare
- * Array parallelo a `sizes`, di stringhe o `{src, isViewer}`, come alternativa a `src` nelle entry: per ogni entry
+ * Array parallelo a `sizes`, di stringhe o `{baseSrc, isViewer}`, come alternativa a `baseSrc` nelle entry: per ogni entry
  * si userebbe `baseSrcset[i]` al posto di `baseSrc`; se manca o è null, si userebbe `baseSrc`.
  * Dubbi da sciogliere: `sizes` viene riordinato per breakpoint, quindi `baseSrcset[i]` richiede di tracciare
  * l'indice originale prima del sort (fragile); servirebbe comunque una condizione `media` per ogni URL.
@@ -28,18 +28,18 @@ import { classnames } from '../classnames.js';
  *
  * TODO aggiungere compatibilità con immagini Unsplash basate su imgix
  *
- * TODO valutare `imgParams` per le entry senza `src` (es. `q` diverso per size): oggi è ammesso solo sulle entry
- * con `src`, perché le altre condividono un solo `srcset`
+ * TODO valutare `imgParams` per le entry senza `baseSrc` (es. `q` diverso per size): oggi è ammesso solo sulle entry
+ * con `baseSrc`, perché le altre condividono un solo `srcset`
  *
  */
 
 /**
  * @typedef {Object} PictureSizeEntry
- * @property {number} [from] - Breakpoint (px) da cui si applica la size (condizione media `width >=`); omesso nell'(unica) entry predefinita mobile-first. Non si usa insieme a `src`: viene ignorato, la condizione è solo in `media`.
+ * @property {number} [from] - Breakpoint (px) da cui si applica la size (condizione media `width >=`); omesso nell'(unica) entry predefinita mobile-first. Non si usa insieme a `baseSrc`: viene ignorato, la condizione è solo in `media`.
  * @property {number | [number, number]} size - Larghezza renderizzata (px, altezza calcolata con `ratio`, se impostato) oppure coppia esplicita `[width, height]` (px).
- * @property {string|null} [src] - URL di un'immagine diversa da `baseSrc`, da usare quando corrisponde `media`: l'URL viene risolto come `baseSrc`, conservando i suoi parametri di query. L'entry genera una `source` per ogni formato tranne l'ultimo e resta fuori da `srcset`, `sizes`, `width`, `height` e `src` di `img`. Se è presente ma `null`/`undefined` (foto opzionale) l'entry viene ignorata senza avvisi, anche se ha `media`; senza `media` viene ignorata con un avviso.
- * @property {[string, string|number][]|null} [imgParams] - Solo per le entry con `src`: sostituisce del tutto `imgParams` generale (vedi il parametro `imgParams` di {@link buildPictureTag} per i segnaposto). Su un'entry senza `src` viene ignorato con un avviso.
- * @property {string} [media] - Condizione media delle `source` dell'entry, usata tal quale (`legacyMediaSyntax` non la riguarda). Senza la proprietà `src` l'entry viene ignorata con un avviso.
+ * @property {string|null} [baseSrc] - URL di un'immagine diversa dal `baseSrc` generale, da usare quando corrisponde `media`: l'URL viene risolto come il `baseSrc` generale, conservando i suoi parametri di query. L'entry genera una `source` per ogni formato tranne l'ultimo e resta fuori da `srcset`, `sizes`, `width`, `height` e `src` di `img`. Se è presente ma `null`/`undefined` (foto opzionale) l'entry viene ignorata senza avvisi, anche se ha `media`; senza `media` viene ignorata con un avviso.
+ * @property {[string, string|number][]|null} [imgParams] - Solo per le entry con `baseSrc`: sostituisce del tutto `imgParams` generale (vedi il parametro `imgParams` di {@link buildPictureTag} per i segnaposto). Su un'entry senza `baseSrc` viene ignorato con un avviso.
+ * @property {string} [media] - Condizione media delle `source` dell'entry, usata tal quale (`legacyMediaSyntax` non la riguarda). Senza la proprietà `baseSrc` l'entry viene ignorata con un avviso.
  */
 
 /**
@@ -51,7 +51,7 @@ import { classnames } from '../classnames.js';
  * default e ogni altra entry si applica dal proprio breakpoint `from` in su, come
  * condizione media `(width >= …)` (sintassi range).
  *
- * Le entry con `src` e `media` usano un'immagine diversa da `baseSrc`: generano delle `source` proprie,
+ * Le entry con `baseSrc` e `media` usano un'immagine diversa dal `baseSrc` generale: generano delle `source` proprie,
  * poste prima delle altre (vince la prima che corrisponde) e nell'ordine in cui sono scritte in `sizes`.
  * Per loro valgono `dpr`, `formats`, `devMode` e `ratio`, come per le altre entry, e `imgParams`,
  * a meno che non abbiano il proprio.
@@ -60,7 +60,7 @@ import { classnames } from '../classnames.js';
  * // Tutti i parametri (valori di default dove previsti):
  * buildPictureTag({
  *   baseSrc: 'path/to/viewer/...', // URL base del viewer, OBBL
- *   sizes: [250], // size renderizzate (px, [w, h], {from, size} o {media, size, src}), FAC
+ *   sizes: [250], // size renderizzate (px, [w, h], {from, size} o {media, size, baseSrc}), FAC
  *   ratio: null, // aspect ratio w/h per le size numeriche, FAC
  *   dpr: 2, // densità massima dei candidati srcset, FAC
  *   imgParams: [['q', '60']], // parametri query aggiunti agli URL (segnaposto {w}, {h}, {f}), FAC
@@ -113,7 +113,7 @@ import { classnames } from '../classnames.js';
  * });
  *
  * @example
- * // immagine diversa da `baseSrc` in un solo caso: la foto alternativa è opzionale e, con `src`
+ * // immagine diversa dal `baseSrc` generale in un solo caso: la foto alternativa è opzionale e, con `baseSrc`
  * // null o undefined, l'entry viene ignorata. La foto non può stare nello `srcset` comune,
  * // quindi l'entry genera due `source` proprie (avif, webp) prima di quelle normali
  * buildPictureTag({
@@ -124,7 +124,7 @@ import { classnames } from '../classnames.js';
  *     {
  *       media: '(min-width: 47.5rem) and (max-width: 63.99rem) and (orientation: portrait)',
  *       size: [480, 720],
- *       src: alternativeImgId != null ? `/viewer/${alternativeImgId}` : null,
+ *       baseSrc: alternativeImgId != null ? `/viewer/${alternativeImgId}` : null,
  *     },
  *   ],
  * });
@@ -145,7 +145,7 @@ import { classnames } from '../classnames.js';
  *     {
  *       media: '(min-width: 47.5rem) and (orientation: portrait)',
  *       size: [480, 720],
- *       src: 'https://images.unsplash.com/photo-123',
+ *       baseSrc: 'https://images.unsplash.com/photo-123',
  *       imgParams: [['q', '70'], ['fit', 'crop'], ['w', '{w}'], ['h', '{h}'], ['fm', '{f}']],
  *     },
  *   ],
@@ -175,7 +175,7 @@ import { classnames } from '../classnames.js';
  *
  * @param {Object} args
  * @param {string} args.baseSrc - URL base dell'immagine (endpoint del viewer); i suoi parametri di query vengono conservati. Un URL relativo (es. `/img/abc123`) viene risolto rispetto alla location corrente; se relativo alla root (inizia con `/`, ma non con `//`), resta tale anche negli URL generati.
- * @param {(number | [number, number] | PictureSizeEntry)[]} [args.sizes=[250]] - Dimensioni renderizzate dell'immagine, in qualsiasi ordine. Ogni entry è un oggetto `{from, size}` o, per un'immagine diversa da `baseSrc`, `{media, size, src}` (vedi {@link PictureSizeEntry}); un numero semplice o una coppia `[width, height]` è la scorciatoia per l'entry predefinita mobile-first (quella senza `from`), attesa esattamente una volta: se tra le entry non ne resta nessuna utilizzabile, viene emesso un avviso e la funzione restituisce `null` (default: [250])
+ * @param {(number | [number, number] | PictureSizeEntry)[]} [args.sizes=[250]] - Dimensioni renderizzate dell'immagine, in qualsiasi ordine. Ogni entry è un oggetto `{from, size}` o, per un'immagine diversa dal `baseSrc` generale, `{media, size, baseSrc}` (vedi {@link PictureSizeEntry}); un numero semplice o una coppia `[width, height]` è la scorciatoia per l'entry predefinita mobile-first (quella senza `from`), attesa esattamente una volta: se tra le entry non ne resta nessuna utilizzabile, viene emesso un avviso e la funzione restituisce `null` (default: [250])
  * @param {number|null} [args.ratio=null] - Aspect ratio predefinito (larghezza / altezza, come nella proprietà CSS `aspect-ratio`) usato per calcolare l'altezza delle size numeriche. Se null, l'altezza non viene calcolata: gli output legati all'altezza (attributo `height`, altezza nel parametro `bb`) vengono omessi e il viewer mantiene il ratio originale dell'immagine (default: null)
  * @param {number} [args.dpr=2] - Densità di pixel massima (intero): i candidati di `srcset` vengono generati per ogni densità da 1 a `dpr` (default: 2)
  * @param {[string, string|number][]} [args.imgParams=[['q','60']]] - Parametri di query (coppie `[name, value]`) aggiunti a ogni URL generato. Nei valori si possono usare i segnaposto `{w}` e `{h}` (dimensioni del candidato, già moltiplicate per la densità) e `{f}` (formato), per i servizi con convenzioni diverse da quelle del viewer interno. Se non ci sono segnaposto vengono aggiunti automaticamente `f` e `bb` (`bb=<w>x<h>`), altrimenti nessuno dei due. In assenza di altezza un parametro che vale solo `{h}` viene omesso, mentre dentro un valore più lungo `{h}` diventa vuoto (default: [['q','60']])
@@ -229,12 +229,23 @@ export function buildPictureTag({
   const dprList = Array.from({length: dpr}, (_, i) => i + 1);
 
   // dimensioni di una size: per le size numeriche l'altezza è calcolata con `ratio`, se presente, altrimenti è null
+  /**
+   * @param {number | [number, number]} size
+   * @returns {[number, number|null]}
+   */
   const parseSize = size => Array.isArray(size)? size : [size, ratio == null? null : Math.floor(size / ratio)];
 
   // candidati srcset di una size (uno per ogni densità da 1 a `dpr`)
+  /** @param {{width: number, height: number|null}} size */
   const getCandidates = ({width, height}) => dprList.map(d => /** @type {[number, number|null]} */ ([width * d, height == null? null : height * d]));
 
   // voci dell'attributo `srcset` per un'immagine e un formato
+  /**
+   * @param {string} src
+   * @param {[number, number|null][]} candidates
+   * @param {string} fmt
+   * @param {[string, string|number][]} [params] - Parametri di query (default: imgParams)
+   */
   const buildSrcset = (src, candidates, fmt, params = imgParams) => {
     // gli URL relativi (es. `/img/abc123`) vengono risolti rispetto alla location corrente
     const url = new URL(src, globalThis.location?.href)
@@ -268,7 +279,7 @@ export function buildPictureTag({
     });
   };
 
-  // entry con `src` e `media`: hanno `source` proprie e restano fuori da tutti i calcoli successivi
+  // entry con `baseSrc` e `media`: hanno `source` proprie e restano fuori da tutti i calcoli successivi
   /** @type {PictureSizeEntry[]} */
   const altEntries = [];
 
@@ -277,12 +288,12 @@ export function buildPictureTag({
       return true;
     }
 
-    // `src` presente ma nullo: foto opzionale assente, nessun avviso
-    if('src' in entry && entry.src == null) {
+    // `baseSrc` presente ma nullo: foto opzionale assente, nessun avviso
+    if('baseSrc' in entry && entry.baseSrc == null) {
       return false;
     }
 
-    const hasSrc = entry.src != null
+    const hasSrc = entry.baseSrc != null
       ,hasMedia = !!entry.media?.trim();
 
     if(hasSrc && hasMedia) {
@@ -293,14 +304,14 @@ export function buildPictureTag({
     // una `source` senza `media` corrisponderebbe sempre e nasconderebbe tutte le altre
     if(hasSrc || hasMedia) {
       // eslint-disable-next-line no-console
-      console.warn(`[buildPictureTag] \`sizes\` entry ignored: \`src\` and \`media\` must be used together (${hasSrc? 'media' : 'src'} is missing)`);
+      console.warn(`[buildPictureTag] \`sizes\` entry ignored: \`baseSrc\` and \`media\` must be used together (${hasSrc? 'media' : 'baseSrc'} is missing)`);
       return false;
     }
 
-    // le entry senza `src` condividono un solo `srcset`
+    // le entry senza `baseSrc` condividono un solo `srcset`
     if(entry.imgParams != null) {
       // eslint-disable-next-line no-console
-      console.warn('[buildPictureTag] `imgParams` ignored in a `sizes` entry without `src`');
+      console.warn('[buildPictureTag] `imgParams` ignored in a `sizes` entry without `baseSrc`');
     }
 
     return true;
@@ -358,15 +369,15 @@ export function buildPictureTag({
     ,defaultSrcIdx = srcsetSizes.findIndex(([w]) => w === medianWidth)
   ;
 
-  // `source` delle entry con `src` e `media`: una per ogni formato tranne l'ultimo (quello dell'img),
+  // `source` delle entry con `baseSrc` e `media`: una per ogni formato tranne l'ultimo (quello dell'img),
   // prima di quelle normali perché vince la prima che corrisponde
-  const altSources = altEntries.flatMap(({src, media, size, imgParams: entryParams}) => {
+  const altSources = altEntries.flatMap(({baseSrc: entrySrc, media, size, imgParams: entryParams}) => {
     const [width, height] = parseSize(size);
 
     return formats.slice(0, -1).map(fmt => ({
       tag: 'source',
       attrs: {
-        srcset: buildSrcset(src, getCandidates({width, height}), fmt, entryParams ?? imgParams).join(','),
+        srcset: buildSrcset(/** @type {string} */ (entrySrc), getCandidates({width, height}), fmt, entryParams ?? imgParams).join(','),
         sizes: `${width}px`,
         type: `image/${fmt}`,
         media: media,
@@ -411,7 +422,7 @@ export function buildPictureTag({
             fetchpriority: fetchpriority,
             ...imgExtraAttrs
           },
-          callback: onLoad == null? undefined : el => {
+          callback: onLoad == null? undefined : (/** @type {Element|Text} */ el) => {
             const img = /** @type {HTMLImageElement} */ (el);
             if(img.complete) {
               onLoad(img);
@@ -427,7 +438,7 @@ export function buildPictureTag({
 
       } else {
         // TODO con sizes con ratio differenti e la stessa immagine, generare una `source` per breakpoint
-        // con attributi `media`, `width` e `height` (`media` è già gestita per le entry con `src`, vedi `altSources`)
+        // con attributi `media`, `width` e `height` (`media` è già gestita per le entry con `baseSrc`, vedi `altSources`)
         return {
           tag: 'source',
           attrs: {
