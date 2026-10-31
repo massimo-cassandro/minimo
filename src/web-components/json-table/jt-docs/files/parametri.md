@@ -1,6 +1,6 @@
 # Parametri
 
-[Torna alla pagina iniziale](../jt-docs.md)
+[↰ Indice](../json-table-docs.md)
 
 Tutti i parametri sono impostabili sia da attributo HTML che come oggetto in `init({...})`. I valori di tipo funzione solo da `init()`.
 
@@ -128,3 +128,6 @@ tipi di dato predefiniti: modificandole si cambiano le classi di tutte le colonn
 | `{totPages}` | numero di pagine |
 
 I numeri vengono formattati secondo `locale`.
+
+
+[↰ Indice](../json-table-docs.md)

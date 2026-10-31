@@ -2,6 +2,8 @@
 
 # Parametri `cols` (colonne)
 
+[↰ Indice](../json-table-docs.md)
+
 Parametro **obbligatorio**: array di oggetti, uno per colonna:
 
 ```javascript
@@ -90,3 +92,5 @@ footer ricevono le stesse classi (`cellClass`) delle celle del body.
 
 Il `tfoot` non è disponibile in modalità server-side (il componente riceve solo la pagina
 corrente, gli aggregati sarebbero parziali): se richiesto viene ignorato con un avviso in console.
+
+[↰ Indice](../json-table-docs.md)

@@ -1,7 +1,9 @@
 # `<json-table>` – datatable da JSON
 
-* [Parametri (include `classes` e `labels`)](jt-docs/parametri.md)
-* [Parametri colonne](jt-docs/parametri-colonne.md)
+* [Parametri (include `classes` e `labels`)](./files/parametri.md)
+* [Parametri colonne](./files/parametri-colonne.md)
+* [DataTypes](./files/dataTypes.md)
+
 
 ---
 
@@ -30,8 +32,8 @@ webpack dello starter-kit).
 Il file `types/global.d.ts` di minimo dichiara il tipo globale `JsonTable` e registra il tag `json-table` in `HTMLElementTagNameMap`: aggiungendolo all'`include` del proprio `jsconfig.json`/`tsconfig.json` (`"node_modules/@massimo-cassandro/minimo/types/global.d.ts"`) si ottiene il completamento dei metodi senza cast né import di tipo:
 
 ```javascript
-const el = document.querySelector('json-table'); // → JsonTable
-el.init({ ... });
+const jtable = document.querySelector('json-table'); // → JsonTable
+jtable.init({ ... });
 
 /** @type {JsonTable} */
 const other = document.createElement('json-table');
@@ -76,10 +78,10 @@ predefiniti (`"@sum"`, ...).
 ## Utilizzo da script
 
 ```javascript
-const el = document.querySelector('json-table');
+const jtable = document.querySelector('json-table');
 // oppure: const el = document.createElement('json-table');
 
-el.init({
+jtable.init({
   jsonUrl: '/api/rows.json',
   caption: 'Utenti',
   cols: [
@@ -92,13 +94,13 @@ el.init({
 });
 
 // dati inline al posto di jsonUrl (se presenti entrambi, `data` prevale)
-el.init({
+jtable.init({
   data: [{ name: 'Mario', city: 'Roma' }, ...],
   cols: [...]
 });
 
 // se appena creato, appendere dopo init():
-document.body.appendChild(el);
+document.body.appendChild(jtable);
 ```
 
 ### Con `domBuilder`
@@ -122,7 +124,7 @@ I parametri non inclusi in `init()` vengono letti dall'attributo HTML corrispond
 ```
 
 ```javascript
-el.init({ jsonUrl: '/api/rows.json' }); // jsonUrl da script, caption, search e cols da attributo
+jtable.init({ jsonUrl: '/api/rows.json' }); // jsonUrl da script, caption, search e cols da attributo
 ```
 
 **Ordine di precedenza:** `init()` > attributo HTML > `JsonTable.setDefaults()` > default interno.
@@ -130,14 +132,14 @@ el.init({ jsonUrl: '/api/rows.json' }); // jsonUrl da script, caption, search e 
 Per ignorare esplicitamente un attributo e utilizzare il valore di default, utilizzare `null` nel config:
 
 ```javascript
-el.init({ jsonUrl: '/api/rows.json', search: null }); // search == default (true)
+jtable.init({ jsonUrl: '/api/rows.json', search: null }); // search == default (true)
 ```
 
 I parametri oggetto `classes`, `labels`, `dataTypes` e `serverParams` vengono **uniti** ai default
 (merge a un livello), quindi ogni sorgente deve indicare solo le chiavi da sovrascrivere:
 
 ```javascript
-el.init({ classes: { table: 'table' } }); // le altre classi restano quelle di default
+jtable.init({ classes: { table: 'table' } }); // le altre classi restano quelle di default
 ```
 
 ## Default di progetto – `JsonTable.setDefaults()`
@@ -185,10 +187,10 @@ Proprietà disponibili dopo il caricamento:
 | `elements` | elementi generati: `wrapper`, `infoOuter`, `info`, `resultInfo`, `searchInput`, `tableWrapper`, `table`, `thead`, `tbody`, `tfoot`, `tableFooter`, `caption`, `pagination` |
 
 ```javascript
-await el.reload({ jsonUrl: '/api/rows.json?anno=2025' });
-await el.reload({ data: [...] });
-el.setSort('name', 'desc');
-el.goToPage(3);
+await jtable.reload({ jsonUrl: '/api/rows.json?anno=2025' });
+await jtable.reload({ data: [...] });
+jtable.setSort('name', 'desc');
+jtable.goToPage(3);
 ```
 
 ## Eventi
@@ -201,72 +203,14 @@ Entrambi vengono emessi sull'elemento con `bubbles: true`; `event.detail.jsonTab
 | `jt:update` | dopo ogni cambio pagina, ordinamento o ricerca (anche via API) | `{ jsonTable, reason }` con `reason` = `'page'`, `'sort'` o `'search'` |
 
 ```javascript
-el.addEventListener('jt:ready', e => console.log(e.detail.jsonTable.data));
-el.addEventListener('jt:update', e => console.log(e.detail.reason, e.detail.jsonTable.state.page));
-el.init({ jsonUrl: '/api/rows.json', cols: [...] });
+jtable.addEventListener('jt:ready', e => console.log(e.detail.jsonTable.data));
+jtable.addEventListener('jt:update', e => console.log(e.detail.reason, e.detail.jsonTable.state.page));
+jtable.init({ jsonUrl: '/api/rows.json', cols: [...] });
 ```
 
 
 
-## Tipi di dato – `dataTypes`
 
-Ogni colonna ha un tipo di dato (`dataType`, default `string`) che ne definisce classi, rendering
-e valori di ordinamento/ricerca. Tipi predefiniti:
-
-| Tipo | Descrizione | Classi delle celle |
-|---|---|---|
-| `string` | valore così com'è | – |
-| `num` | numero formattato con `numbersLocaleOpts` | `textEnd numeric nowrap` |
-| `id` | id numerico: valore grezzo, allineato a destra, non ricercabile | `textEnd numeric` |
-| `perc` | percentuale in scala 0–100, `currPercLocaleOpts` + `%` | `textEnd numeric nowrap` |
-| `percDecimal` | percentuale in scala 0–1 (moltiplicata per 100) | `textEnd numeric nowrap` |
-| `currency` | formato valuta `Intl` con `currency` | `textEnd numeric nowrap` |
-| `euro` | come `currency`, EUR forzato | `textEnd numeric nowrap` |
-| `date` | elemento `<time>`, `datesLocaleOpts`; accetta stringhe ISO, timestamp, `Date` e oggetti data Symfony | `textEnd nowrap` |
-| `datetime` | come `date`, con la parte ora (`timesLocaleOpts`): `<time><span class="[nowrap]">data</span> <small>ora</small></time>` | `textEnd nowrap` |
-| `bool` | icone `boolTrueIcon`/`boolFalseIcon` (accetta anche `1`/`0`, `'true'`/`'false'`); `null` → `renderNullAs`; non ordinabile né ricercabile | stili interni delle icone |
-| `email` | andate a capo facoltative attorno alla `@` | – |
-
-I tipi numerici applicano `renderNaNAs` ai valori non numerici e `renderZeroAs` (se impostato)
-agli zeri. Per tutti i tipi i valori `null`/`undefined` vengono resi come `renderNullAs`.
-
-### Tipi personalizzati
-
-Il parametro `dataTypes` è unito ai tipi predefiniti: una chiave già esistente sovrascrive solo
-le proprietà indicate, una chiave nuova può estendere un tipo esistente con `inheritsFrom`.
-
-```javascript
-dataTypes: {
-  // modifica solo le classi del tipo predefinito `num`
-  num: { cellClass: 'text-end fw-bold' },
-
-  // nuovo tipo basato su `num` (stesse classi, ordinamento, ricerca e gestione NaN/zero)
-  km: {
-    inheritsFrom: 'num',
-    render: (value, row, params) => `${value.toLocaleString(params.locale)} km`
-  }
-}
-```
-
-Proprietà di un tipo di dato (tutte facoltative):
-
-```javascript
-{
-  headerClass,        // string – classi di default del <th>
-  cellClass,          // string – classi di default delle celle
-  internalCellClass,  // (value, row, params) => string – classi aggiunte sempre alle celle,
-                      // indipendentemente da `cellClass` (usato dal tipo `bool` per le icone)
-  render,             // (value, row, params) => contenuto – non invocato per i valori null
-  sortValue,          // (value, row, params) => valore per l'ordinamento
-  searchValue,        // (value, row, params) => stringa per la ricerca
-  colDefaults,        // Object – default forzati per le colonne di questo tipo
-                      // (es. { sortable: false }), comunque sovrascrivibili nella colonna
-  inheritsFrom        // string – solo tipi nuovi: tipo predefinito da estendere
-}
-```
-
-A differenza del `render` di colonna (`(row, tr, td)`), il `render` del tipo di dato riceve per
-primo il **valore** della cella, perché il tipo è generico rispetto al campo.
 
 ## Ordinamento
 
