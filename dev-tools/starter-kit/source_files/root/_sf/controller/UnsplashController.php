@@ -22,7 +22,7 @@ class UnsplashController extends AbstractController
       $orientation = 'landscape';
     }
 
-    $unsplash_access_key = 'xxxxxxx'; // vedi minimo/_private/unsplash-access-keys.md
+    $unsplash_access_key = 'xxxxxxx'; // vedi ~/Sites/_config/docs/unsplash-access-keys.md
 
     $collections_ids = '3660951'; // comma separated list
     $count = null;

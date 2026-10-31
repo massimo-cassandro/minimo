@@ -40,6 +40,10 @@
         "filePath": "/Users/mazz/Sites/_config/docs/webpack-config-upg",
         "group": "Default"
       },
+      {
+        "filePath": "dev-tools/starter-kit/starter-install.sh",
+        "group": "Default"
+      }
     ],
   }
 }
