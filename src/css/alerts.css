@@ -32,17 +32,17 @@
   position: relative;
 
   &.alert-warning, &.alert-notice {
-    --_alert-bg-color: var(--status-warning-color);
+    --_alert-bg-color: var(--status-warning-background-color);
     --_alert-fg-color: var(--status-warning-fg);
     --_alert-border-color: var(--status-warning-border-color);
   }
   &.alert-info {
-    --_alert-bg-color: var(--status-info-color);
+    --_alert-bg-color: var(--status-info-background-color);
     --_alert-fg-color: var(--status-info-fg);
     --_alert-border-color: var(--status-info-border-color);
   }
   &.alert-success {
-    --_alert-bg-color: var(--status-success-color);
+    --_alert-bg-color: var(--status-success-background-color);
     --_alert-fg-color: var(--status-success-fg);
     --_alert-border-color: var(--status-success-border-color);
   }
