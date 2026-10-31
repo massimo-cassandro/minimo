@@ -30,7 +30,7 @@ e valori di ordinamento/ricerca. Tipi predefiniti:
 | `euro` | come `currency`, EUR forzato | `textEnd numeric nowrap` |
 | `date` | elemento `<time>`, `datesLocaleOpts`; accetta stringhe ISO, timestamp, `Date` e oggetti data Symfony | `textEnd nowrap` |
 | `datetime` | come `date`, con la parte ora (`timesLocaleOpts`): `<time><span class="[nowrap]">data</span> <small>ora</small></time>` | `textEnd nowrap` |
-| `bool` | icone `boolTrueIcon`/`boolFalseIcon` (accetta anche `1`/`0`, `'true'`/`'false'`); `null` → `renderNullAs`; non ordinabile né ricercabile | stili interni delle icone |
+| `bool` | icone `boolTrueIcon`/`boolFalseIcon` (accetta anche `1`/`0`, `'true'`/`'false'`); `null` → `renderNullAs`; ordinabile, non ricercabile | stili interni delle icone |
 | `boolTrueOnly` | come `bool`, ma mostra solo `boolTrueIcon`: le celle con valore `false` o `null` restano vuote | stili interni delle icone |
 | `email` | andate a capo facoltative attorno alla `@` | – |
 

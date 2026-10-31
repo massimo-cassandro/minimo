@@ -1,6 +1,7 @@
 
 import * as styles from '../json-table-component.module.css';
-import { classnames } from '../../../utilities/classnames.js';
+import { classnames, classnamesNull } from '../../../utilities/classnames.js';
+import { datatypeDefaults } from './datatype-defaults.js';
 import { iconContent } from './icons.js';
 
 /** @typedef {import('./defaults.js').JsonTableParams} JsonTableParams */
@@ -104,21 +105,22 @@ export function formatNumber(value, params, formatOpts, wrap) {
 
 /**
  * Data type predefiniti, costruiti sui parametri risolti (nomi delle classi, opzioni locale, icone).
+ * I valori di default di ogni tipo (ordinamento, ricerca, classi) sono in `datatype-defaults.js`.
  *
- * | chiave        | descrizione                                                     | classi della cella      |
- * |---------------|-----------------------------------------------------------------|-------------------------|
- * | `string`      | tipo predefinito, valore così com'è                             | –                       |
- * | `num`         | numero formattato con `numbersLocaleOpts`                       | textEnd numeric nowrap  |
- * | `id`          | id numerico: valore grezzo, allineato a destra, non ricercabile | textEnd numeric         |
- * | `perc`        | percentuale già in scala 0–100, `currPercLocaleOpts` + " %"     | textEnd numeric nowrap  |
- * | `percDecimal` | percentuale in scala 0–1 (moltiplicata per 100)                 | textEnd numeric nowrap  |
- * | `currency`    | formato valuta `Intl`, `params.currency`                        | textEnd numeric nowrap  |
- * | `euro`        | come `currency`, EUR forzato                                    | textEnd numeric nowrap  |
- * | `date`        | elemento `<time>`, `datesLocaleOpts`                            | textEnd nowrap          |
- * | `datetime`    | come `date`, più la parte oraria (`timesLocaleOpts`)            | textEnd nowrap          |
- * | `bool`        | `boolTrueIcon`/`boolFalseIcon`; non ordinabile/ricercabile      | (stili interni delle icone) |
- * | `boolTrueOnly`| come `bool`, ma solo `boolTrueIcon`: false e null danno cella vuota | (stili interni delle icone) |
- * | `email`       | a capo morbidi attorno a `@`                                    | –                       |
+ * | chiave        | descrizione                                                         |
+ * |---------------|---------------------------------------------------------------------|
+ * | `string`      | tipo predefinito, valore così com'è                                 |
+ * | `num`         | numero formattato con `numbersLocaleOpts`                           |
+ * | `id`          | id numerico: valore grezzo, allineato a destra                      |
+ * | `perc`        | percentuale già in scala 0–100, `currPercLocaleOpts` + " %"         |
+ * | `percDecimal` | percentuale in scala 0–1 (moltiplicata per 100)                     |
+ * | `currency`    | formato valuta `Intl`, `params.currency`                            |
+ * | `euro`        | come `currency`, EUR forzato                                        |
+ * | `date`        | elemento `<time>`, `datesLocaleOpts`                                |
+ * | `datetime`    | come `date`, più la parte oraria (`timesLocaleOpts`)                |
+ * | `bool`        | `boolTrueIcon`/`boolFalseIcon`                                      |
+ * | `boolTrueOnly`| come `bool`, ma solo `boolTrueIcon`: false e null danno cella vuota |
+ * | `email`       | a capo morbidi attorno a `@`                                        |
  *
  * @param {JsonTableParams} params - Parametri risolti
  * @returns {Object<string, DataTypeDefinition>}
@@ -130,13 +132,9 @@ export function formatNumber(value, params, formatOpts, wrap) {
 export function builtInDataTypes(params) {
 
   const c = params.classes;
-  const numericClass = classnames(c.textEnd, c.numeric, c.nowrap);
-  const dateClass = classnames(c.textEnd, c.nowrap);
 
   /** @type {(formatOpts: Intl.NumberFormatOptions, wrap?: (formatted: string, num: number) => string) => DataTypeDefinition} */
   const numericType = (formatOpts, wrap) => ({
-    headerClass: numericClass,
-    cellClass: numericClass,
     render: (value, row, p) => formatNumber(value, p, formatOpts, wrap),
     sortValue: value => toNumber(value),
     searchValue: (value, row, p) => {
@@ -148,8 +146,6 @@ export function builtInDataTypes(params) {
   // TODO implementare sfTime / sfDatetime (??)
   /** @type {(withTime: boolean) => DataTypeDefinition} */
   const dateType = withTime => ({
-    headerClass: dateClass,
-    cellClass: dateClass,
     render: (value, row, p) => {
       const date = parseDate(value);
       if (!date) {
@@ -174,8 +170,6 @@ export function builtInDataTypes(params) {
 
   /** @type {DataTypeDefinition} */
   const boolType = {
-    headerClass: c.textCenter,
-    cellClass: null,
     internalCellClass: value => {
       const bool = toBool(value);
       return classnames(
@@ -198,21 +192,18 @@ export function builtInDataTypes(params) {
       const bool = toBool(value);
       return bool === null ? -1 : (bool ? 1 : 0);
     },
-    searchValue: () => '',
-    colDefaults: { sortable: false, searchable: false }
+    searchValue: () => ''
   };
 
-  return {
+  /** @type {Object<string, DataTypeDefinition>} */
+  const types = {
 
     string: {},
 
     num: numericType(params.numbersLocaleOpts),
 
     id: {
-      headerClass: classnames(c.textEnd, c.numeric),
-      cellClass: classnames(c.textEnd, c.numeric),
-      sortValue: value => toNumber(value),
-      colDefaults: { searchable: false }
+      sortValue: value => toNumber(value)
     },
 
     perc: numericType(params.currPercLocaleOpts, percWrap),
@@ -234,7 +225,6 @@ export function builtInDataTypes(params) {
 
     boolTrueOnly: {
       ...boolType,
-      nullContent: '',
       render: (value, row, p) => (toBool(value) === true ? iconContent(p.boolTrueIcon) : '')
     },
 
@@ -242,6 +232,17 @@ export function builtInDataTypes(params) {
       render: value => String(value).replace('@', '<wbr>@<wbr>')
     }
   };
+
+  return Object.fromEntries(Object.entries(types).map(([key, type]) => {
+    const { sortable, searchable, headerClass, cellClass, nullContent } = datatypeDefaults[key];
+    return [key, {
+      ...type,
+      nullContent,
+      headerClass: classnamesNull(headerClass?.map(name => c[name])),
+      cellClass: classnamesNull(cellClass?.map(name => c[name])),
+      colDefaults: { sortable, searchable }
+    }];
+  }));
 }
 
 

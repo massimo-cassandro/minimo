@@ -214,7 +214,7 @@ jtable.init({ jsonUrl: '/api/rows.json', cols: [...] });
 
 ## Ordinamento
 
-Ogni colonna con `sortable: true` (default; i tipi `bool` lo disattivano) ha un pulsante nel
+Ogni colonna con `sortable: true` (default) ha un pulsante nel
 `<th>` che cicla tra nessun ordinamento → ascendente → discendente → nessuno; l'attributo
 `aria-sort` del `<th>` e l'icona riflettono lo stato, `title`/`aria-label` del pulsante
 descrivono l'azione del click successivo (`labels.sortAsc/sortDesc/sortNone`). È attivo un solo
