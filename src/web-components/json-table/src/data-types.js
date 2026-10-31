@@ -117,6 +117,7 @@ export function formatNumber(value, params, formatOpts, wrap) {
  * | `date`        | elemento `<time>`, `datesLocaleOpts`                            | textEnd nowrap          |
  * | `datetime`    | come `date`, più la parte oraria (`timesLocaleOpts`)            | textEnd nowrap          |
  * | `bool`        | `boolTrueIcon`/`boolFalseIcon`; non ordinabile/ricercabile      | (stili interni delle icone) |
+ * | `boolTrueOnly`| come `bool`, ma solo `boolTrueIcon`: false e null danno cella vuota | (stili interni delle icone) |
  * | `email`       | a capo morbidi attorno a `@`                                    | –                       |
  *
  * @param {JsonTableParams} params - Parametri risolti
@@ -171,6 +172,36 @@ export function builtInDataTypes(params) {
 
   const percWrap = /** @type {(formatted: string) => string} */ (formatted => `${formatted}\u202F<small>%</small>`);
 
+  /** @type {DataTypeDefinition} */
+  const boolType = {
+    headerClass: c.textCenter,
+    cellClass: null,
+    internalCellClass: value => {
+      const bool = toBool(value);
+      return classnames(
+        styles.boolCell, c.boolCell,
+        bool === true && [styles.boolTrue, c.boolTrue],
+        bool === false && [styles.boolFalse, c.boolFalse]
+      );
+    },
+    render: (value, row, p) => {
+      const bool = toBool(value);
+      if (bool === true) {
+        return iconContent(p.boolTrueIcon);
+      }
+      if (bool === false) {
+        return iconContent(p.boolFalseIcon);
+      }
+      return p.renderNullAs ?? '';
+    },
+    sortValue: value => {
+      const bool = toBool(value);
+      return bool === null ? -1 : (bool ? 1 : 0);
+    },
+    searchValue: () => '',
+    colDefaults: { sortable: false, searchable: false }
+  };
+
   return {
 
     string: {},
@@ -199,33 +230,12 @@ export function builtInDataTypes(params) {
 
     datetime: dateType(true),
 
-    bool: {
-      headerClass: c.textCenter,
-      cellClass: null,
-      internalCellClass: value => {
-        const bool = toBool(value);
-        return classnames(
-          styles.boolCell, c.boolCell,
-          bool === true && [styles.boolTrue, c.boolTrue],
-          bool === false && [styles.boolFalse, c.boolFalse]
-        );
-      },
-      render: (value, row, p) => {
-        const bool = toBool(value);
-        if (bool === true) {
-          return iconContent(p.boolTrueIcon);
-        }
-        if (bool === false) {
-          return iconContent(p.boolFalseIcon);
-        }
-        return p.renderNullAs ?? '';
-      },
-      sortValue: value => {
-        const bool = toBool(value);
-        return bool === null ? -1 : (bool ? 1 : 0);
-      },
-      searchValue: () => '',
-      colDefaults: { sortable: false, searchable: false }
+    bool: boolType,
+
+    boolTrueOnly: {
+      ...boolType,
+      nullContent: '',
+      render: (value, row, p) => (toBool(value) === true ? iconContent(p.boolTrueIcon) : '')
     },
 
     email: {

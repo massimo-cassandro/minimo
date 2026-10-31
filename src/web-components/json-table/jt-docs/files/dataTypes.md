@@ -2,10 +2,24 @@
 
 [↰ Indice](../json-table-docs.md)
 
+```javascript
+cols: [
+  {
+    //...
+    dataType: ...  
+  },
+  {
+    //...
+    type: ... // alias di dataType
+  },
+  // ...
+]
+```
+
 Ogni colonna ha un tipo di dato (`dataType`, default `string`) che ne definisce classi, rendering
 e valori di ordinamento/ricerca. Tipi predefiniti:
 
-| Tipo | Descrizione | Classi delle celle |
+| Tipo | Descrizione | Classi di default  delle celle |
 |---|---|---|
 | `string` | valore così com'è | – |
 | `num` | numero formattato con `numbersLocaleOpts` | `textEnd numeric nowrap` |
@@ -17,10 +31,12 @@ e valori di ordinamento/ricerca. Tipi predefiniti:
 | `date` | elemento `<time>`, `datesLocaleOpts`; accetta stringhe ISO, timestamp, `Date` e oggetti data Symfony | `textEnd nowrap` |
 | `datetime` | come `date`, con la parte ora (`timesLocaleOpts`): `<time><span class="[nowrap]">data</span> <small>ora</small></time>` | `textEnd nowrap` |
 | `bool` | icone `boolTrueIcon`/`boolFalseIcon` (accetta anche `1`/`0`, `'true'`/`'false'`); `null` → `renderNullAs`; non ordinabile né ricercabile | stili interni delle icone |
+| `boolTrueOnly` | come `bool`, ma mostra solo `boolTrueIcon`: le celle con valore `false` o `null` restano vuote | stili interni delle icone |
 | `email` | andate a capo facoltative attorno alla `@` | – |
 
 I tipi numerici applicano `renderNaNAs` ai valori non numerici e `renderZeroAs` (se impostato)
-agli zeri. Per tutti i tipi i valori `null`/`undefined` vengono resi come `renderNullAs`.
+agli zeri. I valori `null`/`undefined` vengono resi come `renderNullAs`, salvo i tipi che definiscono
+`nullContent` (tra i predefiniti, `boolTrueOnly`).
 
 ### Tipi personalizzati
 
@@ -49,6 +65,8 @@ Proprietà di un tipo di dato (tutte facoltative):
   internalCellClass,  // (value, row, params) => string – classi aggiunte sempre alle celle,
                       // indipendentemente da `cellClass` (usato dal tipo `bool` per le icone)
   render,             // (value, row, params) => contenuto – non invocato per i valori null
+  nullContent,        // string – contenuto delle celle con valore null, al posto di `renderNullAs`
+                      // (usato dal tipo `boolTrueOnly` per lasciarle vuote)
   sortValue,          // (value, row, params) => valore per l'ordinamento
   searchValue,        // (value, row, params) => stringa per la ricerca
   colDefaults,        // Object – default forzati per le colonne di questo tipo

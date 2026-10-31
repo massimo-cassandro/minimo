@@ -13,19 +13,21 @@ cols: [
 ]
 ```
 
-* `key`: string – OBBLIGATORIO: chiave dell'oggetto riga (ammessa la notazione con punto per valori annidati, es. 'owner.name')
-* `title`: testo, HTML, Node, array domBuilder o funzione – contenuto del `<th>`. Nelle colonne ordinabili è il testo del pulsante. Default: la chiave
-* `dataType`: string – tipo di dato, una delle chiavi di `dataTypes`; `type` è un alias equivalente. Default: `'string'`
-* `render`: `(row, tr, td) => contenuto` | stringa mustache-like – vedi sotto. Default: `null`
-* `tfootRender`: `(rows, td) => contenuto` | aggregato `'@…'` | stringa statica – contenuto della cella del tfoot (solo se `tfoot` è `true`). `null` = cella vuota. Default: `null`
-* `rowHeading`: boolean – se `true` la cella è un'intestazione di riga (`th[scope=row]`). Default: `false`
-* `searchable`: boolean – abilita la ricerca sulla colonna. Default: `true`
-* `sortable`: boolean – abilita l'ordinamento sulla colonna. Default: `true`
-* `sortValue`: valore | `row => valore` – valore usato per l'ordinamento; prevale su quello del tipo di dato. Default: non impostato (tipo di dato / valore grezzo)
-* `searchValue`: valore | `row => valore` – idem, per la ricerca. Default: non impostato
-* `condition`: boolean | `params => boolean` – se `false` la colonna non viene renderizzata. Default: `true`
-* `headerClass`: string – classi del `<th>`, in sostituzione di quelle del tipo di dato. Default: `null` (classi del tipo di dato)
-* `cellClass`: string – classi delle celle body/tfoot, in sostituzione di quelle del tipo. Se solo una tra `headerClass` e `cellClass` è presente, l'altra assume lo stesso valore. Default: `null` (classi del tipo di dato)
+| Key | Tipo | Default | Descrizione |
+|---|---|---|---|
+| `key` | string | – | **OBBLIGATORIO**: chiave dell'oggetto riga (ammessa la notazione con punto per valori annidati, es. `'owner.name'`) |
+| `title` | testo, HTML, Node, array domBuilder o funzione | la chiave | Contenuto del `<th>`. Nelle colonne ordinabili è il testo del pulsante |
+| `dataType` | string | `'string'` | Tipo di dato, una delle chiavi di `dataTypes`; `type` è un alias equivalente. Vedi [dataTypes](dataTypes.md) |
+| `render` | `(row, tr, td) => contenuto` o stringa mustache-like | `null` | Vedi sotto |
+| `tfootRender` | `(rows, td) => contenuto`, aggregato `'@…'` o stringa statica | `null` | Contenuto della cella del tfoot (solo se `tfoot` è `true`). `null` = cella vuota |
+| `rowHeading` | boolean | `false` | Se `true` la cella è un'intestazione di riga (`th[scope=row]`) |
+| `searchable` | boolean | `true` | Abilita la ricerca sulla colonna |
+| `sortable` | boolean | `true` | Abilita l'ordinamento sulla colonna |
+| `sortValue` | valore o `row => valore` | non impostato (tipo di dato / valore grezzo) | Valore usato per l'ordinamento; prevale su quello del tipo di dato |
+| `searchValue` | valore o `row => valore` | non impostato | Idem, per la ricerca |
+| `condition` | boolean o `params => boolean` | `true` | Se `false` la colonna non viene renderizzata |
+| `headerClass` | string | `null` (classi del tipo di dato) | Classi del `<th>`, in sostituzione di quelle del tipo di dato |
+| `cellClass` | string | `null` (classi del tipo di dato) | Classi delle celle body/tfoot, in sostituzione di quelle del tipo. Se solo una tra `headerClass` e `cellClass` è presente, l'altra assume lo stesso valore |
 
 
 ## `render`

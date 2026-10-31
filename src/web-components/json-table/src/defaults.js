@@ -74,8 +74,10 @@ import {
  * @property {((value: *, row: Object, params: JsonTableParams) => string|null)} [internalCellClass] - Classe/i sempre
  *   aggiunte alle celle, indipendentemente da `cellClass` (usata dal tipo `bool` predefinito per gli stili delle icone)
  * @property {(value: *, row: Object|null, params: JsonTableParams) => CellContent} [render] - Renderer della cella; non invocato
- *   per i valori `null`/`undefined`, che vengono resi come `renderNullAs`. `row` è null quando la funzione è
+ *   per i valori `null`/`undefined`, che vengono resi come `nullContent` o `renderNullAs`. `row` è null quando la funzione è
  *   usata per formattare un aggregato del footer (`tfootRender: '@sum'`, ...)
+ * @property {string} [nullContent] - Contenuto delle celle con valore `null`/`undefined`, al posto di `renderNullAs`
+ *   (usato dal tipo `boolTrueOnly` predefinito per lasciarle vuote)
  * @property {(value: *, row: Object, params: JsonTableParams) => *} [sortValue] - Valore usato per l'ordinamento (default: valore grezzo)
  * @property {(value: *, row: Object, params: JsonTableParams) => string} [searchValue] - Valore usato per la ricerca (default: `String(value)`)
  * @property {Partial<ColDefinition>} [colDefaults] - Default delle colonne imposti da questo tipo (es. `{ sortable: false }`),

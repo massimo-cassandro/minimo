@@ -12,7 +12,7 @@ import { toNumber } from './data-types.js';
  * 1. `render` della colonna: funzione `(row, tr, td)` o stringa in stile mustache (`[[key]]`); una funzione
  *    che restituisce `undefined` lascia proseguire la pipeline (utile per decorare solo `td`/`tr`), `null`
  *    dà `renderNullAs`
- * 2. valore grezzo `null`/`undefined` → `renderNullAs`
+ * 2. valore grezzo `null`/`undefined` → `nullContent` del data type, se definito, altrimenti `renderNullAs`
  * 3. `render(value, row, params)` del data type
  * 4. valore grezzo
  *
@@ -47,7 +47,7 @@ export function cellContent(col, row, params, tr, td) {
   const value = getNestedValue(row, col.key);
 
   if (value == null) {
-    return nullAs;
+    return col._type.nullContent ?? nullAs;
   }
 
   if (typeof col._type.render === 'function') {
