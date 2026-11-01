@@ -77,11 +77,11 @@ Con `jqDatatableMode: true` (o l'attributo `jqdatatablemode="true"`) i default d
 
 | Parametro | Default con `jqDatatableMode` |
 |---|---|
-| `jsonDataField` | `'data'` |
-| `totRecField` | `'recordsTotal'` |
 | `filteredRecField` | `'recordsFiltered'` |
-| `serverSide` | `true` |
+| `jsonDataField` | `'data'` |
 | `serverParams` | `{ page: null, start: 'start', perPage: 'length', sort: 'order[0][column]', dir: 'order[0][dir]', search: 'search[value]', searchFields: 'searchFields' }` |
+| `serverSide` | `true` |
+| `totRecField` | `'recordsTotal'` |
 
 Precedenza: `init()` > attributo HTML > `JsonTable.setDefaults()` > modalità jQuery DataTables > default predefiniti. Ogni parametro può quindi essere sovrascritto singolarmente, e `serverParams` viene unito chiave per chiave.
 

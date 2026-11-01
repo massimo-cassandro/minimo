@@ -1,5 +1,5 @@
 
-import { getCellValue, getNestedValue } from './content-utils.js';
+import { getCellValue, getCellValues } from './content-utils.js';
 
 /** @typedef {import('./defaults.js').JsonTableParams} JsonTableParams */
 /** @typedef {import('./parse-cols.js').ParsedCol} ParsedCol */
@@ -18,7 +18,7 @@ import { getCellValue, getNestedValue } from './content-utils.js';
  * (se definito) → funzione del data type `(value, row, params) => value` → valore grezzo.
  * @param {*} colValue - `sortValue`/`searchValue` della colonna (undefined = non impostato)
  * @param {((value: *, row: Object, params: JsonTableParams) => *)|undefined} typeFn - Funzione del data type
- * @param {*} value - Valore grezzo della cella
+ * @param {*} value - Valore della cella (risultato di `parse`, se definito, altrimenti valore grezzo)
  * @param {Object} row - Oggetto riga
  * @param {JsonTableParams} params - Parametri risolti
  * @returns {*}
@@ -38,7 +38,8 @@ function resolveValue(colValue, typeFn, value, row, params) {
  * Precalcola, per ogni riga, i valori usati da ordinamento e ricerca, così che vengano
  * calcolati una sola volta e non a ogni operazione di ordinamento/ricerca (vedi `sorting.js` e `search.js`).
  * Nelle colonne ripetute su più `<tr>` (`col._subRows`) con valore array, l'ordinamento usa il primo elemento e
- * la ricerca li considera tutti. In modalità server-side i valori non vengono calcolati: ordinamento e ricerca spettano al server.
+ * la ricerca li considera tutti. Il valore di partenza è quello restituito da `parse`, se definito nella colonna.
+ * In modalità server-side i valori non vengono calcolati: ordinamento e ricerca spettano al server.
  *
  * @param {Array<Object>} rows - Righe di dati grezze
  * @param {ParsedCol[]} cols - Colonne analizzate (vedi `parse-cols.js`)
@@ -68,10 +69,7 @@ export function parseRows(rows, cols, params) {
       }
 
       if (col.searchable) {
-        const value = getNestedValue(row, col.key);
-        const values = col._subRows && Array.isArray(value) ? value : [value];
-
-        values.forEach(item => {
+        getCellValues(row, col).forEach(item => {
           const searchValue = resolveValue(
             col.searchValue,
             col._type.searchValue ?? (v => (v == null ? '' : String(v))),

@@ -176,12 +176,12 @@ JsonTable.resetDefaults(); // azzera i default di progetto
 
 | Metodo | Descrizione |
 |---|---|
-| `init(config)` | Avvia il componente (prima o dopo l'inserimento nel DOM) |
-| `reload(overrides)` | Ricarica i dati e ricostruisce la struttura, con eventuali parametri sovrascritti (`Promise`); ricerca, ordinamento e pagina vengono azzerati |
 | `destroy()` | Svuota il componente; `init()` può essere richiamato in seguito |
 | `goToPage(page)` | Mostra la pagina indicata (limitata all'intervallo disponibile) |
-| `setSort(key, dir)` | Ordina per la colonna `key` (`'asc'`, `'desc'`, oppure `null` per rimuovere l'ordinamento) e torna alla prima pagina |
+| `init(config)` | Avvia il componente (prima o dopo l'inserimento nel DOM) |
+| `reload(overrides)` | Ricarica i dati e ricostruisce la struttura, con eventuali parametri sovrascritti (`Promise`); ricerca, ordinamento e pagina vengono azzerati |
 | `setSearch(term)` | Filtra le righe con il termine indicato (stringa vuota = nessun filtro) e torna alla prima pagina; l'input di ricerca viene aggiornato |
+| `setSort(key, dir)` | Ordina per la colonna `key` (`'asc'`, `'desc'`, oppure `null` per rimuovere l'ordinamento) e torna alla prima pagina |
 
 In modalità server-side `goToPage`, `setSort` e `setSearch` generano una nuova richiesta.
 
@@ -189,12 +189,12 @@ Proprietà disponibili dopo il caricamento:
 
 | Proprietà | Descrizione |
 |---|---|
-| `params` | parametri risolti |
-| `data` | righe grezze (array di oggetti; in modalità server-side solo quelle della pagina corrente) |
 | `cols` | colonne dopo il parsing (solo quelle visibili, con classi e tipo di dato risolti) |
+| `data` | righe grezze (array di oggetti; in modalità server-side solo quelle della pagina corrente) |
 | `dataTypes` | mappa dei tipi di dato (predefiniti + personalizzati) |
-| `state` | stato del rendering: `totRec`, `filteredRec`, `rows`, `filtered`, `pageRows`, `searchTerm`, `sort` (`{ key, dir }` o `null`), `page`, `totPages` |
 | `elements` | elementi generati: `wrapper`, `infoOuter`, `info`, `resultInfo`, `searchInput`, `tableWrapper`, `table`, `thead`, `tbody`, `tfoot`, `tableFooter`, `caption`, `pagination` |
+| `params` | parametri risolti |
+| `state` | stato del rendering: `totRec`, `filteredRec`, `rows`, `filtered`, `pageRows`, `searchTerm`, `sort` (`{ key, dir }` o `null`), `page`, `totPages` |
 
 ```javascript
 await jtable.reload({ jsonUrl: '/api/rows.json?anno=2025' });
@@ -273,12 +273,12 @@ elementi `{ slot: 'nome' }` vengono sostituiti dalle parti predefinite:
 
 | Slot | Contenuto |
 |---|---|
+| `caption` | solo la caption (se `caption` è impostata) |
 | `infoSection` | sezione info completa (testo info + input di ricerca, in riga) |
+| `pagination` | solo la navigazione delle pagine (se `perPage` > 0) |
 | `resultInfo` | solo il testo info |
 | `search` | solo l'input di ricerca (se `search` è true) |
 | `table` | wrapper + tabella (thead, tbody, tfoot) e barra `tableFooter` con caption e paginazione |
-| `caption` | solo la caption (se `caption` è impostata) |
-| `pagination` | solo la navigazione delle pagine (se `perPage` > 0) |
 
 `caption` e `pagination` fanno parte della barra sotto la tabella dello slot `table`; se il
 template li colloca esplicitamente altrove, vengono rimossi dalla barra (che sparisce se resta
@@ -369,38 +369,38 @@ Definite in `json-table.minimo.tokens.mjs` (namespace `--jt-*`):
 
 | Proprietà | Default (token minimo) |
 |---|---|
-| `--jt-wrapper-margin-block` | `{size.md}` |
+| `--jt-bool-false-color` | `{status.danger.color}` |
+| `--jt-bool-icon-size` | `1.1em` |
+| `--jt-bool-true-color` | `{status.success.color}` |
 | `--jt-busy-opacity` | `.5` |
-| `--jt-info-gap` | `{size.sm}` |
-| `--jt-info-font-size` | `{font.size.sm}` |
-| `--jt-info-color` | `{text.muted}` |
-| `--jt-info-outer-padding-block-end` | `{size.xs}` |
-| `--jt-search-max-width` | `20rem` |
-| `--jt-thead-hover-background-color` | `color-mix(in srgb, {table.thead.background.color} 90%, {accent})` |
-| `--jt-sort-btn-padding-block` | `{table.cell.padding.block}` |
-| `--jt-sort-btn-padding-inline` | `{table.cell.padding.inline}` |
-| `--jt-sort-btn-line-height` | `{table.cell.line-height}` |
-| `--jt-sort-icon-size` | `1em` |
-| `--jt-sort-icon-gap` | `.4em` |
-| `--jt-sort-icon-none-opacity` | `.4` |
-| `--jt-table-footer-padding-block-start` | `{size.xs}` |
-| `--jt-caption-font-size` | `{font.size.sm}` |
 | `--jt-caption-color` | `{text.muted}` |
-| `--jt-pagination-border-width` | `1px` |
+| `--jt-caption-font-size` | `{font.size.sm}` |
+| `--jt-empty-color` | `{text.muted}` |
+| `--jt-empty-padding-block` | `{size.sm}` |
+| `--jt-info-color` | `{text.muted}` |
+| `--jt-info-font-size` | `{font.size.sm}` |
+| `--jt-info-gap` | `{size.sm}` |
+| `--jt-info-outer-padding-block-end` | `{size.xs}` |
 | `--jt-pagination-border-color` | `{table.border.color}` |
-| `--jt-pagination-radius` | `{radius.xxs}` |
-| `--jt-pagination-font-size` | `{font.size.sm}` |
-| `--jt-pagination-line-height` | `{table.cell.line-height}` |
+| `--jt-pagination-border-width` | `1px` |
 | `--jt-pagination-btn-min-width` | `2.2em` |
 | `--jt-pagination-btn-padding-block` | `{table.cell.padding.block}` |
 | `--jt-pagination-btn-padding-inline` | `{table.cell.padding.inline}` |
-| `--jt-pagination-icon-size` | `1em` |
 | `--jt-pagination-current-background-color` | `{table.thead.background.color}` |
 | `--jt-pagination-current-font-weight` | `{font.weight.semibold}` |
-| `--jt-pagination-hover-background-color` | `{table.tbody.tr.hover-bg-color}` |
 | `--jt-pagination-disabled-opacity` | `.5` |
-| `--jt-bool-icon-size` | `1.1em` |
-| `--jt-bool-true-color` | `{status.success.color}` |
-| `--jt-bool-false-color` | `{status.danger.color}` |
-| `--jt-empty-color` | `{text.muted}` |
-| `--jt-empty-padding-block` | `{size.sm}` |
+| `--jt-pagination-font-size` | `{font.size.sm}` |
+| `--jt-pagination-hover-background-color` | `{table.tbody.tr.hover-bg-color}` |
+| `--jt-pagination-icon-size` | `1em` |
+| `--jt-pagination-line-height` | `{table.cell.line-height}` |
+| `--jt-pagination-radius` | `{radius.xxs}` |
+| `--jt-search-max-width` | `20rem` |
+| `--jt-sort-btn-line-height` | `{table.cell.line-height}` |
+| `--jt-sort-btn-padding-block` | `{table.cell.padding.block}` |
+| `--jt-sort-btn-padding-inline` | `{table.cell.padding.inline}` |
+| `--jt-sort-icon-gap` | `.4em` |
+| `--jt-sort-icon-none-opacity` | `.4` |
+| `--jt-sort-icon-size` | `1em` |
+| `--jt-table-footer-padding-block-start` | `{size.xs}` |
+| `--jt-thead-hover-background-color` | `color-mix(in srgb, {table.thead.background.color} 90%, {accent})` |
+| `--jt-wrapper-margin-block` | `{size.md}` |

@@ -68,6 +68,14 @@ export default {
           $type: 'color',
           $value: '#cbcbcb'
         }
+      },
+
+      rowspan: {
+        'vertical-align': {
+          $type: 'string',
+          $value: 'top',
+
+        },
       }
     },
 

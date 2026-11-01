@@ -1,4 +1,4 @@
-import { getCellValue, getNestedValue, resolveMustache } from './content-utils.js';
+import { getCellValue, getCellValues, resolveMustache } from './content-utils.js';
 import { toNumber } from './data-types.js';
 
 /** @typedef {import('./defaults.js').JsonTableParams} JsonTableParams */
@@ -12,9 +12,10 @@ import { toNumber } from './data-types.js';
  * 1. `render` della colonna: funzione `(row, tr, td, subIdx)` o stringa in stile mustache (`[[key]]`); una funzione
  *    che restituisce `undefined` lascia proseguire la pipeline (utile per decorare solo `td`/`tr`), `null`
  *    dà `renderNullAs`
- * 2. valore grezzo `null`/`undefined` → `nullContent` del data type, se definito, altrimenti `renderNullAs`
- * 3. `render(value, row, params)` del data type
- * 4. valore grezzo
+ * 2. valore della cella: il risultato di `parse` della colonna, se definito, altrimenti il valore grezzo
+ * 3. valore `null`/`undefined` → `nullContent` del data type, se definito, altrimenti `renderNullAs`
+ * 4. `render(value, row, params)` del data type
+ * 5. valore così com'è
  *
  * @param {ParsedCol} col - Colonna analizzata
  * @param {Object} row - Oggetto riga
@@ -41,6 +42,7 @@ import { toNumber } from './data-types.js';
  * cellContent({ ...col, render: '<b>[[name]]</b>' }, { name: 'Mario' }, params);      // → '<b>Mario</b>'
  * cellContent({ ...col, render: (row, tr, td) => { td.title = row.name; } }, row, params, tr, td);
  * // → data type / valore grezzo (render ha restituito undefined)
+ * cellContent({ ...col, key: 'amount', parse: row => row.amount * 2, _type: types.euro }, { amount: 12 }, params); // → '24,00 €'
  */
 export function cellContent(col, row, params, tr, td, subIdx = 0) {
 
@@ -129,10 +131,7 @@ export function tfootContent(col, rows, params, td) {
 
     // nelle colonne `_subRows` flatMap aggrega i singoli elementi degli array
     const nums = rows
-      .flatMap(row => {
-        const value = getNestedValue(row, col.key);
-        return col._subRows ? value : [value];
-      })
+      .flatMap(row => getCellValues(row, col))
       .map(toNumber)
       .filter(n => !Number.isNaN(n));
 

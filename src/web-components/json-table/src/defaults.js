@@ -30,6 +30,15 @@ import {
  */
 
 /**
+ * Preelaborazione del valore di una cella: il risultato prende il posto del valore grezzo per il data type, l'ordinamento,
+ * la ricerca e gli aggregati del footer. Può essere invocata più volte per la stessa cella.
+ * @callback ColParse
+ * @param {Object} row - L'oggetto dati della riga corrente
+ * @param {number} [subIdx] - Indice del `<tr>` all'interno del record, sempre 0 se nessuna colonna usa `rowspan`
+ * @returns {*} Valore della cella; `undefined` (nessun `return`) lascia il valore grezzo, `null` è trattato come valore nullo
+ */
+
+/**
  * Renderer delle celle del footer.
  * @callback TfootRender
  * @param {Object[]} rows - L'intero insieme di dati filtrato, oppure solo la pagina corrente quando `updateFooterOnPageChange` è true
@@ -46,6 +55,8 @@ import {
  *   Quando la colonna è ordinabile è il testo del pulsante di ordinamento (default: la chiave stessa)
  * @property {string} [dataType] - Data type, una delle chiavi di `dataTypes`. `type` è accettato come alias (default: 'string')
  * @property {string} [type] - Alias di `dataType`
+ * @property {ColParse|null} [parse] - Funzione `(row, subIdx) => value` che preelabora il valore prima del data type,
+ *   evitando di scrivere un `render` che ne duplichi la formattazione. Non modifica `row` (default: null)
  * @property {ColRender|string|null} [render] - Renderer della cella: una funzione `(row, tr, td) => content` oppure,
  *   anche tramite attributo HTML, una stringa in stile mustache in cui i segnaposto `[[key]]` vengono sostituiti con i valori
  *   della riga (chiavi annidate ammesse). Sovrascrive il rendering del data type (default: null)

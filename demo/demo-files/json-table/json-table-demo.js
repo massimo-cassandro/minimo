@@ -277,6 +277,35 @@ export function jsonTableDemo(){
       })
     },
 
+    // =>> parse
+    'h2 Preelaborazione del valore: <code>parse</code>',
+    'p La colonna <em>Scadenza</em> calcola la data aggiungendo i giorni di pagamento e usa il data type <code>date</code> standard, che si occupa di formattazione, ordinamento e ricerca, senza un <code>render</code> dedicato.',
+    {
+      tag: 'json-table',
+      callback: el => /** @type {JsonTable} */ (el).init({
+        data: [
+          { invoice: 'F-1', issueDate: '2026-03-10', paymentDays: 30 },
+          { invoice: 'F-2', issueDate: '2026-03-20', paymentDays: 60 },
+          { invoice: 'F-3', issueDate: '2026-04-01', paymentDays: 15 }
+        ],
+        cols: [
+          { key: 'invoice', title: 'Fattura', rowHeading: true },
+          { key: 'issueDate', title: 'Emissione', dataType: 'date' },
+          { key: 'paymentDays', title: 'Giorni', dataType: 'num' },
+          {
+            key: 'dueDate',
+            title: 'Scadenza',
+            dataType: 'date',
+            parse: row => {
+              const date = new Date(row.issueDate);
+              date.setDate(date.getDate() + row.paymentDays);
+              return date.toISOString();
+            }
+          }
+        ]
+      })
+    },
+
     // =>> 5. errors
     'h2 5. Gestione errori (vedi console)',
     'p Attributo <code>data</code> con JSON malformato (ignorato: nessuna sorgente dati e nessun errore perché non è stato chiamato <code>init()</code>), <code>jsonUrl</code> inesistente (errore HTTP in console, componente vuoto), <code>cols</code> mancante (errore di configurazione in console, componente vuoto), <code>cols</code> con <code>dataType</code> sconosciuto (idem).',

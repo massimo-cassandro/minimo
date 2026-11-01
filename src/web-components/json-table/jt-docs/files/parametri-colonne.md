@@ -15,22 +15,23 @@ cols: [
 
 | Key | Tipo | Default | Descrizione |
 |---|---|---|---|
-| `key` | string | – | **OBBLIGATORIO**: chiave dell'oggetto riga (ammessa la notazione con punto per valori annidati, es. `'owner.name'`) |
-| `title` | testo, HTML, Node, array domBuilder o funzione | la chiave | Contenuto del `<th>`. Nelle colonne ordinabili è il testo del pulsante |
+| `cellClass` | string | `null` (classi del tipo di dato) | Classi delle celle body/tfoot, in sostituzione di quelle del tipo. Se solo una tra `headerClass` e `cellClass` è presente, l'altra assume lo stesso valore |
+| `condition` | boolean o `params => boolean` | `true` | Se `false` la colonna non viene renderizzata |
 | `dataType` | string | `'string'` | Tipo di dato, una delle chiavi di `dataTypes`; `type` è un alias equivalente. Vedi [dataTypes](dataTypes.md) |
+| `headerClass` | string | `null` (classi del tipo di dato) | Classi del `<th>`, in sostituzione di quelle del tipo di dato |
+| `key` | string | – | **OBBLIGATORIO**: chiave dell'oggetto riga (ammessa la notazione con punto per valori annidati, es. `'owner.name'`) |
+| `parse` | `(row, subIdx) => valore` | `null` | Preelabora il valore della cella prima del tipo di dato, vedi sotto |
 | `render` | `(row, tr, td, subIdx) => contenuto` o stringa mustache-like | `null` | Vedi sotto |
-| `tfootRender` | `(rows, td) => contenuto`, aggregato `'@…'` o stringa statica | `null` | Contenuto della cella del tfoot (solo se `tfoot` è `true`). `null` = cella vuota |
 | `rowHeading` | boolean | `false` | Se `true` la cella è un'intestazione di riga (`th[scope=row]`) |
 | `rowspan` | number o `row => number` | `null` | Numero di `<tr>` occupati dal record, vedi sotto |
 | `searchable` | boolean | `true` | Abilita la ricerca sulla colonna |
-| `sortable` | boolean | `true` | Abilita l'ordinamento sulla colonna |
-| `sortValue` | valore o `row => valore` | non impostato (tipo di dato / valore grezzo) | Valore usato per l'ordinamento; prevale su quello del tipo di dato |
-| `searchValue` | valore o `row => valore` | non impostato | Idem, per la ricerca |
-| `sortKeys` | array di stringhe | `null` | Solo server-side: chiavi inviate in `sort` al posto di `key`, vedi [Modalità server-side](server-side.md#ordinamento-e-ricerca-su-campi-diversi-dalla-key) |
 | `searchKeys` | array di stringhe | `null` | Solo server-side: campi di ricerca della colonna, inviati in `searchFields`, vedi [Modalità server-side](server-side.md#ordinamento-e-ricerca-su-campi-diversi-dalla-key) |
-| `condition` | boolean o `params => boolean` | `true` | Se `false` la colonna non viene renderizzata |
-| `headerClass` | string | `null` (classi del tipo di dato) | Classi del `<th>`, in sostituzione di quelle del tipo di dato |
-| `cellClass` | string | `null` (classi del tipo di dato) | Classi delle celle body/tfoot, in sostituzione di quelle del tipo. Se solo una tra `headerClass` e `cellClass` è presente, l'altra assume lo stesso valore |
+| `searchValue` | valore o `row => valore` | non impostato (tipo di dato / valore grezzo) | Valore usato per la ricerca; prevale su quello del tipo di dato |
+| `sortable` | boolean | `true` | Abilita l'ordinamento sulla colonna |
+| `sortKeys` | array di stringhe | `null` | Solo server-side: chiavi inviate in `sort` al posto di `key`, vedi [Modalità server-side](server-side.md#ordinamento-e-ricerca-su-campi-diversi-dalla-key) |
+| `sortValue` | valore o `row => valore` | non impostato (tipo di dato / valore grezzo) | Valore usato per l'ordinamento; prevale su quello del tipo di dato |
+| `tfootRender` | `(rows, td) => contenuto`, aggregato `'@…'` o stringa statica | `null` | Contenuto della cella del tfoot (solo se `tfoot` è `true`). `null` = cella vuota |
+| `title` | testo, HTML, Node, array domBuilder o funzione | la chiave | Contenuto del `<th>`. Nelle colonne ordinabili è il testo del pulsante |
 
 
 ## `sortValue` e `searchValue`
@@ -42,6 +43,32 @@ In modalità client-side, per rendere ricercabile un campo non visibile basta in
 ```javascript
 { key: 'nome', searchValue: row => `${row.nome} ${row.codiceInterno}` }
 ```
+
+## `parse`
+
+Preelabora il valore della cella, che viene poi formattato dal tipo di dato della colonna: evita di scrivere un `render` che duplicherebbe la formattazione standard. Riceve l'oggetto dati della riga e `subIdx`, l'indice del `<tr>` all'interno del record (sempre 0 se nessuna colonna usa [`rowspan`](#rowspan)), e restituisce un valore invece del contenuto della cella.
+
+```javascript
+// data di scadenza calcolata, formattata dal tipo `date`
+{
+  key: 'dueDate',
+  dataType: 'date',
+  parse: row => {
+    const date = new Date(row.issueDate);
+    date.setDate(date.getDate() + row.paymentDays);
+    return date.toISOString();
+  }
+}
+```
+
+- `key` può indicare un campo non presente nei dati: resta l'identificatore della colonna
+- `undefined` (nessun `return`) lascia il valore grezzo, mentre `null` viene trattato come un valore nullo (`nullContent` del tipo di dato o `renderNullAs`)
+- il valore restituito viene usato anche per ordinamento, ricerca, classi interne del tipo di dato e aggregati del `tfoot`. `sortValue` e `searchValue` della colonna, se definiti, continuano ad avere la precedenza
+- la funzione può essere invocata più volte per la stessa cella e non deve quindi avere effetti collaterali; per decorare la cella va usato [`render`](#render)
+- `row` non viene modificato: un `render` che restituisce un contenuto prevale su `parse` e riceve i dati originali, così come le stringhe mustache-like
+- con [`rowspan`](#rowspan), nelle colonne senza `rowspan` il valore grezzo non viene passato alla funzione: l'elemento corrispondente si ottiene con `subIdx`, ad es. `(row, subIdx) => row.prices[subIdx] * 2`. Ricerca e aggregati invocano la funzione per ogni elemento solo se il campo `key` contiene un array
+- in modalità server-side agisce solo sulla visualizzazione: ordinamento e ricerca restano a carico del server, che non conosce il valore calcolato
+- non è utilizzabile da attributo HTML, che non può contenere funzioni: un valore diverso da una funzione genera un errore
 
 ## `render`
 
@@ -126,11 +153,11 @@ per `euro`, con `%` per `perc`):
 
 | Aggregato | Valore |
 |---|---|
-| `'@sum'` | somma |
 | `'@avg'` | media aritmetica |
-| `'@min'` | minimo |
-| `'@max'` | massimo |
 | `'@count'` | numero di valori numerici (formattato con `locale`, senza il tipo di dato) |
+| `'@max'` | massimo |
+| `'@min'` | minimo |
+| `'@sum'` | somma |
 
 Un aggregato non riconosciuto viene segnalato in console e produce una cella vuota. Le celle del
 footer ricevono le stesse classi (`cellClass`) delle celle del body.

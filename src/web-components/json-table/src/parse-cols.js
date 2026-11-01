@@ -25,6 +25,7 @@ export const colDefaults = {
   key: '',
   title: null,
   dataType: 'string',
+  parse: null,
   render: null,
   tfootRender: null,
   rowHeading: false,
@@ -57,7 +58,7 @@ export const colDefaults = {
  * @param {JsonTableParams} params - Parametri risolti (passati alle funzioni `condition`)
  * @returns {ParsedCol[]} Solo le colonne visibili
  * @throws {Error} In caso di `cols` mancante/vuoto, `key` mancante, data type sconosciuto, `sortKeys`/`searchKeys`
- *   non validi, `rowspan` definito su tutte le colonne visibili o `render` stringa su una colonna ripetuta su più `<tr>`
+ *   o `parse` non validi, `rowspan` definito su tutte le colonne visibili o `render` stringa su una colonna ripetuta su più `<tr>`
  *
  * @example
  * parseCols([
@@ -108,6 +109,10 @@ export function parseCols(cols, dataTypes, params) {
           throw new Error(`[json-table] colonna \`${merged.key}\`: \`${param}\` deve essere un array di stringhe non vuoto`);
         }
       });
+
+      if (merged.parse != null && typeof merged.parse !== 'function') {
+        throw new Error(`[json-table] colonna \`${merged.key}\`: \`parse\` deve essere una funzione`);
+      }
 
       const condition = typeof merged.condition === 'function'
         ? merged.condition(params)

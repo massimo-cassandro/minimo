@@ -428,6 +428,7 @@
   --table-cell-padding-block: .3rem;
   --table-cell-padding-inline: .6rem;
   --table-tbody-border-width: 1px;
+  --table-tbody-rowspan-vertical-align: top;
   --table-tbody-tr-alt-bg-color: #efefef;
   --table-tbody-tr-hover-bg-color: #cbcbcb;
   --table-tbody-vertical-align: middle;

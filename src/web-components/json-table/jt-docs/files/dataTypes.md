@@ -21,18 +21,18 @@ e valori di ordinamento/ricerca. Tipi predefiniti:
 
 | Tipo | Descrizione | Classi di default  delle celle |
 |---|---|---|
-| `string` | valore così com'è | – |
-| `num` | numero formattato con `numbersLocaleOpts` | `textEnd numeric nowrap` |
-| `id` | id numerico: valore grezzo, allineato a destra, non ricercabile | `textEnd numeric` |
-| `perc` | percentuale in scala 0–100, `currPercLocaleOpts` + `%` | `textEnd numeric nowrap` |
-| `percDecimal` | percentuale in scala 0–1 (moltiplicata per 100) | `textEnd numeric nowrap` |
-| `currency` | formato valuta `Intl` con `currency` | `textEnd numeric nowrap` |
-| `euro` | come `currency`, EUR forzato | `textEnd numeric nowrap` |
-| `date` | elemento `<time>`, `datesLocaleOpts`; accetta stringhe ISO, timestamp, `Date` e oggetti data Symfony | `textEnd nowrap` |
-| `datetime` | come `date`, con la parte ora (`timesLocaleOpts`): `<time><span class="[nowrap]">data</span> <small>ora</small></time>` | `textEnd nowrap` |
 | `bool` | icone `boolTrueIcon`/`boolFalseIcon` (accetta anche `1`/`0`, `'true'`/`'false'`); `null` → `renderNullAs`; ordinabile, non ricercabile | stili interni delle icone |
 | `boolTrueOnly` | come `bool`, ma mostra solo `boolTrueIcon`: le celle con valore `false` o `null` restano vuote | stili interni delle icone |
+| `currency` | formato valuta `Intl` con `currency` | `textEnd numeric nowrap` |
+| `date` | elemento `<time>`, `datesLocaleOpts`; accetta stringhe ISO, timestamp, `Date` e oggetti data Symfony | `textEnd nowrap` |
+| `datetime` | come `date`, con la parte ora (`timesLocaleOpts`): `<time><span class="[nowrap]">data</span> <small>ora</small></time>` | `textEnd nowrap` |
 | `email` | andate a capo facoltative attorno alla `@` | – |
+| `euro` | come `currency`, EUR forzato | `textEnd numeric nowrap` |
+| `id` | id numerico: valore grezzo, allineato a destra, non ricercabile | `textEnd numeric` |
+| `num` | numero formattato con `numbersLocaleOpts` | `textEnd numeric nowrap` |
+| `perc` | percentuale in scala 0–100, `currPercLocaleOpts` + `%` | `textEnd numeric nowrap` |
+| `percDecimal` | percentuale in scala 0–1 (moltiplicata per 100) | `textEnd numeric nowrap` |
+| `string` | valore così com'è | – |
 
 I tipi numerici applicano `renderNaNAs` ai valori non numerici e `renderZeroAs` (se impostato)
 agli zeri. I valori `null`/`undefined` vengono resi come `renderNullAs`, salvo i tipi che definiscono

@@ -51,8 +51,16 @@
         background-color: var(--table-tbody-tr-hover-bg-color);
       }
     }
-    th {
+    th, td {
       vertical-align: var(--table-tbody-vertical-align, top);
+    }
+  }
+
+  &:has([rowspan]) {
+    tbody {
+      td {
+        vertical-align: var(--table-tbody-rowspan-vertical-align, top);
+      }
     }
   }
 
@@ -67,9 +75,8 @@
     border: 1px solid var(--table-border-color);
 
     th, td {
-      &:not(:first-child) {
-        border-inline-start: 1px solid var(--table-border-color);
-      }
+      border-inline-start: 1px solid var(--table-border-color);
+
     }
   }
 
