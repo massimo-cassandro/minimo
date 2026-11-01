@@ -32,3 +32,4 @@
 * 1.53 (29 ott 2026) - markupToElement
 * 1.54 (30 ott 2026) - buildPictureTag: src diverse per media query
 * 1.55 (31 ott 2026) - jsonTable: type `boolTrueOnly`
+* 1.56 (01 nov 2026) - json-table: rowspan

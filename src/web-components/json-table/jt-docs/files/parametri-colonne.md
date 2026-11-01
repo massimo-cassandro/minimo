@@ -18,9 +18,10 @@ cols: [
 | `key` | string | – | **OBBLIGATORIO**: chiave dell'oggetto riga (ammessa la notazione con punto per valori annidati, es. `'owner.name'`) |
 | `title` | testo, HTML, Node, array domBuilder o funzione | la chiave | Contenuto del `<th>`. Nelle colonne ordinabili è il testo del pulsante |
 | `dataType` | string | `'string'` | Tipo di dato, una delle chiavi di `dataTypes`; `type` è un alias equivalente. Vedi [dataTypes](dataTypes.md) |
-| `render` | `(row, tr, td) => contenuto` o stringa mustache-like | `null` | Vedi sotto |
+| `render` | `(row, tr, td, subIdx) => contenuto` o stringa mustache-like | `null` | Vedi sotto |
 | `tfootRender` | `(rows, td) => contenuto`, aggregato `'@…'` o stringa statica | `null` | Contenuto della cella del tfoot (solo se `tfoot` è `true`). `null` = cella vuota |
 | `rowHeading` | boolean | `false` | Se `true` la cella è un'intestazione di riga (`th[scope=row]`) |
+| `rowspan` | number o `row => number` | `null` | Numero di `<tr>` occupati dal record, vedi sotto |
 | `searchable` | boolean | `true` | Abilita la ricerca sulla colonna |
 | `sortable` | boolean | `true` | Abilita l'ordinamento sulla colonna |
 | `sortValue` | valore o `row => valore` | non impostato (tipo di dato / valore grezzo) | Valore usato per l'ordinamento; prevale su quello del tipo di dato |
@@ -35,12 +36,13 @@ cols: [
 Funzione con argomenti posizionali, tutti facoltativi:
 
 ```javascript
-render: (row, tr, td) => contenuto
+render: (row, tr, td, subIdx) => contenuto
 ```
 
 - `row` – l'oggetto dati della riga
 - `tr` – l'elemento `<tr>` della riga
 - `td` – l'elemento della cella (`<td>` o `<th scope="row">`)
+- `subIdx` – l'indice del `<tr>` all'interno del record (sempre 0 se nessuna colonna usa [`rowspan`](#rowspan))
 
 Il valore restituito è il contenuto della cella: testo, stringa HTML, numero, Node o array
 domBuilder. Casi particolari:
@@ -65,6 +67,35 @@ render: '<a href="/users/[[id]]">[[owner.name]]</a>'
 Le stringhe HTML vengono inserite tramite la Sanitizer API (`Element.setHTML`, dove supportata):
 script, attributi handler di eventi e URL `javascript:` vengono rimossi, mentre `class`, `id`,
 `style` e `data-*` sono conservati.
+
+## `rowspan`
+
+Permette di distribuire un record su più `<tr>`: le colonne con `rowspan` generano una sola cella con l'attributo `rowspan`, nel primo `<tr>` del record, mentre le altre generano una cella per ogni `<tr>`.
+
+```javascript
+data: [{ key1: 'aaa', key2: 'bbb', key3: ['riga1', 'riga2', 'riga3'] }],
+cols: [
+  { key: 'key1', rowspan: row => row.key3.length },
+  { key: 'key2', rowspan: row => row.key3.length },
+  { key: 'key3' }
+]
+```
+
+```html
+<tr data-jt-idx="0"><td rowspan="3" data-key="key1">aaa</td><td rowspan="3" data-key="key2">bbb</td><td data-key="key3">riga1</td></tr>
+<tr data-jt-idx="0"><td data-key="key3">riga2</td></tr>
+<tr data-jt-idx="0"><td data-key="key3">riga3</td></tr>
+```
+
+Regole:
+
+- almeno una delle colonne visibili deve essere priva di `rowspan`, altrimenti viene lanciato un errore
+- il numero di `<tr>` è il valore più alto restituito dalle colonne del record: tutte le celle con `rowspan` assumono questo valore. I valori non numerici o minori di 1 contano come 1
+- nelle colonne senza `rowspan`, un valore array fornisce un elemento per ogni `<tr>` (gli elementi mancanti vengono resi come i valori `null`), mentre un valore non array viene ripetuto su ogni `<tr>`
+- nelle colonne senza `rowspan` non sono ammesse le stringhe mustache-like per `render`: viene lanciato un errore, perché non possono selezionare l'elemento corrispondente al `<tr>`. Restano ammesse nelle colonne con `rowspan`, che hanno una sola cella
+- con gli array di oggetti le chiavi annidate (`items.name`) non selezionano l'elemento: va usata una funzione `render`, dove `subIdx` indica l'elemento del `<tr>` corrente, ad es. `(row, tr, td, subIdx) => row.items[subIdx].name`
+- la configurazione da attributo è sconsigliata: non può contenere funzioni, quindi `rowspan` può essere solo un numero fisso, uguale per tutti i record
+- ordinamento, paginazione e conteggi operano sui record, non sui `<tr>`. Le colonne con valore array vengono ordinate in base al primo elemento, mentre la ricerca e gli aggregati del `tfoot` li considerano tutti
 
 ## `tfootRender`
 

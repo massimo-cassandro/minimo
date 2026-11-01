@@ -80,6 +80,25 @@ export function getNestedValue(obj, path) {
 
 
 /**
+ * Legge il valore di una cella del body. Nelle colonne ripetute su più `<tr>` (`col._subRows`, vedi `parse-cols.js`)
+ * un valore array fornisce un elemento per ogni `<tr>`, mentre un valore non array viene ripetuto.
+ *
+ * @param {Object} row - Oggetto riga
+ * @param {{key: string, _subRows: boolean}} col - Colonna analizzata
+ * @param {number} [subIdx=0] - Indice del `<tr>` all'interno del record (default: 0)
+ * @returns {*}
+ *
+ * @example
+ * getCellValue({ a: ['x', 'y'] }, { key: 'a', _subRows: true }, 1);  // → 'y'
+ * getCellValue({ a: ['x', 'y'] }, { key: 'a', _subRows: false }, 1); // → ['x', 'y']
+ */
+export function getCellValue(row, col, subIdx = 0) {
+  const value = getNestedValue(row, col.key);
+  return col._subRows && Array.isArray(value) ? value[subIdx] : value;
+}
+
+
+/**
  * Risolve un template in stile mustache: ogni segnaposto `[[key]]` viene sostituito con il
  * corrispondente valore della riga (chiavi annidate ammesse); i segnaposto che risultano `null`/`undefined`
  * vengono sostituiti con `nullAs`. Utile per la configurazione senza JS tramite attributi HTML.

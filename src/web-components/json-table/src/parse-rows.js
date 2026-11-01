@@ -1,5 +1,5 @@
 
-import { getNestedValue } from './content-utils.js';
+import { getCellValue, getNestedValue } from './content-utils.js';
 
 /** @typedef {import('./defaults.js').JsonTableParams} JsonTableParams */
 /** @typedef {import('./parse-cols.js').ParsedCol} ParsedCol */
@@ -37,6 +37,8 @@ function resolveValue(colValue, typeFn, value, row, params) {
 /**
  * Precalcola, per ogni riga, i valori usati da ordinamento e ricerca, così che vengano
  * calcolati una sola volta e non a ogni operazione di ordinamento/ricerca (vedi `sorting.js` e `search.js`).
+ * Nelle colonne ripetute su più `<tr>` (`col._subRows`) con valore array, l'ordinamento usa il primo elemento e
+ * la ricerca li considera tutti.
  *
  * @param {Array<Object>} rows - Righe di dati grezze
  * @param {ParsedCol[]} cols - Colonne analizzate (vedi `parse-cols.js`)
@@ -57,21 +59,24 @@ export function parseRows(rows, cols, params) {
     const searchParts = [];
 
     cols.forEach(col => {
-      const value = getNestedValue(row, col.key);
-
       if (col.sortable) {
-        sortValues[col.key] = resolveValue(col.sortValue, col._type.sortValue, value, row, params);
+        sortValues[col.key] = resolveValue(col.sortValue, col._type.sortValue, getCellValue(row, col), row, params);
       }
 
       if (col.searchable) {
-        const searchValue = resolveValue(
-          col.searchValue,
-          col._type.searchValue ?? (v => (v == null ? '' : String(v))),
-          value, row, params
-        );
-        if (searchValue != null && searchValue !== '') {
-          searchParts.push(String(searchValue));
-        }
+        const value = getNestedValue(row, col.key);
+        const values = col._subRows && Array.isArray(value) ? value : [value];
+
+        values.forEach(item => {
+          const searchValue = resolveValue(
+            col.searchValue,
+            col._type.searchValue ?? (v => (v == null ? '' : String(v))),
+            item, row, params
+          );
+          if (searchValue != null && searchValue !== '') {
+            searchParts.push(String(searchValue));
+          }
+        });
       }
     });
 

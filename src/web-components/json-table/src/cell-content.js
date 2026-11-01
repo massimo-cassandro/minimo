@@ -1,4 +1,4 @@
-import { getNestedValue, resolveMustache } from './content-utils.js';
+import { getCellValue, getNestedValue, resolveMustache } from './content-utils.js';
 import { toNumber } from './data-types.js';
 
 /** @typedef {import('./defaults.js').JsonTableParams} JsonTableParams */
@@ -9,7 +9,7 @@ import { toNumber } from './data-types.js';
  * Calcola il contenuto di una cella del body.
  *
  * Pipeline:
- * 1. `render` della colonna: funzione `(row, tr, td)` o stringa in stile mustache (`[[key]]`); una funzione
+ * 1. `render` della colonna: funzione `(row, tr, td, subIdx)` o stringa in stile mustache (`[[key]]`); una funzione
  *    che restituisce `undefined` lascia proseguire la pipeline (utile per decorare solo `td`/`tr`), `null`
  *    dà `renderNullAs`
  * 2. valore grezzo `null`/`undefined` → `nullContent` del data type, se definito, altrimenti `renderNullAs`
@@ -21,7 +21,19 @@ import { toNumber } from './data-types.js';
  * @param {JsonTableParams} params - Parametri risolti
  * @param {HTMLTableRowElement} [tr] - Elemento riga, passato al `render` della colonna
  * @param {HTMLTableCellElement} [td] - Elemento cella, passato al `render` della colonna
+ * @param {number} [subIdx=0] - Indice del `<tr>` all'interno del record, vedi `rowspan` (default: 0)
  * @returns {CellContent}
+ *
+ * @example
+ * // Tutti i parametri (valori di default dove previsti):
+ * cellContent(
+ *   col, // colonna analizzata, OBBL
+ *   row, // oggetto riga, OBBL
+ *   params, // parametri risolti, OBBL
+ *   tr, // elemento riga, FAC
+ *   td, // elemento cella, FAC
+ *   0 // indice del tr nel record, FAC
+ * );
  *
  * @example
  * cellContent({ ...col, key: 'amount', _type: types.euro }, { amount: 12 }, params);   // → '12,00 €'
@@ -30,13 +42,13 @@ import { toNumber } from './data-types.js';
  * cellContent({ ...col, render: (row, tr, td) => { td.title = row.name; } }, row, params, tr, td);
  * // → data type / valore grezzo (render ha restituito undefined)
  */
-export function cellContent(col, row, params, tr, td) {
+export function cellContent(col, row, params, tr, td, subIdx = 0) {
 
   const nullAs = params.renderNullAs ?? '';
 
   if (col.render != null) {
     const content = typeof col.render === 'function'
-      ? col.render(row, tr, td)
+      ? col.render(row, tr, td, subIdx)
       : resolveMustache(String(col.render), row, nullAs);
 
     if (content !== undefined) {
@@ -44,7 +56,7 @@ export function cellContent(col, row, params, tr, td) {
     }
   }
 
-  const value = getNestedValue(row, col.key);
+  const value = getCellValue(row, col, subIdx);
 
   if (value == null) {
     return col._type.nullContent ?? nullAs;
@@ -115,8 +127,13 @@ export function tfootContent(col, rows, params, td) {
       return '';
     }
 
+    // nelle colonne `_subRows` flatMap aggrega i singoli elementi degli array
     const nums = rows
-      .map(row => toNumber(getNestedValue(row, col.key)))
+      .flatMap(row => {
+        const value = getNestedValue(row, col.key);
+        return col._subRows ? value : [value];
+      })
+      .map(toNumber)
       .filter(n => !Number.isNaN(n));
 
     const result = aggregate(nums);

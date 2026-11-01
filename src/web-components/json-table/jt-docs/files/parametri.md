@@ -43,7 +43,7 @@ Tutti i parametri sono impostabili sia da attributo HTML che come oggetto in `in
 | `sortNoneArrowIcon` | icona, vedi nota (icona `arrows-down-up`) | Icona del pulsante di ordinamento, nessun ordinamento |
 | `paginationPrevIcon` | icona, vedi nota (icona `caret-left`) | Icona del pulsante "pagina precedente" |
 | `paginationNextIcon` | icona, vedi nota (icona `caret-right`) | Icona del pulsante "pagina successiva" |
-| `trCallback` | (tr, row, params) => void (`null`) | Callback invocata dopo il rendering di ogni riga del body |
+| `trCallback` | (tr, row, params, subIdx) => void (`null`) | Callback invocata dopo il rendering di ogni `<tr>` del body. `subIdx` è l'indice del `<tr>` all'interno del record (sempre 0 se nessuna colonna usa [`rowspan`](parametri-colonne.md#rowspan)) |
 | `tableId` | string (`null`) | Id del tag `<table>` |
 | `classes` | Object | Classi consumer (vedi sotto), unite ai default |
 | `labels` | Object | Testi (vedi sotto), uniti ai default |

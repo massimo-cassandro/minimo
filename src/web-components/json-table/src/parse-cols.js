@@ -6,11 +6,14 @@
 /**
  * Definizione della colonna dopo l'analisi: ogni proprietà ha un valore, `condition` è risolto in un
  * booleano, `headerClass`/`cellClass` sono le stringhe di classi finali e `_type` è l'oggetto del data type.
+ * `_subRows` è true per le colonne senza `rowspan` di una tabella in cui almeno un'altra colonna lo definisce:
+ * le loro celle vengono ripetute su ogni `<tr>` del record.
  * @typedef {Required<Omit<ColDefinition, 'type'|'condition'|'sortValue'|'searchValue'>> & {
  *   condition: boolean,
  *   sortValue: *,
  *   searchValue: *,
- *   _type: DataTypeDefinition
+ *   _type: DataTypeDefinition,
+ *   _subRows: boolean
  * }} ParsedCol
  */
 
@@ -25,6 +28,7 @@ export const colDefaults = {
   render: null,
   tfootRender: null,
   rowHeading: false,
+  rowspan: null,
   searchable: true,
   sortable: true,
   sortValue: undefined,
@@ -50,7 +54,8 @@ export const colDefaults = {
  * @param {Object<string, DataTypeDefinition>} dataTypes - Mappa dei data type (vedi `buildDataTypes`)
  * @param {JsonTableParams} params - Parametri risolti (passati alle funzioni `condition`)
  * @returns {ParsedCol[]} Solo le colonne visibili
- * @throws {Error} In caso di `cols` mancante/vuoto, `key` mancante o data type sconosciuto
+ * @throws {Error} In caso di `cols` mancante/vuoto, `key` mancante, data type sconosciuto, `rowspan`
+ *   definito su tutte le colonne visibili o `render` stringa su una colonna ripetuta su più `<tr>`
  *
  * @example
  * parseCols([
@@ -66,7 +71,7 @@ export function parseCols(cols, dataTypes, params) {
     throw new Error('[json-table] parametro `cols` mancante o vuoto: la definizione delle colonne è obbligatoria');
   }
 
-  return cols
+  const parsedCols = cols
     .map((col, idx) => {
 
       if (col == null || typeof col !== 'object') {
@@ -109,4 +114,21 @@ export function parseCols(cols, dataTypes, params) {
       });
     })
     .filter(col => col.condition);
+
+  const hasRowspan = parsedCols.some(col => col.rowspan != null);
+
+  if (hasRowspan && parsedCols.every(col => col.rowspan != null)) {
+    throw new Error('[json-table] parametro `rowspan`: almeno una colonna deve esserne priva');
+  }
+
+  return parsedCols.map(col => {
+    const subRows = hasRowspan && col.rowspan == null;
+
+    // una stringa mustache non può selezionare l'elemento dell'array corrispondente al `<tr>`
+    if (subRows && typeof col.render === 'string') {
+      throw new Error(`[json-table] colonna \`${col.key}\`: con \`rowspan\` su altre colonne, \`render\` deve essere una funzione`);
+    }
+
+    return { ...col, _subRows: subRows };
+  });
 }

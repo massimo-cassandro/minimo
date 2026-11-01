@@ -255,6 +255,28 @@ export function jsonTableDemo(){
       })
     },
 
+    // =>> rowspan
+    'h2 Record su più righe: <code>rowspan</code>',
+    'p Le colonne con <code>rowspan</code> (numero o funzione <code>row => numero</code>) generano una sola cella, le altre una cella per ogni <code>&lt;tr&gt;</code>, usando gli elementi dell\'array. <code>render</code> riceve l\'indice <code>subIdx</code>. Ordinamento e paginazione operano sui record, la ricerca e <code>@sum</code> su tutti gli elementi.',
+    {
+      tag: 'json-table',
+      callback: el => /** @type {JsonTable} */ (el).init({
+        perPage: 2,
+        tfoot: true,
+        data: [
+          { order: 'A-100', customer: 'Rossi', items: ['Tavolo', 'Sedia', 'Lampada'], prices: [250, 40, 35] },
+          { order: 'A-101', customer: 'Bianchi', items: ['Divano'], prices: [800] },
+          { order: 'A-102', customer: 'Verdi', items: ['Libreria', 'Scrivania'], prices: [320] }
+        ],
+        cols: [
+          { key: 'order', title: 'Ordine', rowHeading: true, rowspan: row => row.items.length },
+          { key: 'customer', title: 'Cliente', rowspan: row => row.items.length },
+          { key: 'items', title: 'Articolo', render: (row, tr, td, subIdx) => `${(subIdx ?? 0) + 1}. ${row.items[subIdx ?? 0]}` },
+          { key: 'prices', title: 'Prezzo', dataType: 'euro', tfootRender: '@sum' }
+        ]
+      })
+    },
+
     // =>> 5. errors
     'h2 5. Gestione errori (vedi console)',
     'p Attributo <code>data</code> con JSON malformato (ignorato: nessuna sorgente dati e nessun errore perché non è stato chiamato <code>init()</code>), <code>jsonUrl</code> inesistente (errore HTTP in console, componente vuoto), <code>cols</code> mancante (errore di configurazione in console, componente vuoto), <code>cols</code> con <code>dataType</code> sconosciuto (idem).',

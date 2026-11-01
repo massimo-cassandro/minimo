@@ -3,6 +3,7 @@
 * [Parametri (include `classes` e `labels`)](./files/parametri.md)
 * [Parametri colonne](./files/parametri-colonne.md)
 * [DataTypes](./files/dataTypes.md)
+* [Server Side](files/server-side.md)
 
 
 ---
@@ -77,16 +78,24 @@ predefiniti (`"@sum"`, ...).
 
 ## Utilizzo da script
 
+```twig
+{%- set linkScheda = path('xxx') -%}
+<p class="inner-nav-main"><a href="{{ linkScheda }}">Nuovo xxx</a></p>
+<json-table jsonUrl="{{ path('yyy') }}" data-link-scheda="{{ linkScheda }}"></json-table>
+<p class="inner-nav"></p>
+```
+
 ```javascript
 const jtable = document.querySelector('json-table');
-// oppure: const el = document.createElement('json-table');
+// oppure: const jtable = document.createElement('json-table');
 
 jtable.init({
-  jsonUrl: '/api/rows.json',
+  // jsonUrl: '/api/rows.json', // non necessario se impostato come attributo
+  perPage: 50,
   caption: 'Utenti',
   cols: [
     { key: 'id', dataType: 'id' },
-    { key: 'name', title: 'Nome', render: row => `<a href="/users/${row.id}">${row.name}</a>` },
+    { key: 'name', title: 'Nome', render: row => `<a href="${linkScheda}/${row.id}">${row.name}</a>` },
     { key: 'amount', title: 'Importo', dataType: 'euro', tfootRender: '@sum' },
     { key: 'active', title: 'Attivo', dataType: 'bool' }
   ],
@@ -255,70 +264,7 @@ farla leggere come nome della tabella) ma un contenitore con id, collegato alla 
 `aria-labelledby`: il nome accessibile della tabella è quindi lo stesso di una `<caption>`.
 Posizioni diverse si ottengono con gli slot `caption` e `pagination` del [template](#template).
 
-## Modalità server-side
-
-Con `serverSide: true` il componente non elabora i dati in locale: a ogni cambio pagina,
-ordinamento o ricerca invia una nuova richiesta GET a `jsonUrl`, aggiungendo alla query string i
-parametri definiti in `serverParams` (quelli già presenti in `jsonUrl` vengono conservati):
-
-```javascript
-serverParams: {
-  page: 'page',        // pagina richiesta (da 1)
-  start: 'start',      // indice (da 0) del primo record richiesto = (page - 1) * perPage,
-                       // comodo per `LIMIT start, perPage`
-  perPage: 'perPage',  // record per pagina
-  sort: 'sort',        // chiave della colonna ordinata (omesso senza ordinamento)
-  dir: 'dir',          // 'asc' | 'desc' (omesso senza ordinamento)
-  search: 'search'     // termine di ricerca (omesso se vuoto)
-}
-```
-
-Un valore `null` omette il parametro (es. `serverParams: { start: null }` per inviare solo `page`).
-Richiesta di esempio, seconda pagina ordinata per nome con ricerca attiva:
-
-```
-GET /api/rows.json?page=2&start=25&perPage=25&sort=name&dir=desc&search=mar
-```
-
-Il JSON di risposta deve contenere le **sole righe della pagina richiesta** in `jsonDataField`,
-il totale dei record in `totRecField` e il numero di record che soddisfano la ricerca in
-`filteredRecField` (se assente vale il totale):
-
-```json
-{ "data": [ ...25 righe... ], "totRec": 1500, "filteredRec": 40 }
-```
-
-Durante la richiesta il contenitore principale ha `aria-busy="true"` (la tabella viene resa
-semitrasparente); le risposte superate da una richiesta più recente vengono ignorate. Se la
-pagina richiesta non esiste più (il set di dati si è ridotto), viene richiesta l'ultima
-disponibile. In questa modalità `data`, `filtered` e `pageRows` dello stato contengono solo la
-pagina corrente e il `tfoot` non è disponibile. `serverSide` richiede `jsonUrl`: con `data` inline
-viene ignorato con un avviso in console.
-
-### Modalità jQuery DataTables
-
-Con `jqDatatableMode: true` (o l'attributo `jqdatatablemode="true"`) i default dei parametri server-side diventano quelli del formato di jQuery DataTables, utile per riutilizzare endpoint già esistenti:
-
-| Parametro | Default con `jqDatatableMode` |
-|---|---|
-| `jsonDataField` | `'data'` |
-| `totRecField` | `'recordsTotal'` |
-| `filteredRecField` | `'recordsFiltered'` |
-| `serverSide` | `true` |
-| `serverParams` | `{ page: null, start: 'start', perPage: 'length', sort: 'order[0][column]', dir: 'order[0][dir]', search: 'search[value]' }` |
-
-Precedenza: `init()` > attributo HTML > `JsonTable.setDefaults()` > modalità jQuery DataTables > default predefiniti. Ogni parametro può quindi essere sovrascritto singolarmente, e `serverParams` viene unito chiave per chiave.
-
-Oltre ai `serverParams`, in questa modalità vengono inviati anche `draw=1` e, per ogni colonna visualizzata, `columns[i][name]` (la `key`), `columns[i][searchable]` e `columns[i][orderable]`. `order[0][column]` riceve l'**indice** della colonna ordinata (tra quelle visualizzate), non la chiave. È previsto un solo criterio di ordinamento (`order[0]`).
-
-```html
-<json-table jsonurl="/api/rows" jqdatatablemode="true" cols='[{"key":"id"},{"key":"name"}]'></json-table>
-```
-
-```
-GET /api/rows?draw=1&columns[0][name]=id&columns[0][searchable]=true&columns[0][orderable]=true&columns[1][name]=name&…&start=25&length=25&order[0][column]=1&order[0][dir]=desc&search[value]=mar
-```
-
+## 
 ## Template
 
 `template` definisce il contenuto del contenitore principale come array domBuilder, in cui gli

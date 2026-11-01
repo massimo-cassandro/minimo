@@ -24,6 +24,7 @@ import {
  * @param {Object} row - L'oggetto dati della riga corrente
  * @param {HTMLTableRowElement} [tr] - L'elemento `<tr>` della riga corrente
  * @param {HTMLTableCellElement} [td] - L'elemento cella (`<td>` o `<th scope="row">`)
+ * @param {number} [subIdx] - Indice del `<tr>` all'interno del record, sempre 0 se nessuna colonna usa `rowspan`
  * @returns {CellContent|void} Contenuto della cella; `undefined` (nessun `return`) ripiega sul rendering del data type,
  *   `null` su `renderNullAs`
  */
@@ -53,6 +54,10 @@ import {
  *   `'@max'`, `'@count'` calcolati sui valori della colonna e formattati dal data type della colonna.
  *   `null` rende una cella vuota (default: null)
  * @property {boolean} [rowHeading] - Se true la cella è un'intestazione di riga (`<th scope="row">`) (default: false)
+ * @property {number|((row: Object) => number)|null} [rowspan] - Numero di `<tr>` occupati dal record, oppure funzione `row => numero`.
+ *   Aggiunge l'attributo `rowspan` alla cella; le colonne senza `rowspan`, almeno una, generano una cella per ogni `<tr>`,
+ *   prendendo da un valore array l'elemento corrispondente, e non ammettono `render` stringa. Se le colonne danno valori
+ *   diversi vale il maggiore (default: null)
  * @property {boolean} [searchable] - Abilita la ricerca su questa colonna (default: true)
  * @property {boolean} [sortable] - Abilita l'ordinamento su questa colonna (default: true)
  * @property {*|((row: Object) => *)} [sortValue] - Valore usato per l'ordinamento, oppure funzione `row => value`.
@@ -263,8 +268,8 @@ import {
  * @property {IconDef} sortNoneArrowIcon - Icona del pulsante di ordinamento, nessun ordinamento attivo (default: icona `arrows-down-up` di minimo)
  * @property {IconDef} paginationPrevIcon - Icona del pulsante pagina precedente (default: icona `caret-left` di minimo)
  * @property {IconDef} paginationNextIcon - Icona del pulsante pagina successiva (default: icona `caret-right` di minimo)
- * @property {((tr: HTMLTableRowElement, row: Object, params: JsonTableParams) => void)|null} trCallback - Callback
- *   invocata dopo il rendering di ogni riga del body (default: null)
+ * @property {((tr: HTMLTableRowElement, row: Object, params: JsonTableParams, subIdx: number) => void)|null} trCallback - Callback
+ *   invocata dopo il rendering di ogni `<tr>` del body; `subIdx` è l'indice del `<tr>` all'interno del record, vedi `rowspan` (default: null)
  * @property {string|null} tableId - Attributo `id` dell'elemento `<table>` (default: null)
  * @property {JsonTableClasses} classes - Nomi di classe del consumer (vedi `JsonTableClasses`)
  * @property {JsonTableLabels} labels - Testi (vedi `JsonTableLabels`)
