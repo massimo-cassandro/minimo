@@ -7,7 +7,7 @@
     "webpack WEB TOOLS prod": "NODE_ENV=production webpack --config ./webpack.config.mjs"
   },
   "devDependencies": {
-    "@babel/core": "^8.0.7",
+    "@babel/core": "^8.0.9",
     "@babel/preset-env": "^8.0.7",
     "@csstools/postcss-global-data": "^4.0.0",
     "@principalstudio/html-webpack-inject-preload": "^1.2.7",

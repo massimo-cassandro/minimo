@@ -10,7 +10,7 @@
     "create-favicons DEMO": "node ../dev-tools/create-favicons/index.mjs --dir=./dev-tools-demo/create-favicons-demo"
   },
   "devDependencies": {
-    "@babel/core": "^8.0.7",
+    "@babel/core": "^8.0.9",
     "@babel/preset-env": "^8.0.7",
     "@csstools/postcss-global-data": "^4.0.0",
     "@principalstudio/html-webpack-inject-preload": "^1.2.7",
