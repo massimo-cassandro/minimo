@@ -92,6 +92,7 @@ const jtable = document.querySelector('json-table');
 jtable.init({
   // jsonUrl: '/api/rows.json', // non necessario se impostato come attributo
   perPage: 50,
+  serverSide: true, // se necessaria la paginazione 
   caption: 'Utenti',
   cols: [
     { key: 'id', dataType: 'id' },

@@ -38,7 +38,7 @@ function resolveValue(colValue, typeFn, value, row, params) {
  * Precalcola, per ogni riga, i valori usati da ordinamento e ricerca, così che vengano
  * calcolati una sola volta e non a ogni operazione di ordinamento/ricerca (vedi `sorting.js` e `search.js`).
  * Nelle colonne ripetute su più `<tr>` (`col._subRows`) con valore array, l'ordinamento usa il primo elemento e
- * la ricerca li considera tutti.
+ * la ricerca li considera tutti. In modalità server-side i valori non vengono calcolati: ordinamento e ricerca spettano al server.
  *
  * @param {Array<Object>} rows - Righe di dati grezze
  * @param {ParsedCol[]} cols - Colonne analizzate (vedi `parse-cols.js`)
@@ -50,6 +50,10 @@ function resolveValue(colValue, typeFn, value, row, params) {
  * // → [{ idx: 0, row: {…}, sortValues: { id: 1, name: 'Mario', amount: 12.5 }, searchText: 'mario 12,5' }]
  */
 export function parseRows(rows, cols, params) {
+
+  if (params.serverSide) {
+    return rows.map((row, idx) => ({ idx, row, sortValues: {}, searchText: '' }));
+  }
 
   return rows.map((row, idx) => {
 

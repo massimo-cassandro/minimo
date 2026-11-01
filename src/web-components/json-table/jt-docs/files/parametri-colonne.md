@@ -26,10 +26,22 @@ cols: [
 | `sortable` | boolean | `true` | Abilita l'ordinamento sulla colonna |
 | `sortValue` | valore o `row => valore` | non impostato (tipo di dato / valore grezzo) | Valore usato per l'ordinamento; prevale su quello del tipo di dato |
 | `searchValue` | valore o `row => valore` | non impostato | Idem, per la ricerca |
+| `sortKeys` | array di stringhe | `null` | Solo server-side: chiavi inviate in `sort` al posto di `key`, vedi [Modalità server-side](server-side.md#ordinamento-e-ricerca-su-campi-diversi-dalla-key) |
+| `searchKeys` | array di stringhe | `null` | Solo server-side: campi di ricerca della colonna, inviati in `searchFields`, vedi [Modalità server-side](server-side.md#ordinamento-e-ricerca-su-campi-diversi-dalla-key) |
 | `condition` | boolean o `params => boolean` | `true` | Se `false` la colonna non viene renderizzata |
 | `headerClass` | string | `null` (classi del tipo di dato) | Classi del `<th>`, in sostituzione di quelle del tipo di dato |
 | `cellClass` | string | `null` (classi del tipo di dato) | Classi delle celle body/tfoot, in sostituzione di quelle del tipo. Se solo una tra `headerClass` e `cellClass` è presente, l'altra assume lo stesso valore |
 
+
+## `sortValue` e `searchValue`
+
+Agiscono solo in modalità client-side. Con `serverSide: true` il server riceve solo le chiavi, non i valori calcolati: i due parametri vengono ignorati con un avviso in console (vedi [Modalità server-side](server-side.md#ordinamento-e-ricerca-su-campi-diversi-dalla-key)). Allo stesso modo, `sortKeys` e `searchKeys` vengono ignorati con un avviso in modalità client-side.
+
+In modalità client-side, per rendere ricercabile un campo non visibile basta includerlo nel `searchValue` di una colonna visibile. Una colonna con `condition: false`, invece, viene eliminata e non partecipa alla ricerca.
+
+```javascript
+{ key: 'nome', searchValue: row => `${row.nome} ${row.codiceInterno}` }
+```
 
 ## `render`
 

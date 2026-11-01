@@ -19,8 +19,9 @@
  * @property {number} perPage - Righe per pagina
  * @property {SortDef|null} sort - Ordinamento attivo, oppure null
  * @property {string} search - Termine di ricerca ('' = nessuno)
- * @property {Array<{key: string, searchable: boolean, sortable: boolean}>} [cols] - Colonne visualizzate (già analizzate);
- *   usate solo con `jqDatatableMode` per inviare `columns[i][...]` e l'indice della colonna ordinata
+ * @property {Array<{key: string, searchable: boolean, sortable: boolean, sortKeys?: string[]|null, searchKeys?: string[]|null}>} [cols] -
+ *   Colonne visualizzate (già analizzate); usate per `sortKeys`/`searchKeys` e, con `jqDatatableMode`, per inviare
+ *   `columns[i][...]` e l'indice della colonna ordinata
  */
 
 /**
@@ -38,15 +39,30 @@ function numericField(json, field) {
   return (raw != null && raw !== '' && Number.isFinite(num)) ? num : undefined;
 }
 
+/**
+ * Valore del parametro `searchFields`: unione senza duplicati di `searchKeys` (o, in sua assenza, della `key`)
+ * delle colonne ricercabili; `null` se nessuna colonna ricercabile definisce `searchKeys`.
+ * @param {NonNullable<ServerRequest['cols']>} cols - Colonne visualizzate
+ * @returns {string|null}
+ */
+function buildSearchFields(cols) {
+  const searchable = cols.filter(col => col.searchable);
+  return searchable.some(col => col.searchKeys)
+    ? [...new Set(searchable.flatMap(col => col.searchKeys ?? [col.key]))].join(',')
+    : null;
+}
+
 
 /**
  * Costruisce l'URL di una richiesta server-side: `params.jsonUrl` più i parametri della query string
  * indicati in `params.serverParams` (i parametri impostati a `null` vengono omessi; `sort`/`dir` vengono inviati
  * solo quando è attivo un ordinamento, `search` solo quando non è vuoto). I parametri della query string
- * già presenti in `jsonUrl` vengono conservati.
+ * già presenti in `jsonUrl` vengono conservati. Le colonne con `sortKeys` inviano in `sort` queste chiavi unite da virgola
+ * al posto di `key`; `searchFields` viene inviato solo insieme a `search` (vedi `buildSearchFields`).
  *
  * Con `params.jqDatatableMode` e `request.cols` vengono inviati anche, come fa jQuery DataTables, `draw=1`,
- * `columns[i][name|searchable|orderable]` e, per `sort`, l'indice della colonna al posto della sua chiave.
+ * `columns[i][name|searchable|orderable]` (`name` è `sortKeys` unito da virgola oppure `key`) e, per `sort`,
+ * l'indice della colonna al posto della sua chiave.
  *
  * @param {JsonTableParams} params - Parametri risolti
  * @param {ServerRequest} request - Stato della richiesta
@@ -78,17 +94,21 @@ export function buildServerUrl(params, request) {
   if (jqCols) {
     set('draw', 1);
     jqCols.forEach((col, idx) => {
-      set(`columns[${idx}][name]`, col.key);
+      set(`columns[${idx}][name]`, col.sortKeys?.join(',') ?? col.key);
       set(`columns[${idx}][searchable]`, col.searchable);
       set(`columns[${idx}][orderable]`, col.sortable);
     });
   }
 
+  const cols = request.cols ?? [];
+  const sortCol = cols.find(col => col.key === request.sort?.key);
+
   set(names.sort, jqCols && request.sort
     ? jqCols.findIndex(col => col.key === request.sort?.key)
-    : request.sort?.key);
+    : sortCol?.sortKeys?.join(',') ?? request.sort?.key);
   set(names.dir, request.sort ? request.sort.dir : null);
   set(names.search, request.search);
+  set(names.searchFields, request.search ? buildSearchFields(cols) : null);
 
   return url.toString();
 }

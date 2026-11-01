@@ -4,7 +4,7 @@ import { defaults } from './src/defaults.js';
 import { resolveParams } from './src/resolve-params.js';
 import { getData } from './src/get-data.js';
 import { buildDataTypes } from './src/data-types.js';
-import { parseCols } from './src/parse-cols.js';
+import { parseCols, warnIneffectiveColParams } from './src/parse-cols.js';
 import { parseRows } from './src/parse-rows.js';
 import { mainBuilder } from './src/main-builder.js';
 import { renderTbody } from './src/table-body.js';
@@ -109,7 +109,7 @@ const emptyState = () => ({
  *   perPage: 25,                        // default: 25 (0 = nessuna paginazione)
  *   paginationDelta: 2,                 // default: 2
  *   serverSide: false,                  // default: false
- *   serverParams: { page: 'page', start: 'start', perPage: 'perPage', sort: 'sort', dir: 'dir', search: 'search' }, // default
+ *   serverParams: { page: 'page', start: 'start', perPage: 'perPage', sort: 'sort', dir: 'dir', search: 'search', searchFields: 'searchFields' }, // default
  *   initialSort: { key: 'name', dir: 'asc' }, // default: null
  *   tfoot: true,                        // default: false (non disponibile in modalità server-side)
  *   updateFooterOnPageChange: false,    // default: false
@@ -391,6 +391,7 @@ export class JsonTable extends HTMLElement {
     try {
       this.dataTypes = buildDataTypes(params);
       this.cols = parseCols(params.cols, this.dataTypes, params);
+      warnIneffectiveColParams(this.cols, params.serverSide);
     } catch (err) {
       // eslint-disable-next-line no-console
       console.error(err);

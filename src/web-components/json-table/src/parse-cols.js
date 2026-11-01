@@ -33,6 +33,8 @@ export const colDefaults = {
   sortable: true,
   sortValue: undefined,
   searchValue: undefined,
+  sortKeys: null,
+  searchKeys: null,
   condition: true,
   headerClass: null,
   cellClass: null
@@ -54,8 +56,8 @@ export const colDefaults = {
  * @param {Object<string, DataTypeDefinition>} dataTypes - Mappa dei data type (vedi `buildDataTypes`)
  * @param {JsonTableParams} params - Parametri risolti (passati alle funzioni `condition`)
  * @returns {ParsedCol[]} Solo le colonne visibili
- * @throws {Error} In caso di `cols` mancante/vuoto, `key` mancante, data type sconosciuto, `rowspan`
- *   definito su tutte le colonne visibili o `render` stringa su una colonna ripetuta su più `<tr>`
+ * @throws {Error} In caso di `cols` mancante/vuoto, `key` mancante, data type sconosciuto, `sortKeys`/`searchKeys`
+ *   non validi, `rowspan` definito su tutte le colonne visibili o `render` stringa su una colonna ripetuta su più `<tr>`
  *
  * @example
  * parseCols([
@@ -100,6 +102,13 @@ export function parseCols(cols, dataTypes, params) {
         throw new Error(`[json-table] colonna #${idx}: parametro \`key\` mancante`);
       }
 
+      ['sortKeys', 'searchKeys'].forEach(param => {
+        const keys = merged[param];
+        if (keys != null && !(Array.isArray(keys) && keys.length && keys.every(k => k && typeof k === 'string'))) {
+          throw new Error(`[json-table] colonna \`${merged.key}\`: \`${param}\` deve essere un array di stringhe non vuoto`);
+        }
+      });
+
       const condition = typeof merged.condition === 'function'
         ? merged.condition(params)
         : (merged.condition ?? true);
@@ -130,5 +139,36 @@ export function parseCols(cols, dataTypes, params) {
     }
 
     return { ...col, _subRows: subRows };
+  });
+}
+
+
+/**
+ * Segnala in console i parametri di colonna che non hanno effetto nella modalità corrente: `sortValue`/`searchValue`
+ * con `serverSide` attivo (il server riceve solo le chiavi) e `sortKeys`/`searchKeys` in modalità client-side.
+ * Le funzioni dei data type non vengono considerate.
+ *
+ * @param {ParsedCol[]} cols - Colonne analizzate
+ * @param {boolean} serverSide - Modalità server-side effettiva (dopo la validazione dei parametri)
+ * @returns {void}
+ */
+export function warnIneffectiveColParams(cols, serverSide) {
+  cols.forEach(col => {
+    const ineffective = serverSide
+      ? [
+        col.sortable && col.sortValue !== undefined && 'sortValue',
+        col.searchable && col.searchValue !== undefined && 'searchValue'
+      ]
+      : [
+        col.sortKeys != null && 'sortKeys',
+        col.searchKeys != null && 'searchKeys'
+      ];
+    const names = ineffective.filter(Boolean).map(name => `\`${name}\``);
+
+    if (names.length) {
+      const hint = serverSide ? ': usare `sortKeys` / `searchKeys`' : '';
+      // eslint-disable-next-line no-console
+      console.warn(`[json-table] colonna \`${col.key}\`: ${names.join(' e ')} non ${names.length > 1 ? 'hanno' : 'ha'} effetto in modalità ${serverSide ? 'server-side' : 'client-side'}${hint}`);
+    }
   });
 }
