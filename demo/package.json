@@ -14,7 +14,7 @@
     "@babel/preset-env": "^8.0.7",
     "@csstools/postcss-global-data": "^4.0.0",
     "@principalstudio/html-webpack-inject-preload": "^1.2.7",
-    "autoprefixer": "^10.6.1",
+    "autoprefixer": "^10.6.2",
     "babel-loader": "^10.1.1",
     "copy-webpack-plugin": "^14.0.0",
     "css-loader": "^7.1.5",
