@@ -47,7 +47,7 @@ export function jsonTableDemo(){
         data: JSON.stringify(demoData.slice(0, 12)),
         tfoot: 'true',
         perpage: '5',
-        initialsort: JSON.stringify({ key: 'euro', dir: 'desc' }),
+        initialsort: JSON.stringify([{ key: 'euro', dir: 'desc' }]),
         cols: JSON.stringify([
           { key: 'id', dataType: 'id' },
           { key: 'text', title: 'Testo (render mustache-like)', render: '<a href="#/json-table?id=[[id]]">[[text]]</a>' },
@@ -243,7 +243,7 @@ export function jsonTableDemo(){
         tfoot: true, // ignorato in modalità server-side (warning in console)
         caption: 'Tabella server-side',
         infoText: 'Righe {start}–{end} di {filteredRec} ({totRec} totali) — pagina {page} di {totPages}',
-        initialSort: { key: 'id', dir: 'asc' },
+        initialSort: [{ key: 'id', dir: 'asc' }],
         cols: [
           { key: 'id', title: 'ID', dataType: 'id' },
           { key: 'text', title: 'Testo' },

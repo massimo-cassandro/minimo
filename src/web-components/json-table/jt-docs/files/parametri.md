@@ -19,7 +19,7 @@ Tutti i parametri sono impostabili sia da attributo HTML che come oggetto in `in
 | `debug` | boolean (`false`) | Log in console di parametri, colonne, dati, stato ed elementi generati |
 | `filteredRecField` | string (`'filteredRec'`) | Solo server-side: chiave del JSON con il numero di record che soddisfano la ricerca corrente; se assente vale `totRecField` |
 | `infoText` | string, Function o null (`null`) | Contenuto dell'area info: stringa mustache-like con i segnaposto `{start}`, `{end}`, `{totRec}`, `{filteredRec}`, `{page}`, `{totPages}`, oppure funzione `(start, end, totRec, filteredRec, page, totPages) => string\|Node`. `null` = viene usato `labels.info` |
-| `initialSort` | { key, dir } o null (`null`) | Ordinamento applicato al caricamento, es. `{ key: 'name', dir: 'asc' }` |
+| `initialSort` | array di { key, dir } o null (`null`) | Ordinamento applicato al caricamento: uno o più criteri in ordine di priorità, es. `[{ key: 'city', dir: 'asc' }, { key: 'name', dir: 'desc' }]` |
 | `jqDatatableMode` | boolean (`false`) | Se `true` imposta come default i valori compatibili con il formato server-side di jQuery DataTables: `jsonDataField: 'data'`, `totRecField: 'recordsTotal'`, `filteredRecField: 'recordsFiltered'`, `serverSide: true` e i `serverParams` indicati in "Modalità jQuery DataTables". Ogni valore resta sovrascrivibile |
 | `jsonDataField` | string o null (`'data'`) | Chiave del JSON che contiene l'array delle righe (es. `'data'` per `{ data: [...] }`); `null` o `''` = la root del JSON è l'array stesso |
 | `jsonUrl` | string (`null`) | URL del JSON da caricare. Ignorato se `data` è presente |

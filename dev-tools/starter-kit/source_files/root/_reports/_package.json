@@ -2,6 +2,7 @@
   "scripts": {
     "1 webpack PROD": "cd .. && NODE_ENV=production webpack --config ./webpack.config.mjs --stats minimal",
     "2 server PROD": "cd .. && docker compose run --rm -p 8100:80 -e APP_ENV=prod -e APP_DEBUG=0 -e ASSETS_DIR=build app sh -c 'php bin/console cache:clear && chown -R www-data:www-data var/cache && exec apache2-foreground' # http://localhost:8100 (container Apache separato da quello di sviluppo su 8007)",
+    "stop server PROD": "docker ps -q --filter publish=8100 | xargs docker stop",
     "lighthouse mobile": "npx lighthouse http://localhost:8100/ --form-factor=mobile --output=html --output-path=./mobile.html --view",
     "lighthouse desktop": "npx lighthouse http://localhost:8100/ --preset=desktop --output=html --output-path=./desktop.html --view",
     "webhint": "npx hint http://localhost:8100/"

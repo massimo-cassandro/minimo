@@ -48,7 +48,7 @@ const other = document.createElement('json-table');
 <json-table
   jsonurl="/api/rows.json"
   caption="Utenti"
-  perpage="10"
+  initialSort='[{ "key": "name", "dir": "asc" }]'
   cols='[
     { "key": "id", "dataType": "id" },
     { "key": "name", "title": "Nome", "render": "<a href=\"/users/[[id]]\">[[name]]</a>" },
@@ -96,6 +96,7 @@ jtable.init({
   perPage: 50,
   serverSide: true, // se necessaria la paginazione 
   caption: 'Utenti',
+  initialSort: [{ key: 'name', dir: 'asc' }], // default: null
   cols: [
     { key: 'id', dataType: 'id' },
     { key: 'name', title: 'Nome', render: row => `<a href="${linkScheda}/${row.id}">${row.name}</a>` },
@@ -229,16 +230,29 @@ jtable.init({ jsonUrl: '/api/rows.json', cols: [...] });
 Ogni colonna con `sortable: true` (default) ha un pulsante nel
 `<th>` che cicla tra nessun ordinamento → ascendente → discendente → nessuno; l'attributo
 `aria-sort` del `<th>` e l'icona riflettono lo stato, `title`/`aria-label` del pulsante
-descrivono l'azione del click successivo (`labels.sortAsc/sortDesc/sortNone`). È attivo un solo
-ordinamento per volta; il cambio di ordinamento riporta alla prima pagina.
+descrivono l'azione del click successivo (`labels.sortAsc/sortDesc/sortNone`). Il click ordina
+per la sola colonna cliccata, sostituendo gli eventuali criteri multipli di `initialSort`; il cambio
+di ordinamento riporta alla prima pagina.
 
 Lato client il confronto usa i valori precalcolati per ogni riga (`sortValue` di colonna, poi del
 tipo di dato, poi il valore grezzo): i valori vuoti (`null`, `''`, `NaN`) vanno sempre in coda,
 i numeri sono confrontati numericamente, il resto con `localeCompare` (`locale`, collazione
 numerica, insensibile a maiuscole e accenti). L'ordinamento è stabile.
 
-`initialSort: { key, dir }` applica un ordinamento al caricamento; `setSort(key, dir)` lo cambia
-via script.
+`initialSort` applica al caricamento uno o più criteri, in ordine di priorità: il secondo decide
+solo tra le righe uguali per il primo, e così via.
+
+```javascript
+initialSort: [{ key: 'city', dir: 'asc' }, { key: 'name', dir: 'desc' }]
+```
+
+```html
+<json-table initialSort='[{ "key": "city", "dir": "asc" }, { "key": "name", "dir": "desc" }]' …></json-table>
+```
+
+Ogni colonna deve esistere, essere ordinabile e comparire una sola volta: i criteri non validi
+vengono ignorati con un errore in console. `aria-sort` e l'icona compaiono solo sulla colonna del
+primo criterio. `setSort(key, dir)` imposta via script l'ordinamento per una sola colonna.
 
 ## Ricerca
 

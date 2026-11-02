@@ -186,7 +186,7 @@ import {
  */
 
 /**
- * Stato di ordinamento / definizione dell'ordinamento iniziale.
+ * Criterio di ordinamento (stato di ordinamento e `initialSort` sono array di criteri, in ordine di priorità).
  * @typedef {Object} SortDef
  * @property {string} key - Chiave della colonna
  * @property {'asc'|'desc'} dir - Direzione
@@ -201,9 +201,11 @@ import {
  * @property {string|null} [start] - Indice (da 0) del primo record richiesto, cioè `(page - 1) * perPage`,
  *   comodo per le query `LIMIT start, perPage` (default: 'start')
  * @property {string|null} [perPage] - Numero di record per pagina (default: 'perPage')
- * @property {string|null} [sort] - Chiave della colonna ordinata, oppure i suoi `sortKeys` uniti da virgola; omesso quando non c'è
- *   un ordinamento attivo (default: 'sort')
- * @property {string|null} [dir] - Direzione di ordinamento, `asc`/`desc`; omesso quando non c'è un ordinamento attivo (default: 'dir')
+ * @property {string|null} [sort] - Chiavi delle colonne ordinate (o i loro `sortKeys`) unite da virgola, in ordine di priorità;
+ *   omesso quando non c'è un ordinamento attivo. Se il nome contiene `{i}` (es. `order[{i}][column]`) viene inviato un
+ *   parametro per ogni criterio, con `{i}` sostituito dall'indice (da 0) (default: 'sort')
+ * @property {string|null} [dir] - Direzioni di ordinamento (`asc`/`desc`) unite da virgola, una per ogni chiave di `sort`
+ *   (ripetuta per ogni `sortKeys` della colonna); omesso quando non c'è un ordinamento attivo. Accetta `{i}` come `sort` (default: 'dir')
  * @property {string|null} [search] - Termine di ricerca; omesso quando vuoto (default: 'search')
  * @property {string|null} [searchFields] - Campi di ricerca uniti da virgola; inviato solo con un termine di ricerca e mai con
  *   `jqDatatableMode` (default: 'searchFields')
@@ -255,7 +257,8 @@ import {
  * @property {ServerParams} serverParams - Solo modalità server-side: nomi dei parametri della query string (vedi `ServerParams`)
  * @property {string[]|null} searchFields - Solo modalità server-side, escluso `jqDatatableMode`: campi su cui cercare, oltre a
  *   quelli delle colonne ricercabili, anche nella forma `tabella.campo`. Il server deve accettare solo valori previsti (default: null)
- * @property {SortDef|null} initialSort - Ordinamento applicato al caricamento, es. `{ key: 'name', dir: 'asc' }` (default: null)
+ * @property {SortDef[]|null} initialSort - Ordinamento applicato al caricamento: array di criteri in ordine di priorità, es.
+ *   `[{ key: 'city', dir: 'asc' }, { key: 'name', dir: 'desc' }]` (default: null)
  * @property {boolean} tfoot - Se renderizzare il `<tfoot>` (vedi `ColDefinition.tfootRender`); ignorato in
  *   modalità server-side (default: false)
  * @property {boolean} updateFooterOnPageChange - Se true, `tfootRender` riceve solo le righe della pagina corrente
@@ -308,7 +311,7 @@ export const mergedParams = ['classes', 'labels', 'dataTypes', 'serverParams'];
  * e quelli di `setDefaults()`. `serverParams` viene unito in modo superficiale come di consueto.
  *
  * In questa modalità `buildServerUrl` invia inoltre `draw=1`, `columns[i][name|searchable|orderable]` e, per
- * `order[0][column]`, l'indice della colonna (non la chiave). Resta un solo criterio di ordinamento (`order[0]`).
+ * `order[i][column]`, l'indice della colonna (non la chiave), con un `order[i]` per ogni criterio di ordinamento.
  *
  * @type {Partial<JsonTableParams>}
  *
@@ -318,7 +321,7 @@ export const mergedParams = ['classes', 'labels', 'dataTypes', 'serverParams'];
  *   totRecField: 'recordsTotal',
  *   filteredRecField: 'recordsFiltered',
  *   serverSide: true,
- *   serverParams: { page: null, start: 'start', perPage: 'length', sort: 'order[0][column]', dir: 'order[0][dir]', search: 'search[value]' }
+ *   serverParams: { page: null, start: 'start', perPage: 'length', sort: 'order[{i}][column]', dir: 'order[{i}][dir]', search: 'search[value]' }
  * }
  */
 export const jqDatatableModeDefaults = {
@@ -330,8 +333,8 @@ export const jqDatatableModeDefaults = {
     page: null,
     start: 'start',
     perPage: 'length',
-    sort: 'order[0][column]',
-    dir: 'order[0][dir]',
+    sort: 'order[{i}][column]',
+    dir: 'order[{i}][dir]',
     search: 'search[value]'
   }
 };
@@ -360,7 +363,7 @@ export const jqDatatableModeDefaults = {
  *   serverSide: false,
  *   serverParams: { page: 'page', start: 'start', perPage: 'perPage', sort: 'sort', dir: 'dir', search: 'search', searchFields: 'searchFields' },
  *   searchFields: null,                // es. ['clienti.nome', 'comuni.nome']
- *   initialSort: null,                 // es. { key: 'name', dir: 'asc' }
+ *   initialSort: null,                 // es. [{ key: 'name', dir: 'asc' }]
  *   tfoot: false,
  *   updateFooterOnPageChange: false,
  *   infoText: null,                    // → labels.info

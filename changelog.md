@@ -34,3 +34,4 @@
 * 1.55 (31 ott 2026) - jsonTable: type `boolTrueOnly`
 * 1.56 (01 nov 2026) - json-table: rowspan
 * 1.57 (02 nov 2026) - json-table: searchFields
+* 1.58 (02 nov 2026) - json-table: initialSort

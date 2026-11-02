@@ -63,27 +63,30 @@ export function compareValues(a, b, locale) {
 
 /**
  * Restituisce una copia ordinata delle righe analizzate, in base al `sortValues[key]` precalcolato di ogni riga.
- * L'ordinamento è stabile, quindi le righe con valori uguali mantengono l'ordine originale.
+ * I criteri vengono applicati in sequenza: il secondo decide solo tra righe uguali per il primo, e così via.
+ * L'ordinamento è stabile, quindi le righe uguali per tutti i criteri mantengono l'ordine originale.
  *
  * @param {ParsedRow[]} rows - Righe analizzate (vedi `parse-rows.js`)
- * @param {string} key - Chiave della colonna
- * @param {SortDir} dir - Direzione
+ * @param {import('./defaults.js').SortDef[]} sort - Criteri di ordinamento, in ordine di priorità
  * @param {string} [locale] - Locale usato per confrontare le stringhe
  * @returns {ParsedRow[]} Un nuovo array
  *
  * @example
- * sortRows(state.rows, 'amount', 'desc', 'it-IT');
+ * sortRows(state.rows, [{ key: 'city', dir: 'asc' }, { key: 'amount', dir: 'desc' }], 'it-IT');
  */
-export function sortRows(rows, key, dir, locale) {
-
-  const sign = dir === 'desc' ? -1 : 1;
+export function sortRows(rows, sort, locale) {
 
   return [...rows].sort((a, b) => {
-    const va = a.sortValues[key];
-    const vb = b.sortValues[key];
-    const cmp = compareValues(va, vb, locale);
-    // i valori vuoti restano per ultimi indipendentemente dalla direzione
-    return (isEmpty(va) || isEmpty(vb)) ? cmp : cmp * sign;
+    for (const { key, dir } of sort) {
+      const va = a.sortValues[key];
+      const vb = b.sortValues[key];
+      const cmp = compareValues(va, vb, locale);
+      if (cmp !== 0) {
+        // i valori vuoti restano per ultimi indipendentemente dalla direzione
+        return (isEmpty(va) || isEmpty(vb) || dir !== 'desc') ? cmp : -cmp;
+      }
+    }
+    return 0;
   });
 }
 

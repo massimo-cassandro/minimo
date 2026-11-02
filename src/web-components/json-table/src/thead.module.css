@@ -7,6 +7,12 @@
   }
 }
 
+/* il pulsante di ordinamento riempie l'intera cella: il padding della cella passa al pulsante.
+   `table th.sortable` (0,1,2) supera `.table th` di minimo (0,1,1) indipendentemente dall'ordine dei CSS */
+table th.sortable {
+  padding: 0;
+}
+
 .sortBtn {
   display: flex;
   gap: var(--jt-sort-icon-gap);

@@ -12,8 +12,8 @@ serverParams: {
   start: 'start',      // indice (da 0) del primo record richiesto = (page - 1) * perPage,
                        // comodo per `LIMIT start, perPage`
   perPage: 'perPage',  // record per pagina
-  sort: 'sort',        // chiave della colonna ordinata, o i suoi `sortKeys` (omesso senza ordinamento)
-  dir: 'dir',          // 'asc' | 'desc' (omesso senza ordinamento)
+  sort: 'sort',        // chiavi delle colonne ordinate, o i loro `sortKeys`, unite da virgola (omesso senza ordinamento)
+  dir: 'dir',          // 'asc' | 'desc', una per ogni chiave di `sort`, unite da virgola (omesso senza ordinamento)
   search: 'search',    // termine di ricerca (omesso se vuoto)
   searchFields: 'searchFields' // campi su cui cercare (omesso senza termine di ricerca)
 }
@@ -25,6 +25,14 @@ Richiesta di esempio, seconda pagina ordinata per nome con ricerca attiva:
 ```
 GET /api/rows.json?page=2&start=25&perPage=25&sort=name&dir=desc&search=mar&searchFields=name,city
 ```
+
+Con più criteri di ordinamento (vedi `initialSort`) `sort` e `dir` contengono liste della stessa lunghezza, da leggere in parallelo:
+
+```
+?sort=city,name&dir=asc,desc
+```
+
+Se il nome di `sort` o `dir` contiene `{i}` (es. `serverParams: { sort: 'order[{i}][key]', dir: 'order[{i}][dir]' }`) viene inviato invece un parametro per ogni criterio, con `{i}` sostituito dall'indice (da 0).
 
 Il JSON di risposta deve contenere le **sole righe della pagina richiesta** in `jsonDataField`,
 il totale dei record in `totRecField` e il numero di record che soddisfano la ricerca in
@@ -53,13 +61,13 @@ Con `jqDatatableMode: true` (o l'attributo `jqdatatablemode="true"`) i default d
 |---|---|
 | `filteredRecField` | `'recordsFiltered'` |
 | `jsonDataField` | `'data'` |
-| `serverParams` | `{ page: null, start: 'start', perPage: 'length', sort: 'order[0][column]', dir: 'order[0][dir]', search: 'search[value]' }` |
+| `serverParams` | `{ page: null, start: 'start', perPage: 'length', sort: 'order[{i}][column]', dir: 'order[{i}][dir]', search: 'search[value]' }` |
 | `serverSide` | `true` |
 | `totRecField` | `'recordsTotal'` |
 
 Precedenza: `init()` > attributo HTML > `JsonTable.setDefaults()` > modalità jQuery DataTables > default predefiniti. Ogni parametro può quindi essere sovrascritto singolarmente, e `serverParams` viene unito chiave per chiave.
 
-Oltre ai `serverParams`, in questa modalità vengono inviati anche `draw=1` e, per ogni colonna visualizzata, `columns[i][name]` (la `key`), `columns[i][searchable]` e `columns[i][orderable]`. `order[0][column]` riceve l'**indice** della colonna ordinata (tra quelle visualizzate), non la chiave. È previsto un solo criterio di ordinamento (`order[0]`).
+Oltre ai `serverParams`, in questa modalità vengono inviati anche `draw=1` e, per ogni colonna visualizzata, `columns[i][name]` (la `key`), `columns[i][searchable]` e `columns[i][orderable]`. `order[i][column]` riceve l'**indice** della colonna ordinata (tra quelle visualizzate), non la chiave, con un `order[i]` per ogni criterio di ordinamento.
 
 Questa modalità è mantenuta solo per compatibilità: `sortKeys`, `searchKeys` e `searchFields` non sono disponibili e vengono ignorati con un avviso in console.
 

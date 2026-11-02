@@ -37,7 +37,7 @@ import { domBuilder } from '../../utilities/dom-builder/dom-builder.js';
  * @property {ParsedRow[]} filtered - Righe dopo ricerca e ordinamento
  * @property {ParsedRow[]} pageRows - Righe della pagina corrente
  * @property {string} searchTerm - Termine di ricerca attivo ('' = nessuno)
- * @property {SortDef|null} sort - Ordinamento attivo (chiave della colonna e direzione), oppure null
+ * @property {SortDef[]} sort - Criteri di ordinamento attivi, in ordine di priorità ([] = nessun ordinamento)
  * @property {number} page - Pagina corrente (da 1)
  * @property {number} totPages - Numero totale di pagine (1 quando la paginazione è disattivata)
  */
@@ -59,7 +59,7 @@ let projectDefaults = {};
  * @returns {JsonTableState}
  */
 const emptyState = () => ({
-  totRec: 0, filteredRec: 0, rows: [], filtered: [], pageRows: [], searchTerm: '', sort: null, page: 1, totPages: 1
+  totRec: 0, filteredRec: 0, rows: [], filtered: [], pageRows: [], searchTerm: '', sort: [], page: 1, totPages: 1
 });
 
 
@@ -111,7 +111,7 @@ const emptyState = () => ({
  *   serverSide: false,                  // default: false
  *   serverParams: { page: 'page', start: 'start', perPage: 'perPage', sort: 'sort', dir: 'dir', search: 'search', searchFields: 'searchFields' }, // default
  *   searchFields: null,                 // default: null (campi di ricerca aggiuntivi in modalità server-side)
- *   initialSort: { key: 'name', dir: 'asc' }, // default: null
+ *   initialSort: [{ key: 'city', dir: 'asc' }, { key: 'name', dir: 'desc' }], // default: null
  *   tfoot: true,                        // default: false (non disponibile in modalità server-side)
  *   updateFooterOnPageChange: false,    // default: false
  *   infoText: null,                     // default: null → labels.info
@@ -334,7 +334,7 @@ export class JsonTable extends HTMLElement {
         return;
       }
     }
-    this.state.sort = dir == null ? null : { key, dir };
+    this.state.sort = dir == null ? [] : [{ key, dir }];
     this.state.page = 1;
     this._update('sort');
   }
@@ -413,14 +413,21 @@ export class JsonTable extends HTMLElement {
 
     // stato iniziale
     this.state = emptyState();
-    if (params.initialSort && typeof params.initialSort === 'object') {
-      const { key, dir } = params.initialSort;
-      const col = this.cols.find(c => c.key === key);
-      if (col && col.sortable && (dir === 'asc' || dir === 'desc')) {
-        this.state.sort = { key, dir };
+    if (params.initialSort != null) {
+      if (Array.isArray(params.initialSort)) {
+        params.initialSort.forEach(item => {
+          const { key, dir } = item ?? {};
+          const col = this.cols.find(c => c.key === key);
+          if (col && col.sortable && (dir === 'asc' || dir === 'desc') && !this.state.sort.some(s => s.key === key)) {
+            this.state.sort.push({ key, dir });
+          } else {
+            // eslint-disable-next-line no-console
+            console.error(`[json-table] initialSort: colonna \`${key}\` inesistente, non ordinabile o ripetuta, oppure direzione non valida (${dir}): criterio ignorato`);
+          }
+        });
       } else {
         // eslint-disable-next-line no-console
-        console.error(`[json-table] initialSort: colonna \`${key}\` inesistente o non ordinabile, oppure direzione non valida (${dir})`);
+        console.error('[json-table] initialSort: deve essere un array di criteri `{ key, dir }`, valore ignorato', params.initialSort);
       }
     }
 
@@ -589,7 +596,7 @@ export class JsonTable extends HTMLElement {
     }
 
     const filtered = filterRows(state.rows, state.searchTerm);
-    state.filtered = state.sort ? sortRows(filtered, state.sort.key, state.sort.dir, params.locale) : filtered;
+    state.filtered = state.sort.length ? sortRows(filtered, state.sort, params.locale) : filtered;
     state.filteredRec = state.filtered.length;
     state.totPages = calcTotPages(state.filteredRec, params.perPage);
     state.page = Math.min(Math.max(1, state.page), state.totPages);

@@ -71,11 +71,6 @@ json-table {
   /* la spaziatura verticale è gestita dal wrapper */
   margin-block: 0;
 
-  /* il pulsante di ordinamento riempie l'intera cella: il padding della cella passa al pulsante */
-  th.sortable {
-    padding: 0;
-  }
-
   /* cella mostrata quando non ci sono righe */
   .empty {
     padding-block: var(--jt-empty-padding-block);
@@ -123,8 +118,5 @@ json-table {
   font-size: var(--jt-caption-font-size);
   color: var(--jt-caption-color);
 }
-
-
-
 
 /* purgecss end ignore */

@@ -56,14 +56,15 @@ export function setSortState(th, state, params) {
 
 
 /**
- * Applica l'ordinamento corrente (`jt.state.sort`) a ogni `<th>` ordinabile del thead: la colonna
- * ordinata riceve `aria-sort` e l'icona corrispondente, le altre vengono riportate a `none`.
+ * Applica l'ordinamento corrente (`jt.state.sort`) a ogni `<th>` ordinabile del thead: la colonna del primo
+ * criterio riceve `aria-sort` e l'icona corrispondente, le altre vengono riportate a `none`. Come indicato dalle
+ * specifiche ARIA, `aria-sort` va su una sola intestazione per volta: i criteri successivi non vengono mostrati.
  *
  * @param {JsonTable} jt - L'istanza del componente
  * @returns {void}
  *
  * @example
- * jt.state.sort = { key: 'name', dir: 'desc' };
+ * jt.state.sort = [{ key: 'name', dir: 'desc' }];
  * applySortState(jt); // th[data-key=name][aria-sort=descending], gli altri th senza aria-sort
  */
 export function applySortState(jt) {
@@ -74,17 +75,20 @@ export function applySortState(jt) {
     return;
   }
 
+  const primary = state.sort[0];
+
   elements.thead.querySelectorAll('th[data-sortable]').forEach(el => {
     const th = /** @type {HTMLTableCellElement} */ (el);
-    const isSorted = state.sort != null && th.dataset.key === state.sort.key;
-    setSortState(th, isSorted ? (state.sort?.dir === 'desc' ? 'descending' : 'ascending') : 'none', params);
+    const isSorted = primary != null && th.dataset.key === primary.key;
+    setSortState(th, isSorted ? (primary.dir === 'desc' ? 'descending' : 'ascending') : 'none', params);
   });
 }
 
 
 /**
  * Collega il listener `click` delegato al thead: un click su un pulsante di ordinamento fa scorrere
- * l'ordinamento della colonna (nessuno → asc → desc → nessuno, vedi `nextSortDir`) tramite `jt.setSort()`.
+ * l'ordinamento della colonna (nessuno → asc → desc → nessuno, vedi `nextSortDir`) tramite `jt.setSort()`, che sostituisce
+ * tutti i criteri attivi (anche quelli di `initialSort`) con la sola colonna cliccata.
  * Il thead non viene ricostruito all'ordinamento, quindi il focus resta sul pulsante cliccato.
  *
  * @param {JsonTable} jt - L'istanza del componente
@@ -109,7 +113,7 @@ export function setSortListener(jt) {
       return;
     }
     const key = btn.dataset.key ?? '';
-    const current = jt.state.sort?.key === key ? jt.state.sort.dir : null;
+    const current = jt.state.sort[0]?.key === key ? jt.state.sort[0].dir : null;
     jt.setSort(key, nextSortDir(current));
   });
 }

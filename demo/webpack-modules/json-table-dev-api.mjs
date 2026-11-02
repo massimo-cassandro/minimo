@@ -63,8 +63,10 @@ export function jsonTableDevApi(req, res, next) {
   const q = url.searchParams;
   const perPage = Math.max(1, Number(q.get('perPage')) || 25);
   const page = Math.max(1, Number(q.get('page')) || Math.floor((Number(q.get('start')) || 0) / perPage) + 1);
-  const sort = q.get('sort');
-  const dir = q.get('dir') === 'desc' ? -1 : 1;
+  // criteri di ordinamento: `sort` e `dir` sono liste separate da virgola, con una direzione per chiave
+  const dirs = (q.get('dir') ?? '').split(',');
+  const sort = (q.get('sort') ?? '').split(',').filter(Boolean)
+    .map((key, idx) => ({ key, sign: dirs[idx] === 'desc' ? -1 : 1 }));
   const search = (q.get('search') ?? '').trim().toLowerCase();
 
   let filtered = rows;
@@ -77,11 +79,16 @@ export function jsonTableDevApi(req, res, next) {
     });
   }
 
-  if (sort) {
+  if (sort.length) {
+    const value = (row, key) => (row[key] && typeof row[key] === 'object' ? row[key].date : row[key]);
     filtered = [...filtered].sort((a, b) => {
-      const va = a[sort] && typeof a[sort] === 'object' ? a[sort].date : a[sort];
-      const vb = b[sort] && typeof b[sort] === 'object' ? b[sort].date : b[sort];
-      return compare(va, vb) * dir;
+      for (const { key, sign } of sort) {
+        const cmp = compare(value(a, key), value(b, key)) * sign;
+        if (cmp !== 0) {
+          return cmp;
+        }
+      }
+      return 0;
     });
   }
 

@@ -125,11 +125,21 @@ GET /api/clienti?…&sort=codice&dir=asc
 
 #### `sortKeys`
 
-Sostituisce la `key` nel parametro `sort`, separando le chiavi con una virgola; `dir` vale per tutte. Serve quando la `key` è diversa dal campo da ordinare, oppure per ordinare su più campi in sequenza:
+Sostituisce la `key` nel parametro `sort`, separando le chiavi con una virgola; in `dir` la direzione della colonna viene ripetuta per ogni chiave. Serve quando la `key` è diversa dal campo da ordinare, oppure per ordinare su più campi in sequenza:
 
 ```javascript
 { key: 'cognome', sortKeys: ['clienti.cognome', 'clienti.nome'] }
-// → sort=clienti.cognome,clienti.nome
+// → sort=clienti.cognome,clienti.nome&dir=asc,asc
+```
+
+#### Più criteri con `initialSort`
+
+Con più criteri in `initialSort` le chiavi vengono inviate in ordine di priorità, con una direzione per chiave:
+
+```javascript
+initialSort: [{ key: 'citta', dir: 'asc' }, { key: 'cognome', dir: 'desc' }]
+// con sortKeys: ['clienti.cognome', 'clienti.nome'] sulla colonna cognome
+// → sort=citta,clienti.cognome,clienti.nome&dir=asc,desc,desc
 ```
 
 #### Valori calcolati o condizionali

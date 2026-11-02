@@ -17,7 +17,7 @@
  * @typedef {Object} ServerRequest
  * @property {number} page - Pagina richiesta (da 1)
  * @property {number} perPage - Righe per pagina
- * @property {SortDef|null} sort - Ordinamento attivo, oppure null
+ * @property {SortDef[]} sort - Criteri di ordinamento attivi, in ordine di priorità ([] = nessuno)
  * @property {string} search - Termine di ricerca ('' = nessuno)
  * @property {Array<{key: string, searchable: boolean, sortable: boolean, sortKeys?: string[]|null, searchKeys?: string[]|null}>} [cols] -
  *   Colonne visualizzate (già analizzate); usate per `sort` e `searchFields` e, con `jqDatatableMode`, per inviare
@@ -67,11 +67,14 @@ function buildSearchFields(cols, searchFields = null) {
  * Costruisce l'URL di una richiesta server-side: `params.jsonUrl` più i parametri della query string
  * indicati in `params.serverParams` (i parametri impostati a `null` vengono omessi; `sort`/`dir` vengono inviati
  * solo quando è attivo un ordinamento, `search` solo quando non è vuoto). I parametri della query string
- * già presenti in `jsonUrl` vengono conservati. Le colonne con `sortKeys` inviano in `sort` queste chiavi unite da virgola
- * al posto di `key`; `searchFields` viene inviato insieme a `search` (vedi `buildSearchFields`).
+ * già presenti in `jsonUrl` vengono conservati. `sort` contiene le chiavi di tutti i criteri unite da virgola e `dir` una
+ * direzione per ogni chiave; le colonne con `sortKeys` inviano queste chiavi al posto di `key`, con la direzione ripetuta
+ * per ognuna. Se il nome di `sort`/`dir` contiene `{i}` viene invece inviato un parametro per criterio, con `{i}` sostituito
+ * dall'indice. `searchFields` viene inviato insieme a `search` (vedi `buildSearchFields`).
  *
  * Con `params.jqDatatableMode` e `request.cols` vengono inviati anche, come fa jQuery DataTables, `draw=1`,
- * `columns[i][name|searchable|orderable]` e, per `sort`, l'indice della colonna al posto della sua chiave.
+ * `columns[i][name|searchable|orderable]` e, per `sort`, l'indice della colonna al posto della sua chiave
+ * (`order[i][column]` e `order[i][dir]` per ogni criterio, con i nomi predefiniti).
  * In questa modalità `sortKeys`, `searchKeys` e `searchFields` non vengono usati.
  *
  * @param {JsonTableParams} params - Parametri risolti
@@ -81,9 +84,9 @@ function buildSearchFields(cols, searchFields = null) {
  * @example
  * buildServerUrl(
  *   { ...params, jsonUrl: '/api/rows.json?year=2025' },
- *   { page: 3, perPage: 25, sort: { key: 'name', dir: 'desc' }, search: 'mar' }
+ *   { page: 3, perPage: 25, sort: [{ key: 'city', dir: 'asc' }, { key: 'name', dir: 'desc' }], search: 'mar' }
  * );
- * // → '/api/rows.json?year=2025&page=3&start=50&perPage=25&sort=name&dir=desc&search=mar'
+ * // → '/api/rows.json?year=2025&page=3&start=50&perPage=25&sort=city,name&dir=asc,desc&search=mar'
  */
 export function buildServerUrl(params, request) {
 
@@ -111,12 +114,21 @@ export function buildServerUrl(params, request) {
   }
 
   const cols = request.cols ?? [];
-  const sortCol = cols.find(col => col.key === request.sort?.key);
+  const sortDefs = request.sort ?? [];
+  // valori inviati per ogni criterio: indice della colonna (jqDatatableMode), oppure `sortKeys` o `key`
+  const sortValues = sortDefs.map(({ key }) => jqCols
+    ? [jqCols.findIndex(col => col.key === key)]
+    : cols.find(col => col.key === key)?.sortKeys ?? [key]);
 
-  set(names.sort, jqCols && request.sort
-    ? jqCols.findIndex(col => col.key === request.sort?.key)
-    : sortCol?.sortKeys?.join(',') ?? request.sort?.key);
-  set(names.dir, request.sort ? request.sort.dir : null);
+  if (names.sort?.includes('{i}')) {
+    sortDefs.forEach(({ dir }, idx) => {
+      set(names.sort?.replace('{i}', String(idx)), sortValues[idx].join(','));
+      set(names.dir?.replace('{i}', String(idx)), dir);
+    });
+  } else {
+    set(names.sort, sortValues.flat().join(','));
+    set(names.dir, sortDefs.flatMap(({ dir }, idx) => sortValues[idx].map(() => dir)).join(','));
+  }
   set(names.search, request.search);
   if (request.search && !params.jqDatatableMode) {
     set(names.searchFields, buildSearchFields(cols, params.searchFields));
@@ -155,7 +167,7 @@ export function buildServerUrl(params, request) {
  *
  * // server-side: GET /api/rows.json?page=2&start=25&perPage=25&search=mar
  * // JSON atteso: { data: [...25 righe], totRec: 1500, filteredRec: 40 }
- * await getData({ ...params, jsonUrl: '/api/rows.json', serverSide: true }, { page: 2, perPage: 25, sort: null, search: 'mar' });
+ * await getData({ ...params, jsonUrl: '/api/rows.json', serverSide: true }, { page: 2, perPage: 25, sort: [], search: 'mar' });
  */
 export async function getData(params, request = null) {
 

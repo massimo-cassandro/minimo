@@ -21,7 +21,7 @@ Dalla root del progetto (o dentro `_reports`, senza `--prefix`):
 
 1. Build di produzione: `npm run --prefix _reports "webpack PROD"`
 2. Avvio del server in prod (porta 8100): `npm run --prefix _reports "server PROD"`
-   (a fine test `Ctrl+C`, o il pulsante cestino di VS Code: il container viene rimosso e la porta liberata)
+   (a fine test `Ctrl+C`, il pulsante cestino di VS Code o `npm run --prefix _reports "stop server PROD"`: il container viene rimosso e la porta liberata)
 3. In un altro terminale:
    - `npm run --prefix _reports "lighthouse mobile"` → `mobile.html`
    - `npm run --prefix _reports "lighthouse desktop"` → `desktop.html`
