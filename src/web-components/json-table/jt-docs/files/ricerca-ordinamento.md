@@ -150,6 +150,17 @@ $sortMap = ['nominativo' => "COALESCE(NULLIF(denominazione_sociale, ''), cognome
 
 Più chiavi in `sortKeys` non equivalgono a un valore condizionale: `ORDER BY denominazione_sociale, cognome` tiene separati i record con e senza denominazione.
 
+Lo stesso vale per [`parse`](parametri-colonne.md#parse): il valore viene calcolato dopo la risposta del server, che ordina in base alla `key` e può ignorarla se non corrisponde a un campo previsto. Il componente non può sapere se il server gestisce la `key`: con `debug` attivo, le colonne ordinabili con `parse` generano quindi un avviso in console, a meno che `sortKeys` non indichi il campo da usare (anche la `key` stessa, se il server la gestisce):
+
+```javascript
+{
+  key: 'dueDate',
+  dataType: 'date',
+  parse: row => calcDueDate(row),
+  sortKeys: ['due_date'] // oppure sortable: false, se il server non può ordinare questo valore
+}
+```
+
 ### Cosa deve fare il server
 
 **Accettare solo campi previsti.** `sort` e `searchFields` arrivano dal client e possono essere modificati da chiunque, quindi il server deve confrontarli con una whitelist. I nomi di campo non si possono passare come parametri di un prepared statement e finirebbero direttamente nell'SQL. Anche controllandone il formato, una richiesta come `search=abc&searchFields=utenti.password` permetterebbe di dedurre il contenuto di un campo riservato dal valore di `filteredRec`.

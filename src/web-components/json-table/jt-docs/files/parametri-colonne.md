@@ -61,7 +61,7 @@ Preelabora il valore della cella, che viene poi formattato dal tipo di dato dell
 - la funzione può essere invocata più volte per la stessa cella e non deve quindi avere effetti collaterali; per decorare la cella va usato [`render`](#render)
 - `row` non viene modificato: un `render` che restituisce un contenuto prevale su `parse` e riceve i dati originali, così come le stringhe mustache-like
 - con [`rowspan`](#rowspan), nelle colonne senza `rowspan` il valore grezzo non viene passato alla funzione: l'elemento corrispondente si ottiene con `subIdx`, ad es. `(row, subIdx) => row.prices[subIdx] * 2`. Ricerca e aggregati invocano la funzione per ogni elemento solo se il campo `key` contiene un array
-- in modalità server-side agisce solo sulla visualizzazione: ordinamento e ricerca restano a carico del server, che non conosce il valore calcolato
+- in modalità server-side agisce solo sulla visualizzazione: ordinamento e ricerca restano a carico del server, che non conosce il valore calcolato. Con `debug` attivo, una colonna ordinabile con `parse` e senza `sortKeys` genera un avviso in console: vedi [Valori calcolati o condizionali](ricerca-ordinamento.md#valori-calcolati-o-condizionali)
 - non è utilizzabile da attributo HTML, che non può contenere funzioni: un valore diverso da una funzione genera un errore
 
 ## `render`
@@ -119,6 +119,8 @@ cols: [
 <tr data-jt-idx="0"><td data-key="key3">riga2</td></tr>
 <tr data-jt-idx="0"><td data-key="key3">riga3</td></tr>
 ```
+
+Per gli accorgimenti su `subIdx`, ordinamento e ricerca, lato client e server, vedi [Tabelle con `rowspan`](rowspan.md).
 
 Regole:
 

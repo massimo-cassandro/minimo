@@ -5,6 +5,7 @@
 * [DataTypes](./files/dataTypes.md)
 * [Server Side](files/server-side.md)
 * [Ricerca e ordinamento](files/ricerca-ordinamento.md)
+* [Tabelle con `rowspan`](files/rowspan.md)
 
 
 ---

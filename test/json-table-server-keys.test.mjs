@@ -148,6 +148,32 @@ test('warnIneffectiveColParams: sortValue/searchValue in server-side', t => {
   assert.match(warn.mock.calls[0].arguments[0], /`both`.*`sortValue`, `searchValue` non hanno effetto.*`searchFields`/);
 });
 
+test('warnIneffectiveColParams: parse su colonna ordinabile in server-side', t => {
+  const warn = t.mock.method(console, 'warn', () => {});
+  const parseCol = row => row.a;
+  const colDefs = [
+    { key: 'calc', parse: parseCol },
+    { key: 'keys', parse: parseCol, sortKeys: ['a'] },
+    { key: 'off', parse: parseCol, sortable: false },
+    { key: 'plain' }
+  ];
+
+  warnIneffectiveColParams(parse(colDefs), { serverSide: true });
+  assert.equal(warn.mock.callCount(), 0);
+
+  warnIneffectiveColParams(parse(colDefs), { serverSide: true, debug: true });
+  assert.equal(warn.mock.callCount(), 1);
+  assert.match(warn.mock.calls[0].arguments[0], /`calc`.*`parse`.*`sortKeys`.*`sortable: false`/);
+
+  warn.mock.resetCalls();
+  warnIneffectiveColParams(parse(colDefs.filter(col => col.key !== 'keys')), { serverSide: false, debug: true });
+  assert.equal(warn.mock.callCount(), 0);
+
+  warnIneffectiveColParams(parse([{ key: 'keys', parse: parseCol, sortKeys: ['a'] }]), { serverSide: true, jqDatatableMode: true, debug: true });
+  assert.equal(warn.mock.callCount(), 2);
+  assert.match(warn.mock.calls[1].arguments[0], /`keys`.*`parse`.*gestire la colonna sul server/);
+});
+
 test('warnIneffectiveColParams: sortKeys/searchKeys in client-side', t => {
   const warn = t.mock.method(console, 'warn', () => {});
   warnIneffectiveColParams(parse([

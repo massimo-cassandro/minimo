@@ -17,6 +17,10 @@
  * }} ParsedCol
  */
 
+/** Messaggio dell'errore per il parametro `cols` mancante o vuoto. */
+export const MISSING_COLS_MESSAGE = '[json-table] parametro `cols` mancante o vuoto: la definizione delle colonne è obbligatoria';
+
+
 /**
  * Default delle colonne.
  * @type {Omit<Required<ColDefinition>, 'type'|'sortValue'|'searchValue'> & { sortValue: *, searchValue: * }}
@@ -71,7 +75,7 @@ export const colDefaults = {
 export function parseCols(cols, dataTypes, params) {
 
   if (!Array.isArray(cols) || !cols.length) {
-    throw new Error('[json-table] parametro `cols` mancante o vuoto: la definizione delle colonne è obbligatoria');
+    throw new Error(MISSING_COLS_MESSAGE);
   }
 
   const parsedCols = cols
@@ -152,6 +156,9 @@ export function parseCols(cols, dataTypes, params) {
  * Segnala in console i parametri di colonna che non hanno effetto nella modalità corrente: `sortValue`/`searchValue`
  * con `serverSide` attivo (il server riceve solo le chiavi), `sortKeys`/`searchKeys` in modalità client-side e con
  * `jqDatatableMode`. Le funzioni dei data type non vengono considerate.
+ * Solo con `debug` attivo segnala anche le colonne ordinabili con `parse` in modalità server-side: il server riceve la
+ * `key`, non il valore calcolato, ma il componente non può sapere se la gestisce comunque (avviso assente con `sortKeys`,
+ * che indica il campo da usare; con `jqDatatableMode` non è disponibile).
  *
  * @param {ParsedCol[]} cols - Colonne analizzate
  * @param {JsonTableParams} params - Parametri risolti, dopo la validazione (`serverSide` è la modalità effettiva)
@@ -174,6 +181,12 @@ export function warnIneffectiveColParams(cols, params) {
       const hint = keysAvailable ? ': usare `sortKeys` / `searchFields`' : '';
       // eslint-disable-next-line no-console
       console.warn(`[json-table] colonna \`${col.key}\`: ${names.join(', ')} ${names.length > 1 ? 'non hanno' : 'non ha'} effetto con ${mode}${hint}`);
+    }
+
+    if (params.debug && serverSide && col.sortable && col.parse && (jqDatatableMode || col.sortKeys == null)) {
+      const fix = jqDatatableMode ? 'gestire la colonna sul server' : 'indicare il campo con `sortKeys`';
+      // eslint-disable-next-line no-console
+      console.warn(`[json-table] colonna \`${col.key}\`: il server ordina in base alla \`key\`, non al valore calcolato da \`parse\`: se non la gestisce, ${fix} oppure impostare \`sortable: false\``);
     }
   });
 }

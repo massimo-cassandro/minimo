@@ -4,7 +4,7 @@ import { defaults } from './src/defaults.js';
 import { resolveParams } from './src/resolve-params.js';
 import { getData } from './src/get-data.js';
 import { buildDataTypes } from './src/data-types.js';
-import { parseCols, warnIneffectiveColParams } from './src/parse-cols.js';
+import { MISSING_COLS_MESSAGE, parseCols, warnIneffectiveColParams } from './src/parse-cols.js';
 import { parseRows } from './src/parse-rows.js';
 import { mainBuilder } from './src/main-builder.js';
 import { renderTbody } from './src/table-body.js';
@@ -209,9 +209,13 @@ export class JsonTable extends HTMLElement {
 
   connectedCallback() {
     this._isConnected = true;
-    if (!this._loadStarted) {
-      this._load();
-    }
+
+    // rimandato al microtask successivo: un init() sincrono arriva prima del caricamento automatico e lo sostituisce
+    queueMicrotask(() => {
+      if (this._isConnected && !this._loadStarted) {
+        this._load();
+      }
+    });
   }
 
   disconnectedCallback() {
@@ -242,7 +246,7 @@ export class JsonTable extends HTMLElement {
     this._initCalledProgrammatically = true;
 
     // un init() esplicito deve sempre riavviare, anche se connectedCallback ha già
-    // eseguito un _load() prematuro (ad es. quando domBuilder aggiunge l'elemento prima di init())
+    // eseguito un _load() prematuro (ad es. quando init() viene chiamato da un altro script o dopo un await)
     this._loadStarted = false;
     this._loadGeneration++;
 
@@ -378,6 +382,13 @@ export class JsonTable extends HTMLElement {
 
     const params = resolveParams(this, this._config, projectDefaults);
     this.params = params;
+
+    // caricamento automatico senza colonne: possono ancora arrivare con init(), anche da un altro script
+    if (this._config === null && !params.cols?.length) {
+      this._reportMissingColsAfterPageLoad();
+      return;
+    }
+
     this._validateParams(params);
 
     // placeholder di caricamento (spinner di minimo)
@@ -470,6 +481,26 @@ export class JsonTable extends HTMLElement {
     // emesso nel microtask successivo così che i listener registrati subito dopo init() lo ricevano comunque
     const event = new CustomEvent('jt:ready', { detail: { jsonTable: this }, bubbles: true });
     Promise.resolve().then(() => this.dispatchEvent(event));
+  }
+
+  /**
+   * Segnala la mancanza di `cols` al termine del caricamento della pagina, quando tutti gli script sono stati eseguiti,
+   * se nel frattempo `init()` e `reload()` non sono stati chiamati.
+   * @returns {void}
+   */
+  _reportMissingColsAfterPageLoad() {
+    const report = () => {
+      if (this._config === null && this._isConnected) {
+        // eslint-disable-next-line no-console
+        console.error(MISSING_COLS_MESSAGE);
+      }
+    };
+
+    if (document.readyState === 'complete') {
+      setTimeout(report);
+    } else {
+      window.addEventListener('load', report, { once: true });
+    }
   }
 
   /**
