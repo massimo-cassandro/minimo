@@ -74,10 +74,11 @@ import {
  * @property {*|((row: Object) => *)} [sortValue] - Valore usato per l'ordinamento, oppure funzione `row => value`.
  *   Sovrascrive il `sortValue` del data type (default: undefined = data type / valore grezzo)
  * @property {*|((row: Object) => *)} [searchValue] - Come `sortValue`, per la ricerca (default: undefined)
- * @property {string[]|null} [sortKeys] - Solo modalità server-side: chiavi inviate nel parametro `sort` quando la colonna è
- *   ordinata, al posto di `key`; il server deve accettare solo valori previsti (default: null)
- * @property {string[]|null} [searchKeys] - Solo modalità server-side: campi su cui cercare per questa colonna, inviati nel
- *   parametro `searchFields`; il server deve accettare solo valori previsti (default: null)
+ * @property {string[]|null} [sortKeys] - Solo modalità server-side, escluso `jqDatatableMode`: chiavi inviate nel parametro `sort`
+ *   quando la colonna è ordinata, al posto di `key`; il server deve accettare solo valori previsti (default: null)
+ * @property {string[]|null} [searchKeys] - Solo modalità server-side, escluso `jqDatatableMode`: campi su cui cercare per questa
+ *   colonna, inviati al posto di `key`. In genere è preferibile il parametro `searchFields` della tabella; il server deve
+ *   accettare solo valori previsti (default: null)
  * @property {boolean|((params: JsonTableParams) => boolean)} [condition] - Se false (o una funzione che restituisce
  *   false) la colonna non viene renderizzata affatto (default: true)
  * @property {string|null} [headerClass] - Classe/i del `<th>`, che sostituiscono quelle del data type. Quando è impostato solo uno tra
@@ -204,8 +205,8 @@ import {
  *   un ordinamento attivo (default: 'sort')
  * @property {string|null} [dir] - Direzione di ordinamento, `asc`/`desc`; omesso quando non c'è un ordinamento attivo (default: 'dir')
  * @property {string|null} [search] - Termine di ricerca; omesso quando vuoto (default: 'search')
- * @property {string|null} [searchFields] - Campi di ricerca uniti da virgola; inviato solo con un termine di ricerca e se almeno
- *   una colonna ricercabile definisce `searchKeys` (default: 'searchFields')
+ * @property {string|null} [searchFields] - Campi di ricerca uniti da virgola; inviato solo con un termine di ricerca e mai con
+ *   `jqDatatableMode` (default: 'searchFields')
  */
 
 /**
@@ -252,6 +253,8 @@ import {
  *   righe della pagina richiesta, più `totRecField` e `filteredRecField`. Richiede `jsonUrl`; `tfoot` non è
  *   disponibile in questa modalità (default: false)
  * @property {ServerParams} serverParams - Solo modalità server-side: nomi dei parametri della query string (vedi `ServerParams`)
+ * @property {string[]|null} searchFields - Solo modalità server-side, escluso `jqDatatableMode`: campi su cui cercare, oltre a
+ *   quelli delle colonne ricercabili, anche nella forma `tabella.campo`. Il server deve accettare solo valori previsti (default: null)
  * @property {SortDef|null} initialSort - Ordinamento applicato al caricamento, es. `{ key: 'name', dir: 'asc' }` (default: null)
  * @property {boolean} tfoot - Se renderizzare il `<tfoot>` (vedi `ColDefinition.tfootRender`); ignorato in
  *   modalità server-side (default: false)
@@ -315,7 +318,7 @@ export const mergedParams = ['classes', 'labels', 'dataTypes', 'serverParams'];
  *   totRecField: 'recordsTotal',
  *   filteredRecField: 'recordsFiltered',
  *   serverSide: true,
- *   serverParams: { page: null, start: 'start', perPage: 'length', sort: 'order[0][column]', dir: 'order[0][dir]', search: 'search[value]', searchFields: 'searchFields' }
+ *   serverParams: { page: null, start: 'start', perPage: 'length', sort: 'order[0][column]', dir: 'order[0][dir]', search: 'search[value]' }
  * }
  */
 export const jqDatatableModeDefaults = {
@@ -329,8 +332,7 @@ export const jqDatatableModeDefaults = {
     perPage: 'length',
     sort: 'order[0][column]',
     dir: 'order[0][dir]',
-    search: 'search[value]',
-    searchFields: 'searchFields'
+    search: 'search[value]'
   }
 };
 
@@ -357,6 +359,7 @@ export const jqDatatableModeDefaults = {
  *   paginationDelta: 2,
  *   serverSide: false,
  *   serverParams: { page: 'page', start: 'start', perPage: 'perPage', sort: 'sort', dir: 'dir', search: 'search', searchFields: 'searchFields' },
+ *   searchFields: null,                // es. ['clienti.nome', 'comuni.nome']
  *   initialSort: null,                 // es. { key: 'name', dir: 'asc' }
  *   tfoot: false,
  *   updateFooterOnPageChange: false,
@@ -413,6 +416,7 @@ export const defaults = {
     search: 'search',
     searchFields: 'searchFields'
   },
+  searchFields: null,
   initialSort: null,
 
   tfoot: false,

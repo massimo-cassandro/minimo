@@ -20,7 +20,7 @@
  * @property {SortDef|null} sort - Ordinamento attivo, oppure null
  * @property {string} search - Termine di ricerca ('' = nessuno)
  * @property {Array<{key: string, searchable: boolean, sortable: boolean, sortKeys?: string[]|null, searchKeys?: string[]|null}>} [cols] -
- *   Colonne visualizzate (già analizzate); usate per `sortKeys`/`searchKeys` e, con `jqDatatableMode`, per inviare
+ *   Colonne visualizzate (già analizzate); usate per `sort` e `searchFields` e, con `jqDatatableMode`, per inviare
  *   `columns[i][...]` e l'indice della colonna ordinata
  */
 
@@ -40,16 +40,26 @@ function numericField(json, field) {
 }
 
 /**
- * Valore del parametro `searchFields`: unione senza duplicati di `searchKeys` (o, in sua assenza, della `key`)
- * delle colonne ricercabili; `null` se nessuna colonna ricercabile definisce `searchKeys`.
+ * Valore del parametro di query `searchFields`: `searchKeys` (o, in sua assenza, `key`) delle colonne ricercabili più
+ * il parametro `searchFields`, senza duplicati. Un nome semplice viene scartato se è presente anche nella forma
+ * `tabella.nome`, che lo rende univoco nelle query con join (es. `cognome` e `clienti.cognome` → `clienti.cognome`).
  * @param {NonNullable<ServerRequest['cols']>} cols - Colonne visualizzate
- * @returns {string|null}
+ * @param {string[]|null} [searchFields=null] - Campi aggiuntivi (default: null)
+ * @returns {string}
+ *
+ * @example
+ * buildSearchFields([{ key: 'codice', searchable: true }, { key: 'cognome', searchable: true }], ['clienti.cognome', 'comuni.nome']);
+ * // → 'codice,clienti.cognome,comuni.nome'
  */
-function buildSearchFields(cols) {
-  const searchable = cols.filter(col => col.searchable);
-  return searchable.some(col => col.searchKeys)
-    ? [...new Set(searchable.flatMap(col => col.searchKeys ?? [col.key]))].join(',')
-    : null;
+function buildSearchFields(cols, searchFields = null) {
+  const fields = [...new Set([
+    ...cols.filter(col => col.searchable).flatMap(col => col.searchKeys ?? [col.key]),
+    ...(searchFields ?? [])
+  ])];
+
+  return fields
+    .filter(field => field.includes('.') || !fields.some(other => other.endsWith(`.${field}`)))
+    .join(',');
 }
 
 
@@ -58,11 +68,11 @@ function buildSearchFields(cols) {
  * indicati in `params.serverParams` (i parametri impostati a `null` vengono omessi; `sort`/`dir` vengono inviati
  * solo quando è attivo un ordinamento, `search` solo quando non è vuoto). I parametri della query string
  * già presenti in `jsonUrl` vengono conservati. Le colonne con `sortKeys` inviano in `sort` queste chiavi unite da virgola
- * al posto di `key`; `searchFields` viene inviato solo insieme a `search` (vedi `buildSearchFields`).
+ * al posto di `key`; `searchFields` viene inviato insieme a `search` (vedi `buildSearchFields`).
  *
  * Con `params.jqDatatableMode` e `request.cols` vengono inviati anche, come fa jQuery DataTables, `draw=1`,
- * `columns[i][name|searchable|orderable]` (`name` è `sortKeys` unito da virgola oppure `key`) e, per `sort`,
- * l'indice della colonna al posto della sua chiave.
+ * `columns[i][name|searchable|orderable]` e, per `sort`, l'indice della colonna al posto della sua chiave.
+ * In questa modalità `sortKeys`, `searchKeys` e `searchFields` non vengono usati.
  *
  * @param {JsonTableParams} params - Parametri risolti
  * @param {ServerRequest} request - Stato della richiesta
@@ -94,7 +104,7 @@ export function buildServerUrl(params, request) {
   if (jqCols) {
     set('draw', 1);
     jqCols.forEach((col, idx) => {
-      set(`columns[${idx}][name]`, col.sortKeys?.join(',') ?? col.key);
+      set(`columns[${idx}][name]`, col.key);
       set(`columns[${idx}][searchable]`, col.searchable);
       set(`columns[${idx}][orderable]`, col.sortable);
     });
@@ -108,7 +118,9 @@ export function buildServerUrl(params, request) {
     : sortCol?.sortKeys?.join(',') ?? request.sort?.key);
   set(names.dir, request.sort ? request.sort.dir : null);
   set(names.search, request.search);
-  set(names.searchFields, request.search ? buildSearchFields(cols) : null);
+  if (request.search && !params.jqDatatableMode) {
+    set(names.searchFields, buildSearchFields(cols, params.searchFields));
+  }
 
   return url.toString();
 }

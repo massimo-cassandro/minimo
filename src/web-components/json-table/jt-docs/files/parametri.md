@@ -35,6 +35,7 @@ Tutti i parametri sono impostabili sia da attributo HTML che come oggetto in `in
 | `renderZeroAs` | string o null (`null`) | Se non null, contenuto per i valori numerici pari a zero |
 | `search` | boolean (`true`) | Genera l'input di ricerca |
 | `searchDebounce` | number (`300`) | Millisecondi di attesa dopo l'ultimo tasto prima di eseguire la ricerca |
+| `searchFields` | string[] o null (`null`) | Solo server-side: campi su cui cercare oltre a quelli delle colonne ricercabili, anche nella forma `tabella.campo`. Vedi [Ricerca e ordinamento](ricerca-ordinamento.md#searchfields) |
 | `serverParams` | Object | Nomi dei parametri di query string in modalità server-side, uniti ai default (vedi sotto) |
 | `serverSide` | boolean (`false`) | Paginazione, ordinamento e ricerca delegati al server (vedi "Modalità server-side"). Richiede `jsonUrl` |
 | `sortAscArrowIcon` | icona, vedi nota (icona `arrow-up`) | Icona del pulsante di ordinamento, ordinamento asc attivo |

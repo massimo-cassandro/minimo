@@ -4,6 +4,7 @@
 * [Parametri colonne](./files/parametri-colonne.md)
 * [DataTypes](./files/dataTypes.md)
 * [Server Side](files/server-side.md)
+* [Ricerca e ordinamento](files/ricerca-ordinamento.md)
 
 
 ---

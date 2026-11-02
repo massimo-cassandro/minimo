@@ -110,6 +110,7 @@ const emptyState = () => ({
  *   paginationDelta: 2,                 // default: 2
  *   serverSide: false,                  // default: false
  *   serverParams: { page: 'page', start: 'start', perPage: 'perPage', sort: 'sort', dir: 'dir', search: 'search', searchFields: 'searchFields' }, // default
+ *   searchFields: null,                 // default: null (campi di ricerca aggiuntivi in modalità server-side)
  *   initialSort: { key: 'name', dir: 'asc' }, // default: null
  *   tfoot: true,                        // default: false (non disponibile in modalità server-side)
  *   updateFooterOnPageChange: false,    // default: false
@@ -391,7 +392,7 @@ export class JsonTable extends HTMLElement {
     try {
       this.dataTypes = buildDataTypes(params);
       this.cols = parseCols(params.cols, this.dataTypes, params);
-      warnIneffectiveColParams(this.cols, params.serverSide);
+      warnIneffectiveColParams(this.cols, params);
     } catch (err) {
       // eslint-disable-next-line no-console
       console.error(err);
@@ -495,6 +496,17 @@ export class JsonTable extends HTMLElement {
     if (params.serverSide && params.tfoot) {
       console.warn('[json-table] `tfoot` non è disponibile in modalità server-side (i dati sono paginati dal server): tfoot ignorato');
       params.tfoot = false;
+    }
+
+    if (params.searchFields != null) {
+      if (!Array.isArray(params.searchFields) || !params.searchFields.every(field => field && typeof field === 'string')) {
+        console.warn('[json-table] `searchFields` deve essere un array di stringhe non vuote: parametro ignorato');
+        params.searchFields = null;
+
+      } else if (!params.serverSide || params.jqDatatableMode) {
+        console.warn(`[json-table] \`searchFields\` non ha effetto con ${params.serverSide ? '`jqDatatableMode`' : 'modalità client-side'}: parametro ignorato`);
+        params.searchFields = null;
+      }
     }
     /* eslint-enable no-console */
   }

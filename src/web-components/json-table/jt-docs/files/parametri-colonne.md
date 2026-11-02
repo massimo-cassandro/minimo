@@ -25,24 +25,18 @@ cols: [
 | `rowHeading` | boolean | `false` | Se `true` la cella è un'intestazione di riga (`th[scope=row]`) |
 | `rowspan` | number o `row => number` | `null` | Numero di `<tr>` occupati dal record, vedi sotto |
 | `searchable` | boolean | `true` | Abilita la ricerca sulla colonna |
-| `searchKeys` | array di stringhe | `null` | Solo server-side: campi di ricerca della colonna, inviati in `searchFields`, vedi [Modalità server-side](server-side.md#ordinamento-e-ricerca-su-campi-diversi-dalla-key) |
+| `searchKeys` | array di stringhe | `null` | Solo server-side: campi di ricerca della colonna, al posto di `key`. In genere è preferibile il parametro [`searchFields`](ricerca-ordinamento.md#searchfields) della tabella |
 | `searchValue` | valore o `row => valore` | non impostato (tipo di dato / valore grezzo) | Valore usato per la ricerca; prevale su quello del tipo di dato |
 | `sortable` | boolean | `true` | Abilita l'ordinamento sulla colonna |
-| `sortKeys` | array di stringhe | `null` | Solo server-side: chiavi inviate in `sort` al posto di `key`, vedi [Modalità server-side](server-side.md#ordinamento-e-ricerca-su-campi-diversi-dalla-key) |
+| `sortKeys` | array di stringhe | `null` | Solo server-side: chiavi inviate in `sort` al posto di `key`, vedi [Ricerca e ordinamento](ricerca-ordinamento.md#sortkeys) |
 | `sortValue` | valore o `row => valore` | non impostato (tipo di dato / valore grezzo) | Valore usato per l'ordinamento; prevale su quello del tipo di dato |
 | `tfootRender` | `(rows, td) => contenuto`, aggregato `'@…'` o stringa statica | `null` | Contenuto della cella del tfoot (solo se `tfoot` è `true`). `null` = cella vuota |
 | `title` | testo, HTML, Node, array domBuilder o funzione | la chiave | Contenuto del `<th>`. Nelle colonne ordinabili è il testo del pulsante |
 
 
-## `sortValue` e `searchValue`
+## Ricerca e ordinamento
 
-Agiscono solo in modalità client-side. Con `serverSide: true` il server riceve solo le chiavi, non i valori calcolati: i due parametri vengono ignorati con un avviso in console (vedi [Modalità server-side](server-side.md#ordinamento-e-ricerca-su-campi-diversi-dalla-key)). Allo stesso modo, `sortKeys` e `searchKeys` vengono ignorati con un avviso in modalità client-side.
-
-In modalità client-side, per rendere ricercabile un campo non visibile basta includerlo nel `searchValue` di una colonna visibile. Una colonna con `condition: false`, invece, viene eliminata e non partecipa alla ricerca.
-
-```javascript
-{ key: 'nome', searchValue: row => `${row.nome} ${row.codiceInterno}` }
-```
+`sortValue` e `searchValue` agiscono solo in modalità client-side, `sortKeys` e `searchKeys` solo in modalità server-side: nella modalità sbagliata vengono ignorati con un avviso in console. Vedi [Ricerca e ordinamento](ricerca-ordinamento.md).
 
 ## `parse`
 

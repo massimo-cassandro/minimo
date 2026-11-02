@@ -150,30 +150,30 @@ export function parseCols(cols, dataTypes, params) {
 
 /**
  * Segnala in console i parametri di colonna che non hanno effetto nella modalità corrente: `sortValue`/`searchValue`
- * con `serverSide` attivo (il server riceve solo le chiavi) e `sortKeys`/`searchKeys` in modalità client-side.
- * Le funzioni dei data type non vengono considerate.
+ * con `serverSide` attivo (il server riceve solo le chiavi), `sortKeys`/`searchKeys` in modalità client-side e con
+ * `jqDatatableMode`. Le funzioni dei data type non vengono considerate.
  *
  * @param {ParsedCol[]} cols - Colonne analizzate
- * @param {boolean} serverSide - Modalità server-side effettiva (dopo la validazione dei parametri)
+ * @param {JsonTableParams} params - Parametri risolti, dopo la validazione (`serverSide` è la modalità effettiva)
  * @returns {void}
  */
-export function warnIneffectiveColParams(cols, serverSide) {
+export function warnIneffectiveColParams(cols, params) {
+  const { serverSide, jqDatatableMode } = params;
+  const keysAvailable = serverSide && !jqDatatableMode;
+  const mode = jqDatatableMode && serverSide ? '`jqDatatableMode`' : `modalità ${serverSide ? 'server-side' : 'client-side'}`;
+
   cols.forEach(col => {
-    const ineffective = serverSide
-      ? [
-        col.sortable && col.sortValue !== undefined && 'sortValue',
-        col.searchable && col.searchValue !== undefined && 'searchValue'
-      ]
-      : [
-        col.sortKeys != null && 'sortKeys',
-        col.searchKeys != null && 'searchKeys'
-      ];
-    const names = ineffective.filter(Boolean).map(name => `\`${name}\``);
+    const names = [
+      serverSide && col.sortable && col.sortValue !== undefined && 'sortValue',
+      serverSide && col.searchable && col.searchValue !== undefined && 'searchValue',
+      !keysAvailable && col.sortKeys != null && 'sortKeys',
+      !keysAvailable && col.searchKeys != null && 'searchKeys'
+    ].filter(Boolean).map(name => `\`${name}\``);
 
     if (names.length) {
-      const hint = serverSide ? ': usare `sortKeys` / `searchKeys`' : '';
+      const hint = keysAvailable ? ': usare `sortKeys` / `searchFields`' : '';
       // eslint-disable-next-line no-console
-      console.warn(`[json-table] colonna \`${col.key}\`: ${names.join(' e ')} non ${names.length > 1 ? 'hanno' : 'ha'} effetto in modalità ${serverSide ? 'server-side' : 'client-side'}${hint}`);
+      console.warn(`[json-table] colonna \`${col.key}\`: ${names.join(', ')} ${names.length > 1 ? 'non hanno' : 'non ha'} effetto con ${mode}${hint}`);
     }
   });
 }
