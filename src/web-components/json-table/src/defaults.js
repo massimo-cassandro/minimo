@@ -186,7 +186,7 @@ import {
  */
 
 /**
- * Criterio di ordinamento (stato di ordinamento e `initialSort` sono array di criteri, in ordine di priorità).
+ * Criterio di ordinamento (lo stato di ordinamento è un array di criteri, in ordine di priorità).
  * @typedef {Object} SortDef
  * @property {string} key - Chiave della colonna
  * @property {'asc'|'desc'} dir - Direzione
@@ -257,8 +257,9 @@ import {
  * @property {ServerParams} serverParams - Solo modalità server-side: nomi dei parametri della query string (vedi `ServerParams`)
  * @property {string[]|null} searchFields - Solo modalità server-side, escluso `jqDatatableMode`: campi su cui cercare, oltre a
  *   quelli delle colonne ricercabili, anche nella forma `tabella.campo`. Il server deve accettare solo valori previsti (default: null)
- * @property {SortDef[]|null} initialSort - Ordinamento applicato al caricamento: array di criteri in ordine di priorità, es.
- *   `[{ key: 'city', dir: 'asc' }, { key: 'name', dir: 'desc' }]` (default: null)
+ * @property {Object<string, 'asc'|'desc'>|null} initialSort - Ordinamento applicato al caricamento: oggetto
+ *   `chiave colonna → direzione`, in ordine di priorità, es. `{ city: 'asc', name: 'desc' }`. Le chiavi di tipo
+ *   intero (es. `'2024'`) vengono sempre enumerate per prime in ordine numerico (default: null)
  * @property {boolean} tfoot - Se renderizzare il `<tfoot>` (vedi `ColDefinition.tfootRender`); ignorato in
  *   modalità server-side (default: false)
  * @property {boolean} updateFooterOnPageChange - Se true, `tfootRender` riceve solo le righe della pagina corrente
@@ -363,7 +364,7 @@ export const jqDatatableModeDefaults = {
  *   serverSide: false,
  *   serverParams: { page: 'page', start: 'start', perPage: 'perPage', sort: 'sort', dir: 'dir', search: 'search', searchFields: 'searchFields' },
  *   searchFields: null,                // es. ['clienti.nome', 'comuni.nome']
- *   initialSort: null,                 // es. [{ key: 'name', dir: 'asc' }]
+ *   initialSort: null,                 // es. { name: 'asc' }
  *   tfoot: false,
  *   updateFooterOnPageChange: false,
  *   infoText: null,                    // → labels.info

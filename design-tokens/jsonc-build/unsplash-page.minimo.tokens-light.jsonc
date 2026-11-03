@@ -5,7 +5,7 @@
 // Per rigenerarlo: node build-tokens.mjs --config <path/to/config>
 // -----------------------------------------------------------------------
 {
-  "uspg": {
+  "up": {
     "bg": {
       "color": {
         "$type": "color",
@@ -43,7 +43,7 @@
     "h1": {
       "color": {
         "$type": "color",
-        "$value": "{uspg.text.color}"
+        "$value": "{up.text.color}"
       },
       "font": {
         "size": {
@@ -82,7 +82,7 @@
       "hover": {
         "color": {
           "$type": "color",
-          "$value": "{uspg.link.color}"
+          "$value": "{up.link.color}"
         },
         "background": {
           "color": {
@@ -113,7 +113,7 @@
           },
           "color": {
             "$type": "color",
-            "$value": "{uspg.link.color}"
+            "$value": "{up.link.color}"
           },
           "offset": {
             "$type": "dimension",
@@ -142,7 +142,7 @@
       "box": {
         "bg": {
           "$type": "color",
-          "$value": "{uspg.link.color}"
+          "$value": "{up.link.color}"
         }
       },
       "fill": {

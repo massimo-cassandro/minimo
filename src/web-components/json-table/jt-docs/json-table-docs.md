@@ -4,6 +4,7 @@
 * [Parametri colonne](./files/parametri-colonne.md)
 * [DataTypes](./files/dataTypes.md)
 * [Server Side](files/server-side.md)
+* [Backend Symfony per la modalità server-side](files/serverside-api.md)
 * [Ricerca e ordinamento](files/ricerca-ordinamento.md)
 * [Tabelle con `rowspan`](files/rowspan.md)
 
@@ -48,7 +49,7 @@ const other = document.createElement('json-table');
 <json-table
   jsonurl="/api/rows.json"
   caption="Utenti"
-  initialSort='[{ "key": "name", "dir": "asc" }]'
+  initialSort='{ "name": "asc" }'
   cols='[
     { "key": "id", "dataType": "id" },
     { "key": "name", "title": "Nome", "render": "<a href=\"/users/[[id]]\">[[name]]</a>" },
@@ -96,7 +97,7 @@ jtable.init({
   perPage: 50,
   serverSide: true, // se necessaria la paginazione 
   caption: 'Utenti',
-  initialSort: [{ key: 'name', dir: 'asc' }], // default: null
+  initialSort: { name: 'asc' }, // default: null
   cols: [
     { key: 'id', dataType: 'id' },
     { key: 'name', title: 'Nome', render: row => `<a href="${linkScheda}/${row.id}">${row.name}</a>` },
@@ -243,15 +244,17 @@ numerica, insensibile a maiuscole e accenti). L'ordinamento è stabile.
 solo tra le righe uguali per il primo, e così via.
 
 ```javascript
-initialSort: [{ key: 'city', dir: 'asc' }, { key: 'name', dir: 'desc' }]
+initialSort: { city: 'asc', name: 'desc' }
 ```
 
 ```html
-<json-table initialSort='[{ "key": "city", "dir": "asc" }, { "key": "name", "dir": "desc" }]' …></json-table>
+<json-table initialSort='{ "city": "asc", "name": "desc" }' …></json-table>
 ```
 
-Ogni colonna deve esistere, essere ordinabile e comparire una sola volta: i criteri non validi
-vengono ignorati con un errore in console. `aria-sort` e l'icona compaiono solo sulla colonna del
+Ogni colonna deve esistere ed essere ordinabile: i criteri non validi vengono ignorati con un
+errore in console. La priorità segue l'ordine delle chiavi nell'oggetto, con un'eccezione propria di
+JavaScript: le chiavi di tipo intero (es. `'2024'`) vengono sempre enumerate per prime, in ordine
+numerico. `aria-sort` e l'icona compaiono solo sulla colonna del
 primo criterio. `setSort(key, dir)` imposta via script l'ordinamento per una sola colonna.
 
 ## Ricerca

@@ -29,4 +29,5 @@ _reports/**/*.html
 public/_dev
 unresolved-unused-props.md
 orphan-classes.md
+**/TODO*.md
 .symfony.*.y*ml

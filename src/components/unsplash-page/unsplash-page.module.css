@@ -3,29 +3,29 @@
 
 custom properties:
 
---uspg-bg-color: hsl(0deg 0% 0% / .7);
---uspg-credits-font-size: var(--font-size-xs);
---uspg-credits-font-weight: var(--font-weight-regular);
---uspg-credits-line-height: var(--line-height-xs);
---uspg-font-family: var(--font-family);
---uspg-font-size: var(--font-size-base);
---uspg-font-variation-settings: unset;
---uspg-font-weight: var(--font-weight-regular);
---uspg-h1-color: var(--uspg-text-color);
---uspg-h1-font-size: var(--font-size-xl);
---uspg-h1-font-variation-settings: unset;
---uspg-h1-font-weight: var(--font-weight-bold);
---uspg-h1-line-height: var(--line-height-xs);
---uspg-icon-box-bg: var(--uspg-link-color);
---uspg-icon-fill-color: #333;
---uspg-icon-hover-box-bg: #fff;
---uspg-line-height: var(--line-height-sm);
---uspg-link-color: #fc0;
---uspg-link-decoration: none;
---uspg-link-hover-color: #fc0;
---uspg-link-hover-decoration: underline;
---uspg-loader-color: hsl(0deg 0% 100% / .6);
---uspg-text-color: #fff;
+--up-bg-color: hsl(0deg 0% 0% / .7);
+--up-credits-font-size: var(--font-size-xs);
+--up-credits-font-weight: var(--font-weight-regular);
+--up-credits-line-height: var(--line-height-xs);
+--up-font-family: var(--font-family);
+--up-font-size: var(--font-size-base);
+--up-font-variation-settings: unset;
+--up-font-weight: var(--font-weight-regular);
+--up-h1-color: var(--up-text-color);
+--up-h1-font-size: var(--font-size-xl);
+--up-h1-font-variation-settings: unset;
+--up-h1-font-weight: var(--font-weight-bold);
+--up-h1-line-height: var(--line-height-xs);
+--up-icon-box-bg: var(--up-link-color);
+--up-icon-fill-color: #333;
+--up-icon-hover-box-bg: #fff;
+--up-line-height: var(--line-height-sm);
+--up-link-color: #fc0;
+--up-link-decoration: none;
+--up-link-hover-color: #fc0;
+--up-link-hover-decoration: underline;
+--up-loader-color: hsl(0deg 0% 100% / .6);
+--up-text-color: #fff;
 
 */
 
@@ -61,40 +61,40 @@ html.uspg {
   height: 100dvh;
 
 
-  font-family: var(--uspg-font-family, sans-serif);
-  font-size: var(--uspg-font-size, 1rem);
-  font-variation-settings: var(--uspg-font-variation-settings, unset);
-  font-weight: var(--uspg-font-weight, 400);
-  line-height: var(--uspg-line-height, 1.4);
+  font-family: var(--up-font-family, sans-serif);
+  font-size: var(--up-font-size, 1rem);
+  font-variation-settings: var(--up-font-variation-settings, unset);
+  font-weight: var(--up-font-weight, 400);
+  line-height: var(--up-line-height, 1.4);
 
   background-color: #333;
 
   a {
     &:is(:link, :visited) {
-      text-decoration: var(--uspg-link-decoration);
+      text-decoration: var(--up-link-decoration);
     }
     &:link {
-      color: var(--uspg-link-color);
+      color: var(--up-link-color);
     }
     &:visited {
-      color: var(--uspg-link-visited-color);
+      color: var(--up-link-visited-color);
     }
     &:focus {
       outline: none;
     }
     &:focus-visible {
-      outline: var(--uspg-link-focus-outline-width) var(--uspg-link-focus-outline-style) var(--uspg-link-focus-outline-color);
-      outline-offset: var(--uspg-link-focus-outline-offset);
+      outline: var(--up-link-focus-outline-width) var(--up-link-focus-outline-style) var(--up-link-focus-outline-color);
+      outline-offset: var(--up-link-focus-outline-offset);
     }
     @media (hover: hover) {
       &:hover {
-        color: var(--uspg-link-hover-color);
-        text-decoration: var(--uspg-link-hover-decoration);
-        background-color: var(--uspg-link-hover-background-color);
+        color: var(--up-link-hover-color);
+        text-decoration: var(--up-link-hover-decoration);
+        background-color: var(--up-link-hover-background-color);
       }
     }
     &:active {
-      color: var(--uspg-link-active-color);
+      color: var(--up-link-active-color);
     }
   }
 }
@@ -148,8 +148,8 @@ html.uspg {
 }
 
 .message, .credits {
-  color: var(--uspg-text-color, #fff);
-  background-color: var(--uspg-bg-color, hsl(0deg 0% 0% / .7));
+  color: var(--up-text-color, #fff);
+  background-color: var(--up-bg-color, hsl(0deg 0% 0% / .7));
 }
 
 .message {
@@ -165,11 +165,11 @@ html.uspg {
 
   h1 {
     margin: 0;
-    font-size: var(--uspg-h1-font-size, 2rem);
-    font-variation-settings: var(--uspg-h1-font-variation-settings, unset);
-    font-weight: var(--uspg-h1-font-weight, 700);
-    line-height: var(--uspg-h1-line-height, 1.25);
-    color: var(--uspg-h1-color, var(--uspg-text-color, #fff));
+    font-size: var(--up-h1-font-size, 2rem);
+    font-variation-settings: var(--up-h1-font-variation-settings, unset);
+    font-weight: var(--up-h1-font-weight, 700);
+    line-height: var(--up-h1-line-height, 1.25);
+    color: var(--up-h1-color, var(--up-text-color, #fff));
   }
 
   p {
@@ -193,9 +193,9 @@ html.uspg {
     left: var(--_arrow-position);
     width: var(--_arrow-size);
     height: var(--_arrow-size);
-    color: var(--uspg-icon-fill-color, #333);
+    color: var(--up-icon-fill-color, #333);
     cursor: w-resize;
-    background-color: var(--uspg-icon-box-bg, var(--uspg-link-color, #fc0));
+    background-color: var(--up-icon-box-bg, var(--up-link-color, #fc0));
     border-radius: 50%;
 
     @media (prefers-reduced-motion: no-preference) {
@@ -206,7 +206,7 @@ html.uspg {
 
     @media (hover: hover) {
       &:hover {
-        background-color: var(--uspg-icon-hover-box-bg, #fff);
+        background-color: var(--up-icon-hover-box-bg, #fff);
       }
     }
 
@@ -246,9 +246,9 @@ html.uspg {
   justify-content: center;
   width: 100%;
   padding: .2rem 1rem;
-  font-size: var(--uspg-credits-font-size, .8em);
-  font-weight: var(--uspg-credits-font-weight, 400);
-  line-height: var(--uspg-credits-line-height, 1.3);
+  font-size: var(--up-credits-font-size, .8em);
+  font-weight: var(--up-credits-font-weight, 400);
+  line-height: var(--up-credits-line-height, 1.3);
 
 
   @media screen and (min-width: 768px) {
@@ -276,8 +276,8 @@ html.uspg {
     border-radius: 50%;
 
     &:active {
-      color: var(--uspg-icon-fill-color, #333);
-      background-color: var(--uspg-icon-box-bg, var(--uspg-link-color, #fc0));
+      color: var(--up-icon-fill-color, #333);
+      background-color: var(--up-icon-box-bg, var(--up-link-color, #fc0));
 
       svg {
         opacity: 1;
@@ -324,7 +324,7 @@ html.uspg {
 .loader {
   width: 80px;
   aspect-ratio: 1;
-  background: conic-gradient(#000, var(--uspg-loader-color, hsl(0deg 0% 100% / .6))) content-box;
+  background: conic-gradient(#000, var(--up-loader-color, hsl(0deg 0% 100% / .6))) content-box;
   border-radius: 50%;
   /* stylelint-disable-next-line property-no-vendor-prefix */
   -webkit-mask:

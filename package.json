@@ -1,6 +1,6 @@
 {
   "name": "@massimo-cassandro/minimo",
-  "version": "1.58.0",
+  "version": "1.58.2",
   "description": "Light css framework & utilities",
   "type": "module",
   "main": "./src/index.js",
@@ -20,7 +20,8 @@
     "url": "https://github.com/massimo-cassandro/minimo/issues"
   },
   "publishConfig": {
-    "access": "public"
+    "access": "public",
+    "registry": "http://localhost:4873"
   },
   "workspaces": [
     "demo",
@@ -43,11 +44,12 @@
   },
   "scripts": {
     "UPD-version": "npx update-version  # --config=./dev-utilities.config.mjs",
+    "verdaccio": "verdaccio-start",
     "npm-publish": "npm publish",
     "build-tokens": "node ./dev-tools/design-tokens-builder/build-tokens.mjs --config ./design-tokens/tokens-config.mjs",
     "build-margin-padding-css": "node ./scripts/build-margin-padding-css.mjs",
     "generate:types": "node ./scripts/generate-class-types.mjs",
-    "prepublishOnly": "npm run generate:types",
+    "prepack": "npm run generate:types",
     "build custom media": "node ./dev-tools/custom-media-builder/custom-media-builder.mjs --src=./src/custom-media.js",
     "check unresolved props": "node ./dev-tools/design-tokens-builder/check-unresolved-custom-props.mjs --config ./design-tokens/tokens-config.mjs",
     "test": "node --test \"test/**/*.test.mjs\"",

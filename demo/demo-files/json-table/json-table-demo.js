@@ -243,7 +243,7 @@ export function jsonTableDemo(){
         tfoot: true, // ignorato in modalità server-side (warning in console)
         caption: 'Tabella server-side',
         infoText: 'Righe {start}–{end} di {filteredRec} ({totRec} totali) — pagina {page} di {totPages}',
-        initialSort: [{ key: 'id', dir: 'asc' }],
+        initialSort: { id: 'asc' },
         cols: [
           { key: 'id', title: 'ID', dataType: 'id' },
           { key: 'text', title: 'Testo' },

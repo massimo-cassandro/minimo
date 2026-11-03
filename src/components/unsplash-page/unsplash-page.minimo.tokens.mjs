@@ -1,5 +1,5 @@
 export default {
-  'uspg': {
+  'up': {
     bg: {
       color: {
         $type: 'color',
@@ -41,7 +41,7 @@ export default {
     h1: {
       color: {
         $type: 'color',
-        $value: '{uspg.text.color}'
+        $value: '{up.text.color}'
       },
       font: {
         size: {
@@ -83,7 +83,7 @@ export default {
       hover: {
         color: {
           $type: 'color',
-          $value: '{uspg.link.color}'
+          $value: '{up.link.color}'
         },
         background: {
           color: {
@@ -113,7 +113,7 @@ export default {
             $type: 'string'
           },
           color: {
-            $value: '{uspg.link.color}',
+            $value: '{up.link.color}',
             $type: 'color'
           },
           offset: {
@@ -149,7 +149,7 @@ export default {
       box: {
         bg: {
           $type: 'color',
-          $value: '{uspg.link.color}'
+          $value: '{up.link.color}'
         }
       },
       fill: {

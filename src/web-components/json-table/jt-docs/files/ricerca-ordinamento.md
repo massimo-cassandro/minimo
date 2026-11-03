@@ -137,7 +137,7 @@ Sostituisce la `key` nel parametro `sort`, separando le chiavi con una virgola; 
 Con più criteri in `initialSort` le chiavi vengono inviate in ordine di priorità, con una direzione per chiave:
 
 ```javascript
-initialSort: [{ key: 'citta', dir: 'asc' }, { key: 'cognome', dir: 'desc' }]
+initialSort: { citta: 'asc', cognome: 'desc' }
 // con sortKeys: ['clienti.cognome', 'clienti.nome'] sulla colonna cognome
 // → sort=citta,clienti.cognome,clienti.nome&dir=asc,desc,desc
 ```

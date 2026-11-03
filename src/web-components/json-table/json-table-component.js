@@ -111,7 +111,7 @@ const emptyState = () => ({
  *   serverSide: false,                  // default: false
  *   serverParams: { page: 'page', start: 'start', perPage: 'perPage', sort: 'sort', dir: 'dir', search: 'search', searchFields: 'searchFields' }, // default
  *   searchFields: null,                 // default: null (campi di ricerca aggiuntivi in modalità server-side)
- *   initialSort: [{ key: 'city', dir: 'asc' }, { key: 'name', dir: 'desc' }], // default: null
+ *   initialSort: { city: 'asc', name: 'desc' }, // default: null
  *   tfoot: true,                        // default: false (non disponibile in modalità server-side)
  *   updateFooterOnPageChange: false,    // default: false
  *   infoText: null,                     // default: null → labels.info
@@ -414,20 +414,19 @@ export class JsonTable extends HTMLElement {
     // stato iniziale
     this.state = emptyState();
     if (params.initialSort != null) {
-      if (Array.isArray(params.initialSort)) {
-        params.initialSort.forEach(item => {
-          const { key, dir } = item ?? {};
+      if (typeof params.initialSort === 'object' && !Array.isArray(params.initialSort)) {
+        Object.entries(params.initialSort).forEach(([key, dir]) => {
           const col = this.cols.find(c => c.key === key);
-          if (col && col.sortable && (dir === 'asc' || dir === 'desc') && !this.state.sort.some(s => s.key === key)) {
+          if (col && col.sortable && (dir === 'asc' || dir === 'desc')) {
             this.state.sort.push({ key, dir });
           } else {
             // eslint-disable-next-line no-console
-            console.error(`[json-table] initialSort: colonna \`${key}\` inesistente, non ordinabile o ripetuta, oppure direzione non valida (${dir}): criterio ignorato`);
+            console.error(`[json-table] initialSort: colonna \`${key}\` inesistente o non ordinabile, oppure direzione non valida (${dir}): criterio ignorato`);
           }
         });
       } else {
         // eslint-disable-next-line no-console
-        console.error('[json-table] initialSort: deve essere un array di criteri `{ key, dir }`, valore ignorato', params.initialSort);
+        console.error('[json-table] initialSort: deve essere un oggetto `{ chiave: "asc"|"desc", … }`, valore ignorato', params.initialSort);
       }
     }
 
