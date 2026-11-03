@@ -44,7 +44,7 @@
   },
   "scripts": {
     "UPD-version": "npx update-version  # --config=./dev-utilities.config.mjs",
-    "verdaccio": "verdaccio-start",
+    "verdaccio": "launchctl print gui/$(id -u)/local.verdaccio >/dev/null 2>&1 || launchctl bootstrap gui/$(id -u) ~/Sites/_verdaccio/local.verdaccio.plist",
     "npm-publish": "npm publish",
     "build-tokens": "node ./dev-tools/design-tokens-builder/build-tokens.mjs --config ./design-tokens/tokens-config.mjs",
     "build-margin-padding-css": "node ./scripts/build-margin-padding-css.mjs",

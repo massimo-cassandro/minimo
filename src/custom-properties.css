@@ -474,7 +474,7 @@
   --up-link-hover-background-color: transparent;
   --up-link-hover-color: var(--up-link-color);
   --up-link-hover-decoration: underline;
-  --up-link-visited-color: #ff117b;
+  --up-link-visited-color: var(--up-link-color);
   --up-loader-color: hsl(0deg 0% 100% / .6);
   --up-text-color: #fff;
 

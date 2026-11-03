@@ -77,7 +77,7 @@ export default {
       visited: {
         color: {
           $type: 'color',
-          $value: '#ff117b'
+          $value: '{up.link.color}'
         }
       },
       hover: {
