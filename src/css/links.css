@@ -26,7 +26,7 @@ a:not(.btn), .btn-link {
   }
 
   &:focus-visible {
-    outline: var(--link-focus-outline-width) solid color-mix(in srgb, var(--link-focus-outline-color) 60%, transparent);
+    outline: var(--link-focus-outline-width) solid var(--link-focus-outline-color);
     outline-offset: var(--link-focus-outline-offset);
   }
   @media (hover: hover) {
