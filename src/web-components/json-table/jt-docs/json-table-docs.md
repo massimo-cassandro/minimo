@@ -5,6 +5,7 @@
 * [DataTypes](./files/dataTypes.md)
 * [Server Side](files/server-side.md)
 * [Backend Symfony per la modalità server-side](files/serverside-api.md)
+* [Form di filtro collegato (`filterForm`)](files/filter-form.md)
 * [Ricerca e ordinamento](files/ricerca-ordinamento.md)
 * [Tabelle con `rowspan`](files/rowspan.md)
 
@@ -183,11 +184,12 @@ JsonTable.resetDefaults(); // azzera i default di progetto
 | `destroy()` | Svuota il componente; `init()` può essere richiamato in seguito |
 | `goToPage(page)` | Mostra la pagina indicata (limitata all'intervallo disponibile) |
 | `init(config)` | Avvia il componente (prima o dopo l'inserimento nel DOM) |
+| `refresh()` | Richiede di nuovo i dati con lo stato corrente (pagina, ordinamento, ricerca, valori applicati di [`filterForm`](files/filter-form.md)) e ridisegna la tabella senza ricostruirla (`Promise`) |
 | `reload(overrides)` | Ricarica i dati e ricostruisce la struttura, con eventuali parametri sovrascritti (`Promise`); ricerca, ordinamento e pagina vengono azzerati |
 | `setSearch(term)` | Filtra le righe con il termine indicato (stringa vuota = nessun filtro) e torna alla prima pagina; l'input di ricerca viene aggiornato |
 | `setSort(key, dir)` | Ordina per la colonna `key` (`'asc'`, `'desc'`, oppure `null` per rimuovere l'ordinamento) e torna alla prima pagina |
 
-In modalità server-side `goToPage`, `setSort` e `setSearch` generano una nuova richiesta.
+In modalità server-side `goToPage`, `setSort` e `setSearch` generano una nuova richiesta; `refresh()` la genera in entrambe le modalità.
 
 Proprietà disponibili dopo il caricamento:
 
@@ -214,7 +216,7 @@ Entrambi vengono emessi sull'elemento con `bubbles: true`; `event.detail.jsonTab
 | Evento | Quando | `event.detail` |
 |---|---|---|
 | `jt:ready` | al termine della costruzione e del primo rendering (nel microtask successivo, quindi un listener registrato subito dopo `init()` lo intercetta comunque) | `{ jsonTable }` |
-| `jt:update` | dopo ogni cambio pagina, ordinamento o ricerca (anche via API) | `{ jsonTable, reason }` con `reason` = `'page'`, `'sort'` o `'search'` |
+| `jt:update` | dopo ogni cambio pagina, ordinamento o ricerca (anche via API), dopo il submit/reset del form di filtro e dopo `refresh()` | `{ jsonTable, reason }` con `reason` = `'page'`, `'sort'`, `'search'`, `'filter'` o `'refresh'` |
 
 ```javascript
 jtable.addEventListener('jt:ready', e => console.log(e.detail.jsonTable.data));

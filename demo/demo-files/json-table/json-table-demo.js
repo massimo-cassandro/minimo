@@ -255,6 +255,65 @@ export function jsonTableDemo(){
       })
     },
 
+    // =>> 4b. filterForm
+    'h2 4b. Form di filtro collegato: <code>filterForm</code>',
+    'p Il form sotto è libero (campi a scelta, qui un select, due numeri e un gruppo di checkbox <code>anni[]</code>) ed è collegato alla tabella con <code>filterForm: \'jt-filter-form\'</code>. I valori non vuoti vengono aggiunti alla query string di ogni richiesta, compresa la prima. Al submit il form non viene inviato: la tabella richiede di nuovo i dati e si ridisegna senza ricostruirsi, torna alla prima pagina, azzera la ricerca interna e mantiene l\'ordinamento. Anche il reset del form aggiorna la tabella. L\'endpoint simulato filtra per <code>attivo</code>, <code>importoMin</code>, <code>importoMax</code> e <code>anni[]</code>; <code>totRec</code> resta il totale non filtrato. Evento <code>jt:update</code> con <code>reason: \'filter\'</code> in console.',
+    {
+      tag: 'form',
+      id: 'jt-filter-form',
+      className: 'flex flex-wrap gap-2 mbe-sm',
+      children: [
+        {
+          tag: 'select',
+          className: 'form-control',
+          attrs: { name: 'attivo', 'aria-label': 'Attivo' },
+          children: [
+            { tag: 'option', attrs: { value: '' }, content: 'Attivo: tutti' },
+            { tag: 'option', attrs: { value: '1' }, content: 'Solo attivi' },
+            { tag: 'option', attrs: { value: '0' }, content: 'Solo non attivi' }
+          ]
+        },
+        { tag: 'input', className: 'form-control', attrs: { type: 'number', name: 'importoMin', placeholder: 'Importo min', step: 'any', 'aria-label': 'Importo minimo' } },
+        { tag: 'input', className: 'form-control', attrs: { type: 'number', name: 'importoMax', placeholder: 'Importo max', step: 'any', 'aria-label': 'Importo massimo' } },
+        ...['2019', '2020', '2021', '2023', '2024'].map(year => ({
+          tag: 'label',
+          className: 'form-check',
+          children: [
+            { tag: 'input', className: 'form-check-input', attrs: { type: 'checkbox', name: 'anni[]', value: year } },
+            { tag: 'span', content: year }
+          ]
+        })),
+        { tag: 'button', className: 'btn btn-primary btn-sm', attrs: { type: 'submit' }, content: 'Filtra' },
+        { tag: 'button', className: 'btn btn-outline-secondary btn-sm', attrs: { type: 'reset' }, content: 'Azzera' }
+      ]
+    },
+    {
+      tag: 'json-table',
+      callback: el => {
+        el.addEventListener('jt:update', e => {
+          const { reason, jsonTable } = /** @type {CustomEvent} */ (e).detail;
+          if (reason === 'filter') {
+            console.log('[demo] jt:update (filter)', jsonTable._filters?.toString(), jsonTable.state.filteredRec);
+          }
+        });
+        /** @type {JsonTable} */ (el).init({
+          jsonUrl: '/demo-api/json-table',
+          serverSide: true,
+          filterForm: 'jt-filter-form',
+          perPage: 10,
+          caption: 'Tabella server-side con form di filtro',
+          infoText: 'Righe {start}–{end} di {filteredRec} ({totRec} totali)',
+          cols: [
+            { key: 'id', title: 'ID', dataType: 'id' },
+            { key: 'text', title: 'Testo' },
+            { key: 'date', title: 'Data', dataType: 'date' },
+            { key: 'euro', title: 'Importo', dataType: 'euro' },
+            { key: 'bool', title: 'Attivo', dataType: 'bool' }
+          ]
+        });
+      }
+    },
+
     // =>> rowspan
     'h2 Record su più righe: <code>rowspan</code>',
     'p Le colonne con <code>rowspan</code> (numero o funzione <code>row => numero</code>) generano una sola cella, le altre una cella per ogni <code>&lt;tr&gt;</code>, usando gli elementi dell\'array. <code>render</code> riceve l\'indice <code>subIdx</code>. Ordinamento e paginazione operano sui record, la ricerca e <code>@sum</code> su tutti gli elementi.',

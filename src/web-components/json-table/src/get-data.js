@@ -40,6 +40,27 @@ function numericField(json, field) {
 }
 
 /**
+ * Applica a un URL i valori di un form di filtro (vedi `filterForm`): ogni chiave sostituisce l'eventuale parametro omonimo
+ * già presente nell'URL; le chiavi ripetute (checkbox con lo stesso nome, select multiple) vengono aggiunte tutte.
+ * @param {URL} url - URL da modificare
+ * @param {URLSearchParams|null} [filters=null] - Valori del form (default: null)
+ * @returns {void}
+ *
+ * @example
+ * const url = new URL('/api/rows.json?anno=2024&tipo=a', location.href);
+ * applyFilters(url, new URLSearchParams('anno=2025&stato[]=1&stato[]=2'));
+ * // → /api/rows.json?tipo=a&anno=2025&stato[]=1&stato[]=2
+ */
+function applyFilters(url, filters = null) {
+  if (!filters) {
+    return;
+  }
+  new Set(filters.keys()).forEach(key => url.searchParams.delete(key));
+  filters.forEach((value, key) => url.searchParams.append(key, value));
+}
+
+
+/**
  * Valore del parametro di query `searchFields`: `searchKeys` (o, in sua assenza, `key`) delle colonne ricercabili più
  * il parametro `searchFields`, senza duplicati. Un nome semplice viene scartato se è presente anche nella forma
  * `tabella.nome`, che lo rende univoco nelle query con join (es. `cognome` e `clienti.cognome` → `clienti.cognome`).
@@ -77,8 +98,12 @@ function buildSearchFields(cols, searchFields = null) {
  * (`order[i][column]` e `order[i][dir]` per ogni criterio, con i nomi predefiniti).
  * In questa modalità `sortKeys`, `searchKeys` e `searchFields` non vengono usati.
  *
+ * I valori del form di filtro (`filters`) vengono applicati prima dei parametri di `serverParams`, che in caso di
+ * nomi coincidenti prevalgono.
+ *
  * @param {JsonTableParams} params - Parametri risolti
  * @param {ServerRequest} request - Stato della richiesta
+ * @param {URLSearchParams|null} [filters=null] - Valori del form di filtro (vedi `filterForm`) (default: null)
  * @returns {string}
  *
  * @example
@@ -88,9 +113,10 @@ function buildSearchFields(cols, searchFields = null) {
  * );
  * // → '/api/rows.json?year=2025&page=3&start=50&perPage=25&sort=city,name&dir=asc,desc&search=mar'
  */
-export function buildServerUrl(params, request) {
+export function buildServerUrl(params, request, filters = null) {
 
   const url = new URL(String(params.jsonUrl), document.baseURI);
+  applyFilters(url, filters);
   const names = params.serverParams ?? {};
 
   /** @type {(name: string|null|undefined, value: string|number|boolean|null|undefined) => void} */
@@ -145,11 +171,13 @@ export function buildServerUrl(params, request) {
  * lette dalla chiave `jsonDataField` (`null`/`''` = la radice del JSON è l'array stesso); quando il
  * JSON contiene anche una chiave numerica `totRecField`, viene restituita come `totRec`, altrimenti `totRec` è
  * la lunghezza dell'array delle righe. In modalità server-side (`request` indicato) l'URL porta i parametri di paginazione /
- * ordinamento / ricerca (vedi `buildServerUrl`) e viene letto anche `filteredRecField`.
+ * ordinamento / ricerca (vedi `buildServerUrl`) e viene letto anche `filteredRecField`. I valori del form di filtro
+ * (`filters`, vedi `filterForm`) vengono aggiunti alla query string in entrambe le modalità; vengono ignorati con `data`.
  * Restituisce `null` quando non è configurata alcuna sorgente.
  *
  * @param {JsonTableParams} params - Parametri risolti (vedi `resolve-params.js`)
  * @param {ServerRequest|null} [request=null] - Stato della richiesta server-side; `null` per una richiesta semplice (default: null)
+ * @param {URLSearchParams|null} [filters=null] - Valori del form di filtro (default: null)
  * @returns {Promise<DataResult|null>} Righe e totali, oppure `null` quando non sono impostati né `data` né `jsonUrl`
  * @throws {Error} Quando `data` non è un array, in caso di errori HTTP/di rete, oppure quando il JSON recuperato
  *   non contiene un array in `jsonDataField`
@@ -168,8 +196,11 @@ export function buildServerUrl(params, request) {
  * // server-side: GET /api/rows.json?page=2&start=25&perPage=25&search=mar
  * // JSON atteso: { data: [...25 righe], totRec: 1500, filteredRec: 40 }
  * await getData({ ...params, jsonUrl: '/api/rows.json', serverSide: true }, { page: 2, perPage: 25, sort: [], search: 'mar' });
+ *
+ * // con i valori di un form di filtro: GET /api/rows.json?anno=2025
+ * await getData({ ...params, jsonUrl: '/api/rows.json' }, null, new URLSearchParams('anno=2025'));
  */
-export async function getData(params, request = null) {
+export async function getData(params, request = null, filters = null) {
 
   if (params.data != null) {
     if (!Array.isArray(params.data)) {
@@ -179,7 +210,16 @@ export async function getData(params, request = null) {
   }
 
   if (params.jsonUrl) {
-    const url = request ? buildServerUrl(params, request) : params.jsonUrl;
+    let url;
+    if (request) {
+      url = buildServerUrl(params, request, filters);
+    } else if (filters) {
+      const filteredUrl = new URL(String(params.jsonUrl), document.baseURI);
+      applyFilters(filteredUrl, filters);
+      url = filteredUrl.toString();
+    } else {
+      url = params.jsonUrl;
+    }
     const response = await fetch(url);
 
     if (!response.ok) {

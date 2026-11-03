@@ -257,6 +257,12 @@ import {
  * @property {ServerParams} serverParams - Solo modalità server-side: nomi dei parametri della query string (vedi `ServerParams`)
  * @property {string[]|null} searchFields - Solo modalità server-side, escluso `jqDatatableMode`: campi su cui cercare, oltre a
  *   quelli delle colonne ricercabili, anche nella forma `tabella.campo`. Il server deve accettare solo valori previsti (default: null)
+ * @property {string|HTMLFormElement|null} filterForm - Form di filtro collegato alla tabella: id del `<form>` oppure, solo
+ *   tramite `init()`, l'elemento stesso. I valori non vuoti del form vengono aggiunti alla query string di `jsonUrl` (sostituendo
+ *   gli eventuali parametri omonimi) in ogni richiesta, compresa la prima. Al submit (il form non viene inviato) e al reset del
+ *   form i dati vengono richiesti di nuovo e la tabella ridisegnata, senza ricostruirne la struttura: si torna alla prima pagina,
+ *   la ricerca interna viene azzerata e l'ordinamento mantenuto. Funziona in entrambe le modalità; richiede `jsonUrl`
+ *   (ignorato con `data` inline) (default: null)
  * @property {Object<string, 'asc'|'desc'>|null} initialSort - Ordinamento applicato al caricamento: oggetto
  *   `chiave colonna → direzione`, in ordine di priorità, es. `{ city: 'asc', name: 'desc' }`. Le chiavi di tipo
  *   intero (es. `'2024'`) vengono sempre enumerate per prime in ordine numerico (default: null)
@@ -364,6 +370,7 @@ export const jqDatatableModeDefaults = {
  *   serverSide: false,
  *   serverParams: { page: 'page', start: 'start', perPage: 'perPage', sort: 'sort', dir: 'dir', search: 'search', searchFields: 'searchFields' },
  *   searchFields: null,                // es. ['clienti.nome', 'comuni.nome']
+ *   filterForm: null,                  // es. 'filtri-clienti' (id del form)
  *   initialSort: null,                 // es. { name: 'asc' }
  *   tfoot: false,
  *   updateFooterOnPageChange: false,
@@ -421,6 +428,7 @@ export const defaults = {
     searchFields: 'searchFields'
   },
   searchFields: null,
+  filterForm: null,
   initialSort: null,
 
   tfoot: false,

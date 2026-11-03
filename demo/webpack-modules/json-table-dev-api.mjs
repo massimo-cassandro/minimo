@@ -5,6 +5,8 @@
   "server", come farebbe un vero backend quando si usa `<json-table serverside>`.
   Parametri della query string (nomi di default dei `serverParams` di json-table):
     page, start, perPage, sort, dir, search
+  Filtri (form di filtro collegato con `filterForm`, tutti facoltativi):
+    attivo (1|0), importoMin, importoMax, anni[] (anni del campo `date`, valori ripetuti)
   Risposta: { data: [...righe della pagina richiesta], totRec, filteredRec }
 
   Non usato nella build di produzione: la demo "server-side" funziona solo in sviluppo.
@@ -69,11 +71,22 @@ export function jsonTableDevApi(req, res, next) {
     .map((key, idx) => ({ key, sign: dirs[idx] === 'desc' ? -1 : 1 }));
   const search = (q.get('search') ?? '').trim().toLowerCase();
 
-  let filtered = rows;
+  // filtri del form (vuoto = nessun filtro)
+  const attivo = q.get('attivo');
+  const importoMin = q.get('importoMin') ? Number(q.get('importoMin')) : null;
+  const importoMax = q.get('importoMax') ? Number(q.get('importoMax')) : null;
+  const anni = q.getAll('anni[]');
+
+  let filtered = rows.filter(row =>
+    (attivo !== '1' && attivo !== '0' || row.bool === (attivo === '1'))
+    && (importoMin === null || Number.isNaN(importoMin) || row.euro >= importoMin)
+    && (importoMax === null || Number.isNaN(importoMax) || row.euro <= importoMax)
+    && (!anni.length || anni.includes(String(row.date).slice(0, 4)))
+  );
 
   if (search) {
     const words = search.split(/\s+/);
-    filtered = rows.filter(row => {
+    filtered = filtered.filter(row => {
       const haystack = Object.values(row).map(v => (v && typeof v === 'object' ? v.date : v)).join(' ').toLowerCase();
       return words.every(w => haystack.includes(w));
     });

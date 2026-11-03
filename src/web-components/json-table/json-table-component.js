@@ -14,6 +14,7 @@ import { applySortState, setSortListener } from './src/thead.js';
 import { setSearchListener, filterRows } from './src/search.js';
 import { sortRows } from './src/sorting.js';
 import { calcTotPages, renderPagination } from './src/pagination.js';
+import { bindFilterForm } from './src/filter-form.js';
 import { domBuilder } from '../../utilities/dom-builder/dom-builder.js';
 
 /** @typedef {import('./src/defaults.js').JsonTableParams} JsonTableParams */
@@ -43,8 +44,9 @@ import { domBuilder } from '../../utilities/dom-builder/dom-builder.js';
  */
 
 /**
- * Motivo di un aggiornamento dello stato, passato nel detail dell'evento `jt:update`.
- * @typedef {'page'|'sort'|'search'} UpdateReason
+ * Motivo di un aggiornamento dello stato, passato nel detail dell'evento `jt:update`:
+ * `filter` = submit/reset del form di filtro (`filterForm`), `refresh` = chiamata di `refresh()`.
+ * @typedef {'page'|'sort'|'search'|'filter'|'refresh'} UpdateReason
  */
 
 /**
@@ -72,7 +74,7 @@ const emptyState = () => ({
  *
  * Eventi (entrambi con bubbling, `event.detail.jsonTable` è l'istanza del componente):
  * - `jt:ready`: emesso quando la struttura è stata costruita e i primi dati sono stati renderizzati
- * - `jt:update`: emesso dopo ogni cambio di pagina / ordinamento / ricerca (`event.detail.reason`)
+ * - `jt:update`: emesso dopo ogni cambio di pagina / ordinamento / ricerca / filtro e dopo `refresh()` (`event.detail.reason`)
  *
  * @example
  * // solo markup
@@ -111,6 +113,7 @@ const emptyState = () => ({
  *   serverSide: false,                  // default: false
  *   serverParams: { page: 'page', start: 'start', perPage: 'perPage', sort: 'sort', dir: 'dir', search: 'search', searchFields: 'searchFields' }, // default
  *   searchFields: null,                 // default: null (campi di ricerca aggiuntivi in modalità server-side)
+ *   filterForm: null,                   // default: null (id del form di filtro, oppure l'elemento <form>)
  *   initialSort: { city: 'asc', name: 'desc' }, // default: null
  *   tfoot: true,                        // default: false (non disponibile in modalità server-side)
  *   updateFooterOnPageChange: false,    // default: false
@@ -184,6 +187,10 @@ export class JsonTable extends HTMLElement {
     this._requestGeneration = 0;
     /** timer di debounce della ricerca in sospeso (vedi `search.js`) @type {ReturnType<typeof setTimeout>|undefined} */
     this._searchTimer = undefined;
+    /** valori correnti del form di filtro (vedi `filter-form.js`) @type {URLSearchParams|null} */
+    this._filters = null;
+    /** rimuove i listener del form di filtro @type {AbortController|null} */
+    this._filterFormController = null;
 
     /** Parametri risolti, disponibili dopo il primo caricamento. @type {JsonTableParams} */
     this.params = /** @type {JsonTableParams} */ ({ ...defaults });
@@ -262,6 +269,9 @@ export class JsonTable extends HTMLElement {
    */
   destroy() {
     clearTimeout(this._searchTimer);
+    this._filterFormController?.abort();
+    this._filterFormController = null;
+    this._filters = null;
     this._loadStarted = false;
     this._loadGeneration++;
     this._requestGeneration++;
@@ -289,6 +299,26 @@ export class JsonTable extends HTMLElement {
     this._loadStarted = false;
     this._loadGeneration++;
     await this._load();
+  }
+
+  /**
+   * Richiede di nuovo i dati con lo stato corrente (pagina, ordinamento, ricerca e valori del form di filtro) e
+   * ridisegna la tabella senza ricostruirne la struttura, a differenza di `reload()`. Utile, ad esempio, dopo una
+   * modifica dei dati sul server o per aggiornamenti periodici. Se la tabella non è ancora stata costruita equivale a
+   * `reload()`. Emette `jt:update` con `reason: 'refresh'`.
+   *
+   * @returns {Promise<void>}
+   *
+   * @example
+   * await el.refresh();
+   * setInterval(() => el.refresh(), 60_000);
+   */
+  async refresh() {
+    if (!this.elements.wrapper) {
+      await this.reload();
+      return;
+    }
+    await this._update('refresh', null, true);
   }
 
   /**
@@ -383,6 +413,15 @@ export class JsonTable extends HTMLElement {
     const params = resolveParams(this, this._config, projectDefaults);
     this.params = params;
 
+    // form di filtro indicato per id ma non ancora presente (markup successivo alla tabella, documento in caricamento)
+    if (typeof params.filterForm === 'string' && params.filterForm && !document.getElementById(params.filterForm)
+      && document.readyState === 'loading') {
+      await new Promise(resolve => document.addEventListener('DOMContentLoaded', resolve, { once: true }));
+      if (generation !== this._loadGeneration) {
+        return;
+      }
+    }
+
     // caricamento automatico senza colonne: possono ancora arrivare con init(), anche da un altro script
     if (this._config === null && !params.cols?.length) {
       this._reportMissingColsAfterPageLoad();
@@ -390,6 +429,7 @@ export class JsonTable extends HTMLElement {
     }
 
     this._validateParams(params);
+    bindFilterForm(this);
 
     // placeholder di caricamento (spinner di minimo)
     domBuilder([
@@ -435,7 +475,7 @@ export class JsonTable extends HTMLElement {
     let failed = false;
 
     try {
-      result = await getData(params, params.serverSide ? this._serverRequest() : null);
+      result = await getData(params, params.serverSide ? this._serverRequest() : null, this._filters);
     } catch (err) {
       failed = true;
       // eslint-disable-next-line no-console
@@ -479,6 +519,7 @@ export class JsonTable extends HTMLElement {
       console.log('cols', this.cols);
       console.log('data', this.data);
       console.log('state', this.state);
+      console.log('filters', this._filters?.toString());
       console.log('elements', this.elements);
       console.groupEnd();
       /* eslint-enable no-console */
@@ -533,6 +574,11 @@ export class JsonTable extends HTMLElement {
     if (params.serverSide && params.tfoot) {
       console.warn('[json-table] `tfoot` non è disponibile in modalità server-side (i dati sono paginati dal server): tfoot ignorato');
       params.tfoot = false;
+    }
+
+    if (params.filterForm != null && params.filterForm !== '' && (params.data != null || !params.jsonUrl)) {
+      console.warn('[json-table] `filterForm` richiede `jsonUrl` (senza `data`): parametro ignorato');
+      params.filterForm = null;
     }
 
     if (params.searchFields != null) {
@@ -605,17 +651,42 @@ export class JsonTable extends HTMLElement {
   }
 
   /**
-   * Applica un cambio di stato (pagina, ordinamento o ricerca): ricalcola lo stato e rieffettua il rendering oppure, in
-   * modalità server-side, invia una nuova richiesta (le risposte obsolete vengono ignorate) e ne renderizza il risultato.
-   * Emette `jt:update` alla fine.
+   * Applica i valori del form di filtro (submit o reset, vedi `filter-form.js`): torna alla prima pagina, azzera la
+   * ricerca interna (mantenendo l'ordinamento), richiede di nuovo i dati e ridisegna la tabella. Se la tabella non è
+   * ancora stata costruita (caricamento in corso o fallito) esegue `reload()`, che rilegge il form.
+   *
+   * @param {URLSearchParams} filters - Valori del form
+   * @returns {Promise<void>}
+   */
+  async _applyFilters(filters) {
+    if (!this.elements.wrapper) {
+      await this.reload();
+      return;
+    }
+
+    this._filters = filters;
+    clearTimeout(this._searchTimer);
+    if (this.elements.searchInput) {
+      this.elements.searchInput.value = '';
+    }
+    this.state.searchTerm = '';
+    this.state.page = 1;
+    await this._update('filter', null, true);
+  }
+
+  /**
+   * Applica un cambio di stato (pagina, ordinamento, ricerca o filtro): ricalcola lo stato e rieffettua il rendering
+   * oppure, in modalità server-side o con `refetch`, invia una nuova richiesta (le risposte obsolete vengono ignorate) e
+   * ne renderizza il risultato. Emette `jt:update` alla fine.
    *
    * @param {UpdateReason} reason - Cosa è cambiato
    * @param {string|null} [focusTarget=null] - Passato a `renderPagination()` (default: null)
+   * @param {boolean} [refetch=false] - Richiede di nuovo i dati anche in modalità client-side (default: false)
    * @returns {Promise<void>}
    */
-  async _update(reason, focusTarget = null) {
+  async _update(reason, focusTarget = null, refetch = false) {
 
-    if (this.params.serverSide) {
+    if (this.params.serverSide || refetch) {
       const generation = ++this._requestGeneration;
       const loadGeneration = this._loadGeneration;
       const requestedPage = this.state.page;
@@ -624,7 +695,7 @@ export class JsonTable extends HTMLElement {
       /** @type {import('./src/get-data.js').DataResult|null} */
       let result = null;
       try {
-        result = await getData(this.params, this._serverRequest());
+        result = await getData(this.params, this.params.serverSide ? this._serverRequest() : null, this._filters);
       } catch (err) {
         // eslint-disable-next-line no-console
         console.error(err);
@@ -643,7 +714,7 @@ export class JsonTable extends HTMLElement {
 
       // la pagina richiesta non esiste più (l'insieme di dati si è ridotto dall'ultima richiesta):
       // `_computeState` ha limitato la pagina, recupera l'ultima disponibile
-      if (!this.state.rows.length && this.state.filteredRec > 0 && this.state.page !== requestedPage) {
+      if (this.params.serverSide && !this.state.rows.length && this.state.filteredRec > 0 && this.state.page !== requestedPage) {
         this._update(reason, focusTarget);
         return;
       }

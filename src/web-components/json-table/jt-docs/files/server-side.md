@@ -20,6 +20,8 @@ serverParams: {
 ```
 
 Un valore `null` omette il parametro (es. `serverParams: { start: null }` per inviare solo `page`).
+
+Ai parametri della tabella si aggiungono gli eventuali campi del form collegato con `filterForm` (vedi [Form di filtro collegato](filter-form.md)), che non devono usare gli stessi nomi.
 Richiesta di esempio, seconda pagina ordinata per nome con ricerca attiva:
 
 ```

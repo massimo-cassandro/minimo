@@ -20,7 +20,7 @@ Richiesta (GET, tutti i parametri sono facoltativi):
 | `dir` | `asc`/`desc` separati da virgola, uno per ogni chiave di `sort` |
 | `search` | termine di ricerca |
 | `searchFields` | campi su cui cercare, separati da virgola |
-| altri | parametri già presenti in `jsonUrl` (filtri di pagina, vedi sotto), conservati dal componente |
+| altri | campi del form di filtro (`filterForm`) e parametri già presenti in `jsonUrl`, vedi [Filtri esterni alla tabella](#filtri-esterni-alla-tabella-filterform) |
 
 Risposta:
 
@@ -35,7 +35,7 @@ Le fasi sono sempre le stesse, nell'ordine:
 1. **controllo accessi**
 2. **query base** – condizioni sempre valide (record non cancellati, visibilità per l'utente…)
 3. **`totRec`** – conteggio della query base
-4. **filtri di pagina** – parametri aggiuntivi di `jsonUrl` (form di filtro esterni alla tabella)
+4. **filtri di pagina** – campi del form collegato con `filterForm` e parametri aggiuntivi di `jsonUrl`
 5. **ricerca** – `search` + `searchFields`
 6. **`filteredRec`** – conteggio dopo filtri e ricerca
 7. **select** – solo i campi necessari, più eventuali campi `HIDDEN` per l'ordinamento
@@ -197,31 +197,64 @@ non riducono il sotto-array (a meno che non sia esplicitamente richiesto).
   modifiche lato client.
 - Restituire solo i campi effettivamente usati dalla tabella (render, link, condizioni).
 
-### Filtri esterni alla tabella
+### Filtri esterni alla tabella (`filterForm`)
 
-I form di filtro della pagina non fanno parte del protocollo: il loro valore si aggiunge alla
-query string di `jsonUrl` e il componente lo conserva in ogni richiesta. Lato client, al submit
-del form:
+Un form di filtro costruito liberamente nella pagina si collega alla tabella con il parametro `filterForm` (vedi [Form di filtro collegato](filter-form.md)): a ogni richiesta i suoi campi non vuoti vengono aggiunti alla query string, accanto ai parametri di paginazione, ordinamento e ricerca. Per il server sono normali parametri GET, non previsti dal protocollo della tabella: è l'azione a decidere come interpretarli.
 
-```javascript
-const baseUrl = jtable.getAttribute('jsonurl'); // url senza filtri
+Esempio di richiesta, con un form che contiene `stato`, `dal`, `al` e le checkbox `zone[]`:
 
-form.addEventListener('submit', async e => {
-  e.preventDefault();
-  const url = new URL(baseUrl, location.href);
-  new FormData(form).forEach((value, key) => {
-    if (value !== '') url.searchParams.set(key, value);
-  });
-  await jtable.reload({ jsonUrl: url.toString() }); // azzera ricerca, ordinamento e pagina
-});
+```
+GET /clienti-json?stato=attivo&dal=2025-01-01&zone[]=nord&zone[]=sud&page=1&start=0&perPage=25&sort=nome&dir=asc
 ```
 
-Lato server:
+Il metodo `applyFilters()` richiamato nell'azione di esempio:
 
-- leggere i filtri con i metodi tipizzati (`getInt()`, `getBoolean()`, `get()` + validazione);
-- un valore vuoto (select senza scelta) significa "nessun filtro": distinguerlo esplicitamente da
-  `0`/`false` quando questi sono valori validi;
-- non usare per i filtri nomi che collidono con quelli di `serverParams`.
+```php
+private function applyFilters(QueryBuilder $qb, Request $request): void
+{
+  $q = $request->query;
+
+  // valore singolo da un elenco chiuso
+  $stato = $q->getString('stato');
+  if (in_array($stato, ['attivo', 'sospeso'], true)) {
+    $qb->andWhere('c.stato = :f_stato')->setParameter('f_stato', $stato);
+  }
+
+  // date: validare il formato prima di usarle
+  $dal = \DateTimeImmutable::createFromFormat('!Y-m-d', $q->getString('dal'));
+  if ($dal) {
+    $qb->andWhere('c.dataCreazione >= :f_dal')->setParameter('f_dal', $dal);
+  }
+  $al = \DateTimeImmutable::createFromFormat('!Y-m-d', $q->getString('al'));
+  if ($al) {
+    $qb->andWhere('c.dataCreazione < :f_al')->setParameter('f_al', $al->modify('+1 day'));
+  }
+
+  // checkbox / select multiple (`zone[]`): array, filtrato con una whitelist
+  $zone = array_intersect($q->all('zone'), ['nord', 'centro', 'sud']);
+  if ($zone) {
+    $qb->andWhere('c.zona IN (:f_zone)')->setParameter('f_zone', $zone);
+  }
+
+  // booleano facoltativo: assente = nessun filtro, '0' = false
+  if ($q->has('privato')) {
+    $qb->andWhere('c.personaGiuridica = :f_pg')->setParameter('f_pg', !$q->getBoolean('privato'));
+  }
+}
+```
+
+Linee guida:
+
+- **parametro assente = nessun filtro**: il componente non invia i campi vuoti, quindi `has()` distingue "nessuna scelta" da `0`/`false` quando questi sono valori validi;
+- leggere i valori con i metodi tipizzati (`getString()`, `getInt()`, `getBoolean()`) e validarli; un valore non valido va ignorato, non deve produrre un errore 500;
+- i campi multipli arrivano come array solo se il nome termina con `[]`: leggerli con `$request->query->all('nome')` (senza `[]`); senza le parentesi PHP conserva solo l'ultimo valore;
+- valori sempre come parametri (`setParameter`); i valori che diventano **nomi** di campo o di colonna (es. un select "cerca in…") vanno tradotti con una whitelist, come `sort` e `searchFields`;
+- nomi dei parametri con un prefisso (es. `f_`) per non collidere con quelli della query (ricerca `jt_s0`…, eventuali subquery);
+- **conteggi**: applicare i filtri dopo il calcolo di `totRec` se l'info deve mostrare il totale generale (come nello schema sopra), prima se `totRec` deve essere il totale dell'insieme filtrato; in ogni caso prima di `filteredRec`;
+- i campi del form non devono usare i nomi di `serverParams` (`page`, `start`, `perPage`, `sort`, `dir`, `search`, `searchFields` con i default): la tabella li sovrascriverebbe;
+- il pulsante che ha inviato il form viene incluso se ha un `name` (es. `azione=esporta`): l'endpoint deve comunque rispondere con il JSON della tabella, per un'esportazione usare un'azione separata.
+
+**Tabelle client-side.** Con `filterForm` senza `serverSide` l'endpoint riceve solo i campi del form: applica i filtri e restituisce **tutte** le righe corrispondenti (nessuna paginazione, ricerca o ordinamento lato server), con `totRec` facoltativo.
 
 ## Helper riutilizzabile
 
@@ -338,6 +371,6 @@ parametri nell'helper, lasciando invariato il resto.
 - [ ] `perPage` con default e massimo
 - [ ] nessun join *to-many* nella query paginata; sotto-array caricati per gli id della pagina
 - [ ] righe normalizzate (date ISO, booleani, oggetti annidati) con le `key` delle colonne
-- [ ] filtri di pagina con nomi che non collidono con `serverParams`
+- [ ] filtri di pagina (`filterForm`): parametro assente = nessun filtro, valori tipizzati e validati, campi multipli con `[]`, nomi che non collidono con `serverParams`
 
 [↰ Indice](../json-table-docs.md)

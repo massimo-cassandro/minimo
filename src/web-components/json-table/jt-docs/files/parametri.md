@@ -17,6 +17,7 @@ Tutti i parametri sono impostabili sia da attributo HTML che come oggetto in `in
 | `dataTypes` | Object (`{}`) | Tipi di dato personalizzati, uniti a quelli predefiniti (vedi [dataTypes](dataTypes.md)) |
 | `datesLocaleOpts` | Intl.DateTimeFormatOptions (`{ year: 'numeric', month: 'short', day: 'numeric' }`) | Parte data dei tipi date/datetime |
 | `debug` | boolean (`false`) | Log in console di parametri, colonne, dati, stato ed elementi generati |
+| `filterForm` | string o HTMLFormElement (`null`) | Id del form di filtro collegato (da `init()` anche l'elemento): i suoi valori vengono aggiunti alla query string di `jsonUrl` e al submit/reset la tabella viene aggiornata. Richiede `jsonUrl`. Vedi [Form di filtro collegato](filter-form.md) |
 | `filteredRecField` | string (`'filteredRec'`) | Solo server-side: chiave del JSON con il numero di record che soddisfano la ricerca corrente; se assente vale `totRecField` |
 | `infoText` | string, Function o null (`null`) | Contenuto dell'area info: stringa mustache-like con i segnaposto `{start}`, `{end}`, `{totRec}`, `{filteredRec}`, `{page}`, `{totPages}`, oppure funzione `(start, end, totRec, filteredRec, page, totPages) => string\|Node`. `null` = viene usato `labels.info` |
 | `initialSort` | oggetto { chiave: 'asc'\|'desc' } o null (`null`) | Ordinamento applicato al caricamento: uno o più criteri in ordine di priorità, es. `{ city: 'asc', name: 'desc' }` |
