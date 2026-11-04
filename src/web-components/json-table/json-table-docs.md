@@ -1478,6 +1478,26 @@ Linee guida:
 - i campi del form non devono usare i nomi di `serverParams` (`page`, `start`, `perPage`, `sort`, `dir`, `search`, `searchFields` con i default): la tabella li sovrascriverebbe;
 - il pulsante che ha inviato il form viene incluso se ha un `name` (es. `azione=esporta`): l'endpoint deve comunque rispondere con il JSON della tabella, per un'esportazione usare un'azione separata.
 
+**Form generati con Symfony Form.** Symfony assegna ai campi un `name` con il prefisso del form type (es. `filtro_clienti[stato]`, `filtro_clienti[zone][]`): la query string contiene quindi questi nomi, e `$request->query->get('stato')` non trova nulla, quindi il filtro viene ignorato senza errori. L'opzione `id` passata a `form_row()` modifica solo l'attributo `id`, non il `name`. Le soluzioni sono due:
+
+- eliminare il prefisso nel form type, così i campi arrivano come `stato`, `zone[]`…:
+
+  ```php
+  class FiltroClientiType extends AbstractType
+  {
+    // ...
+
+    public function getBlockPrefix(): string
+    {
+      return '';
+    }
+  }
+  ```
+
+- mantenere il prefisso e leggere i valori come array: `$f = $request->query->all('filtro_clienti');` (poi `$f['stato'] ?? null`, con la stessa validazione).
+
+Con il form generato da Symfony la query string può contenere anche altri parametri, che l'endpoint ignora: il `_token` CSRF, se è attivo sul form (per un form di filtro in GET si può disattivare con `'csrf_protection' => false` in `configureOptions()`), e il pulsante di submit, se ha un `name`.
+
 **Tabelle client-side.** Con `filterForm` senza `serverSide` l'endpoint riceve solo i campi del form: applica i filtri e restituisce **tutte** le righe corrispondenti (nessuna paginazione, ricerca o ordinamento lato server), con `totRec` facoltativo.
 
 ### <a id="backend-helper"></a>Helper riutilizzabile
@@ -1596,6 +1616,7 @@ parametri nell'helper, lasciando invariato il resto.
 - [ ] nessun join *to-many* nella query paginata; sotto-array caricati per gli id della pagina
 - [ ] righe normalizzate (date ISO, booleani, oggetti annidati) con le `key` delle colonne
 - [ ] filtri di pagina (`filterForm`): parametro assente = nessun filtro, valori tipizzati e validati, campi multipli con `[]`, nomi che non collidono con `serverParams`
+- [ ] form di filtro generato con Symfony Form: `getBlockPrefix()` restituisce `''`, oppure i valori vengono letti con `$request->query->all('<prefisso>')`
 
 ## <a id="eventi"></a>Eventi
 

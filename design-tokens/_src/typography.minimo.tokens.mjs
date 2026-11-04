@@ -15,6 +15,11 @@ export default {
         $type: 'string',
         $description: '64 to 90 rem: https://clamp.font-size.app/?config=eyJyb290IjoiMTYiLCJtaW5XaWR0aCI6IjY0cmVtIiwibWF4V2lkdGgiOiI5MHJlbSIsIm1pbkZvbnRTaXplIjoiLjlyZW0iLCJtYXhGb250U2l6ZSI6IjFyZW0ifQ%3D%3D'
       },
+      lead: {
+        $value: 'clamp(.95rem, .5192rem + .6731vw, 1.125rem)',
+        $type: 'string',
+        $description: '64-90rem: https://clamp.font-size.app/?config=eyJyb290IjoiMTYiLCJtaW5XaWR0aCI6IjY0cmVtIiwibWF4V2lkdGgiOiI5MHJlbSIsIm1pbkZvbnRTaXplIjoiLjk1cmVtIiwibWF4Rm9udFNpemUiOiIxLjEyNXJlbSJ9'
+      },
       xxs: {
         $value: 'clamp(.6rem, .3538rem + .3846vw, .7rem)',
         $type: 'string',

@@ -1,0 +1,5 @@
+**/*.html
+**/*.mov
+**/*.mp4
+
+voiceover-*.txt
