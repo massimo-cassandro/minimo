@@ -4,20 +4,20 @@ import { randomId } from '../random-id.js';
 
 /**
  * Wrapper `.form-group` condiviso dai builder di tag qui sotto: gestisce il controllo
- * `condition`, `wrapperClass`, il testo di aiuto opzionale e `callback` in
+ * `condition`, `formGroupExtraClass`, il testo di aiuto opzionale e `callback` in
  * un unico punto, così che ogni builder debba fornire solo i propri `children`
  * (tipicamente label + controllo).
  *
  * @param {Object} args
  * @param {boolean} [args.condition=true] - Se false, restituisce `null` senza costruire nulla (default: true)
- * @param {string | null} [args.wrapperClass=null] - classe opzionale da aggiungere al wrapper `.form-group` (default: null)
+ * @param {string | null} [args.formGroupExtraClass=null] - classe opzionale da aggiungere al wrapper `.form-group` (default: null)
  * @param {string | HTMLElement | null} [args.help=null] - Testo di aiuto opzionale (default: null)
  * @param {Array<Object>} args.children - figli domBuilder da renderizzare dentro il `.form-group` (prima del testo di aiuto).
  * @returns {DomBuilderItem|null} L'elemento domBuilder `.form-group`, oppure `null` quando `condition` è false.
  */
 function buildFormGroup({
   condition = true,
-  wrapperClass = null,
+  formGroupExtraClass = null,
   help = null,
   children
 }) {
@@ -27,7 +27,7 @@ function buildFormGroup({
   }
 
   return {
-    className: classnames('form-group', wrapperClass),
+    className: classnames('form-group', formGroupExtraClass),
     children: [
       ...children,
       {
@@ -49,13 +49,13 @@ function buildFormGroup({
  * @param {string | null} args.id - attributo `id`.
  * @param {string | number | null} args.value - attributo `value` dell'input.
  * @param {string | null} [args.type='text'] - attributo `type` dell'input (default: 'text')
- * @param {string | null} [args.wrapperClass=null] - classe opzionale da aggiungere al wrapper `.form-group` (default: null)
+ * @param {string | null} [args.formGroupExtraClass=null] - classe opzionale da aggiungere al wrapper `.form-group` (default: null)
  * @param {string | null} [args.class=null] - classe opzionale da aggiungere all'`input` (default: null)
  * @param {string | null} [args.classname=null] - Alias di `class` (default: null)
  * @param {string | null} [args.className=null] - Alias di `class` (default: null)
  * @param {boolean} [args.condition=true] - Se false, la funzione restituisce `null` senza costruire nulla (default: true)
  * @param {string | HTMLElement | null} args.help - Testo di aiuto opzionale.
- * @param {(function(HTMLElement|Text): void) | null} args.callback - Funzione callback opzionale.
+ * @param {(function(Element|Text): void) | null} args.callback - Funzione callback opzionale.
  * @param {Record<string, any> | null}  [args.attrs={}] - Oggetto di attributi opzionale (default: {})
  * @example
  * // Tutti i parametri (valori di default dove previsti):
@@ -65,7 +65,7 @@ function buildFormGroup({
  *   id: null, // attributo id, FAC
  *   value: null, // attributo value, FAC
  *   type: 'text', // attributo type, FAC
- *   wrapperClass: null, // classi extra del .form-group, FAC
+ *   formGroupExtraClass: null, // classi extra del .form-group, FAC
  *   class: null, // classi extra (alias `classname`, `className`), FAC
  *   condition: true, // se false restituisce null, FAC
  *   help: null, // testo di aiuto, FAC
@@ -81,7 +81,7 @@ export function buildInput({
   id = null,
   value = null,
   type = 'text',
-  wrapperClass = null,
+  formGroupExtraClass = null,
   class: classArg = null,
   classname: classnameArg = null,
   className: classNameArg = null,
@@ -97,7 +97,7 @@ export function buildInput({
 
   return buildFormGroup({
     condition,
-    wrapperClass,
+    formGroupExtraClass,
     help,
     children: [
       `label.form-label[for:${id}] ${label}`,
@@ -129,14 +129,14 @@ export function buildInput({
  *    coppie valore/testo delle opzioni, come array di array a due elementi `[[value, text], ...]`,
  *    come array di oggetti `[{somekey: value, somekey2: text},...]`, oppure come singolo oggetto `{value: text, ...}`
  * @param {boolean} [args.addEmptyOption=true] - Se true, viene aggiunto in cima un tag option vuoto (default: true)
- * @param {string | null} [args.wrapperClass=null] - classe opzionale da aggiungere al wrapper `.form-group` (default: null)
+ * @param {string | null} [args.formGroupExtraClass=null] - classe opzionale da aggiungere al wrapper `.form-group` (default: null)
  * @param {string | null} [args.class=null] - classe opzionale da aggiungere all'`input` (default: null)
  * @param {string | null} [args.classname=null] - Alias di `class` (default: null)
  * @param {string | null} [args.className=null] - Alias di `class` (default: null)
  * @param {boolean} [args.condition=true] - Se false, la funzione restituisce `null` senza costruire nulla (default: true)
  * @param {boolean} [args.useBsClass=false] - Se true, usa la classe BS5 (`form-select`) al posto di `form-control` (default: false)
  * @param {string | HTMLElement | null} args.help - Testo di aiuto opzionale.
- * @param {(function(HTMLElement|Text): void) | null} args.callback - Funzione callback opzionale.
+ * @param {(function(Element|Text): void) | null} args.callback - Funzione callback opzionale.
  * @param {Record<string, any> | null}  [args.attrs={}] - Oggetto di attributi opzionale (default: {})
  * @example
  * // Tutti i parametri (valori di default dove previsti):
@@ -147,7 +147,7 @@ export function buildInput({
  *   selectedValue: null, // valore selezionato (confronto ==), FAC
  *   options: null, // coppie [value, label], array di oggetti o oggetto, FAC
  *   addEmptyOption: true, // option vuota in cima, FAC
- *   wrapperClass: null, // classi extra del .form-group, FAC
+ *   formGroupExtraClass: null, // classi extra del .form-group, FAC
  *   class: null, // classi extra (alias `classname`, `className`), FAC
  *   useBsClass: false, // usa `form-select` invece di `form-control`, FAC
  *   condition: true, // se false restituisce null, FAC
@@ -165,7 +165,7 @@ export function buildSelect({
   selectedValue = null,
   options = null,
   addEmptyOption = true,
-  wrapperClass = null,
+  formGroupExtraClass = null,
   class: classArg = null,
   classname: classnameArg = null,
   className: classNameArg = null,
@@ -200,7 +200,7 @@ export function buildSelect({
 
   return buildFormGroup({
     condition,
-    wrapperClass,
+    formGroupExtraClass,
     help,
     children: [
       `label.form-label[for:${id}] ${label}`,
@@ -242,11 +242,11 @@ export function buildSelect({
  * @param {boolean} [args.checked=false] - attributo `checked` della checkbox (default: false)
  * @param {boolean} [args.switch=false] - Se true, la checkbox viene resa come switch
  *    (wrapper `.form-switch`, `role="switch"` e attributo nativo `switch`) (default: false)
- * @param {string | null} [args.wrapperClass=null] - classe opzionale da aggiungere al wrapper `.form-group` (usata solo quando `addFormGroup` è true) (default: null)
+ * @param {string | null} [args.formGroupExtraClass=null] - classe opzionale da aggiungere al wrapper `.form-group` (usata solo quando `addFormGroup` è true) (default: null)
  * @param {boolean} [args.addFormGroup=true] - Se true, racchiude la checkbox in un elemento `.form-group` (default: true)
  * @param {boolean} [args.condition=true] - Se false, la funzione restituisce `null` senza costruire nulla (default: true)
  * @param {string | HTMLElement | null} args.help - Testo di aiuto opzionale.
- * @param {(function(HTMLElement|Text): void) | null} args.callback - Funzione callback opzionale.
+ * @param {(function(Element|Text): void) | null} args.callback - Funzione callback opzionale.
  * @param {Record<string, any> | null}  [args.attrs={}] - Oggetto di attributi opzionale (default: {})
  * @example
  * // Tutti i parametri (valori di default dove previsti):
@@ -257,7 +257,7 @@ export function buildSelect({
  *   value: 1, // attributo value, FAC
  *   checked: false, // attributo checked, FAC
  *   switch: false, // resa come switch, FAC
- *   wrapperClass: null, // classi extra del .form-group, FAC
+ *   formGroupExtraClass: null, // classi extra del .form-group, FAC
  *   addFormGroup: true, // racchiude in un .form-group, FAC
  *   condition: true, // se false restituisce null, FAC
  *   help: null, // testo di aiuto, FAC
@@ -274,7 +274,7 @@ export function buildCheckbox({
   value = 1,
   checked = false,
   switch: isSwitch = false,
-  wrapperClass = null,
+  formGroupExtraClass = null,
   addFormGroup = true,
   condition = true,
   help = null,
@@ -304,7 +304,7 @@ export function buildCheckbox({
   id = id || randomId();
 
   const tag = {
-    className: classnames('form-check', isSwitch && 'form-switch', !addFormGroup && !help && wrapperClass),
+    className: classnames('form-check', isSwitch && 'form-switch', !addFormGroup && !help && formGroupExtraClass),
     children: [
       {
         tag: 'input',
@@ -327,7 +327,7 @@ export function buildCheckbox({
 
   if(addFormGroup) {
     return buildFormGroup({
-      wrapperClass,
+      formGroupExtraClass,
       help,
       children: [tag]
     });
@@ -348,13 +348,13 @@ export function buildCheckbox({
  * @param {string | null} args.id - attributo `id`.
  * @param {string | number | null} args.value - contenuto della textarea.
  * @param {boolean} [args.autosize=true] - aggiunge la classe `autosize` (default: true)
- * @param {string | null} [args.wrapperClass=null] - classe opzionale da aggiungere al wrapper `.form-group` (default: null)
+ * @param {string | null} [args.formGroupExtraClass=null] - classe opzionale da aggiungere al wrapper `.form-group` (default: null)
  * @param {string | null} [args.class=null] - classe opzionale da aggiungere all'elemento textarea (default: null)
  * @param {string | null} [args.classname=null] - Alias di `class` (default: null)
  * @param {string | null} [args.className=null] - Alias di `class` (default: null)
  * @param {boolean} [args.condition=true] - Se false, la funzione restituisce `null` senza costruire nulla (default: true)
  * @param {string | HTMLElement | null} args.help - Testo di aiuto opzionale.
- * @param {(function(HTMLElement|Text): void) | null} args.callback - Funzione callback opzionale.
+ * @param {(function(Element|Text): void) | null} args.callback - Funzione callback opzionale.
  * @param {Record<string, any> | null}  [args.attrs={}] - Oggetto di attributi opzionale (default: {})
  * @example
  * // Tutti i parametri (valori di default dove previsti):
@@ -364,7 +364,7 @@ export function buildCheckbox({
  *   id: null, // attributo id, FAC
  *   value: null, // contenuto, FAC
  *   autosize: true, // aggiunge la classe autosize, FAC
- *   wrapperClass: null, // classi extra del .form-group, FAC
+ *   formGroupExtraClass: null, // classi extra del .form-group, FAC
  *   class: null, // classi extra (alias `classname`, `className`), FAC
  *   condition: true, // se false restituisce null, FAC
  *   help: null, // testo di aiuto, FAC
@@ -379,7 +379,7 @@ export function buildTextarea({
   name = null,
   id = null,
   value = null,
-  wrapperClass = null,
+  formGroupExtraClass = null,
   class: classArg = null,
   classname: classnameArg = null,
   className: classNameArg = null,
@@ -396,7 +396,7 @@ export function buildTextarea({
 
   return buildFormGroup({
     condition,
-    wrapperClass,
+    formGroupExtraClass,
     help,
     children: [
       `label.form-label[for:${id}] ${label}`,
@@ -421,21 +421,21 @@ export function buildTextarea({
  * @param {Object} args
  * @param {string} args.label - label.
  * @param {string | number | null} args.value - contenuto testuale.
- * @param {string | null} [args.wrapperClass=null] - classe opzionale da aggiungere al wrapper `.form-group` (default: null)
+ * @param {string | null} [args.formGroupExtraClass=null] - classe opzionale da aggiungere al wrapper `.form-group` (default: null)
  * @param {boolean} [args.noBorder=true] - aggiunge la classe `no-border` (default: true)
  * @param {string | null} [args.class=null] - classe opzionale da aggiungere al campo finto (default: null)
  * @param {string | null} [args.classname=null] - Alias di `class` (default: null)
  * @param {string | null} [args.className=null] - Alias di `class` (default: null)
  * @param {boolean} [args.condition=true] - Se false, la funzione restituisce `null` senza costruire nulla (default: true)
  * @param {string | HTMLElement | null} args.help - Testo di aiuto opzionale.
- * @param {(function(HTMLElement|Text): void) | null} args.callback - Funzione callback opzionale.
+ * @param {(function(Element|Text): void) | null} args.callback - Funzione callback opzionale.
  * @param {Record<string, any> | null}  [args.attrs={}] - Oggetto di attributi opzionale (default: {})
  * @example
  * // Tutti i parametri (valori di default dove previsti):
  * buildFakeField({
  *   label: '...', // label, OBBL
  *   value: null, // contenuto testuale, FAC
- *   wrapperClass: null, // classi extra del .form-group, FAC
+ *   formGroupExtraClass: null, // classi extra del .form-group, FAC
  *   noBorder: true, // aggiunge la classe no-border, FAC
  *   class: null, // classi extra (alias `classname`, `className`), FAC
  *   condition: true, // se false restituisce null, FAC
@@ -449,7 +449,7 @@ export function buildTextarea({
 export function buildFakeField({
   label,
   value = null,
-  wrapperClass = null,
+  formGroupExtraClass = null,
   class: classArg = null,
   classname: classnameArg = null,
   className: classNameArg = null,
@@ -464,7 +464,7 @@ export function buildFakeField({
 
   return buildFormGroup({
     condition,
-    wrapperClass,
+    formGroupExtraClass,
     help,
     children: [
       `span.form-label ${label}`,
@@ -494,8 +494,10 @@ export function buildFakeField({
  * @param {string | null} [args.classname=null] - Alias di `class` (default: null)
  * @param {string | null} [args.className=null] - Alias di `class` (default: null)
  * @param {boolean} [args.condition=true] - Se false, la funzione restituisce `null` senza costruire nulla (default: true)
- * @param {(function(HTMLElement|Text): void) | null} args.callback - Funzione callback opzionale.
+ * @param {(function(Element|Text): void) | null} args.callback - Funzione callback opzionale.
  * @param {Record<string, any> | null}  [args.attrs={}] - Oggetto di attributi opzionale (default: {})
+ * @param {boolean} [args.addFormGroup=false] - Se true, racchiude il button in un elemento `.form-group` (default: false)
+ * @param {string | null} [args.formGroupExtraClass=null] - classe opzionale da aggiungere al wrapper `.form-group` (usata solo quando `addFormGroup` è true) (default: null)
  * @example
  * // Tutti i parametri (valori di default dove previsti):
  * buildButton({
@@ -506,9 +508,11 @@ export function buildFakeField({
  *   condition: true, // se false restituisce null, FAC
  *   attrs: {}, // attributi extra, FAC
  *   callback: null, // callback(el) dopo la creazione, FAC
+ *   addFormGroup: false, // racchiude in un .form-group, FAC
+ *   formGroupExtraClass: null, // classi extra del .form-group, FAC
  * });
  *
- * @returns {DomBuilderItem|null} L'elemento domBuilder `button`, oppure `null` quando `condition` è false.
+ * @returns {DomBuilderItem|null} L'elemento domBuilder `button` (o racchiuso in `.form-group`), oppure `null` quando `condition` è false.
  */
 export function buildButton({
   content,
@@ -520,11 +524,13 @@ export function buildButton({
   condition = true,
   callback = null,
   attrs = {},
+  addFormGroup = false,
+  formGroupExtraClass = null,
 }) {
 
   const className = classArg ?? classnameArg ?? classNameArg;
 
-  return {
+  const tag = {
     condition: condition,
     tag: 'button',
     className: classnames(className, attrs?.class),
@@ -539,4 +545,15 @@ export function buildButton({
     ),
     callback: callback
   };
+
+  if(addFormGroup) {
+    return buildFormGroup({
+      condition,
+      formGroupExtraClass,
+      children: [tag]
+    });
+
+  } else {
+    return tag;
+  }
 }
