@@ -47,5 +47,6 @@
 
 
 /* spinner: includere solo il css dello spinner scelto */
+@import '@minimoCss/spinner-wrapper.css';
 @import '@minimoCss/spinner-circle-basic.css';
 

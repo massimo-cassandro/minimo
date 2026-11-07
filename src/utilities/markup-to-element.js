@@ -17,6 +17,23 @@
  * markupToElement(calendarIcon, { 'aria-hidden': 'true', focusable: 'false' }); // → SVGSVGElement
  * markupToElement('<span class="badge">nuovo</span>');                         // → HTMLSpanElement
  * markupToElement('<li>uno</li><li>due</li>');                                 // → [HTMLLIElement, HTMLLIElement]
+ *
+ * @example
+ * // Uso nei `children` di domBuilder, insieme ad altri elementi fratelli.
+ * // Con una sola radice l'elemento restituito viene inserito così com'è;
+ * // con più radici (array) serve lo spread, con `.flat()` difensivo per coprire anche
+ * // il caso di elemento singolo o `null`:
+ * domBuilder([{
+ *   tag: 'div',
+ *   children: [
+ *     markupToElement(calendarIcon, { 'aria-hidden': 'true', focusable: 'false' }),
+ *     { tag: 'span', className: 'label', content: 'Scadenza' },
+ *     { tag: 'ul', children: [
+ *       { tag: 'li', content: 'primo' },
+ *       ...[markupToElement('<li>due</li><li>tre</li>')].flat(),
+ *     ]},
+ *   ]
+ * }], container);
  */
 export function markupToElement(markup, attrs = {}) {
 

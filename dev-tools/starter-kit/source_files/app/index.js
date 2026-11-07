@@ -10,5 +10,6 @@ dismissAlerts();
 
 
 if (process.env.NODE_ENV === 'development') {
-  import('@massimo-cassandro/minimo/layout-tools');
+  import('@massimo-cassandro/minimo/layout-tools')
+    .then(({ layoutTools }) => layoutTools());
 }

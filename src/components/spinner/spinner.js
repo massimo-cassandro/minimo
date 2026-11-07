@@ -1,4 +1,4 @@
-import * as styles from './spinner.module.css';
+import '@minimoCss/spinner-wrapper.css';
 import { classnames } from '../../utilities/classnames.js';
 
 /** @typedef {import('../../utilities/dom-builder/dom-builder.js').DomBuilderItem} DomBuilderItem */
@@ -40,14 +40,14 @@ export function spinner({spinnerExtraClass = null, output = 'html'} = {}) {
   // NB: la struttura domBuilder va tenuta allineata manualmente al markup HTML sottostante
   if(output === 'domBuilder') {
     return {
-      className: styles.spinnerWrapper,
+      className: 'spinner-wrapper',
       children: [
         { className: spinnerClass, content: 'Loading...' }
       ]
     };
   }
 
-  const html = `<div class="${styles.spinnerWrapper}">
+  const html = `<div class="spinner-wrapper">
     <div class="${spinnerClass}">Loading...</div>
   </div>`;
 

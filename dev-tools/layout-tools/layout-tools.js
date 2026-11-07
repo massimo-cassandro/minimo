@@ -1,6 +1,7 @@
 import * as styles from './layout-tools.module.css';
 
 // TODO aggiungere popup info viewport
+// TODO aggiungere info schermo, vedi https://huddlekit.com/tools/viewport-size e simili
 
 /**
  * Aggiunge alla pagina un indicatore del breakpoint corrente (solo per sviluppo)

@@ -859,6 +859,7 @@ export type MinimoClass =
   | 'span-5'
   | 'span-6'
   | 'spinner'
+  | 'spinner-wrapper'
   | 'table'
   | 'table-bordered'
   | 'table-responsive'

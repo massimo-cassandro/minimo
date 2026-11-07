@@ -45,7 +45,7 @@ function buildFormGroup({
  *
  * @param {Object} args
  * @param {string} args.label - label dell'input.
- * @param {string | null} args.name - attributo `name` dell'input.
+ * @param {string | null} [args.name=null] - attributo `name` dell'input (default: null)
  * @param {string | null} args.id - attributo `id`.
  * @param {string | number | null} args.value - attributo `value` dell'input.
  * @param {string | null} [args.type='text'] - attributo `type` dell'input (default: 'text')
@@ -61,7 +61,7 @@ function buildFormGroup({
  * // Tutti i parametri (valori di default dove previsti):
  * buildInput({
  *   label: '...', // label, OBBL
- *   name: '...', // attributo name, OBBL
+ *   name: null, // attributo name, FAC
  *   id: null, // attributo id, FAC
  *   value: null, // attributo value, FAC
  *   type: 'text', // attributo type, FAC
@@ -77,7 +77,7 @@ function buildFormGroup({
  */
 export function buildInput({
   label,
-  name,
+  name = null,
   id = null,
   value = null,
   type = 'text',
@@ -108,7 +108,7 @@ export function buildInput({
         attrs: {
           ...(attrs??{}),
           type: type,
-          name: name,
+          name: name ?? attrs?.name,
           value: value
         },
         callback: callback
@@ -122,7 +122,7 @@ export function buildInput({
  *
  * @param {Object} args
  * @param {string} args.label - label della select.
- * @param {string | null} args.name - attributo `name` della select.
+ * @param {string | null} [args.name=null] - attributo `name` della select (default: null)
  * @param {string | null} args.id - attributo `id`.
  * @param {string | number | null} args.selectedValue - valore selezionato (nota: confrontato con i valori di 'options' tramite uguaglianza debole '=='):
  * @param {Array<[string|number, string]> | Array<Record<string, string>> | Record<string, string> | null} args.options -
@@ -142,7 +142,7 @@ export function buildInput({
  * // Tutti i parametri (valori di default dove previsti):
  * buildSelect({
  *   label: '...', // label, OBBL
- *   name: '...', // attributo name, OBBL
+ *   name: null, // attributo name, FAC
  *   id: null, // attributo id, FAC
  *   selectedValue: null, // valore selezionato (confronto ==), FAC
  *   options: null, // coppie [value, label], array di oggetti o oggetto, FAC
@@ -160,7 +160,7 @@ export function buildInput({
  */
 export function buildSelect({
   label,
-  name,
+  name = null,
   id = null,
   selectedValue = null,
   options = null,
@@ -210,7 +210,7 @@ export function buildSelect({
         id: id,
         attrs: {
           ...(attrs??{}),
-          name: name,
+          name: name ?? attrs?.name,
         },
         children: [
           ...(addEmptyOption? ['option[value:]'] : []),
@@ -236,7 +236,7 @@ export function buildSelect({
  *
  * @param {Object} args
  * @param {string} args.label - label della checkbox.
- * @param {string | null} args.name - attributo `name` della checkbox.
+ * @param {string | null} [args.name=null] - attributo `name` della checkbox (default: null)
  * @param {string | null} args.id - attributo `id`.
  * @param {string | number | null} [args.value=1] - attributo `value` della checkbox (default: 1)
  * @param {boolean} [args.checked=false] - attributo `checked` della checkbox (default: false)
@@ -252,7 +252,7 @@ export function buildSelect({
  * // Tutti i parametri (valori di default dove previsti):
  * buildCheckbox({
  *   label: '...', // label, OBBL
- *   name: '...', // attributo name, OBBL
+ *   name: null, // attributo name, FAC
  *   id: null, // attributo id, FAC
  *   value: 1, // attributo value, FAC
  *   checked: false, // attributo checked, FAC
@@ -269,7 +269,7 @@ export function buildSelect({
  */
 export function buildCheckbox({
   label,
-  name,
+  name = null,
   id = null,
   value = 1,
   checked = false,
@@ -314,7 +314,7 @@ export function buildCheckbox({
           ...(attrs??{}),
           type: 'checkbox',
           value: value,
-          name: name,
+          name: name ?? attrs?.name,
           checked: checked,
           // controllo switch nativo (per ora solo WebKit), con ripiego css altrove
           ...(isSwitch? {role: 'switch', switch: ''} : {})
@@ -344,7 +344,7 @@ export function buildCheckbox({
  *
  * @param {Object} args
  * @param {string} args.label - label della textarea.
- * @param {string | null} args.name - attributo `name` della textarea.
+ * @param {string | null} [args.name=null] - attributo `name` della textarea (default: null)
  * @param {string | null} args.id - attributo `id`.
  * @param {string | number | null} args.value - contenuto della textarea.
  * @param {boolean} [args.autosize=true] - aggiunge la classe `autosize` (default: true)
@@ -360,7 +360,7 @@ export function buildCheckbox({
  * // Tutti i parametri (valori di default dove previsti):
  * buildTextarea({
  *   label: '...', // label, OBBL
- *   name: '...', // attributo name, OBBL
+ *   name: null, // attributo name, FAC
  *   id: null, // attributo id, FAC
  *   value: null, // contenuto, FAC
  *   autosize: true, // aggiunge la classe autosize, FAC
@@ -376,7 +376,7 @@ export function buildCheckbox({
  */
 export function buildTextarea({
   label,
-  name,
+  name = null,
   id = null,
   value = null,
   wrapperClass = null,
@@ -406,7 +406,7 @@ export function buildTextarea({
         id: id,
         attrs: {
           ...(attrs??{}),
-          name: name,
+          name: name ?? attrs?.name,
         },
         content: value,
         callback: callback

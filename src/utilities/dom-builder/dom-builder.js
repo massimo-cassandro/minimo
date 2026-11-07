@@ -8,7 +8,7 @@ import { createDomElement, normalizeNamespace } from './resolveNamespace.js';
 
 /**
  * @typedef {Object} DomBuilderItem
- * @property {string | string[]} [tag='div'] - Nome del tag o array di tag annidati (ciascuno è il genitore del successivo). Anche `tagName`. La grafia viene conservata, necessaria per i tag SVG come `linearGradient` (default: 'div')
+ * @property {string | string[]} [tag='div'] - Nome del tag (solo il nome, senza sintassi abbreviata) o array di tag annidati in sintassi abbreviata (ciascuno è il genitore del successivo). Anche `tagName`. La grafia viene conservata, necessaria per i tag SVG come `linearGradient` (default: 'div')
  * @property {string | string[]} [tagName='div'] - Alias di `tag` (default: 'div')
  * @property {string | string[]} [className] - Classe/i CSS: una singola stringa o un array (i valori falsy vengono scartati).
  * @property {string | string[]} [class] - Alias di `className`.
@@ -92,7 +92,11 @@ import { createDomElement, normalizeNamespace } from './resolveNamespace.js';
  *
  * La sintassi abbreviata non supporta `content`, `callback`, `condition` o `children`; per questi usare la sintassi a oggetto.
  *
- * La sintassi abbreviata può essere usata anche per la proprietà `tag` nella sintassi a oggetto.
+ * Nella sintassi a oggetto la sintassi abbreviata è ammessa in `tag` **solo** quando è un array: ogni elemento
+ * dell'array viene analizzato con `parseDomString` (es. `tag: ['.wrapper', 'ul.list']`). Un `tag` stringa singola
+ * è invece sempre il semplice nome del tag (es. `tag: 'span'`): `tag: 'span.label'` non è valido, per classi, id
+ * e attributi vanno usate le proprietà dell'oggetto (`className`, `id`, `attrs`), oppure, se non servono le altre
+ * proprietà, la stringa abbreviata direttamente come elemento di `structureArray`/`children` (es. `'span.label Testo'`).
  * Quando `tag` è un array, ogni elemento diventa il genitore del successivo. Tutte le altre proprietà dell'oggetto
  * (className, callback, ecc.) vengono applicate solo all'ultimo elemento dell'array.
  * Quando la stringa abbreviata e le proprietà a livello di oggetto sono in conflitto (classi, id o attributi),
@@ -117,7 +121,7 @@ import { createDomElement, normalizeNamespace } from './resolveNamespace.js';
  *
  * @function domBuilder
  * @param {Array<DomBuilderItem|string|Node>} [structureArray=[]] - Array di configurazione. Accetta stringhe (scorciatoia secondo `parseDomString`), oggetti di configurazione e/o `Node` (un `Element`, un `DocumentFragment`, ...) inseriti così come sono; ogni oggetto di configurazione supporta:
- * - `tag` / `tagName` {string | string[]} - Nome del tag HTML, o array di tag annidati (ciascuno è il genitore del successivo). Default `'div'`.
+ * - `tag` / `tagName` {string | string[]} - Nome del tag HTML (solo il nome, senza sintassi abbreviata), o array di tag annidati in sintassi abbreviata (ciascuno è il genitore del successivo). Default `'div'`.
  * - `className` / `class` / `classname` {string | string[]} - Classe/i CSS: una singola stringa o un array (i valori falsy vengono scartati).
  * - `id` {string | null} - ID univoco dell'elemento.
  * - `attrs` {[string, *] | [string, *][] | Object<string, *>} - Attributi: una coppia `[name, value]`, un array di coppie o un oggetto `{name: value}`.

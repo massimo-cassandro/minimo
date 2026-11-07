@@ -9,8 +9,11 @@
 * [Parametri del componente](#parametri)
   * [`classes`](#parametri-classes)
   * [`labels`](#parametri-labels)
+  * [`infoText`](#parametri-infotext)
+  * [`trCallback`](#parametri-trcallback)
 * [Parametri colonne](#colonne)
   * [Ricerca e ordinamento](#colonne-ricerca)
+  * [`condition`](#colonne-condition)
   * [`parse`](#colonne-parse)
   * [`render`](#colonne-render)
   * [`rowspan`](#colonne-rowspan)
@@ -232,7 +235,7 @@ Tutti i parametri sono impostabili sia da attributo HTML che come oggetto in `in
 | `debug` | boolean (`false`) | Log in console di parametri, colonne, dati, stato ed elementi generati |
 | `filterForm` | string o HTMLFormElement (`null`) | Id del form di filtro collegato (da `init()` anche l'elemento): i suoi valori vengono aggiunti alla query string di `jsonUrl` e al submit/reset la tabella viene aggiornata. Richiede `jsonUrl`. Vedi [Form di filtro collegato](#filterform) |
 | `filteredRecField` | string (`'filteredRec'`) | Solo server-side: chiave del JSON con il numero di record che soddisfano la ricerca corrente; se assente vale `totRecField` |
-| `infoText` | string, Function o null (`null`) | Contenuto dell'area info: stringa mustache-like con i segnaposto `{start}`, `{end}`, `{totRec}`, `{filteredRec}`, `{page}`, `{totPages}`, oppure funzione `(start, end, totRec, filteredRec, page, totPages) => string\|Node`. `null` = viene usato `labels.info` |
+| `infoText` | string, Function o null (`null`) | Contenuto dell'area info: stringa mustache-like con i segnaposto `{start}`, `{end}`, `{totRec}`, `{filteredRec}`, `{page}`, `{totPages}`, oppure funzione `(start, end, totRec, filteredRec, page, totPages) => string\|Node`. `null` = viene usato `labels.info` ([Altre info](#parametri-infotext)) |
 | `initialSort` | oggetto { chiave: 'asc'\|'desc' } o null (`null`) | Ordinamento applicato al caricamento: uno o più criteri in ordine di priorità, es. `{ city: 'asc', name: 'desc' }` |
 | `jqDatatableMode` | boolean (`false`) | Se `true` imposta come default i valori compatibili con il formato server-side di jQuery DataTables: `jsonDataField: 'data'`, `totRecField: 'recordsTotal'`, `filteredRecField: 'recordsFiltered'`, `serverSide: true` e i `serverParams` indicati in "Modalità jQuery DataTables". Ogni valore resta sovrascrivibile |
 | `jsonDataField` | string o null (`'data'`) | Chiave del JSON che contiene l'array delle righe (es. `'data'` per `{ data: [...] }`); `null` o `''` = la root del JSON è l'array stesso |
@@ -260,7 +263,7 @@ Tutti i parametri sono impostabili sia da attributo HTML che come oggetto in `in
 | `tfoot` | boolean (`false`) | Genera il tfoot (vedi `tfootRender` delle colonne). Non disponibile in modalità server-side |
 | `timesLocaleOpts` | Intl.DateTimeFormatOptions (`{ hour12: false, hour: '2-digit', minute: '2-digit' }`) | Parte ora del tipo datetime |
 | `totRecField` | string (`'totRec'`) | Chiave del JSON con il totale dei record (numerico); se assente o non numerico il totale è la lunghezza dell'array |
-| `trCallback` | (tr, row, params, subIdx) => void (`null`) | Callback invocata dopo il rendering di ogni `<tr>` del body. `subIdx` è l'indice del `<tr>` all'interno del record (sempre 0 se nessuna colonna usa [`rowspan`](#colonne-rowspan)) |
+| `trCallback` | (tr, row, params, subIdx) => void (`null`) | **[solo JS]** Callback invocata dopo il rendering di ogni `<tr>` del body. `subIdx` è l'indice del `<tr>` all'interno del record (sempre 0 se nessuna colonna usa [`rowspan`](#colonne-rowspan)) ([Altre info](#parametri-trcallback)) |
 | `updateFooterOnPageChange` | boolean (`false`) | Se `true` `tfootRender` riceve solo i record della pagina corrente (subtotali di pagina) e il footer si aggiorna a ogni cambio pagina; se `false` riceve l'intero set filtrato e si aggiorna solo al cambio filtro |
 
 **Nota sulle icone**: ogni icona può essere una stringa SVG/HTML (es. import `?inline`), un Node, un oggetto domBuilder o una funzione che restituisce uno di questi valori.
@@ -329,18 +332,85 @@ tipi di dato predefiniti: modificandole si cambiano le classi di tutte le colonn
 | `sortDesc` | `'Ordina questa colonna in senso discendente (Z → A)'` | `title`/`aria-label` del pulsante di ordinamento: descrive l'azione del prossimo click |
 | `sortNone` | `'Rimuovi l’ordinamento a questa colonna'` | `title`/`aria-label` del pulsante di ordinamento: descrive l'azione del prossimo click |
 
-#### Segnaposto di `labels.info` / `infoText`:
+### <a id="parametri-infotext"></a>`infoText`
 
-| Segnaposto | Valore |
+Definisce il contenuto dell'area info (`elements.resultInfo`), aggiornata a ogni cambio di pagina, ricerca, ordinamento o filtro. Può essere:
+
+- `null` (default): viene usato il template `labels.info`
+- una stringa mustache-like con i segnaposto elencati sotto, che sostituisce `labels.info`
+- una funzione con argomenti posizionali, che restituisce il contenuto (testo, stringa HTML, Node o array domBuilder):
+
+```javascript
+infoText: (start, end, totRec, filteredRec, page, totPages) => contenuto
+```
+
+#### Segnaposto e argomenti
+
+| Segnaposto / argomento | Valore |
 |---|---|
-| `{end}` | indice dell'ultimo record della pagina corrente |
+| `{end}` | indice dell'ultimo record della pagina corrente (0 se non ci sono righe) |
 | `{filteredRec}` | totale dei record dopo il filtro |
 | `{page}` | pagina corrente |
-| `{start}` | indice (da 1) del primo record della pagina corrente, nel set filtrato |
+| `{start}` | indice (da 1) del primo record della pagina corrente, nel set filtrato (0 se non ci sono righe) |
 | `{totPages}` | numero di pagine |
 | `{totRec}` | totale dei record non filtrati (dal JSON, vedi `totRecField`, o lunghezza dei dati) |
 
-I numeri vengono formattati secondo `locale`.
+Nella stringa i segnaposto vengono sostituiti dai numeri formattati secondo `locale`, mentre la funzione riceve i numeri grezzi, da formattare se necessario.
+
+Differenze tra stringa e funzione in assenza di righe (`filteredRec` pari a 0):
+
+- con `labels.info` o una stringa vengono mostrati `labels.noResults` (ricerca attiva) o `labels.noRows`
+- la funzione viene invocata comunque e deve quindi gestire anche questo caso
+
+```javascript
+infoText: (start, end, totRec, filteredRec) => {
+  if (!filteredRec) {
+    return 'Nessun ordine';
+  }
+  const fmt = n => n.toLocaleString('it-IT');
+  return filteredRec < totRec
+    ? `Ordini ${fmt(start)}–${fmt(end)} di ${fmt(filteredRec)} (filtrati da ${fmt(totRec)})`
+    : `Ordini ${fmt(start)}–${fmt(end)} di ${fmt(totRec)}`;
+}
+```
+
+La funzione è utilizzabile solo da `init()` (o `JsonTable.setDefaults()`); da attributo HTML `infoText` può essere solo una stringa.
+
+### <a id="parametri-trcallback"></a>`trCallback`
+
+**[solo JS]** Funzione invocata per ogni `<tr>` del body, dopo che tutte le sue celle sono state riempite (e quindi dopo i `render` delle colonne):
+
+```javascript
+trCallback: (tr, row, params, subIdx) => void
+```
+
+- `tr` – l'elemento `<tr>` appena generato (già con l'attributo `data-jt-idx`)
+- `row` – l'oggetto dati del record, non modificato da eventuali `parse`
+- `params` – i parametri risolti della tabella
+- `subIdx` – l'indice del `<tr>` all'interno del record (sempre 0 se nessuna colonna usa [`rowspan`](#colonne-rowspan))
+
+Il valore restituito viene ignorato. Serve a intervenire sulla riga nel suo insieme, mentre il `render` di una colonna è pensato per la singola cella (anche se riceve `tr`):
+
+```javascript
+// classe e attributo sulla riga in base ai dati
+trCallback: (tr, row) => {
+  tr.classList.toggle('text-muted', !row.active);
+  tr.dataset.id = row.id;
+}
+
+// riga cliccabile che apre la scheda del record
+trCallback: (tr, row) => {
+  tr.style.cursor = 'pointer';
+  tr.addEventListener('click', () => location.href = `/clienti/${row.id}`);
+}
+```
+
+Accorgimenti:
+
+- le righe vengono rigenerate a ogni cambio di pagina, ordinamento, ricerca o filtro (e in modalità server-side a ogni nuova richiesta): la funzione viene quindi invocata ogni volta sui nuovi `<tr>`, e gli eventuali listener vanno aggiunti lì, non una volta sola dopo `init()`. In alternativa, per tabelle con molte righe, si può usare un unico listener delegato sul `tbody` (`jtable.elements.tbody`) e risalire al record con `data-jt-idx`
+- con [`rowspan`](#colonne-rowspan) la funzione viene invocata una volta per ogni `<tr>` del record: per agire una sola volta per record va usato `subIdx === 0`, mentre per applicare un'impostazione all'intero record (es. un colore di sfondo) va ripetuta su ogni `<tr>`
+- non viene invocata per la cella unica mostrata in assenza di righe, né per le righe di `thead` e `tfoot`
+- non è utilizzabile da attributo HTML, che non può contenere funzioni
 
 ## <a id="colonne"></a>Parametri colonne
 
@@ -358,11 +428,11 @@ cols: [
 | Key | Tipo | Default | Descrizione |
 |---|---|---|---|
 | `cellClass` | string | `null` (classi del tipo di dato) | Classi delle celle body/tfoot, in sostituzione di quelle del tipo. Se solo una tra `headerClass` e `cellClass` è presente, l'altra assume lo stesso valore |
-| `condition` | boolean o `params => boolean` | `true` | Se `false` la colonna non viene renderizzata |
+| `condition` | boolean o `params => boolean` | `true` | Se `false` la colonna non viene renderizzata ([Altre info](#colonne-condition)) |
 | `dataType` | string | `'string'` | Tipo di dato, una delle chiavi di `dataTypes`; `type` è un alias equivalente. Vedi [dataTypes](#datatypes) |
 | `headerClass` | string | `null` (classi del tipo di dato) | Classi del `<th>`, in sostituzione di quelle del tipo di dato |
 | `key` | string | – | **OBBLIGATORIO**: chiave dell'oggetto riga (ammessa la notazione con punto per valori annidati, es. `'owner.name'`) |
-| `parse` | `(row, subIdx) => valore` | `null` | Preelabora il valore della cella prima del tipo di dato, vedi sotto |
+| `parse` | `(row, subIdx) => valore` | `null` | **[solo JS]** Preelabora il valore della cella prima del tipo di dato, vedi sotto |
 | `render` | `(row, tr, td, subIdx) => contenuto` o stringa mustache-like | `null` | Vedi sotto |
 | `rowHeading` | boolean | `false` | Se `true` la cella è un'intestazione di riga (`th[scope=row]`) |
 | `rowspan` | number o `row => number` | `null` | Numero di `<tr>` occupati dal record, vedi sotto |
@@ -379,7 +449,33 @@ cols: [
 
 `sortValue` e `searchValue` agiscono solo in modalità client-side, `sortKeys` e `searchKeys` solo in modalità server-side: nella modalità sbagliata vengono ignorati con un avviso in console. Vedi [Ricerca e ordinamento](#ricerca-ordinamento).
 
-### <a id="colonne-parse"></a>`parse`
+### <a id="colonne-condition"></a>`condition`
+
+Determina se la colonna fa parte della tabella. Può essere un booleano o una funzione che riceve i parametri risolti della tabella e restituisce un booleano (il valore restituito viene convertito con `Boolean()`):
+
+```javascript
+condition: params => boolean
+```
+
+```javascript
+// colonna visibile solo agli amministratori, in base a un attributo del markup
+const isAdmin = jtable.dataset.admin === '1';
+
+jtable.init({
+  cols: [
+    { key: 'name', title: 'Nome' },
+    { key: 'margin', title: 'Margine', dataType: 'euro', condition: isAdmin },
+    // in base a un parametro della tabella
+    { key: 'internalCode', title: 'Codice', condition: params => !params.serverSide }
+  ]
+});
+```
+
+- viene valutata una sola volta per colonna, all'avvio (`init()` o `reload()`), non per ogni riga: per nascondere il contenuto di singole celle va usato [`render`](#colonne-render)
+- una colonna con `condition` false viene eliminata del tutto: non genera `<th>`, celle né celle del `tfoot`, non partecipa a ricerca e ordinamento e non compare in `jtable.cols`
+- non è un sistema di sicurezza: i dati della colonna restano comunque nel JSON ricevuto dal browser. Per i dati riservati il filtro va fatto lato server
+- da attributo HTML è ammesso solo il valore booleano
+
 
 Preelabora il valore della cella, che viene poi formattato dal tipo di dato della colonna: evita di scrivere un `render` che duplicherebbe la formattazione standard. Riceve l'oggetto dati della riga e `subIdx`, l'indice del `<tr>` all'interno del record (sempre 0 se nessuna colonna usa [`rowspan`](#colonne-rowspan)), e restituisce un valore invece del contenuto della cella.
 
@@ -615,8 +711,9 @@ Il valore è l'`id` del form; con `init()` si può passare anche l'elemento stes
 
       </div>
 
-      <div class="form-group mbs">
-        <button id="submitButton" type="submit" name="Submit" class="btn btn-primary">Avvia ricerca</button>
+      <div class="flex justify-content-space-between mbs">
+        <button id="submitButton" type="submit" class="btn btn-primary">Avvia ricerca</button>
+        <button type="reset" class="btn btn-secondary btn-hollow">Reset</button>
       </div>
 
     </fieldset>
