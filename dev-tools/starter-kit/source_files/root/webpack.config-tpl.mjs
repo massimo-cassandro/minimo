@@ -1,5 +1,5 @@
 // webpack.config.mjs __project_name__
-// v.3.5
+// v.3.6
 import path from 'path';
 import { fileURLToPath } from 'url';
 import webpack from 'webpack';
@@ -659,6 +659,10 @@ const config = {
     // un file js/css) per aggiornare il purge
     ...(usePurgeCss && (!isDevelopment || purgeCssInDev)
       ? createPurgeCSSPlugins({
+
+        // entry critical per nome (con purgecss-webpack-plugin v9 `only` è
+        // confrontato con il nome del chunk, non con il path dell'asset)
+        criticalEntries: Object.keys(entries).filter(name => name.endsWith('.critical')),
 
         // SOLO file che generano markup o classi (twig, php, js);
         // i file di stile vengono comunque scartati dal plugin

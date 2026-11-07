@@ -1,5 +1,5 @@
 // webpack-modules/purgecss-setup.mjs
-// v.3
+// v.4
 import { PurgeCSSPlugin } from 'purgecss-webpack-plugin';
 import { globSync } from 'glob';
 
@@ -15,6 +15,11 @@ import { globSync } from 'glob';
   opera sugli asset css già finalizzati (dopo questo purge e dopo la
   minificazione), quindi vede anche gli usi di var() nei blocchi
   `purgecss start/end ignore`, che PurgeCSS mantiene.
+  Le entry critical vanno passate per nome (`criticalEntries`, le chiavi di
+  `entry`): il nome completo funziona sia con purgecss-webpack-plugin v8
+  (`only` confrontato come sottostringa del path dell'asset) sia con la v9
+  (`only` confrontato con il nome del chunk). Un generico `'.critical'` con
+  la v9 non trova nessun chunk e il passaggio stretto verrebbe saltato.
   Il purge lavora sul singolo asset css: i @keyframes definiti in un asset
   (es. `shared.css`) ma usati solo in un altro vengono rimossi (vedi
   `safelist.keyframes` / `keyframes: false`).
@@ -24,16 +29,19 @@ import { globSync } from 'glob';
  * @param {object} params
  * @param {string[]} params.contentGlobs file da scansionare per le classi/id usati
  *   (twig, php, js...); i file di stile vengono comunque scartati dal plugin
+ * @param {string[]} [params.criticalEntries=[]] nomi delle entry critical (chiavi di
+ *   `entry` con suffisso `.critical`); se vuoto il passaggio critical non viene creato
  * @param {object} params.safelist { standard, deep, greedy, keyframes } — selettori sempre
  *   mantenuti, indipendentemente dal contenuto scansionato
  * @param {boolean} [params.keyframes=true] rimuove i @keyframes non referenziati (default: true)
  * @param {boolean} [params.debug=false] logga i selettori rimossi a fine build (default: false)
  * @returns {object[]} plugin webpack da inserire in `plugins`
- *   (critical + generale, più il logger di debug se `debug: true`)
+ *   (critical, se ci sono entry critical, + generale, più il logger di debug se `debug: true`)
  *
  * @example
  * createPurgeCSSPlugins({
  *   contentGlobs: [path.resolve(__dirname, './app/src/**\/*.{js,mjs}')],
+ *   criticalEntries: Object.keys(entries).filter(name => name.endsWith('.critical')),
  *   safelist: { standard: [/^alert-/], deep: [/^m_/], greedy: [/^&$/] },
  *   keyframes: true, // default
  *   debug: false     // default
@@ -41,6 +49,7 @@ import { globSync } from 'glob';
  */
 export function createPurgeCSSPlugins({
   contentGlobs,
+  criticalEntries = [],
   safelist,
   keyframes = true,
   debug = false
@@ -59,11 +68,13 @@ export function createPurgeCSSPlugins({
     rejected: debug // popola purgedStats per il log di debug
   };
 
-  const pluginCritical = new PurgeCSSPlugin({
-    ...commonOptions,
-    only: ['.critical'],
-    safelist
-  });
+  const pluginCritical = criticalEntries.length
+    ? new PurgeCSSPlugin({
+      ...commonOptions,
+      only: criticalEntries,
+      safelist
+    })
+    : null;
 
   const pluginMain = new PurgeCSSPlugin({
     ...commonOptions,
@@ -71,7 +82,7 @@ export function createPurgeCSSPlugins({
   });
 
   return [
-    pluginCritical,
+    ...(pluginCritical ? [pluginCritical] : []),
     pluginMain,
 
     // log dei selettori rimossi (richiede `debug: true`, che imposta anche `rejected: true`)
@@ -79,8 +90,10 @@ export function createPurgeCSSPlugins({
       apply: (compiler) => {
         compiler.hooks.afterEmit.tap('PurgeCSSLog', () => {
           /* eslint-disable no-console */
-          console.log('\n--- [PurgeCSS] Selettori rimossi (critical) ---');
-          console.dir(pluginCritical.purgedStats, { depth: null, maxArrayLength: null });
+          if (pluginCritical) {
+            console.log('\n--- [PurgeCSS] Selettori rimossi (critical) ---');
+            console.dir(pluginCritical.purgedStats, { depth: null, maxArrayLength: null });
+          }
           console.log('\n--- [PurgeCSS] Selettori rimossi ---');
           console.dir(pluginMain.purgedStats, { depth: null, maxArrayLength: null });
           /* eslint-enable no-console */
