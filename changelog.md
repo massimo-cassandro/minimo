@@ -36,3 +36,4 @@
 * 1.57 (02 nov 2026) - json-table: searchFields
 * 1.58 (02 nov 2026) - json-table: initialSort
 * 1.59 (03 nov 2026) - json-table: filter form
+* 1.60 (08 nov 2026) - cookies: deleteCookie

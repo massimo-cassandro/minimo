@@ -10,7 +10,7 @@ export { domBuilder } from './utilities/dom-builder/dom-builder.js';
 export { enableSubmitBtns } from './utilities/enable-submit-btns.js';
 export { escapeHTML, unescapeHTML } from './utilities/escape-html.js';
 export { generatePwd } from './utilities/generate-pwd.js';
-export { getCookie, setCookie } from './utilities/cookies.js';
+export { getCookie, setCookie, deleteCookie } from './utilities/cookies.js';
 export { linkedDates } from './utilities/linked-dates.js';
 export { markupToElement } from './utilities/markup-to-element.js';
 export { parseFileSize } from './utilities/parse-file-size.js';

@@ -42,3 +42,23 @@ export function setCookie({name, value, path = null, expire = null}) {
     '; SameSite=Lax' +
     (expire ? `; Max-Age=${expire}` : '');
 }
+
+
+/**
+ * Elimina un cookie (lo reimposta vuoto con `Max-Age=0`).
+ * `path` deve corrispondere a quello usato in `setCookie`, altrimenti il cookie non viene eliminato.
+ * @param {object} params
+ * @param {string} params.name
+ * @param {string|null} [params.path=null] (default: null)
+ * @example
+ * deleteCookie({
+ *   name: 'cookieName',
+ *   path: window.location.pathname
+ * });
+ */
+export function deleteCookie({name, path = null}) {
+  document.cookie = `${name}=` +
+    (path ? `; path=${path}` : '') +
+    '; SameSite=Lax' +
+    '; Max-Age=0';
+}
