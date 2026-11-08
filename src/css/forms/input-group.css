@@ -42,7 +42,8 @@
     }
   }
 
-  &:has([disabled]) {
+  /* option/optgroup esclusi: un select con option disabilitate non è un campo disabilitato */
+  &:has([disabled]:not(option, optgroup)) {
     > .btn, .input-group-text {
       font-style: italic;
       color: var(--text-muted);

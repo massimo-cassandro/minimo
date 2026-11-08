@@ -21,7 +21,8 @@
 }
 
 .form-group {
-  &:has([disabled]) {
+  /* option/optgroup esclusi: un select con option disabilitate non è un campo disabilitato */
+  &:has([disabled]:not(option, optgroup)) {
     opacity: var(--form-control-disabled-opacity);
     .form-label {
       font-style: var(--form-control-disabled-font-style);

@@ -17,7 +17,8 @@
   }
 }
 
-.form-group:has([required]):not(:has([disabled])) {
+/* option/optgroup esclusi: un select con option disabilitate non è un campo disabilitato */
+.form-group:has([required]):not(:has([disabled]:not(option, optgroup))) {
 
   /*
     `>` esclude le label all'interno delle form-collection
