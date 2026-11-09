@@ -37,4 +37,4 @@
 * 1.58 (02 nov 2026) - json-table: initialSort
 * 1.59 (03 nov 2026) - json-table: filter form
 * 1.60 (08 nov 2026) - cookies: deleteCookie
-* 1.60.1 (08 nov 2026) - form-group, input-group: le option/optgroup disabilitate non disabilitano il gruppo
+* 1.61 (09 nov 2026) - form-tags: `addFormGroup`/`formGroupExtraClass` → `wrapper`/`wrapperClass` (default `form-group`), `wrapper` su tutti i builder; domBuilder appiattisce gli array annidati

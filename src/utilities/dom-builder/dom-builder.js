@@ -120,7 +120,7 @@ import { createDomElement, normalizeNamespace } from './resolveNamespace.js';
  * La sintassi abbreviata a stringa non supporta `namespace`: usa solo la risoluzione automatica.
  *
  * @function domBuilder
- * @param {Array<DomBuilderItem|string|Node>} [structureArray=[]] - Array di configurazione. Accetta stringhe (scorciatoia secondo `parseDomString`), oggetti di configurazione e/o `Node` (un `Element`, un `DocumentFragment`, ...) inseriti così come sono; ogni oggetto di configurazione supporta:
+ * @param {Array<DomBuilderItem|string|Node>} [structureArray=[]] - Array di configurazione (gli array annidati vengono appiattiti). Accetta stringhe (scorciatoia secondo `parseDomString`), oggetti di configurazione e/o `Node` (un `Element`, un `DocumentFragment`, ...) inseriti così come sono; ogni oggetto di configurazione supporta:
  * - `tag` / `tagName` {string | string[]} - Nome del tag HTML (solo il nome, senza sintassi abbreviata), o array di tag annidati in sintassi abbreviata (ciascuno è il genitore del successivo). Default `'div'`.
  * - `className` / `class` / `classname` {string | string[]} - Classe/i CSS: una singola stringa o un array (i valori falsy vengono scartati).
  * - `id` {string | null} - ID univoco dell'elemento.
@@ -193,6 +193,10 @@ export function domBuilder(/** @type {Array<DomBuilderItem|string|Node>} */ stru
     debug: false,
     ...options
   };
+
+  // array annidati (es. il blocco label + controllo restituito dai builder di form-tags.js con `wrapper: false`)
+  // vengono appiattiti, così da poter essere inseriti direttamente in `structureArray`, `children` o `content`
+  structureArray = /** @type {Array<DomBuilderItem|string|Node>} */ (structureArray.flat(Infinity));
 
   if(parent && options.emptyParent) {
     parent.innerHTML = '';
