@@ -5,23 +5,49 @@ import { itTranslation } from './src/it-translation.js';
 import { buildSections, resolveConfig } from './src/resolve-config.js';
 
 /**
- * @typedef {Object} CookieRow - Riga dell'elenco dei cookie
- * @property {string} name - Nome del cookie
- * @property {string} domain - Dominio che imposta il cookie (es. "Questo sito", "google.com")
- * @property {string} description - Descrizione (può contenere `<br>`)
- * @property {string} expiration - Durata
+ * @typedef {'cookie'|'localStorage'|'sessionStorage'|'servizio di terzi'} RowType
  */
 
 /**
- * @typedef {Object} CookieTableHeaders - Intestazioni della tabella dei cookie
- * @property {string} name
- * @property {string} domain
- * @property {string} description
- * @property {string} expiration
+ * @typedef {Object} CookieRow - Riga dell'elenco dei cookie (o di altri strumenti di memorizzazione e servizi)
+ * @property {string} name - Nome del cookie, della chiave di storage o del servizio
+ * @property {RowType|string} [type] - Tipo di riga; se almeno una riga lo indica compare la colonna "Tipo" (default: "cookie")
+ * @property {string} domain - Dominio che imposta il cookie (es. "Questo sito", "google.com")
+ * @property {string} description - Descrizione (può contenere `<br>`)
+ * @property {string} [expiration] - Durata (default: "")
+ */
+
+/**
+ * @typedef {Object} CookieTableHeaders - Intestazioni della tabella dei cookie (l'ordine delle colonne è fisso)
+ * @property {string} [name] - (default: "Cookie", oppure "Nome" se compare la colonna "Tipo")
+ * @property {string} [type] - Indicandola, la colonna "Tipo" compare sempre (default: "Tipo")
+ * @property {string} [domain] - (default: "Impostato da")
+ * @property {string} [description] - (default: "Descrizione")
+ * @property {string} [expiration] - (default: "Durata")
  */
 
 /**
  * @typedef {'necessary'|'functionality'|'analytics'} CategoryKey
+ */
+
+/**
+ * @typedef {Object} CategoryOptions - Opzioni di una categoria
+ * @property {string} [title] - Titolo (sovrascrive quello di default)
+ * @property {string} [description] - Descrizione (sovrascrive quella di default)
+ * @property {boolean} [show] - Mostra la categoria anche senza righe né servizi (default: false)
+ * @property {boolean} [reloadOnRevoke] - Ricarica la pagina alla revoca del consenso, per gli script di terzi
+ *   già caricati che non si possono scaricare, es. Google Maps (default: false)
+ */
+
+/**
+ * @typedef {Object} CustomService - Servizio personalizzato, registrato come servizio di vanilla-cookieconsent
+ * @property {'functionality'|'analytics'} [category] - Categoria di appartenenza (default: "functionality")
+ * @property {string} [label] - Etichetta nel modal preferenze (default: nome del servizio)
+ * @property {boolean} [enabled] - Con `false` il servizio viene ignorato (default: true)
+ * @property {CookieRow[]} [cookies] - Righe aggiunte all'elenco della categoria (default: [])
+ * @property {import('vanilla-cookieconsent').CookieItem[]} [autoClearCookies] - Cookie da eliminare alla revoca (default: [])
+ * @property {() => void} [onAccept] - Eseguito al consenso
+ * @property {() => void} [onReject] - Eseguito alla revoca di un consenso dato in precedenza
  */
 
 /**
@@ -35,8 +61,8 @@ import { buildSections, resolveConfig } from './src/resolve-config.js';
  * @property {(opts: T) => CookieRow[]} cookies - Cookie impostati dal modulo
  * @property {(opts: T) => import('vanilla-cookieconsent').CookieItem[]} [autoClearCookies] - Cookie da eliminare alla revoca del consenso
  * @property {(opts: T) => void} [init] - Eseguito all'avvio, prima della verifica del consenso
- * @property {(opts: T) => void} onAccept - Eseguito al consenso
- * @property {(opts: T) => void} onReject - Eseguito alla revoca di un consenso dato in precedenza
+ * @property {(opts: T) => void} [onAccept] - Eseguito al consenso
+ * @property {(opts: T) => void} [onReject] - Eseguito alla revoca di un consenso dato in precedenza
  */
 
 /**
@@ -45,8 +71,11 @@ import { buildSections, resolveConfig } from './src/resolve-config.js';
  * @property {Object} [modules] - Moduli opzionali, attivi solo con `enabled: true`
  * @property {import('./src/modules/recaptcha.js').RecaptchaModuleOptions} [modules.recaptcha] - Google reCAPTCHA v3
  * @property {import('./src/modules/analytics.js').AnalyticsModuleOptions} [modules.analytics] - Google Analytics 4
- * @property {Partial<Record<CategoryKey, CookieRow[]>>} [cookies] - Cookie aggiuntivi del sito, per categoria
- * @property {Partial<Record<CategoryKey, {title?: string, description?: string}>>} [categories] - Testi delle categorie (sovrascrivono quelli di default)
+ * @property {import('./src/modules/google-maps.js').GoogleMapsModuleOptions} [modules.googleMaps] - Google Maps (solo dichiarazione del servizio)
+ * @property {Record<string, CustomService>} [services] - Servizi personalizzati, per nome
+ * @property {Partial<Record<CategoryKey, CookieRow[]>>} [cookies] - Righe aggiuntive del sito (cookie, storage, servizi), per categoria
+ * @property {Partial<Record<CategoryKey, CategoryOptions>>} [categories] - Opzioni delle categorie
+ * @property {CookieTableHeaders} [cookieTableHeaders] - Intestazioni della tabella (sovrascrivono quelle di default)
  * @property {import('vanilla-cookieconsent').GuiOptions} [guiOptions] - Opzioni grafiche, unite a quelle di default
  * @property {import('vanilla-cookieconsent').CookieConsentConfig['onConsent']} [onConsent] - Callback aggiuntivo al consenso
  * @property {import('vanilla-cookieconsent').CookieConsentConfig['onChange']} [onChange] - Callback aggiuntivo alla modifica delle preferenze
@@ -61,9 +90,12 @@ import { buildSections, resolveConfig } from './src/resolve-config.js';
  *   modules: { // moduli opzionali, FAC
  *     recaptcha: { enabled: false, siteKey: '' }, // reCAPTCHA v3, FAC
  *     analytics: { enabled: false, measurementId: '' }, // GA4, FAC
+ *     googleMaps: { enabled: false }, // Google Maps, FAC
  *   },
- *   cookies: { necessary: [], functionality: [], analytics: [] }, // cookie del sito, FAC
- *   categories: {}, // testi delle categorie, FAC
+ *   services: {}, // servizi personalizzati, FAC
+ *   cookies: { necessary: [], functionality: [], analytics: [] }, // righe del sito, FAC
+ *   categories: {}, // testi e opzioni delle categorie, FAC
+ *   cookieTableHeaders: {}, // intestazioni della tabella, FAC
  *   guiOptions: {}, // opzioni grafiche vanilla-cookieconsent, FAC
  *   onConsent: undefined, // callback al consenso, FAC
  *   onChange: undefined, // callback alla modifica, FAC
@@ -73,28 +105,32 @@ import { buildSections, resolveConfig } from './src/resolve-config.js';
  */
 export async function initCookieConsent(config = {}) {
 
-  const { activeModules, categories } = resolveConfig(config);
+  const { activeServices, categories, tableHeaders } = resolveConfig(config);
 
-  activeModules.forEach(m => m.module.init?.(m.opts));
+  activeServices.forEach(s => s.init?.());
 
   /** @type {Record<string, import('vanilla-cookieconsent').Category>} */
   const ccCategories = {};
 
   categories.forEach(cat => {
-    const autoClearCookies = cat.modules.flatMap(m => m.module.autoClearCookies?.(m.opts) ?? []);
+    const autoClearCookies = cat.services.flatMap(s => s.autoClearCookies);
 
     ccCategories[cat.key] = {
       // le categorie non necessarie non devono essere preselezionate
       // (linee guida Garante Privacy 2021: niente consenso preimpostato)
       enabled: cat.key === 'necessary',
       readOnly: cat.key === 'necessary',
-      ...(autoClearCookies.length ? { autoClear: { cookies: autoClearCookies } } : {}),
-      ...(cat.modules.length
+      // `reloadPage` richiede la presenza di `autoClear`, anche senza cookie da eliminare
+      ...(autoClearCookies.length || cat.reloadOnRevoke
+        ? { autoClear: { cookies: autoClearCookies, ...(cat.reloadOnRevoke ? { reloadPage: true } : {}) } }
+        : {}
+      ),
+      ...(cat.services.length
         ? {
-          services: Object.fromEntries(cat.modules.map(m => [m.name, {
-            label: m.module.label,
-            onAccept: () => m.module.onAccept(m.opts),
-            onReject: () => m.module.onReject(m.opts),
+          services: Object.fromEntries(cat.services.map(s => [s.name, {
+            label: s.label,
+            ...(s.onAccept ? { onAccept: s.onAccept } : {}),
+            ...(s.onReject ? { onReject: s.onReject } : {}),
           }]))
         }
         : {}
@@ -116,7 +152,7 @@ export async function initCookieConsent(config = {}) {
       translations: {
         it: itTranslation({
           privacyPolicyUrl: config.privacyPolicyUrl ?? '/privacy-policy',
-          sections: buildSections(categories),
+          sections: buildSections(categories, tableHeaders),
         }),
       },
     },

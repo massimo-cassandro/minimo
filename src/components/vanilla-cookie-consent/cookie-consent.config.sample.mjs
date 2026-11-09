@@ -18,6 +18,10 @@ export default {
   // URL della pagina Privacy e Cookie Policy, linkata nei testi dei modal
   privacyPolicyUrl: '/privacy-policy',
 
+  // in alternativa, URL passato dal server (es. da Twig: `<html data-privacy-url="{{ path('privacy') }}">`)
+  // invece di scriverlo a mano:
+  // privacyPolicyUrl: document.documentElement.dataset.privacyUrl ?? '/privacy-policy',
+
   // Moduli opzionali: ogni modulo viene attivato solo se presente e con `enabled: true`.
   // I cookie dei moduli attivi vengono aggiunti automaticamente all'elenco della relativa categoria
   modules: {
@@ -40,9 +44,44 @@ export default {
       measurementId: '', // es. 'G-XXXXXXXXXX', obbligatorio se il modulo è attivo
       // category: 'analytics',
     },
+
+    // Google Maps: non carica nulla, dichiara solo il servizio e la riga descrittiva.
+    // Il caricamento della mappa resta a cura del progetto (vedi `onCategoryAccepted()` nel README).
+    // Con `categories.functionality.reloadOnRevoke: true` la revoca ricarica la pagina
+    // (lo script di Google Maps, una volta caricato, non si può scaricare)
+    googleMaps: {
+      enabled: false,
+      // category: 'functionality',
+      // label: 'Google Maps',
+      // description: 'testo che sostituisce la descrizione di default',
+      // onAccept: () => {},
+      // onReject: () => {},
+    },
   },
 
-  // Cookie aggiuntivi impostati dal sito, per categoria.
+  // Servizi personalizzati, registrati come servizi di vanilla-cookieconsent nella categoria indicata:
+  // l'utente può attivarli singolarmente dal modal delle preferenze.
+  // Le righe di `cookies` vengono aggiunte all'elenco della categoria
+  // services: {
+  //   youtube: {
+  //     category: 'functionality', // functionality (default) o analytics
+  //     label: 'Video YouTube',
+  //     cookies: [
+  //       {
+  //         name: 'YouTube',
+  //         type: 'servizio di terzi',
+  //         domain: 'youtube.com',
+  //         description: 'Riproduzione dei video incorporati. YouTube può impostare cookie sui propri domini.',
+  //       },
+  //     ],
+  //     // autoClearCookies: [{ name: /^yt_/ }], // cookie da eliminare alla revoca
+  //     onAccept: () => {}, // es. sostituire i segnaposto con i video
+  //     onReject: () => {},
+  //   },
+  // },
+
+  // Righe aggiuntive dell'elenco, per categoria: cookie, ma anche localStorage, sessionStorage
+  // e servizi di terzi (campo `type`, facoltativo; se presente in almeno una riga compare la colonna "Tipo").
   // `cc_cookie` (scelta dell'utente) è sempre aggiunto tra i necessari
   cookies: {
     necessary: [
@@ -52,17 +91,37 @@ export default {
         description: 'Identifica la sessione corrente in modo anonimo in modo di poter eseguire alcune azioni.',
         expiration: 'sessione'
       },
+      // {
+      //   name: 'theme-preference',
+      //   type: 'localStorage', // cookie (default), localStorage, sessionStorage, servizio di terzi
+      //   domain: 'Questo sito',
+      //   description: 'Memorizza il tema chiaro/scuro scelto dall’utente.',
+      //   expiration: 'fino alla cancellazione',
+      // },
     ],
     // functionality: [],
     // analytics: [],
   },
 
-  // Titoli e descrizioni delle categorie (sovrascrivono quelli di default)
+  // Opzioni delle categorie: titolo e descrizione sovrascrivono quelli di default.
+  // Le categorie non necessarie compaiono solo se hanno righe o servizi, oppure con `show: true`
   // categories: {
   //   functionality: {
-  //     title: 'Cookie per funzionalità aggiuntive',
-  //     description: '...'
+  //     title: 'Contenuti di terze parti',
+  //     description: 'Mappe e video forniti da servizi esterni, caricati solo con il tuo consenso.',
+  //     // show: true,
+  //     // reloadOnRevoke: true, // ricarica la pagina alla revoca (script di terzi non scaricabili)
   //   },
+  // },
+
+  // Intestazioni della tabella dei cookie (sovrascrivono quelle di default).
+  // Indicando `type` la colonna "Tipo" compare sempre
+  // cookieTableHeaders: {
+  //   name: 'Nome',
+  //   type: 'Tipo',
+  //   domain: 'Impostato da',
+  //   description: 'Descrizione',
+  //   expiration: 'Durata',
   // },
 
   // Opzioni grafiche di vanilla-cookieconsent (unite a quelle di default)
@@ -71,7 +130,7 @@ export default {
   //   consentModal: { layout: 'box', position: 'bottom right' },
   // },
 
-  // Callback aggiuntivi, eseguiti dopo la gestione dei moduli
+  // Callback aggiuntivi di vanilla-cookieconsent
   // onConsent: ({ cookie }) => {},
   // onChange: ({ cookie, changedCategories, changedServices }) => {},
 };

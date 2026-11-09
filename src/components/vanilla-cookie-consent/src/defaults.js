@@ -1,11 +1,19 @@
 // valori di default di cookie-consent (vedi `cookie-consent.config.sample.mjs`)
 
-/** @type {import('../cookie-consent.js').CookieTableHeaders} */
+// l'ordine delle chiavi determina l'ordine delle colonne
+/** @type {Required<import('../cookie-consent.js').CookieTableHeaders>} */
 export const cookieTableHeaders = {
   name: 'Cookie',
+  type: 'Tipo',
   domain: 'Impostato da',
   description: 'Descrizione',
   expiration: 'Durata',
+};
+
+// intestazioni modificate quando compare la colonna "Tipo" (le righe non sono più solo cookie)
+/** @type {import('../cookie-consent.js').CookieTableHeaders} */
+export const typeColumnHeaders = {
+  name: 'Nome',
 };
 
 // ordine di visualizzazione delle categorie

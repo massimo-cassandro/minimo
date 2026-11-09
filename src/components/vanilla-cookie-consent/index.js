@@ -4,3 +4,4 @@
 export { initCookieConsent } from './cookie-consent.js';
 export { renderCookieList } from './render-cookie-list.js';
 export { loadRecaptchaAsync } from './src/modules/recaptcha.js';
+export { isAccepted, acceptCategoryKeepingOthers, onCategoryAccepted } from './src/helpers.js';

@@ -21,14 +21,19 @@ export function renderCookieList(target, config = {}) {
 
     const sublist = section.appendChild(document.createElement('ul'));
 
-    cat.cookies.forEach(cookie => {
+    cat.cookies.forEach(row => {
       const li = sublist.appendChild(document.createElement('li'));
-      li.appendChild(document.createElement('strong')).textContent = `${cookie.name}: `;
+      li.appendChild(document.createElement('strong')).textContent = row.name;
+
+      // il tipo viene indicato solo per le righe che non sono cookie (localStorage, servizi di terzi, …)
+      const type = row.type && row.type !== 'cookie' ? ` (${row.type})` : '';
 
       // la descrizione può contenere `<br>` (usato nel modal, che interpreta l'HTML):
       // qui viene sostituito da uno spazio, dato che il testo è inserito come text node
-      const description = cookie.description.replace(/<br\s*\/?>/gi, ' ');
-      li.appendChild(document.createTextNode(`${description} (dur. ${cookie.expiration})`));
+      const description = row.description.replace(/<br\s*\/?>/gi, ' '),
+        expiration = row.expiration && row.expiration !== '—' ? ` (dur. ${row.expiration})` : '';
+
+      li.appendChild(document.createTextNode(`${type}: ${description}${expiration}`));
     });
   });
 

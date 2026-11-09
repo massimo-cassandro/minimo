@@ -156,9 +156,9 @@ Non toccare: il repo originale `/Users/mazz/Sites/eslint-config`; LICENSE (minim
 
 ## VANILLA-COOKIE-CONSENT
 
-`src/components/vanilla-cookie-consent/` — rifattorizzato il 9/11/2026: `initCookieConsent(config)`, config a cura del consumer (`cookie-consent.config.sample.mjs`), moduli reCAPTCHA/Analytics come servizi di vanilla-cookieconsent, token `--vcc-*`, README.
+`src/components/vanilla-cookie-consent/` — rifattorizzato il 9/11/2026: `initCookieConsent(config)`, config a cura del consumer (`cookie-consent.config.sample.mjs`), moduli reCAPTCHA/Analytics/Google Maps e servizi personalizzati come servizi di vanilla-cookieconsent, helper per il progetto, token `--vcc-*`, README. Dalla v1.63 integra le richieste emerse dall'uso in BeTogether (mappa Google Maps caricata in modo differito).
 
-  * Verificare il funzionamento in un progetto reale o nella demo (non ancora provato nel browser)
+  * Verificare nel browser le novità della v1.63 (servizi personalizzati, `reloadOnRevoke`, colonna "Tipo", helper): finora provate solo con jsdom
   * Aggiungere una demo in `demo/`
   * `renderCookieList`: valutare `domBuilder` e una tabella invece della lista annidata
   * Valutare Consent Mode v2 per il modulo Analytics
