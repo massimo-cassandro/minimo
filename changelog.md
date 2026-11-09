@@ -38,3 +38,4 @@
 * 1.59 (03 nov 2026) - json-table: filter form
 * 1.60 (08 nov 2026) - cookies: deleteCookie
 * 1.61 (09 nov 2026) - form-tags: `addFormGroup`/`formGroupExtraClass` → `wrapper`/`wrapperClass` (default `form-group`), `wrapper` su tutti i builder; domBuilder appiattisce gli array annidati
+* 1.62 (09 nov 2026) - vanilla cookie consent

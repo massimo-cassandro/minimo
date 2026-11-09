@@ -54,7 +54,7 @@ minimo/
 │   │   ├── spinner/                # solo CSS
 │   │   ├── unsplash-page/          # pagina foto Unsplash
 │   │   ├── TODO form-multiselect/       # spostato da _wrk, in attesa di integrazione
-│   │   └── TODO vanilla-cookie-consent/ # spostato da _wrk, in attesa di integrazione
+│   │   └── vanilla-cookie-consent/      # wrapper di vanilla-cookieconsent (peer dep opzionale) — integrazione in corso, vedi TODO.md
 │   └── web-components/
 │       ├── s-datatable-component/  # web component per simple-datatables ⚠️ da deprecare (verrà sostituito da json-table)
 │       ├── json-table/             # ★ in corso di realizzazione, sostituto di s-datatable-component (vedi sotto)
@@ -191,6 +191,7 @@ Contiene vecchi script inutilizzati, parcheggiati temporaneamente per eventuali 
 Esempi attuali/previsti:
 - `@svgdotjs/svg.js` — richiesto da `charts/` (già in `peerDependencies`/`peerDependenciesMeta` come opzionale)
 - `blurhash` — richiesto da `unsplash-page` (già in `peerDependencies`/`peerDependenciesMeta` come opzionale)
+- `vanilla-cookieconsent` — richiesto da `src/components/vanilla-cookie-consent/` (già in `peerDependencies`/`peerDependenciesMeta` come opzionale)
 - `@tarekraafat/autocomplete.js` — richiesto da `src/components/autocomplete/` (TODO: aggiungere a `peerDependenciesMeta`)
 
 Ogni nuovo componente che introduce una dipendenza esterna deve seguire questa stessa logica: aggiungere la libreria a `peerDependencies` con `"optional": true` in `peerDependenciesMeta`, e documentare l'installazione richiesta.
@@ -226,7 +227,7 @@ Ogni componente/web-component con CSS (`src/components/*`, `src/web-components/*
 
 A questo scopo ogni cartella componente/web-component ha un proprio file `<nome-componente>.minimo.tokens.mjs` colocato al suo interno (accanto al CSS/JS). Il file token del componente può referenziare token generici di minimo (es. `{status.success.background.color}`) — la risoluzione avviene in fase di build tramite `build-tokens` — ma il CSS del componente vede solo l'output namespaced, non la catena di riferimenti. Questo rende più semplice portare il componente in framework diversi da minimo (basta il proprio file token, non l'intero `custom-properties.css`).
 
-**Stato:** fatto per `modal-alert` e `inner-nav`. Per lo stato degli altri componenti vedi le rispettive sezioni in [TODO.md](TODO.md).
+**Stato:** fatto per `modal-alert`, `inner-nav` e `vanilla-cookie-consent` (quest'ultimo con prefisso `--vcc-*`, per non entrare in conflitto con le variabili `--cc-*` della libreria). Per lo stato degli altri componenti vedi le rispettive sezioni in [TODO.md](TODO.md).
 
 ---
 
@@ -273,7 +274,7 @@ TODO aperti su json-table ([src/web-components/TODO json-table/TODO.md](src/web-
 
 ### Altri elementi in `_wrk/`
 
-`js-utilities/` e `recaptcha/` sono stati **cestinati** (rimossi senza migrazione). `modal-popup/` è stato integrato in produzione in `src/components/modal-popup/`. `vanilla-cookie-consent/` è stato spostato in `src/components/TODO vanilla-cookie-consent/`, in attesa di integrazione. `json-table/` è stato spostato in `src/web-components/TODO json-table/` come riferimento per lo sviluppo del nuovo componente (vedi sopra). `unsplash-page-demo/` e `modal-alert-demo/` sono stati rimossi da `_wrk/`; quest'ultimo è ora in `demo/demo-files/TODO modal-alert-demo/`. `charts/` (vecchia versione 1a vers da rifattorizzare) è stato spostato in `charts/TODO charts/`, accanto alla nuova versione. `__snippets/twig/` (snippet Twig/Symfony: form theme, shared includes, select2, sf-macro, contenuti, error-pages, ...) è stato smistato: le parti ancora utili sono confluite in `archived/` e `snippets/`, il resto è stato **cestinato**; sono rimaste in `__snippets/` solo le sottocartelle `style-dictionary/` e `utilities/`. `auto-datatable-customization/` è stato **eliminato definitivamente** (12/9/2026, nessuna migrazione). `js-file-uploader` (progetto esterno, non proveniente da `_wrk/`) è stato aggiunto direttamente in `src/web-components/TODO js-file-uploader/`, in attesa di integrazione (vedi [TODO.md sezione FILE-UPLOADER](TODO.md#file-uploader)).
+`js-utilities/` e `recaptcha/` sono stati **cestinati** (rimossi senza migrazione). `modal-popup/` è stato integrato in produzione in `src/components/modal-popup/`. `vanilla-cookie-consent/` è stato spostato in `src/components/vanilla-cookie-consent/` (prefisso `TODO` rimosso e rifattorizzato il 9/11/2026, da verificare nel browser: vedi [TODO.md § VANILLA-COOKIE-CONSENT](TODO.md#vanilla-cookie-consent)). `json-table/` è stato spostato in `src/web-components/TODO json-table/` come riferimento per lo sviluppo del nuovo componente (vedi sopra). `unsplash-page-demo/` e `modal-alert-demo/` sono stati rimossi da `_wrk/`; quest'ultimo è ora in `demo/demo-files/TODO modal-alert-demo/`. `charts/` (vecchia versione 1a vers da rifattorizzare) è stato spostato in `charts/TODO charts/`, accanto alla nuova versione. `__snippets/twig/` (snippet Twig/Symfony: form theme, shared includes, select2, sf-macro, contenuti, error-pages, ...) è stato smistato: le parti ancora utili sono confluite in `archived/` e `snippets/`, il resto è stato **cestinato**; sono rimaste in `__snippets/` solo le sottocartelle `style-dictionary/` e `utilities/`. `auto-datatable-customization/` è stato **eliminato definitivamente** (12/9/2026, nessuna migrazione). `js-file-uploader` (progetto esterno, non proveniente da `_wrk/`) è stato aggiunto direttamente in `src/web-components/TODO js-file-uploader/`, in attesa di integrazione (vedi [TODO.md sezione FILE-UPLOADER](TODO.md#file-uploader)).
 
 Elementi ancora presenti in `_wrk/`:
 

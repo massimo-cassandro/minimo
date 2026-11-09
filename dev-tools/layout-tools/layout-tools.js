@@ -45,9 +45,11 @@ export function layoutTools({ framework = 'minimo' } = {}) {
 
   document.body.appendChild(div);
 
-  // soluzione temporanea, al clic si deve aprire un menu con le info e con il pulsante di rimozione
+  // soluzione temporanea, al clic si deve aprire un menu con le info viewport (e altro...?) e con il pulsante di rimozione
+  // NB: rimuove anche la toolbar symfony se presente
   div.addEventListener('click', () => {
     div.remove();
+    document.querySelector('.sf-toolbar')?.remove();
   });
 
   return div;

@@ -155,7 +155,15 @@ Non toccare: il repo originale `/Users/mazz/Sites/eslint-config`; LICENSE (minim
     * `src/utilities/dom-builder-helpers/form-tags.js` (e `TODO table-tag.js`) usano ancora la sintassi JSDoc `function(...)`, non supportata da TypeScript 7: stessa correzione applicata a `dom-builder.js` nello step 3
 
 ## VANILLA-COOKIE-CONSENT
-  * `src/components/TODO vanilla-cookie-consent/`
+
+`src/components/vanilla-cookie-consent/` — rifattorizzato il 9/11/2026: `initCookieConsent(config)`, config a cura del consumer (`cookie-consent.config.sample.mjs`), moduli reCAPTCHA/Analytics come servizi di vanilla-cookieconsent, token `--vcc-*`, README.
+
+  * Verificare il funzionamento in un progetto reale o nella demo (non ancora provato nel browser)
+  * Aggiungere una demo in `demo/`
+  * `renderCookieList`: valutare `domBuilder` e una tabella invece della lista annidata
+  * Valutare Consent Mode v2 per il modulo Analytics
+  * Consent modal con `equalWeightButtons: false`: verificare con le linee guida (pulsanti "accetta" e "rifiuta" con la stessa evidenza)
+  * Testi solo in italiano: valutare altre lingue tramite config
 
 ## AUTOCOMPLETE
 
@@ -209,7 +217,7 @@ Non toccare: il repo originale `/Users/mazz/Sites/eslint-config`; LICENSE (minim
   * capire come organizzare la dir `snippets`, recupero di quanto utile da `_wrk/__snippets`
   * rimozione `_wrk`, spostare autodatatable (anche il repo, da deprecare) in `archived`
   * Miglioramenti perfomances e verifica componenti con css per far sì che possano essere usati anche frameowrk diversi da minimo.
-  * Analisi di `src/components` e `src/utilities` (esclusi i sotto-dir con prefisso `TODO ` — `form-multiselect`, `vanilla-cookie-consent` — già tracciati sopra come da integrare, non ancora in uno stato stabile).
+  * Analisi di `src/components` e `src/utilities` (esclusi i sotto-dir con prefisso `TODO ` — `form-multiselect` — e `vanilla-cookie-consent`, già tracciati sopra come da integrare, non ancora in uno stato stabile).
   * inserire info per uso con html-css-class-completion: https://marketplace.visualstudio.com/items?itemName=Zignd.html-css-class-completion
 }
 

@@ -1,0 +1,40 @@
+/* stylelint-disable selector-max-id */
+@import 'vanilla-cookieconsent/dist/cookieconsent.css';
+
+/*
+  vanilla-cookieconsent definisce le proprie variabili `--cc-*` su `:root`: qui vengono ridefinite
+  su `#cc-main` (contenitore di tutti gli elementi della libreria) a partire dai token `--vcc-*`
+  (vedi `vanilla-cookie-consent.minimo.tokens.mjs`).
+  Le variabili derivate dalla libreria (es. `--cc-btn-primary-border-color: var(--cc-btn-primary-bg)`)
+  sono risolte su `:root` con i valori originali, per questo vanno ridefinite tutte qui.
+  NB: la classe `.cc--darkmode` della libreria non ha effetto su queste variabili: la dark mode
+  è gestita dai token di minimo.
+*/
+#cc-main {
+  --cc-font-family: var(--vcc-font-family);
+  --cc-bg: var(--vcc-bg);
+  --cc-primary-color: var(--vcc-primary-color);
+  --cc-secondary-color: var(--vcc-secondary-color);
+  --cc-link-color: var(--vcc-link-color);
+  --cc-modal-border-radius: var(--vcc-modal-border-radius);
+  --cc-btn-border-radius: var(--vcc-btn-border-radius);
+  --cc-btn-primary-bg: var(--vcc-btn-primary-bg);
+  --cc-btn-primary-color: var(--vcc-btn-primary-color);
+  --cc-btn-primary-border-color: var(--vcc-btn-primary-border-color);
+  --cc-btn-primary-hover-bg: var(--vcc-btn-primary-hover-bg);
+  --cc-btn-primary-hover-color: var(--vcc-btn-primary-hover-color);
+  --cc-btn-primary-hover-border-color: var(--vcc-btn-primary-hover-border-color);
+  --cc-btn-secondary-bg: var(--vcc-btn-secondary-bg);
+  --cc-btn-secondary-color: var(--vcc-btn-secondary-color);
+  --cc-btn-secondary-border-color: var(--vcc-btn-secondary-border-color);
+  --cc-btn-secondary-hover-bg: var(--vcc-btn-secondary-hover-bg);
+  --cc-btn-secondary-hover-color: var(--vcc-btn-secondary-hover-color);
+  --cc-btn-secondary-hover-border-color: var(--vcc-btn-secondary-hover-border-color);
+  --cc-toggle-on-bg: var(--vcc-toggle-on-bg);
+  --cc-toggle-enabled-icon-color: var(--cc-bg);
+  --cc-toggle-disabled-icon-color: var(--cc-bg);
+  --cc-webkit-scrollbar-hover-bg: var(--cc-btn-primary-hover-bg);
+
+  /* stylelint-disable-next-line declaration-no-important */
+  h2 { line-height: 1.3 !important; }
+}

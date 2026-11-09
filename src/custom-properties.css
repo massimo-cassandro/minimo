@@ -479,6 +479,27 @@
   --up-loader-color: hsl(0deg 0% 100% / .6);
   --up-text-color: #fff;
 
+  --vcc-bg: var(--body-background-color);
+  --vcc-btn-border-radius: var(--btn-border-radius);
+  --vcc-btn-primary-bg: var(--btn-primary-background-color);
+  --vcc-btn-primary-border-color: var(--btn-primary-border-color);
+  --vcc-btn-primary-color: var(--btn-primary-color);
+  --vcc-btn-primary-hover-bg: var(--btn-primary-hover-background-color);
+  --vcc-btn-primary-hover-border-color: var(--btn-primary-hover-border-color);
+  --vcc-btn-primary-hover-color: var(--btn-primary-hover-color);
+  --vcc-btn-secondary-bg: var(--btn-secondary-background-color);
+  --vcc-btn-secondary-border-color: var(--btn-secondary-border-color);
+  --vcc-btn-secondary-color: var(--btn-secondary-color);
+  --vcc-btn-secondary-hover-bg: var(--btn-secondary-hover-background-color);
+  --vcc-btn-secondary-hover-border-color: var(--btn-secondary-hover-border-color);
+  --vcc-btn-secondary-hover-color: var(--btn-secondary-hover-color);
+  --vcc-font-family: var(--font-family);
+  --vcc-link-color: var(--link-color);
+  --vcc-modal-border-radius: var(--radius-md);
+  --vcc-primary-color: var(--text-color);
+  --vcc-secondary-color: var(--text-muted);
+  --vcc-toggle-on-bg: var(--btn-primary-background-color);
+
   --z-index-overlay: 99;
   --z-index-snackbar: 100;
 }
