@@ -700,7 +700,16 @@ const config = {
             // purgecss non riconosce il nesting selector nativo: senza questo pattern
             // i selettori annidati composti solo da `&` + pseudo classi (&:hover,
             // &:focus-visible, `&` semplice, ecc.) verrebbero SEMPRE rimossi
-            /^&$/
+            /^&$/,
+            // banner dei cookie (componente vanilla-cookie-consent, libreria
+            // vanilla-cookieconsent): le classi sono generate dal js della libreria per
+            // concatenazione e non compaiono nei file scansionati. Tutti i selettori
+            // della libreria contengono #cc-main (più `html.disable--interaction.show--consent body`).
+            // I commenti `purgecss start/end ignore` di cookie-consent.css non bastano:
+            // css-loader tratta l'@import della libreria come modulo separato, fuori dal
+            // blocco ignorato. Innocui se il componente non è usato
+            /^cc-main$/,
+            /^show--consent$/
           ]
         },
 

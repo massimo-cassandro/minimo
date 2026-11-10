@@ -1,3 +1,4 @@
+/* purgecss start ignore */
 /* stylelint-disable selector-max-id */
 @import 'vanilla-cookieconsent/dist/cookieconsent.css';
 
@@ -38,3 +39,5 @@
   /* stylelint-disable-next-line declaration-no-important */
   h2 { line-height: 1.3 !important; }
 }
+
+/* purgecss end ignore */

@@ -1,6 +1,6 @@
 // risolve la configurazione del consumer: servizi attivi (moduli interni e servizi personalizzati),
 // categorie e sezioni (con l'elenco dei cookie)
-// usato sia da `initCookieConsent()` sia da `renderCookieList()`, così che modal e pagina privacy
+// usato sia da `initCookieConsent()` sia da `getCookieList()`, così che modal e pagina privacy
 // mostrino sempre gli stessi cookie
 
 import { baseNecessaryCookies, categoryKeys, categoryTexts, cookieTableHeaders, typeColumnHeaders } from './defaults.js';

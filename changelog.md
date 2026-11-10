@@ -40,3 +40,4 @@
 * 1.61 (09 nov 2026) - form-tags: `addFormGroup`/`formGroupExtraClass` → `wrapper`/`wrapperClass` (default `form-group`), `wrapper` su tutti i builder; domBuilder appiattisce gli array annidati
 * 1.62 (09 nov 2026) - vanilla cookie consent
 * 1.63 (09 nov 2026) - vanilla-cookie-consent: servizi personalizzati (`services`), modulo `googleMaps`, categorie `show`/`reloadOnRevoke`, righe con `type` e `cookieTableHeaders`, helper `isAccepted`/`acceptCategoryKeepingOthers`/`onCategoryAccepted`
+* 1.64 (10 nov 2026) - cookie-consent: get-cookie-list

@@ -12,6 +12,8 @@ npm i vanilla-cookieconsent
 
 Il CSS della libreria viene importato da `cookie-consent.css` (a sua volta importato da `cookie-consent.js`): serve una configurazione webpack in grado di risolvere gli `@import` da `node_modules` (come quella dello starter-kit di minimo).
 
+Con PurgeCSS le classi del banner, generate dal js della libreria, verrebbero rimosse: aggiungere `/^cc-main$/` e `/^show--consent$/` al safelist `greedy` (già presenti nel `webpack.config-tpl.mjs` dello starter-kit). I commenti `purgecss start/end ignore` di `cookie-consent.css` proteggono solo le regole del file stesso: css-loader tratta l'`@import` della libreria come modulo separato.
+
 ## Configurazione
 
 Copiare `cookie-consent.config.sample.mjs` nel progetto (es. `src/cookie-consent.config.mjs`) e compilarlo. Tutte le proprietà sono facoltative:
@@ -179,16 +181,33 @@ Per gestioni più specifiche, vanilla-cookieconsent emette su `window` gli event
 
 ## Elenco dei cookie nella pagina privacy
 
-`renderCookieList()` genera l'elenco dei cookie a partire dalla stessa configurazione, così che coincida con quello del modal:
+`getCookieList()` restituisce l'elenco dei cookie a partire dalla stessa configurazione, così che coincida con quello del modal. Restituisce solo i dati, diviso per categoria: il markup (titoli, liste, tabelle) è a cura del progetto.
 
 ```js
-import { renderCookieList } from '@massimo-cassandro/minimo/vanilla-cookie-consent';
+import { getCookieList } from '@massimo-cassandro/minimo/vanilla-cookie-consent';
 import config from './cookie-consent.config.mjs';
 
-renderCookieList(document.getElementById('cookie-list'), config);
+getCookieList(config);
+// [
+//   {
+//     key: 'necessary',
+//     section: 'Cookie strettamente necessari',
+//     description: 'I cookie necessari sono indispensabili…',
+//     cookies: [
+//       { name: 'cc_cookie', type: 'cookie', domain: 'Questo sito', description: 'Registra la tua scelta sui cookie', expiration: '6 mesi' },
+//       …
+//     ]
+//   },
+//   …
+// ]
 ```
 
-L'elenco è una `<ul>` annidata; i titoli delle categorie hanno la classe `cookie-list-section`. Per le righe che non sono cookie il tipo viene indicato tra parentesi dopo il nome.
+- categorie nello stesso ordine e con gli stessi titoli e descrizioni del modal preferenze; compaiono solo quelle mostrate anche nel modal;
+- nelle righe tutti i campi sono valorizzati: `type` vale `'cookie'` se non indicato, `expiration` una stringa vuota;
+- `description` può contenere `<br>` (il modal interpreta l'HTML): sostituirlo o usare `innerHTML` a seconda del markup;
+- gli oggetti restituiti sono copie: si possono modificare senza effetti sul modal.
+
+Sostituisce `renderCookieList()` (fino alla v1.63.2), che generava una `<ul>` annidata.
 
 ## Scanner di cookie e test automatici
 

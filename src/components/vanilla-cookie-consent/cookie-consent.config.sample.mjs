@@ -1,7 +1,7 @@
 /*
   Configurazione di esempio di cookie-consent.
   Copiare questo file nel progetto (es. `src/cookie-consent.config.mjs`), compilarlo e passarlo
-  a `initCookieConsent()` (e, se serve, a `renderCookieList()` nella pagina della privacy policy):
+  a `initCookieConsent()` (e, se serve, a `getCookieList()` per la pagina della privacy policy):
 
     import { initCookieConsent } from '@massimo-cassandro/minimo/vanilla-cookie-consent';
     import config from './cookie-consent.config.mjs';
