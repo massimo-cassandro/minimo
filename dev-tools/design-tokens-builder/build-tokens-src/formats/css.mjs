@@ -182,6 +182,58 @@ export let lastFinalProps = {};
 */
 export let lastPropTypes = {};
 
+/*
+  Scale ordinate in modo logico anziché alfabetico: quando due nomi di proprietà
+  differiscono per un segmento (separato da trattini) presente in una di queste scale,
+  vale la posizione nella scala (ad es. `font-size-xs` prima di `font-size-sm`,
+  `font-weight-light` prima di `font-weight-regular`).
+*/
+const SCALE_SEQUENCES = [
+  // taglie
+  ['3xs', 'xxxs', '2xs', 'xxs', 'xs', 'sm', 'base', 'md', 'lg', 'xl',
+    'xxl', '2xl', 'xxxl', '3xl', '4xl', '5xl', '6xl', '7xl', '8xl', '9xl'],
+  // pesi
+  ['thin', 'xlight', 'light', 'regular', 'medium', 'semibold', 'bold', 'xbold', 'black'],
+];
+
+// segmento → posizione complessiva (le scale sono disposte una di seguito all'altra)
+const SCALE_RANK = new Map(SCALE_SEQUENCES.flat().map((segment, idx) => [segment, idx]));
+
+/**
+ * Confronta due nomi di custom property (senza `--` iniziale) per l'ordinamento dell'output.
+ * Il confronto avviene segmento per segmento (separatore: trattino): al primo segmento
+ * diverso, se entrambi appartengono a una scala di taglia o di peso (vedi SCALE_SEQUENCES)
+ * vale la posizione nella scala; se vi appartiene uno solo, questo precede l'altro;
+ * altrimenti l'ordine è alfabetico (con i numeri confrontati per valore).
+ * @param {string} a - Primo nome
+ * @param {string} b - Secondo nome
+ * @returns {number} valore negativo, zero o positivo, come per Array.prototype.sort()
+ */
+export const comparePropNames = (a, b) => {
+  const segmentsA = a.split('-');
+  const segmentsB = b.split('-');
+  const length = Math.min(segmentsA.length, segmentsB.length);
+
+  for (let i = 0; i < length; i++) {
+    const segA = segmentsA[i];
+    const segB = segmentsB[i];
+    if (segA === segB) continue;
+
+    const rankA = SCALE_RANK.get(segA.toLowerCase());
+    const rankB = SCALE_RANK.get(segB.toLowerCase());
+    if (rankA !== undefined && rankB !== undefined) return rankA - rankB;
+    if (rankA !== undefined) return -1;
+    if (rankB !== undefined) return 1;
+
+    const result = segA.localeCompare(segB, 'en', { numeric: true, sensitivity: 'base' });
+    if (result !== 0) return result;
+  }
+
+  // un nome è il prefisso dell'altro: prima il più corto
+  return segmentsA.length - segmentsB.length
+    || a.localeCompare(b, 'en', { numeric: true, sensitivity: 'base' });
+};
+
 /**
  * Calcola la mappa finale `nome -> coda della dichiarazione` per un dizionario di token:
  * risolve il valore CSS di ogni token (inclusi i builder dei tipi complessi qui sopra),
@@ -200,28 +252,6 @@ export const computeFinalProps = (dictionary, options) => {
   }
 
   const resolveRefs = makeResolveRefs(tokenByPath);
-
-  const sequenceList = [
-    'xxs', 'xs', 'sm', 'base', 'md', 'lg', 'xl', 'xxl', 'xxxl', '2xl', '3xl',
-    'xlight', 'light', 'regular', 'medium', 'semibold', 'bold', 'xbold'
-  ];
-
-  const sortFunction = (a, b) => {
-    const idxA = sequenceList.indexOf(a.name);
-    const idxB = sequenceList.indexOf(b.name);
-
-    // Entrambi nella lista → ordine arbitrario
-    if (idxA !== -1 && idxB !== -1) return idxA - idxB;
-
-    // Solo A nella lista → A viene prima
-    if (idxA !== -1) return -1;
-
-    // Solo B nella lista → B viene prima
-    if (idxB !== -1) return 1;
-
-    // Nessuno nella lista → ordine alfabetico
-    return a.name.localeCompare(b.name, 'en', { numeric: true, sensitivity: 'base' });
-  };
 
   /*
     I token caricati tramite `include` (sourceModes: token della modalità base resi
@@ -245,8 +275,7 @@ export const computeFinalProps = (dictionary, options) => {
 
   const lines = dictionary.allTokens
     .filter((token) => token.isSource !== false)
-    // .sort((a, b) => a.name.localeCompare(b.name, 'en', {numeric: true, sensitivity: 'base'}))
-    .sort((a, b) => sortFunction(a,b))
+    .sort((a, b) => comparePropNames(a.name, b.name))
     .flatMap((token) => {
       const type = token.$type ?? token.type;
       const orig = token.original?.$value ?? token.original?.value;
@@ -339,7 +368,7 @@ export const computeFinalProps = (dictionary, options) => {
 /**
  * Costruisce il testo finale del blocco CSS (`<selector> { ... }`) a partire da una mappa
  * nome → coda della dichiarazione già calcolata (vedi computeFinalProps() qui sopra):
- * ordina le proprietà alfabeticamente, estrae i customPropsGroups, antepone una
+ * ordina le proprietà (vedi comparePropNames), estrae i customPropsGroups, antepone una
  * dichiarazione `color-scheme` opzionale e, se richiesto, racchiude il risultato in
  * `@layer <addLayer> { ... }`.
  *
@@ -372,12 +401,13 @@ export const buildCssBlock = ({
   addLayer = null,
 }) => {
   /*
-    L'output finale è sempre ordinato alfabeticamente in modo crescente per nome della
-    proprietà, a prescindere dal merge — questo mantiene in ordine anche le proprietà
+    L'output finale è sempre ordinato in modo crescente per nome della proprietà
+    (alfabetico, con le scale di taglia e di peso in ordine logico: vedi comparePropNames),
+    a prescindere dal merge — questo mantiene in ordine anche le proprietà
     presenti solo nel preesistente (da merge-css.mjs) invece di accodarle alla fine.
   */
   const sortedProps = Object.entries(finalProps)
-    .sort(([a], [b]) => a.localeCompare(b, 'en', { numeric: true, sensitivity: 'base' }));
+    .sort(([a], [b]) => comparePropNames(a, b));
 
   /*
     customPropsGroups: le proprietà il cui primo segmento del nome (separato da trattini)
@@ -403,7 +433,7 @@ export const buildCssBlock = ({
       const idxA = prefixes.indexOf(a.split('-')[0]);
       const idxB = prefixes.indexOf(b.split('-')[0]);
       if (idxA !== idxB) return idxA - idxB;
-      return a.localeCompare(b, 'en', { numeric: true, sensitivity: 'base' });
+      return comparePropNames(a, b);
     });
   });
 

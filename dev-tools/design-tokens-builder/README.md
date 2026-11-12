@@ -174,7 +174,7 @@ Le seguenti transform vengono registrate in aggiunta a quelle predefinite di Sty
 
 #### Output CSS
 
-Tutti i token vengono generati come custom properties CSS dentro `:root`, in ordine alfabetico.
+Tutti i token vengono generati come custom properties CSS dentro `:root`, in ordine alfabetico. Fanno eccezione i segmenti del nome (separati da trattini) che appartengono a una scala di taglia (`xxs`, `xs`, `sm`, `base`, `md`, `lg`, `xl`, `2xl`, …) o di peso (`xlight`, `light`, `regular`, `medium`, `semibold`, `bold`, `xbold`, …): questi seguono l'ordine logico della scala e precedono gli altri segmenti (ad es. `--font-size-xs` prima di `--font-size-sm`).
 
 I token di tipografia vengono espansi in più proprietà:
 - `--token-name-font` — una shorthand `font` (quando sono presenti sia `fontSize` sia `fontFamily`)
