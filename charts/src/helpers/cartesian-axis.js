@@ -12,8 +12,8 @@ import { createTextEl } from './create-text-element.js';
  * @property {boolean} [debug] - Se true aggiunge gli attributi `data-debug-info` agli elementi (default: false)
  * @property {import('./parse-std-axis-opts.js').ChartArea} chart_area - Area del grafico, calcolata da `parseStdAxisOpts`
  * @property {number} [padding] - Spazio intorno ai bordi del grafico (default: 0)
- * @property {number|null} [width] - Larghezza dell'svg, di fatto obbligatoria
- * @property {number|null} [height] - Altezza dell'svg, di fatto obbligatoria
+ * @property {number} width - Larghezza dell'svg
+ * @property {number} height - Altezza dell'svg
  * @property {Object} [axisAttrs] - Attributi svg.js delle linee degli assi (default: {})
  * @property {Object} [ticksAttrs] - Attributi svg.js dei ticks (default: {})
  * @property {import('./core.js').ChartFontAttrs} [labelYAttrs] - Attributi font delle etichette dell'asse dei valori (default: {})
@@ -27,7 +27,7 @@ import { createTextEl } from './create-text-element.js';
  * @property {number} zero_y - Coordinata della linea dello zero (y con orientamento verticale, x con orientamento orizzontale)
  * @property {number} stepX_size - Lunghezza in px di ogni suddivisione dell'asse delle categorie
  * @property {number} stepX_count - Numero di suddivisioni dell'asse delle categorie
- * @property {number} [ticksLength] - Lunghezza dei ticks in px, di fatto obbligatoria
+ * @property {number} [ticksLength] - Lunghezza dei ticks in px (default: 0)
  * @property {boolean} [showXgrid] - Mostra la griglia ortogonale all'asse delle categorie (verticale, oppure orizzontale con orientamento orizzontale) (default: true)
  * @property {boolean} [showYgrid] - Mostra la griglia ortogonale all'asse dei valori (orizzontale, oppure verticale con orientamento orizzontale) (default: true)
  * @property {Object} [gridLinesAttrs] - Attributi svg.js delle linee della griglia (default: {})
@@ -39,7 +39,7 @@ import { createTextEl } from './create-text-element.js';
  * @property {string|null} [xAxisTitleFontFilePath] - Percorso del file del font del titolo dell'asse in basso (solo textToPath) (default: null)
  * @property {Array<string|number>} [xLabels] - Etichette dell'asse delle categorie
  * @property {boolean} [xLabelsOnTicks] - Se true le etichette di categoria sono posizionate in corrispondenza dei ticks, altrimenti sono centrate nello spazio di ogni suddivisione (default: true)
- * @property {(value: number) => string|number} [labelYFormatter] - Funzione per formattare le etichette dell'asse dei valori; il default è null, ma è di fatto obbligatoria: viene sempre eseguita (default: null)
+ * @property {((value: number) => string|number)|null} [labelYFormatter] - Funzione per formattare le etichette dell'asse dei valori; se null viene mostrato il valore senza elaborazione (default: null)
  */
 
 /**
@@ -47,7 +47,7 @@ import { createTextEl } from './create-text-element.js';
  * Smista la richiesta in base a `params.orientation`: `vertical` (barre/linee verticali, default)
  * o `horizontal` (barre orizzontali). Gli argomenti sono gli stessi per entrambi gli orientamenti,
  * interpretati diversamente da ciascun ramo (vedi `cartesianAxisVertical` e `cartesianAxisHorizontal`).
- * Il gruppo restituito non è aggiunto ad alcun svg. In caso di errore lo registra in console e restituisce `undefined`.
+ * Il gruppo restituito non è aggiunto ad alcun svg. In caso di errore lo registra in console e rilancia l'errore.
  *
  * @example
  * // Tutti i parametri (valori di default dove previsti):
@@ -71,7 +71,7 @@ import { createTextEl } from './create-text-element.js';
  *   zero_y: parsed.zero_y, // coordinata della linea dello zero, OBBL
  *   stepX_size: parsed.stepX_size, // px per suddivisione asse categorie, OBBL
  *   stepX_count: 6, // suddivisioni asse categorie, OBBL
- *   ticksLength: 8, // lunghezza ticks, OBBL
+ *   ticksLength: 8, // lunghezza ticks, FAC
  *   showXgrid: true, // griglia asse categorie, FAC
  *   showYgrid: true, // griglia asse valori, FAC
  *   gridLinesAttrs: {}, // attributi linee griglia, FAC
@@ -83,7 +83,7 @@ import { createTextEl } from './create-text-element.js';
  *   xAxisTitleFontFilePath: null, // file font titolo asse in basso, FAC
  *   xLabels: [], // etichette di categoria, FAC
  *   xLabelsOnTicks: true, // etichette di categoria sui ticks, FAC
- *   labelYFormatter: value => value, // formattazione etichette asse valori, OBBL
+ *   labelYFormatter: null, // formattazione etichette asse valori, FAC
  * });
  *
  * @param {import('./core.js').MinimoCharts} chartInstance - Istanza di `MinimoCharts`
@@ -122,7 +122,7 @@ async function cartesianAxisVertical(chartInstance, {
   zero_y,
   stepX_size,
   stepX_count,
-  ticksLength,
+  ticksLength = 0,
   showXgrid = true, // griglia verticale
   showYgrid = true, // griglia orizzontale
   gridLinesAttrs = {},
@@ -179,10 +179,9 @@ async function cartesianAxisVertical(chartInstance, {
 
     for await (const stepIdx of Array.from(Array(stepY_count + 1).keys())) {
 
-      // TODO[epic=charts] `labelYFormatter` viene sempre eseguita: con null (il default, descritto nei grafici come "nessuna elaborazione")
-      // questa riga va in errore. Usare il valore non formattato quando la funzione è assente
       const y = chart_area.bottom - (stepY_size * stepIdx)
-        ,label = labelYFormatter(min_value + stepY_value * stepIdx);
+        ,stepValue = min_value + stepY_value * stepIdx
+        ,label = labelYFormatter? labelYFormatter(stepValue) : stepValue; // senza funzione il valore non viene elaborato
 
       // =>> ticks Y
       ticksYGroup
@@ -209,7 +208,7 @@ async function cartesianAxisVertical(chartInstance, {
 
       // =>> griglia orizzontale (ortogonale all'asse Y)
       // viene omessa solo la linea che coincide con l'asse X (la linea dello zero)
-      if(showYgrid && Math.abs(y - zero_y) > 0.01) {
+      if(yGridGroup && Math.abs(y - zero_y) > 0.01) {
         yGridGroup.line(
           chart_area.left, y,
           chart_area.right, y
@@ -353,6 +352,7 @@ async function cartesianAxisVertical(chartInstance, {
 
   } catch(e) {
     console.error( 'MinimoCharts → cartesianAxis', e ); // eslint-disable-line
+    throw e;
   }
 }
 
@@ -389,7 +389,7 @@ async function cartesianAxisHorizontal(chartInstance, {
   zero_y: zero_x, // rinominato per chiarezza: qui è una coordinata X
   stepX_size,
   stepX_count,
-  ticksLength,
+  ticksLength = 0,
   showXgrid = true, // griglia orizzontale (asse categorie)
   showYgrid = true, // griglia verticale (asse valori)
   gridLinesAttrs = {},
@@ -443,10 +443,9 @@ async function cartesianAxisHorizontal(chartInstance, {
 
     for await (const stepIdx of Array.from(Array(stepY_count + 1).keys())) {
 
-      // TODO[epic=charts] `labelYFormatter` viene sempre eseguita: con null (il default, descritto nei grafici come "nessuna elaborazione")
-      // questa riga va in errore. Usare il valore non formattato quando la funzione è assente
       const x = chart_area.left + (stepY_size * stepIdx)
-        ,label = labelYFormatter(min_value + stepY_value * stepIdx);
+        ,stepValue = min_value + stepY_value * stepIdx
+        ,label = labelYFormatter? labelYFormatter(stepValue) : stepValue; // senza funzione il valore non viene elaborato
 
       // =>> ticks asse valori
       ticksValueGroup
@@ -482,7 +481,7 @@ async function cartesianAxisHorizontal(chartInstance, {
 
       // =>> griglia verticale (ortogonale all'asse valori)
       // viene omessa solo la linea che coincide con l'asse categorie (la linea dello zero)
-      if(showYgrid && Math.abs(x - zero_x) > 0.01) {
+      if(valueGridGroup && Math.abs(x - zero_x) > 0.01) {
         valueGridGroup.line(
           x, chart_area.top,
           x, chart_area.bottom
@@ -613,5 +612,6 @@ async function cartesianAxisHorizontal(chartInstance, {
 
   } catch(e) {
     console.error( 'MinimoCharts → cartesianAxis (horizontal)', e ); // eslint-disable-line
+    throw e;
   }
 }

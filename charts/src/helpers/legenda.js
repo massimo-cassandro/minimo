@@ -13,7 +13,7 @@ import { createTextEl } from './create-text-element.js';
  * Costruisce la legenda di un grafico: un gruppo svg.js con le voci disposte in orizzontale,
  * ognuna composta da una forma (linea o cerchio) e dal relativo testo.
  * Il gruppo restituito non è aggiunto ad alcun svg e va posizionato da chi lo richiede.
- * In caso di errore (es. `items` vuoto) lo registra in console e restituisce `undefined`.
+ * In caso di errore (es. `items` vuoto) lo registra in console e rilancia l'errore.
  *
  * @example
  * // Tutti i parametri (valori di default dove previsti):
@@ -22,7 +22,7 @@ import { createTextEl } from './create-text-element.js';
  *   elements_gap: 20, // spazio tra le voci, FAC
  *   lines_width: 20, // lunghezza delle forme `line`, FAC
  *   circles_radius: 20, // diametro delle forme `circle`, FAC
- *   fontAttrs: { fill: '#333', size: 14 }, // attributi font dei testi, OBBL
+ *   fontAttrs: null, // attributi font dei testi, FAC
  *   fontFilePath: null, // percorso file font (solo textToPath), FAC
  *   items: [{ shape: 'line', attrs: {}, text: 'Serie 1' }], // voci della legenda, OBBL
  * });
@@ -33,7 +33,7 @@ import { createTextEl } from './create-text-element.js';
  * @param {number} [params.elements_gap=20] - Spazio tra una voce e l'altra (default: 20)
  * @param {number} [params.lines_width=20] - Lunghezza delle forme di tipo `line` (default: 20)
  * @param {number} [params.circles_radius=20] - Dimensione delle forme di tipo `circle`; nonostante il nome corrisponde al diametro (default: 20)
- * @param {import('./core.js').ChartFontAttrs} params.fontAttrs - Attributi svg.js dei font dei testi; il default è null, ma è di fatto obbligatorio: viene letto `fontAttrs.fill` (default: null)
+ * @param {import('./core.js').ChartFontAttrs|null} [params.fontAttrs=null] - Attributi svg.js dei font dei testi; se null vengono usati quelli di default dell'istanza (default: null)
  * @param {string|null} [params.fontFilePath=null] - Percorso del file del font, per la conversione dei testi in tracciati (default: null)
  * @param {LegendaItem[]} params.items - Voci della legenda, almeno una (default: [])
  * @returns {Promise<import('@svgdotjs/svg.js').G>} Il gruppo svg.js della legenda
@@ -96,12 +96,12 @@ export async function legenda(chartInstance, {
           x, height  / 2,
           x + lines_width, height  / 2
         )
-          .attr(voce.attrs);
+          .attr(voce.attrs?? {});
         x = x + lines_width;
 
       } else if (voce.shape === 'circle') {
         thisGroup.circle(circles_radius)
-          .attr(voce.attrs)
+          .attr(voce.attrs?? {})
           .move(x, (height - circles_radius) / 2);
 
         x = x + circles_radius;
@@ -111,12 +111,10 @@ export async function legenda(chartInstance, {
       }
 
       // testo
-      // TODO[epic=charts] `fontAttrs` ha default null ma qui viene letto `fontAttrs.fill`: senza `fontAttrs` questa riga va in errore.
-      // Usare `fontAttrs?.fill` (createTextEl gestisce già `fontAttr` null)
       const labelEl = await createTextEl(chartInstance, {
-          text: voce.text,
-          textFill: fontAttrs.fill?? '#000',
-          fontAttr: fontAttrs,
+          text: voce.text?? '',
+          textFill: fontAttrs?.fill?? '#000',
+          fontAttr: fontAttrs?? {},
           fontFilePath: fontFilePath,
           parentElement: thisGroup
         }),
@@ -131,6 +129,7 @@ export async function legenda(chartInstance, {
 
   } catch(e) {
     console.error( 'MinimoCharts → legenda', e ); // eslint-disable-line
+    throw e;
   }
 
 }

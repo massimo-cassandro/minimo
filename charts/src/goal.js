@@ -5,7 +5,6 @@ import { createTextEl } from './helpers/create-text-element.js';
  * Grafico obiettivo: un triangolo rettangolo disposto orizzontalmente, che mostra la porzione di
  * raggiungimento di un obiettivo. Un cursore sotto il triangolo indica il valore corrente e,
  * facoltativamente, l'area ancora mancante all'obiettivo viene evidenziata con attributi diversi.
- * Va eseguita con `this` legato all'istanza di `MinimoCharts`: normalmente si usa il wrapper `goalChart` di `charts/index.js`.
  * In caso di errore (parametri non validi, dimensioni mancanti) lo registra in console e restituisce `undefined`.
  *
  * @example
@@ -34,7 +33,7 @@ import { createTextEl } from './helpers/create-text-element.js';
  *   currentValueFormatter: value => `${value}%`, // formattazione valore corrente, FAC
  * });
  *
- * @this {import('./helpers/core.js').MinimoCharts}
+ * @param {import('./helpers/core.js').MinimoCharts} chartInstance - Istanza di `MinimoCharts`
  * @param {Object} params - Parametri del grafico
  * @param {boolean} [params.debug=false] - Se true aggiunge agli elementi gli attributi `data-debug-info`, utili per il debug (default: false)
  * @param {string|HTMLElement|null} [params.container=null] - Container del grafico (selettore o elemento DOM); se null viene restituito il codice SVG (default: null)
@@ -57,6 +56,18 @@ import { createTextEl } from './helpers/create-text-element.js';
  * @param {number} [params.cursorSize=12] - Lato del quadrato che circoscrive il triangolo del cursore (default: 12)
  * @param {Object} [params.cursorAttrs] - Attributi svg.js del cursore che indica il valore corrente (default: { fill: "#000" })
  * @param {(value: number) => string|number} [params.currentValueFormatter] - Funzione per la formattazione del valore corrente (default: percentuale in formato italiano, con al massimo 2 decimali)
+ * @returns {Promise<string|undefined>} Il codice SVG se `container` è null, altrimenti `undefined` (il grafico viene aggiunto al container)
+ */
+export function goalChart(chartInstance, params) {
+  return goal.call(chartInstance, params);
+}
+
+/**
+ * Implementazione di `goalChart`, a cui si rimanda per la descrizione e l'elenco completo dei parametri.
+ * Va eseguita con `this` legato all'istanza di `MinimoCharts`: normalmente si usa `goalChart`.
+ *
+ * @this {import('./helpers/core.js').MinimoCharts}
+ * @param {Parameters<typeof goalChart>[1]} params - Parametri del grafico (vedi `goalChart`)
  * @returns {Promise<string|undefined>} Il codice SVG se `container` è null, altrimenti `undefined` (il grafico viene aggiunto al container)
  */
 export async function goal({
@@ -219,6 +230,10 @@ export async function goal({
 
     ({ width, height } = await waitForContainerSize(container, { width, height }, debug));
 
+    // se né `height` né `chartHeight` sono impostati e l'altezza è stata ricavata dal container,
+    // `chartHeight` è data dalla differenza tra `height` e lo spazio di cursore ed etichetta
+    chartHeight ??= height - cursorAndLabelHeight;
+
     // larghezza iniziale grafico
     // al netto del padding orizzontale pari a 1/2 cursore, in modo che sia visibile interamente
     // quando posizionato agli estremi (anche in presenta di etichetta laterale, nel caso quest'ultima sia più alta del grafico)
@@ -295,7 +310,7 @@ export async function goal({
       });
 
     // posizionamento etichetta destra
-    if(rightLabelGroup) {
+    if(rightLabelGroup && rightLabel_bbox) {
       rightLabelGroup.move(
         chartWidth + cursorSize,
         (chartHeight - rightLabel_bbox.height) / 2
@@ -348,7 +363,7 @@ export async function goal({
 
 
     // posizionamento etichetta valore
-    if(currentValueLabelEl) {
+    if(currentValueLabelEl && currentValueLabelBbox) {
       const labelX = currentValuePosition - (currentValueLabelBbox.width / 2) + cursorSize / 2;
       currentValueLabelEl.move(
         labelX + currentValueLabelBbox.width > width

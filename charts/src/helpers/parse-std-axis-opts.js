@@ -29,7 +29,7 @@
  * Prima elaborazione e controlli delle impostazioni comuni a tutti i grafici con assi:
  * calcola valori minimo e massimo, area del grafico, dimensioni delle suddivisioni e posizione dello zero.
  * NB: non fa parte della classe `MinimoCharts`, va importata dove richiesto.
- * In caso di errore (es. uno dei parametri obbligatori è null) lo registra in console e restituisce `undefined`.
+ * In caso di errore (es. uno dei parametri obbligatori è null) lo registra in console e rilancia l'errore.
  *
  * @example
  * // Tutti i parametri (valori di default dove previsti):
@@ -77,7 +77,8 @@ export function parseStdAxisOpts(params) {
     const parsed = /** @type {ParsedAxisOpts} */ ({});
 
     // default
-    params = {
+    // `opts` resta distinto da `params` perché assuma il tipo risultante dall'unione con i default
+    const defaults = {
       max_value: null,
       min_value: null,
       values: [], // array flat dei valori per il calcolo di maxValues e minValues, qualora fossero null
@@ -99,13 +100,13 @@ export function parseStdAxisOpts(params) {
         non sul calcolo "nice zero" di min_value/max_value/stepY_count, che è indipendente dall'orientamento
       */
       orientation: 'vertical',
-
-      ...params
     };
 
-    ['width', 'height', 'eti_asseX_height', 'eti_asseY_width', 'stepY_count', 'stepX_count', 'ticksLength']
+    const opts = {...defaults, ...params};
+
+    /** @type {Array<keyof typeof opts>} */ (['width', 'height', 'eti_asseX_height', 'eti_asseY_width', 'stepY_count', 'stepX_count', 'ticksLength'])
       .forEach(key => {
-        if(params[key] == null) {
+        if(opts[key] == null) {
           throw `‘${key}’ non può essere null`;
         }
       });
@@ -116,23 +117,23 @@ export function parseStdAxisOpts(params) {
     //---------------
 
     // calcolo valore massimo dei dati se non già impostato in precedenza
-    if(params.max_value == null) {
-      parsed.max_value = Math.max(0, ...params.values.flat());
+    if(opts.max_value == null) {
+      parsed.max_value = Math.max(0, .../** @type {number[]} */ (opts.values.flat()));
     } else {
-      parsed.max_value = params.max_value;
+      parsed.max_value = opts.max_value;
     }
 
     // calcolo valore minimo dei dati se non già impostato in precedenza
-    if(params.min_value == null) {
-      parsed.min_value = Math.min(parsed.max_value, ...params.values.flat().filter(v => v != null));
+    if(opts.min_value == null) {
+      parsed.min_value = Math.min(parsed.max_value, .../** @type {number[]} */ (opts.values.flat().filter(v => v != null)));
     } else {
-      parsed.min_value = params.min_value;
+      parsed.min_value = opts.min_value;
     }
 
     // se i valori attraversano lo zero (min negativo, max positivo), min_value/max_value/stepY_count
     // vengono ricalcolati in modo che tutti gli step della griglia abbiano la stessa dimensione
     // e che lo zero coincida esattamente con una delle suddivisioni (invece di cadere a metà tra due step)
-    let stepY_count = params.stepY_count;
+    let stepY_count = opts.stepY_count;
 
     if(parsed.min_value < 0 && parsed.max_value > 0) {
       const rawStep = (parsed.max_value - parsed.min_value) / stepY_count,
@@ -146,7 +147,7 @@ export function parseStdAxisOpts(params) {
     }
     parsed.stepY_count = stepY_count;
 
-    const legenda_height = params.legenda?.height?? 0;
+    const legenda_height = opts.legenda?.height?? 0;
     const gap_legenda = legenda_height? 10 : 0; // spazio tra legenda e grafico
 
 
@@ -154,10 +155,10 @@ export function parseStdAxisOpts(params) {
     // coordinate e dimensioni del rettangolo interno all'svg entro cui viene disegnato il grafico
     // i lati sx e inferiore corrispondono agli assi
     parsed.chart_area = /** @type {ChartArea} */ ({
-      top       : legenda_height + gap_legenda + params.padding, // coordinata y superiore
-      right     : params.width - (params.padding_right?? params.padding), // coordinata x dx
-      bottom    : params.height - params.eti_asseX_height - params.ticksLength - params.padding, // coordinata y inferiore
-      left      : params.eti_asseY_width + params.ticksLength + params.padding // coordinata x sx
+      top       : legenda_height + gap_legenda + opts.padding, // coordinata y superiore
+      right     : opts.width - (opts.padding_right?? opts.padding), // coordinata x dx
+      bottom    : opts.height - opts.eti_asseX_height - opts.ticksLength - opts.padding, // coordinata y inferiore
+      left      : opts.eti_asseY_width + opts.ticksLength + opts.padding // coordinata x sx
     });
     parsed.chart_area.width = parsed.chart_area.right - parsed.chart_area.left;
     parsed.chart_area.height = parsed.chart_area.bottom - parsed.chart_area.top;
@@ -166,13 +167,13 @@ export function parseStdAxisOpts(params) {
     // (usato per il calcolo delle etichette)
     parsed.stepY_value = (parsed.max_value - parsed.min_value) / stepY_count;
 
-    const isHorizontal = params.orientation === 'horizontal';
+    const isHorizontal = opts.orientation === 'horizontal';
 
     // lunghezza di ogni step dell'asse dei valori e dell'asse delle categorie:
     // con orientamento verticale l'asse dei valori è l'asse Y (chart_area.height) e quello delle
     // categorie è l'asse X (chart_area.width); con orientamento orizzontale i ruoli sono invertiti
     parsed.stepY_size = (isHorizontal? parsed.chart_area.width : parsed.chart_area.height) / stepY_count;
-    parsed.stepX_size = (isHorizontal? parsed.chart_area.height : parsed.chart_area.width) / (params.stepX_count - 1);
+    parsed.stepX_size = (isHorizontal? parsed.chart_area.height : parsed.chart_area.width) / (opts.stepX_count - 1);
 
     // coordinata corrispondente al valore 0 (asse Y con orientamento verticale, asse X con orientamento orizzontale)
     // utile quando min_value è negativo: la baseline delle barre viene disegnata in corrispondenza
@@ -193,5 +194,6 @@ export function parseStdAxisOpts(params) {
 
   } catch(e) {
     console.error( 'MinimoCharts → parseStdOpts', e ); // eslint-disable-line
+    throw e;
   }
 }

@@ -167,7 +167,7 @@ const default_params = {
     Null per nessuna eleborazione.
     La funzione di default assume che il valore sia di tipo numerico
   */
-  labelYFormatter: etiValue =>  (Math.ceil(etiValue / 1e3) || 0) // `|| 0` normalizza -0 (altrimenti mostrato come "-0")
+  labelYFormatter: (/** @type {number} */ etiValue) =>  (Math.ceil(etiValue / 1e3) || 0) // `|| 0` normalizza -0 (altrimenti mostrato come "-0")
     .toLocaleString('it-IT', {
       minimumFractionDigits: 0,
       maximumFractionDigits: 0
@@ -178,7 +178,6 @@ const default_params = {
 
 /**
  * Grafico a linee: una linea per ogni sub-array di `values`, con un punto per ogni valore.
- * Va eseguita con `this` legato all'istanza di `MinimoCharts`: normalmente si usa il wrapper `linesChart` di `charts/index.js`.
  * In caso di errore (parametri non validi, dimensioni mancanti) lo registra in console e restituisce `undefined`.
  *
  * @example
@@ -222,7 +221,7 @@ const default_params = {
  *   labelYFormatter: value => value.toLocaleString('it-IT'), // formattazione etichette dei valori, FAC
  * });
  *
- * @this {import('./helpers/core.js').MinimoCharts}
+ * @param {import('./helpers/core.js').MinimoCharts} chartInstance - Istanza di `MinimoCharts`
  * @param {Object} params - Parametri del grafico
  * @param {boolean} [params.debug] - Se true aggiunge agli elementi gli attributi `data-debug-info`, utili per il debug (default: false)
  * @param {string|HTMLElement|null} [params.container] - Container del grafico (selettore o elemento DOM); se null viene restituito il codice SVG (default: null)
@@ -234,7 +233,7 @@ const default_params = {
  * @param {number} [params.padding] - Spazio extra attorno al bordo (default: 10)
  * @param {number} [params.stepY_count] - Numero di suddivisioni dell'asse Y; può variare se i valori attraversano lo zero (default: 4)
  * @param {number} [params.ticksLength] - Lunghezza dei ticks in px (default: 8)
- * @param {Object|null} [params.legenda] - Opzioni della legenda; con null la legenda non viene mostrata, altrimenti `items` è obbligatorio. Chiavi: `height` (20), `elements_gap` (25), `lines_width` (20), `fontAttrs`, `fontFilePath` e `items`, array di oggetti di cui basta impostare `text`: `shape` è sempre `line` e `attrs` è ricavato dagli attributi delle linee dati (default: {})
+ * @param {Partial<Parameters<typeof legenda>[1]>|null} [params.legenda] - Opzioni della legenda; con null la legenda non viene mostrata, altrimenti `items` è obbligatorio. Chiavi: `height` (20), `elements_gap` (25), `lines_width` (20), `fontAttrs`, `fontFilePath` e `items`, array di oggetti di cui basta impostare `text`: `shape` è sempre `line` e `attrs` è ricavato dagli attributi delle linee dati (default: {})
  * @param {number} [params.yAxisLabelWidth] - Larghezza dell'area delle etichette dell'asse Y (default: 60)
  * @param {number} [params.xAxisLabelHeight] - Altezza dell'area delle etichette dell'asse X (default: 50)
  * @param {string|null} [params.yAxisTitle] - Titolo dell'asse Y (default: null)
@@ -254,20 +253,33 @@ const default_params = {
  * @param {string|null} [params.labelXFontFilePath] - Percorso del file del font delle etichette dell'asse X (solo textToPath) (default: null)
  * @param {import('./helpers/core.js').ChartFontAttrs} [params.labelYAttrs] - Attributi font (come in `MinimoCharts.defaults.font`, incluso `fill`) delle etichette dell'asse Y (default: { size: 14, weight: 400, fill: "#999" })
  * @param {string|null} [params.labelYFontFilePath] - Percorso del file del font delle etichette dell'asse Y (solo textToPath) (default: null)
- * @param {Object|Object[]} [params.data_lines_attrs] - Attributi svg.js delle linee dati. Se è un oggetto ne viene letto solo `stroke-width`, come spessore di default; se è un array, ogni elemento contiene gli attributi della linea con lo stesso indice. Il colore (`stroke`) è sempre ricavato da `data_colors` (default: linee di spessore 2)
- * @param {Object} [params.data_points_attrs] - Attributi svg.js dei cerchi aggiunti a ogni punto delle linee (NB: non aggiungere `cx` o `cy`). `r` può essere un numero (uguale per tutti i punti) o un array, in cui ogni valore si applica alla linea con lo stesso indice (default: { r: 4 })
+ * @param {Record<string, any>|Array<Record<string, any>>} [params.data_lines_attrs] - Attributi svg.js delle linee dati. Se è un oggetto ne viene letto solo `stroke-width`, come spessore di default; se è un array, ogni elemento contiene gli attributi della linea con lo stesso indice. Il colore (`stroke`) è sempre ricavato da `data_colors` (default: linee di spessore 2)
+ * @param {Record<string, any>} [params.data_points_attrs] - Attributi svg.js dei cerchi aggiunti a ogni punto delle linee (NB: non aggiungere `cx` o `cy`). `r` può essere un numero (uguale per tutti i punti) o un array, in cui ogni valore si applica alla linea con lo stesso indice (default: { r: 4 })
  * @param {string[]|null} [params.data_colors] - Colori delle linee; se null vengono usati i colori di default dell'istanza (`chartInstance.defaults.colors`) (default: null)
  * @param {Array<number|null>|null} [params.data_lines_widths] - Spessori delle linee: array in cui ogni valore si applica alla linea con lo stesso indice; i valori null o undefined, o l'intero parametro null, corrispondono a `data_lines_attrs['stroke-width']` (in sua mancanza a 1) (default: null)
  * @param {boolean} [params.addValuesTitle] - Aggiunge un attributo `data-title` in corrispondenza dei punti (al momento non attivo, vedi TODO nel codice) (default: true)
  * @param {(value: number) => string|number} [params.labelYFormatter] - Funzione per formattare le etichette dell'asse Y; quella di default assume che il valore sia numerico (default: migliaia arrotondate per eccesso, con suffisso K)
  * @returns {Promise<string|undefined>} Il codice SVG se `container` è null, altrimenti `undefined` (il grafico viene aggiunto al container)
  */
-export async function lines(params) {
+export function linesChart(chartInstance, params) {
+  return lines.call(chartInstance, params);
+}
+
+/**
+ * Implementazione di `linesChart`, a cui si rimanda per la descrizione e l'elenco completo dei parametri.
+ * Va eseguita con `this` legato all'istanza di `MinimoCharts`: normalmente si usa `linesChart`.
+ *
+ * @this {import('./helpers/core.js').MinimoCharts}
+ * @param {Parameters<typeof linesChart>[1]} userParams - Parametri del grafico (vedi `linesChart`)
+ * @returns {Promise<string|undefined>} Il codice SVG se `container` è null, altrimenti `undefined` (il grafico viene aggiunto al container)
+ */
+export async function lines(userParams) {
 
   const chartInstance = this;
 
-  params = {...default_params, ...params};
-  params.data_colors??= chartInstance.defaults.colors;
+  // `userParams` resta distinto da `params` perché quest'ultimo assuma il tipo risultante dall'unione con i default
+  const params = {...default_params, ...userParams};
+  const data_colors = params.data_colors?? chartInstance.defaults.colors;
 
   try {
 
@@ -279,7 +291,7 @@ export async function lines(params) {
     });
 
     const flatValues = params.values.flat(); // utilizzato anche in seguito
-    if(flatValues.filter(v => isNaN(v)).length) {
+    if(flatValues.filter(v => isNaN(/** @type {number} */ (v))).length) {
       throw 'Tutti i valori dei sub-array di `values` devono essere numerici';
     }
 
@@ -295,18 +307,20 @@ export async function lines(params) {
     ({ width: params.width, height: params.height } = await waitForContainerSize(containerElement, { width: params.width, height: params.height }, params.debug));
 
     // =>> ricalcolo data_lines_attrs (utilizzato anche per le linee della legenda)
-    const default_line_width = params.data_lines_attrs['stroke-width']?? 1;
+    // `user_lines_attrs` può essere un oggetto o un array: il tipo generico permette entrambi gli accessi
+    const user_lines_attrs = /** @type {Record<string, any>} */ (params.data_lines_attrs);
+    const default_line_width = user_lines_attrs['stroke-width']?? 1;
 
     // TODO[epic=charts] se `data_lines_attrs` è un oggetto (come nel default) ne viene usato solo `stroke-width`:
     // `params.data_lines_attrs[idx]` è undefined e gli altri attributi vengono ignorati. Applicare l'oggetto a tutte le linee
     // il ciclo è basato su params.values per essere certi che il numero di elementi coincida
-    params.data_lines_attrs = params.values.map((_, idx) => {
-      const thisColor = params.data_colors[idx],
+    const data_lines_attrs = params.values.map((_, idx) => {
+      const thisColor = data_colors[idx],
         thisLineWidth = (params.data_lines_widths??[])[idx]?? default_line_width;
 
       return {
         ...default_lines_attrs,
-        ...params.data_lines_attrs[idx]?? {},
+        ...user_lines_attrs[idx]?? {},
         stroke: thisColor,
         'stroke-width': thisLineWidth
       };
@@ -315,9 +329,18 @@ export async function lines(params) {
 
     // =>> legenda
     // costruzione delle opzioni per la legenda
+    /** @type {Parameters<typeof legenda>[1]|null} */
+    let legendaOpts = null;
+
     if(params.legenda != null) {
 
-      params.legenda = {
+      const userLegenda = /** @type {Partial<Parameters<typeof legenda>[1]>} */ (params.legenda);
+
+      // TODO[epic=charts] `legenda.items` è di fatto obbligatorio se `legenda` non è null: con il default `legenda: {}` il ciclo qui sotto va in errore.
+      // Usare un array vuoto in assenza di `items`, o segnalare un errore esplicito
+      const userItems = /** @type {import('./helpers/legenda.js').LegendaItem[]} */ (userLegenda.items);
+
+      legendaOpts = {
 
         /** altezza legenda */
         height: 20,
@@ -329,33 +352,32 @@ export async function lines(params) {
         lines_width: 20,
 
         /** attributi svg.js dei font del testo della legenda (null utilizza default) */
-        fontAttrs: {
+        fontAttrs: /** @type {import('./helpers/core.js').ChartFontAttrs} */ ({
           fill: '#333',
           'font-size': 14,
           'font-weight': 400
-        },
+        }),
         fontFilePath: null,
 
 
-        ...(params.legenda??[])
-      };
+        ...userLegenda,
 
-      // legenda.items (elementi della legenda)
-      // il ciclo viene eseguito su params.data_lines_attrs per essere certi che il numero di elementi coincida
-      // è utilizzato in ordine inverso in modo che il primo elmento della legenda corrisponda alla linea in primo piano
-      params.legenda.items = params.data_lines_attrs.toReversed().map((line_attr, idx) => {
-        // TODO[epic=charts] `legenda.items` è di fatto obbligatorio se `legenda` non è null: con il default `legenda: {}` questa riga va in errore.
-        // Usare un array vuoto in assenza di `items`, o segnalare un errore esplicito
-        const thisLegendaItem = params.legenda.items.toReversed()[idx]?? {};
-        return {
-          ...thisLegendaItem,
-          shape: 'line',
-          attrs: {
-            ...(thisLegendaItem.attrs?? {}),
-            ...line_attr
-          }
-        };
-      });
+        // legenda.items (elementi della legenda)
+        // il ciclo viene eseguito su data_lines_attrs per essere certi che il numero di elementi coincida
+        // è utilizzato in ordine inverso in modo che il primo elmento della legenda corrisponda alla linea in primo piano
+        items: data_lines_attrs.toReversed().map((line_attr, idx) => {
+          /** @type {import('./helpers/legenda.js').LegendaItem} */
+          const thisLegendaItem = userItems.toReversed()[idx]?? {};
+          return {
+            ...thisLegendaItem,
+            shape: /** @type {'line'} */ ('line'),
+            attrs: {
+              ...(thisLegendaItem.attrs?? {}),
+              ...line_attr
+            }
+          };
+        })
+      };
     }
 
 
@@ -393,7 +415,7 @@ export async function lines(params) {
       max_value: params.max_value,
       min_value: params.min_value,
       values: flatValues,
-      legenda: params.legenda,
+      legenda: legendaOpts,
       padding: params.padding,
       padding_right: paddingRight,
       width: params.width,
@@ -412,6 +434,9 @@ export async function lines(params) {
     const cartesianAxisGroup = await cartesianAxis(chartInstance, {
       ...params,
       ...{
+        // ripetute perché assumano il tipo `number` (in `params` sono dichiarate `number|null`)
+        width: params.width,
+        height: params.height,
         max_value,
         min_value,
         chart_area,
@@ -434,6 +459,7 @@ export async function lines(params) {
     params.values.forEach((lineDataArray, idx) => {
       const thisLineGroup = linesGroup.group()
           .attr({ 'data-debug-info': params.debug? `Gruppo Linea ${idx}` : null }),
+        /** @type {Array<[number, number]>} */
         coords = []; // array delle coordinate
 
 
@@ -450,7 +476,7 @@ export async function lines(params) {
         }
       });
 
-      thisLineGroup.polyline(coords).attr(params.data_lines_attrs[idx]);
+      thisLineGroup.polyline(coords).attr(data_lines_attrs[idx]);
 
       // punti
       const radius = Array.isArray(params.data_points_attrs.r)
@@ -463,7 +489,7 @@ export async function lines(params) {
           .attr({
             ...params.data_points_attrs,
             r: radius,
-            fill: params.data_lines_attrs[idx].stroke,
+            fill: data_lines_attrs[idx].stroke,
             cx: point[0],
             cy: point[1],
             'data-debug-info': params.debug? `Valore: ${params.values[idx][coord_idx]}` : null,
@@ -476,8 +502,8 @@ export async function lines(params) {
 
 
     // =>> Legenda
-    if(params.legenda) {
-      const legendaEl = await legenda(chartInstance, params.legenda);
+    if(legendaOpts) {
+      const legendaEl = await legenda(chartInstance, legendaOpts);
       legendaEl.attr({ 'data-cfg.debug-info': params.debug? 'Legenda' : null });
       const legendaBbox = legendaEl.bbox();
 

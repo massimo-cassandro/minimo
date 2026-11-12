@@ -150,7 +150,7 @@ const default_params = {
     Null per nessuna eleborazione.
     La funzione di default assume che il valore sia di tipo numerico
   */
-  labelYFormatter: etiValue =>  (Math.ceil(etiValue / 1e3) || 0) // `|| 0` normalizza -0 (altrimenti mostrato come "-0")
+  labelYFormatter: (/** @type {number} */ etiValue) =>  (Math.ceil(etiValue / 1e3) || 0) // `|| 0` normalizza -0 (altrimenti mostrato come "-0")
     .toLocaleString('it-IT', {
       minimumFractionDigits: 0,
       maximumFractionDigits: 0
@@ -163,7 +163,6 @@ const default_params = {
  * Grafico a barre verticali: categorie sull'asse X, valori sull'asse Y.
  * Ogni sub-array di `values` è una serie; le barre con lo stesso indice sono raggruppate nella stessa categoria.
  * Gestisce i valori negativi: le barre partono dalla linea dello zero.
- * Va eseguita con `this` legato all'istanza di `MinimoCharts`: normalmente si usa il wrapper `barsChart` di `charts/index.js`.
  * In caso di errore (parametri non validi, dimensioni mancanti) lo registra in console e restituisce `undefined`.
  *
  * @example
@@ -206,7 +205,7 @@ const default_params = {
  *   labelYFormatter: value => value.toLocaleString('it-IT'), // formattazione etichette dei valori, FAC
  * });
  *
- * @this {import('./helpers/core.js').MinimoCharts}
+ * @param {import('./helpers/core.js').MinimoCharts} chartInstance - Istanza di `MinimoCharts`
  * @param {Object} params - Parametri del grafico
  * @param {boolean} [params.debug] - Se true aggiunge agli elementi gli attributi `data-debug-info`, utili per il debug (default: false)
  * @param {string|HTMLElement|null} [params.container] - Container del grafico (selettore o elemento DOM); se null viene restituito il codice SVG (default: null)
@@ -221,7 +220,7 @@ const default_params = {
  * @param {number} [params.padding] - Spazio extra attorno al bordo (default: 10)
  * @param {number} [params.stepY_count] - Numero di suddivisioni dell'asse Y; può variare se i valori attraversano lo zero (default: 4)
  * @param {number} [params.ticksLength] - Lunghezza dei ticks in px (default: 8)
- * @param {Object} params.legenda - Opzioni della legenda, sempre mostrata: `items` è obbligatorio. Chiavi: `height` (20), `elements_gap` (25), `circles_radius` (20), `fontAttrs`, `fontFilePath` e `items`, array di oggetti di cui basta impostare `text`: `shape` è sempre `circle` e il colore è ricavato da `data_colors` (default: {})
+ * @param {Partial<Parameters<typeof legenda>[1]>} params.legenda - Opzioni della legenda, sempre mostrata: `items` è obbligatorio. Chiavi: `height` (20), `elements_gap` (25), `circles_radius` (20), `fontAttrs`, `fontFilePath` e `items`, array di oggetti di cui basta impostare `text`: `shape` è sempre `circle` e il colore è ricavato da `data_colors` (default: {})
  * @param {number} [params.yAxisLabelWidth] - Larghezza dell'area delle etichette dell'asse Y (default: 60)
  * @param {number} [params.xAxisLabelHeight] - Altezza dell'area delle etichette dell'asse X (default: 50)
  * @param {string|null} [params.yAxisTitle] - Titolo dell'asse Y (default: null)
@@ -245,12 +244,25 @@ const default_params = {
  * @param {(value: number) => string|number} [params.labelYFormatter] - Funzione per formattare le etichette dell'asse Y; quella di default assume che il valore sia numerico (default: migliaia arrotondate per eccesso, con suffisso K)
  * @returns {Promise<string|undefined>} Il codice SVG se `container` è null, altrimenti `undefined` (il grafico viene aggiunto al container)
  */
-export async function bars(params) {
+export function barsChart(chartInstance, params) {
+  return bars.call(chartInstance, params);
+}
+
+/**
+ * Implementazione di `barsChart`, a cui si rimanda per la descrizione e l'elenco completo dei parametri.
+ * Va eseguita con `this` legato all'istanza di `MinimoCharts`: normalmente si usa `barsChart`.
+ *
+ * @this {import('./helpers/core.js').MinimoCharts}
+ * @param {Parameters<typeof barsChart>[1]} userParams - Parametri del grafico (vedi `barsChart`)
+ * @returns {Promise<string|undefined>} Il codice SVG se `container` è null, altrimenti `undefined` (il grafico viene aggiunto al container)
+ */
+export async function bars(userParams) {
 
   const chartInstance = this;
 
-  params = {...default_params, ...params};
-  params.data_colors??= chartInstance.defaults.colors;
+  // `userParams` resta distinto da `params` perché quest'ultimo assuma il tipo risultante dall'unione con i default
+  const params = {...default_params, ...userParams};
+  const data_colors = params.data_colors?? chartInstance.defaults.colors;
 
   try {
 
@@ -262,7 +274,7 @@ export async function bars(params) {
     });
 
     const flatValues = params.values.flat(); // utilizzato anche in seguito
-    if(flatValues.filter(v => isNaN(v)).length) {
+    if(flatValues.filter(v => isNaN(/** @type {number} */ (v))).length) {
       throw 'Tutti i valori dei sub-array di `values` devono essere numerici';
     }
 
@@ -284,6 +296,9 @@ export async function bars(params) {
 
     // =>> legenda
     // costruzione delle opzioni per la legenda
+    const userLegenda = /** @type {Partial<Parameters<typeof legenda>[1]>} */ (params.legenda);
+
+    /** @type {Parameters<typeof legenda>[1]} */
     const legenda_params = {
 
       ...{
@@ -297,28 +312,29 @@ export async function bars(params) {
         circles_radius: 20,
 
         /** attributi svg.js dei font del testo della legenda (null utilizza default) */
-        fontAttrs: {
+        fontAttrs: /** @type {import('./helpers/core.js').ChartFontAttrs} */ ({
           fill: '#333',
           'font-size': 14,
           'font-weight': 400
-        },
+        }),
         fontFilePath: null,
       },
 
-      ...params.legenda
+      ...userLegenda,
+      items: [] // impostato qui sotto
     };
 
 
     // legenda.items (elementi della legenda)
     // TODO[epic=charts] `legenda.items` è di fatto obbligatorio: con il default `legenda: {}` questa riga va in errore.
     // Gestire l'assenza di `items` (omettere la legenda, come in lines con `legenda: null`) o segnalare un errore esplicito
-    legenda_params.items = params.legenda.items.map((item, idx) => {
+    legenda_params.items = /** @type {import('./helpers/legenda.js').LegendaItem[]} */ (userLegenda.items).map((item, idx) => {
       return {
         ...item,
-        shape: 'circle',
+        shape: /** @type {'circle'} */ ('circle'),
         attrs: {
           ...(item.attrs?? {}),
-          fill: params.data_colors[idx]?? '#666',
+          fill: data_colors[idx]?? '#666',
         }
       };
     });
@@ -367,6 +383,9 @@ export async function bars(params) {
       ...params,
       xLabelsOnTicks: false, // posiziona l'etichetta al centro di ogni step X
       ...{
+        // ripetute perché assumano il tipo `number` (in `params` sono dichiarate `number|null`)
+        width: params.width,
+        height: params.height,
         max_value,
         min_value,
         chart_area,
@@ -463,7 +482,7 @@ export async function bars(params) {
 
             barsGroup.path(path)
               .attr({
-                fill: params.data_colors[idx]?? '#666',
+                fill: data_colors[idx]?? '#666',
                 'data-debug-info': params.debug? `value: ${itemValue}` : null
               });
           }

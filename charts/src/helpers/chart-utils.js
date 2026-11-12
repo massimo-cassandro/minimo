@@ -91,19 +91,14 @@ export function calcArcCoords(options) {
 
   options = { ...default_options, ...options };
 
-  try {
-    if (options.percentage == null ||
-      options.center?.x == null ||
-      options.center?.y == null ||
-      options.start_angle == null ||
-      options.radius == null ||
-      options.max_arc == null
-    ) {
-      throw 'Errore parametri in `calcArcCoords`';
-    }
-  } catch (e) {
-    // eslint-disable-next-line no-console
-    console.error(e);
+  if (options.percentage == null ||
+    options.center?.x == null ||
+    options.center?.y == null ||
+    options.start_angle == null ||
+    options.radius == null ||
+    options.max_arc == null
+  ) {
+    throw 'Errore parametri in `calcArcCoords`';
   }
 
   // Angolo dell'arco corrispondente alla percentuale data
@@ -195,7 +190,8 @@ export function waitForContainerSize(containerElement, { width = null, height = 
   }
 
   if (!containerElement) {
-    return Promise.resolve({ width, height });
+    // senza container le dimensioni non possono che essere quelle ricevute: la loro validità va verificata dal chiamante
+    return Promise.resolve(/** @type {{width: number, height: number}} */ ({ width, height }));
   }
 
   return new Promise(resolve => {

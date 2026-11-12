@@ -4,7 +4,7 @@ import { SVG } from '@svgdotjs/svg.js';
  * Crea l'elemento SVG radice del grafico e lo aggiunge al container (uso nel browser).
  * È la funzione di default di `MinimoCharts`, che la esegue con `this` legato all'istanza;
  * per l'uso con Node va sostituita con `createSvgCanvasNode`.
- * In caso di errore (es. container mancante) lo registra in console e restituisce `undefined`.
+ * In caso di errore (es. container mancante) lo registra in console e rilancia l'errore.
  *
  * @this {import('./core.js').MinimoCharts}
  * @param {string|HTMLElement|null} [container] - Container del grafico (selettore o elemento DOM), obbligatorio
@@ -30,6 +30,7 @@ export function createSvgCanvas(container, debug = false) {
 
   } catch(e) {
     console.error( 'Charts → createSvgCanvas', e ); // eslint-disable-line
+    throw e;
   }
 
 }
