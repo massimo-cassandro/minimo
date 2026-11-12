@@ -158,6 +158,94 @@ const default_params = {
     (etiValue > 0? '\u2009K' : ''), // \u2009: thin space (https://www.compart.com/en/unicode/U+2009)
 
 };
+
+/**
+ * Grafico a barre orizzontali, analogo di `bars` con assi invertiti:
+ * categorie sull'asse verticale (a sinistra), valori sull'asse orizzontale (in basso).
+ * NB: i parametri mantengono i nomi di `bars`: `xLabels`, `labelX*` e `showXgrid` si riferiscono alle categorie,
+ * `stepY_count`, `labelY*` e `showYgrid` ai valori; `xAxis*` e `yAxis*` indicano invece la posizione (in basso / a sinistra).
+ * Va eseguita con `this` legato all'istanza di `MinimoCharts`: normalmente si usa il wrapper `hBarsChart` di `charts/index.js`.
+ * In caso di errore (parametri non validi, dimensioni mancanti) lo registra in console e restituisce `undefined`.
+ *
+ * @example
+ * // Tutti i parametri (valori di default dove previsti):
+ * hBarsChart(chartInstance, {
+ *   debug: false, // info per il debug, FAC
+ *   container: '#chart', // selettore o elemento DOM, FAC
+ *   width: null, // larghezza, null = container, FAC
+ *   height: 300, // altezza, null = container, FAC
+ *   svgAttrs: {}, // attributi svg, FAC
+ *   values: [[10, 20, 30]], // una serie per ogni sub-array, OBBL
+ *   barsGap: 5, // spazio tra le barre, FAC
+ *   seriesGap: 10, // spazio tra i gruppi, FAC
+ *   barsCornerRadius: 6, // raggio angoli barre, FAC
+ *   xLabels: ['A', 'B', 'C'], // etichette di categoria, FAC
+ *   padding: 10, // spazio attorno al bordo, FAC
+ *   stepY_count: 4, // suddivisioni asse valori, FAC
+ *   ticksLength: 8, // lunghezza ticks, FAC
+ *   legenda: { items: [{ text: 'Serie 1' }] }, // legenda (`items`), OBBL
+ *   yAxisLabelWidth: 60, // larghezza etichette a sinistra, FAC
+ *   xAxisLabelHeight: 50, // altezza etichette in basso, FAC
+ *   yAxisTitle: null, // titolo asse a sinistra, FAC
+ *   yAxisTitleAttrs: { size: 18, weight: 400, fill: '#999' }, // font titolo a sinistra, FAC
+ *   yAxisTitleFontFilePath: null, // file font titolo a sinistra, FAC
+ *   xAxisTitle: null, // titolo asse in basso, FAC
+ *   xAxisTitleAttrs: { size: 18, weight: 400, fill: '#999' }, // font titolo in basso, FAC
+ *   xAxisTitleFontFilePath: null, // file font titolo in basso, FAC
+ *   max_value: null, // massimo, null = automatico, FAC
+ *   min_value: null, // minimo, null = automatico, FAC
+ *   axisAttrs: { stroke: '#999', 'stroke-width': 2 }, // attributi assi, FAC
+ *   ticksAttrs: { stroke: '#999', 'stroke-width': 1 }, // attributi ticks, FAC
+ *   showXgrid: false, // griglia orizzontale, FAC
+ *   showYgrid: true, // griglia verticale, FAC
+ *   gridLinesAttrs: { stroke: '#999', 'stroke-width': 1 }, // attributi griglia, FAC
+ *   labelXAttrs: { size: 14, weight: 400, fill: '#999' }, // font etichette di categoria, FAC
+ *   labelXFontFilePath: null, // file font etichette di categoria, FAC
+ *   labelYAttrs: { size: 14, weight: 400, fill: '#999' }, // font etichette dei valori, FAC
+ *   labelYFontFilePath: null, // file font etichette dei valori, FAC
+ *   data_colors: null, // colori, null = default istanza, FAC
+ *   labelYFormatter: value => value.toLocaleString('it-IT'), // formattazione etichette dei valori, FAC
+ * });
+ *
+ * @this {import('./helpers/core.js').MinimoCharts}
+ * @param {Object} params - Parametri del grafico
+ * @param {boolean} [params.debug] - Se true aggiunge agli elementi gli attributi `data-debug-info`, utili per il debug (default: false)
+ * @param {string|HTMLElement|null} [params.container] - Container del grafico (selettore o elemento DOM); se null viene restituito il codice SVG (default: null)
+ * @param {number|null} [params.width] - Larghezza del grafico in px; se null viene usata quella del container. Se non è impostata né ricavabile viene generato un errore. NB: il padding del container rientra nelle dimensioni del grafico, è preferibile non impostarlo (default: null)
+ * @param {number|null} [params.height] - Altezza del grafico in px; se null viene usata quella del container. Se non è impostata né ricavabile viene generato un errore (default: 300)
+ * @param {Object} [params.svgAttrs] - Attributi facoltativi per l'elemento svg (classe, ecc.) (default: {})
+ * @param {Array<Array<number|null>>} params.values - Valori numerici delle barre: array di array, in cui ogni sub-array contiene i valori di una singola serie di barre (i valori null non vengono disegnati) (default: [])
+ * @param {number} [params.barsGap] - Spazio tra una barra e l'altra, all'interno dello stesso gruppo di categoria (default: 5)
+ * @param {number} [params.seriesGap] - Spazio tra un gruppo di categoria e l'altro (default: 10)
+ * @param {number} [params.barsCornerRadius] - Raggio degli angoli delle barre sul lato lontano dallo zero; viene ridotto se supera metà dello spessore della barra (default: 6)
+ * @param {Array<string|number>} [params.xLabels] - Etichette di categoria, una per ogni gruppo di barre; sono posizionate sull'asse verticale, a sinistra (default: [])
+ * @param {number} [params.padding] - Spazio extra attorno al bordo (default: 10)
+ * @param {number} [params.stepY_count] - Numero di suddivisioni dell'asse dei valori (in basso); può variare se i valori attraversano lo zero (default: 4)
+ * @param {number} [params.ticksLength] - Lunghezza dei ticks in px (default: 8)
+ * @param {Object} params.legenda - Opzioni della legenda, sempre mostrata: `items` è obbligatorio. Chiavi: `height` (20), `elements_gap` (25), `circles_radius` (20), `fontAttrs`, `fontFilePath` e `items`, array di oggetti di cui basta impostare `text`: `shape` è sempre `circle` e il colore è ricavato da `data_colors` (default: {})
+ * @param {number} [params.yAxisLabelWidth] - Larghezza dell'area delle etichette di categoria (asse verticale, a sinistra) (default: 60)
+ * @param {number} [params.xAxisLabelHeight] - Altezza dell'area delle etichette dell'asse dei valori (in basso) (default: 50)
+ * @param {string|null} [params.yAxisTitle] - Titolo dell'asse delle categorie (a sinistra) (default: null)
+ * @param {import('./helpers/core.js').ChartFontAttrs} [params.yAxisTitleAttrs] - Attributi font del titolo dell'asse delle categorie (default: { size: 18, weight: 400, fill: "#999" })
+ * @param {string|null} [params.yAxisTitleFontFilePath] - Percorso del file del font del titolo dell'asse delle categorie (solo textToPath) (default: null)
+ * @param {string|null} [params.xAxisTitle] - Titolo dell'asse dei valori (in basso) (default: null)
+ * @param {import('./helpers/core.js').ChartFontAttrs} [params.xAxisTitleAttrs] - Attributi font del titolo dell'asse dei valori (default: { size: 18, weight: 400, fill: "#999" })
+ * @param {string|null} [params.xAxisTitleFontFilePath] - Percorso del file del font del titolo dell'asse dei valori (solo textToPath) (default: null)
+ * @param {number|null} [params.max_value] - Valore massimo dell'asse dei valori (in basso); se null viene calcolato dai dati (default: null)
+ * @param {number|null} [params.min_value] - Valore minimo dell'asse dei valori (in basso); se null viene calcolato dai dati: 0 se sono tutti positivi (le barre partono da 0), altrimenti il valore minimo effettivo (default: null)
+ * @param {Object} [params.axisAttrs] - Attributi svg.js delle linee degli assi, es. `{ stroke: '#414141', 'stroke-width': 1, class: 'xxxx' }` (default: linee grigie (#999) di spessore 2)
+ * @param {Object} [params.ticksAttrs] - Attributi svg.js dei ticks (default: linee grigie (#999) di spessore 1)
+ * @param {boolean} [params.showXgrid] - Mostra la griglia orizzontale (asse delle categorie) (default: false)
+ * @param {boolean} [params.showYgrid] - Mostra la griglia verticale (asse dei valori) (default: true)
+ * @param {Object} [params.gridLinesAttrs] - Attributi svg.js delle linee della griglia (default: linee grigie (#999) di spessore 1)
+ * @param {import('./helpers/core.js').ChartFontAttrs} [params.labelXAttrs] - Attributi font (come in `MinimoCharts.defaults.font`, incluso `fill`) delle etichette di categoria (a sinistra) (default: { size: 14, weight: 400, fill: "#999" })
+ * @param {string|null} [params.labelXFontFilePath] - Percorso del file del font delle etichette di categoria (solo textToPath) (default: null)
+ * @param {import('./helpers/core.js').ChartFontAttrs} [params.labelYAttrs] - Attributi font (come in `MinimoCharts.defaults.font`, incluso `fill`) delle etichette dell'asse dei valori (in basso) (default: { size: 14, weight: 400, fill: "#999" })
+ * @param {string|null} [params.labelYFontFilePath] - Percorso del file del font delle etichette dell'asse dei valori (in basso) (solo textToPath) (default: null)
+ * @param {string[]|null} [params.data_colors] - Colori delle serie di barre; se null vengono usati i colori di default dell'istanza (`chartInstance.defaults.colors`) (default: null)
+ * @param {(value: number) => string|number} [params.labelYFormatter] - Funzione per formattare le etichette dell'asse dei valori (in basso); quella di default assume che il valore sia numerico (default: migliaia arrotondate per eccesso, con suffisso K)
+ * @returns {Promise<string|undefined>} Il codice SVG se `container` è null, altrimenti `undefined` (il grafico viene aggiunto al container)
+ */
 export async function hbars(params) {
 
   const chartInstance = this;
@@ -223,6 +311,8 @@ export async function hbars(params) {
 
 
     // legenda.items (elementi della legenda)
+    // TODO[epic=charts] `legenda.items` è di fatto obbligatorio: con il default `legenda: {}` questa riga va in errore.
+    // Gestire l'assenza di `items` (omettere la legenda, come in lines con `legenda: null`) o segnalare un errore esplicito
     legenda_params.items = params.legenda.items.map((item, idx) => {
       return {
         ...item,

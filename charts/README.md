@@ -25,16 +25,18 @@ Installazione dei pacchetti aggiuntivi:
 
 ```bash
 # sempre necessario (browser e Node)
-npm install @svgdotjs/svg.js
+npm install -S @svgdotjs/svg.js
 
 # solo per l'uso con Node: fornisce window e document a svg.js
-npm install svgdom
+npm install -S svgdom
 
 # solo per l'uso con Node, e solo se si attiva `textToPath` (testi convertiti in tracciati)
-npm install opentype.js
+npm install -S opentype.js
 ```
 
 `svgdom` non è una dipendenza di `@svgdotjs/svg.js`: va installato a parte, ed è richiesto da `src/node-helpers/create-svg-canvas-node.mjs`. `opentype.js` viene caricato con un import dinamico solo quando `textToPath` è attivo, quindi nel browser non serve.
+
+Esempio: 
 
 ```javascript
 import { MinimoCharts, barsChart } from '@massimo-cassandro/minimo/charts';

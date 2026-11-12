@@ -1,9 +1,64 @@
-// mostra un triangolo rettangolo disposto orizzontalmente che mostra
-// la porzione di raggiungimento di un obiettivo
-
 import { parseContainer, getElementFromContainer, waitForContainerSize } from './helpers/chart-utils.js';
 import { createTextEl } from './helpers/create-text-element.js';
 
+/**
+ * Grafico obiettivo: un triangolo rettangolo disposto orizzontalmente, che mostra la porzione di
+ * raggiungimento di un obiettivo. Un cursore sotto il triangolo indica il valore corrente e,
+ * facoltativamente, l'area ancora mancante all'obiettivo viene evidenziata con attributi diversi.
+ * Va eseguita con `this` legato all'istanza di `MinimoCharts`: normalmente si usa il wrapper `goalChart` di `charts/index.js`.
+ * In caso di errore (parametri non validi, dimensioni mancanti) lo registra in console e restituisce `undefined`.
+ *
+ * @example
+ * // Tutti i parametri (valori di default dove previsti):
+ * goalChart(chartInstance, {
+ *   debug: false, // info per il debug, FAC
+ *   container: '#chart', // selettore o elemento DOM, FAC
+ *   svgAttrs: {}, // attributi svg, FAC
+ *   width: null, // larghezza, null = container, FAC
+ *   height: null, // altezza totale dell'svg, FAC
+ *   chartHeight: 80, // altezza del solo triangolo, FAC
+ *   rightLabel: null, // etichetta sul lato destro, FAC
+ *   rightLabelFontAttrs: { size: 16 }, // font etichetta destra, FAC
+ *   rightLabelFontFilePath: null, // file font etichetta destra, FAC
+ *   rightLabelRotateCounterClockWise: true, // verso di rotazione etichetta destra, FAC
+ *   goalValue: 100, // valore dell'obiettivo, OBBL
+ *   currentValue: 0, // valore corrente, FAC
+ *   showMissingGoalArea: true, // evidenzia l'area mancante, FAC
+ *   goalAreaAttrs: { fill: '#ddd', stroke: '#999', 'stroke-width': 1 }, // attributi triangolo, FAC
+ *   missingGoalAttrs: { fill: '#f17575', stroke: '#c00', 'stroke-width': 1 }, // attributi area mancante, FAC
+ *   showCurrentValue: false, // mostra il valore sotto il cursore, FAC
+ *   currentValueFontAttrs: { size: 16 }, // font valore corrente, FAC
+ *   currentValueFontFilePath: null, // file font valore corrente, FAC
+ *   cursorSize: 12, // lato del cursore, FAC
+ *   cursorAttrs: { fill: '#000' }, // attributi cursore, FAC
+ *   currentValueFormatter: value => `${value}%`, // formattazione valore corrente, FAC
+ * });
+ *
+ * @this {import('./helpers/core.js').MinimoCharts}
+ * @param {Object} params - Parametri del grafico
+ * @param {boolean} [params.debug=false] - Se true aggiunge agli elementi gli attributi `data-debug-info`, utili per il debug (default: false)
+ * @param {string|HTMLElement|null} [params.container=null] - Container del grafico (selettore o elemento DOM); se null viene restituito il codice SVG (default: null)
+ * @param {Object} [params.svgAttrs={}] - Attributi facoltativi per l'elemento svg (classe, ecc.) (default: {})
+ * @param {number|null} [params.width=null] - Larghezza del grafico in px; se null viene usata quella del container. Lo spazio dell'eventuale etichetta destra viene sottratto alla larghezza totale (default: null)
+ * @param {number|null} [params.height=null] - Altezza totale dell'svg in px. Se impostata, `chartHeight` viene ignorato e ricavato sottraendo lo spazio di cursore ed etichetta del valore; se null è data dalla somma di `chartHeight` e di tale spazio. Almeno uno tra `height` e `chartHeight` deve essere presente (default: null)
+ * @param {number|null} [params.chartHeight=80] - Altezza del solo grafico (il triangolo), senza cursore ed etichette; usata solo se `height` è null (default: 80)
+ * @param {string|null} [params.rightLabel=null] - Eventuale etichetta da collocare sul lato destro, ruotata di 90° (default: null)
+ * @param {import('./helpers/core.js').ChartFontAttrs} [params.rightLabelFontAttrs] - Attributi font dell'etichetta destra (default: { size: 16 })
+ * @param {string|null} [params.rightLabelFontFilePath=null] - Percorso del file del font dell'etichetta destra, per la conversione in tracciati (solo Node) (default: null)
+ * @param {boolean} [params.rightLabelRotateCounterClockWise=true] - Verso di rotazione dell'etichetta destra: con true viene ruotata di 90°, con false di -90° (default: true)
+ * @param {number} params.goalValue - Valore dell'obiettivo
+ * @param {number} [params.currentValue=0] - Valore corrente; nel posizionamento del cursore non supera mai `goalValue` (default: 0)
+ * @param {boolean} [params.showMissingGoalArea=true] - Se true l'area mancante all'obiettivo viene mostrata secondo gli attributi di `missingGoalAttrs` (default: true)
+ * @param {Object} [params.goalAreaAttrs] - Attributi svg.js del triangolo dell'obiettivo (default: { fill: "#ddd", stroke: "#999", "stroke-width": 1 })
+ * @param {Object} [params.missingGoalAttrs] - Attributi svg.js della porzione di obiettivo non raggiunta, usati solo se `showMissingGoalArea` è true (default: { fill: "#f17575", stroke: "#c00", "stroke-width": 1 })
+ * @param {boolean} [params.showCurrentValue=false] - Mostra il valore corrente sotto il cursore (default: false)
+ * @param {import('./helpers/core.js').ChartFontAttrs} [params.currentValueFontAttrs] - Attributi font del valore corrente (default: { size: 16 })
+ * @param {string|null} [params.currentValueFontFilePath=null] - Percorso del file del font del valore corrente, per la conversione in tracciati (solo Node) (default: null)
+ * @param {number} [params.cursorSize=12] - Lato del quadrato che circoscrive il triangolo del cursore (default: 12)
+ * @param {Object} [params.cursorAttrs] - Attributi svg.js del cursore che indica il valore corrente (default: { fill: "#000" })
+ * @param {(value: number) => string|number} [params.currentValueFormatter] - Funzione per la formattazione del valore corrente (default: percentuale in formato italiano, con al massimo 2 decimali)
+ * @returns {Promise<string|undefined>} Il codice SVG se `container` è null, altrimenti `undefined` (il grafico viene aggiunto al container)
+ */
 export async function goal({
   /** mostra info utili per il debug */
   debug = false,
@@ -194,6 +249,8 @@ export async function goal({
         parentElement: rightLabelGroup
       });
 
+      // TODO[epic=charts] il nome `rightLabelRotateCounterClockWise` non corrisponde al comportamento: con true la rotazione è di 90° (senso orario in svg.js),
+      // come indicato anche nel commento del parametro. Rinominare il parametro o invertire i valori
       rightLabelEl.rotate(rightLabelRotateCounterClockWise? 90 : -90);
       rightLabel_bbox = rightLabelGroup.bbox();
       chartWidth -= rightLabel_bbox.width;

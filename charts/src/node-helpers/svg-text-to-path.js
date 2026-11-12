@@ -1,21 +1,21 @@
 // https://stackblitz.com/edit/vitejs-vite-acphht?file=main.js
-
-/*
-// Esempio di utilizzo:
-const fontUrl = './Rubik Moonrocks.ttf';
-const text = 'Hello, World!';
-const fontSize = 16; // in punti
-textToSvgPath(fontUrl, text, fontSize)
-  .then(({ svgPathData, svg }) => {
-    //console.log(svgPathData); // stringa con i dati del path SVG
-    console.log(svg); // elemento SVG come stringa
-  })
-  .catch((err) => console.error(err));
- */
-
-// Funzione che carica il font e converte il testo in path SVG
 // vedi ada-frontend/ada-charts/test/textToPath-test.mjs
 
+/**
+ * Carica un font e converte un testo in un tracciato SVG.
+ * Richiede il package `opentype.js` (peer dependency facoltativa), caricato con un import dinamico.
+ *
+ * @example
+ * const { pathData, pathElementString } = await textToSvgPath('./Rubik Moonrocks.ttf', 'Hello, World!', 16);
+ * // pathData: stringa con i dati del path SVG (attributo `d`)
+ * // pathElementString: elemento `<path>` come stringa
+ *
+ * @param {string} fontUrl - Percorso o URL del file del font
+ * @param {string|number} text - Testo da convertire
+ * @param {number} fontSize - Dimensione del testo
+ * @returns {Promise<{pathData: string, pathElementString: string}>} I dati del tracciato (attributo `d`) e l'elemento `<path>` come stringa
+ * @throws {Error} Se il caricamento del font non riesce (l'errore viene anche registrato in console)
+ */
 export async function textToSvgPath(fontUrl, text, fontSize) {
   try {
     const opentype = (await import(/* webpackIgnore: true */ 'opentype.js')).default;

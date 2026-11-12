@@ -1,162 +1,153 @@
-/**
- * Genera un indicatore grafico di tipo rating/tachimetro.
- * Mostra un'asticella mobile su una scala suddivisa in porzioni colorate.
- * Supporta la visualizzazione di etichette principali e fino a due mini-display secondari.
- *
- * @param {Object} options - Oggetto contenente i parametri di configurazione.
- * @returns {Promise<string|undefined>} Restituisce la stringa SVG se container è null, altrimenti la renderizza nel DOM.
- */
-
-
-import { parseContainer, polarToCartesianString, polarToCartesian } from '../chart-utils.js';
-import { createTextEl } from '../create-text-element.js';
+import { parseContainer, polarToCartesianString, polarToCartesian } from '../helpers/chart-utils.js';
+import { createTextEl } from '../helpers/create-text-element.js';
 import { rad30, getDisplayBackgroundPath, calcolaPuntoInterno, normalizeAngle, isCircleDx } from './ratingDisplayUtils.js';
 
+/**
+ * Etichetta di testo del rating display.
+ * @typedef {Object} RatingDisplayLabel
+ * @property {string} [label] - Testo dell'etichetta
+ * @property {import('../helpers/core.js').ChartFontAttrs} [font] - Attributi del font
+ * @property {string} [fill] - Colore del testo (default: "#000")
+ * @property {string|null} [fontFilePath] - Percorso del file del font, per la conversione in tracciati (solo Node)
+ */
+
+/**
+ * Configurazione di un mini display secondario.
+ * @typedef {Object} RatingMiniDisplay
+ * @property {'sx'|'dx'|'left'|'right'} position - Posizione: 'sx' | 'dx' (alias: 'left' | 'right')
+ * @property {number} value - Valore numerico da rappresentare
+ * @property {'gauge'|'value'} type - Tipo di visualizzazione: 'gauge' (tachimetro) o 'value' (testo di `value`)
+ * @property {RatingDisplayLabel} [typeValueFont] - Oggetto analogo a quelli definiti in `displayLabel`, per la rappresentazione di `type: 'value'`. Se `typeValueFont.label` non è presente, viene utilizzato `value` (arrotondato all'intero)
+ * @property {RatingDisplayLabel[]} [mdLabel] - Etichette del mini display (stessa struttura di `displayLabel`, max 2)
+ * @property {Object} [mdArcAttrs] - Oggetto simile a `displayBackgroundAttrs`, relativo all'arco che avvolge il mini display
+ * @property {Object} [mdRodAttrs] - Attributi per l'asticella del mini display
+ */
+
+/**
+ * Genera un indicatore grafico di tipo rating/tachimetro (WIP: non ancora esportato da `charts/index.js`).
+ * Mostra un'asticella mobile su una scala suddivisa in porzioni colorate.
+ * Supporta la visualizzazione di etichette principali e fino a due mini-display secondari
+ * (etichette, mini display e animazione sono al momento disattivati, vedi codice commentato e TODO).
+ * Va eseguita con `this` legato all'istanza di `MinimoCharts`.
+ * In caso di errore (parametri non validi) lo registra in console e restituisce `undefined`.
+ *
+ * @example
+ * // Tutti i parametri (valori di default dove previsti):
+ * ratingDisplay.call(chartInstance, {
+ *   debug: false, // riferimenti grafici per il debug, FAC
+ *   container: '#chart', // selettore o elemento DOM, FAC
+ *   width: null, // larghezza svg, null = container, FAC
+ *   centerGap: r => r/9, // distanza tra i centri (numero o funzione del raggio), FAC
+ *   scaleEndThickness: r => r/5, // spessore finale della scala (numero o funzione del raggio), FAC
+ *   portions: 5, // numero di porzioni della scala, FAC
+ *   portionGap: 2, // gradi tra una porzione e l'altra, FAC
+ *   svgAttrs: {}, // attributi svg, FAC
+ *   displayBackgroundAttrs: { fill: 'none' }, // attributi arco di sfondo, FAC
+ *   displayPadding: 10, // spazio tra sfondo ed elementi interni, FAC
+ *   scaleStartValue: 0, // valore minimo della scala, FAC
+ *   rodPositionForceCenter: false, // asticella al centro della fascia, FAC
+ *   value: 3.5, // valore da rappresentare, OBBL
+ *   scaleColors: null, // colori delle porzioni, null = default istanza, FAC
+ *   scaleAttrs: null, // attributi delle porzioni, FAC
+ *   scaleTicksColor: null, // colore dei segni di separazione, FAC
+ *   rodAttrs: { fill: '#000' }, // attributi asticella e anello, FAC
+ *   displayLabel: null, // etichette centrali (max 2), FAC
+ *   displayLabelTopMargin: 4, // distanza anello / etichetta, FAC
+ *   displayLabelRowGap: 2, // spazio tra le righe dell'etichetta, FAC
+ *   miniDisplay: null, // mini display secondari (max 2), FAC
+ *   miniDisplayTopMargin: 0, // distanza display / mini display, FAC
+ *   miniDisplayLabelTopMargin: 0, // distanza arco mini display / etichette, FAC
+ *   miniDisplayLabelRowGap: 2, // spazio tra le righe delle etichette dei mini display, FAC
+ *   animation: false, // animazione dell'asticella, FAC
+ * });
+ *
+ * @this {import('../helpers/core.js').MinimoCharts}
+ * @param {Object} params - Parametri di configurazione
+ * @param {boolean} [params.debug=false] - Modalità debug: se attiva mostra i riferimenti grafici (centri di rotazione, angoli) e i metadati `data-debug-info` (default: false)
+ * @param {string|HTMLElement|null} [params.container=null] - Elemento DOM o selettore CSS dove iniettare il grafico. Se null, la funzione restituisce l'SVG come stringa (default: null)
+ * @param {number|null} [params.width=null] - Larghezza del documento SVG. Obbligatoria se eseguito in ambiente Node (default: null)
+ * @param {number|((r: number) => number)} [params.centerGap] - Distanza tra il centro della circonferenza esterna e ciascuna delle circonferenze interne (*dA* e *dB* nella documentazione). Numero o funzione del raggio dato (default: r => r/9)
+ * @param {number|((r: number) => number)} [params.scaleEndThickness] - Spessore finale della scala (indicato con *s* nella documentazione). Numero o funzione del raggio dato (default: r => r/5)
+ * @param {number} [params.portions=5] - Numero di porzioni (sezioni di colore) in cui è diviso il tachimetro (default: 5)
+ * @param {number} [params.portionGap=2] - Distanza tra una porzione e la successiva. Corrisponde all'angolo in gradi tra le due semirette passanti per il centro della circonferenza esterna e i segmenti laterali delle porzioni. Indicato con *gamma* nella documentazione (default: 2)
+ * @param {Object} [params.svgAttrs={}] - Attributi aggiuntivi (es. class, id) da applicare al tag SVG radice (default: {})
+ * @param {Object} [params.displayBackgroundAttrs] - Attributi grafici (fill, stroke) per l'arco di sfondo esterno (default: { fill: "none" })
+ * @param {number} [params.displayPadding=10] - Spazio tra il bordo del background e gli elementi interni del display (default: 10)
+ * @param {number} [params.scaleStartValue=0] - Valore minimo della scala numerica da cui parte il calcolo della posizione (default: 0)
+ * @param {boolean} [params.rodPositionForceCenter=false] - Se true, l'asticella punta sempre al centro della fascia; se false, segue la proporzione del valore esatto (default: false)
+ * @param {number} params.value - Valore numerico da rappresentare. Determina il colore e la posizione dell'asticella. Il default è null, ma è obbligatorio (default: null)
+ * @param {string[]|null} [params.scaleColors=null] - Array di colori per le porzioni della scala. Se null, usa i colori di default della chartInstance (default: null)
+ * @param {Object|null} [params.scaleAttrs=null] - Attributi SVG aggiuntivi applicati ai percorsi (path) delle porzioni della scala (default: null)
+ * @param {string|null} [params.scaleTicksColor=null] - Colore dei segni di separazione tra le porzioni. Se null, usa lo stesso colore della porzione adiacente (default: null)
+ * @param {Object} [params.rodAttrs] - Attributi per l'asticella indicatrice e il suo anello centrale (default: { fill: "#000" })
+ * @param {RatingDisplayLabel[]|null} [params.displayLabel=null] - Testo centrale sotto l'asticella. Array di max 2 oggetti: {label, font, fill, fontFilePath} (default: null)
+ * @param {number} [params.displayLabelTopMargin=4] - Distanza verticale tra l'anello dell'asticella e la prima riga dell'etichetta (default: 4)
+ * @param {number} [params.displayLabelRowGap=2] - Spazio verticale tra la prima e la seconda riga dell'etichetta principale (default: 2)
+ * @param {RatingMiniDisplay[]|null} [params.miniDisplay=null] - Configurazione dei mini display secondari: array di uno o due oggetti (default: null)
+ * @param {number} [params.miniDisplayTopMargin=0] - Distanza verticale tra la base del display principale e l'inizio dei mini display (default: 0)
+ * @param {number} [params.miniDisplayLabelTopMargin=0] - Distanza verticale tra la base dell'arco del mini display e le sue etichette (default: 0)
+ * @param {number} [params.miniDisplayLabelRowGap=2] - Distanza tra le righe di testo (`mdLabel`) del mini display (default: 2)
+ * @param {boolean} [params.animation=false] - Se true, abilita l'animazione dell'asticella (richiede implementazione specifica) (default: false)
+ * @returns {Promise<string|undefined>} La stringa SVG se `container` è null, altrimenti `undefined` (il grafico viene aggiunto al container)
+ */
 export async function ratingDisplay({
 
-  /**
-   * @param {boolean} [debug=false] - Modalità debug: se attiva mostra i riferimenti grafici (centri di rotazione, angoli) e i metadati data-debug-info. (default: false)
-   */
   debug = false,
 
-  /**
-   * @param {HTMLElement|string|null} [container=null] - Elemento DOM o selettore CSS dove iniettare il grafico. Se null, la funzione restituisce l'SVG come stringa. (default: null)
-   */
   container = null,
 
-  /**
-   * @param {number|null} [width=null] - Larghezza del documento SVG. Obbligatoria se eseguito in ambiente Node. (default: null)
-   */
   width = null,
 
-  /**
-   * @param {number|function} [centerGap=r=>r/8] - Distanza tra il centro della circonferenza esterna e ciascuna delle circonferenze interne (*dA* e *dB* nella documentzione).
-   * Numero o funzione del raggio dato. (default: r => r/9)
-   */
   centerGap = r => r/9,
 
-  /**
-   * @param {number|function} [scaleEndThickness=r=>r/8] - Spessore finale della scala (indicato con *s* nella documentazione).
-   * Numero o funzione del raggio dato. (default: r => r/5)
-   */
   scaleEndThickness = r => r/5,
 
-  /**
-   * @param {number} [portions=5] - Numero di porzioni (sezioni di colore) in cui è diviso il tachimetro. (default: 5)
-   */
   portions = 5,
 
-  /**
-   * @param {number} [portionGap=10] - Distanza tra una porzione e la successiva.
-   * Corrisponde all'angolo in gradi tra le due semirette passanti per il centro della circonferenza esterna e i segmenti laterali delle porzioni.
-   * Indicato con *gamma* nella documentazione (default: 2)
-   */
   portionGap = 2,
 
-  /**
-   * @param {Object} [svgAttrs={}] - Attributi aggiuntivi (es. class, id) da applicare al tag SVG radice. (default: {})
-   */
   svgAttrs = {},
 
-  /**
-   * @param {Object} [displayBackgroundAttrs] - Attributi grafici (fill, stroke) per l'arco di sfondo esterno. (default: { fill: 'none' })
-   */
   displayBackgroundAttrs = {
     fill: 'none',
   },
 
-  /**
-   * @param {number} [displayPadding=10] - Spazio tra il bordo del background e gli elementi interni del display. (default: 10)
-   */
   displayPadding = 10,
 
-  /**
-   * @param {number} [scaleStartValue=0] - Valore minimo della scala numerica da cui parte il calcolo della posizione. (default: 0)
-   */
   scaleStartValue = 0,
 
-  /**
-   * @param {boolean} [rodPositionForceCenter=false] - Se true, l'asticella punta sempre al centro della fascia; se false, segue la proporzione del valore esatto. (default: false)
-   */
   rodPositionForceCenter = false,
 
-
-  /**
-   * @param {number|null} [value=null] - Valore numerico da rappresentare. Determina il colore e la posizione dell'asticella. (default: null)
-   */
   value = null,
 
-  /**
-   * @param {string[]|null} [scaleColors=null] - Array di colori per le porzioni della scala. Se null, usa i colori di default della chartInstance. (default: null)
-   */
   scaleColors = null,
 
-  /** * @param {Object|null} [scaleAttrs=null] - Attributi SVG aggiuntivi applicati ai percorsi (path) delle porzioni della scala. (default: null)
-   */
   scaleAttrs = null,
 
-  /**
-   * @param {string|null} [scaleTicksColor=null] - Colore dei segni di separazione tra le porzioni. Se null, usa lo stesso colore della porzione adiacente. (default: null)
-   */
   scaleTicksColor = null,
 
-  /**
-   * @param {Object} [rodAttrs] - Attributi per l'asticella indicatrice e il suo anello centrale. (default: { fill: '#000' })
-   */
   rodAttrs = {
     fill: '#000'
   },
 
-  /**
-   * @param {Object[]|null} [displayLabel=null] - Testo centrale sotto l'asticella. Array di max 2 oggetti: {label, font, fill, fontFilePath}. (default: null)
-   */
   displayLabel = null,
 
-  /**
-   * @param {number} [displayLabelTopMargin=4] - Distanza verticale tra l'anello dell'asticella e la prima riga dell'etichetta. (default: 4)
-   */
   displayLabelTopMargin = 4,
 
-  /**
-   * @param {number} [displayLabelRowGap=2] - Spazio verticale tra la prima e la seconda riga dell'etichetta principale. (default: 2)
-   */
   displayLabelRowGap = 2,
 
-  /**
-   * @param {Object[]|null} [miniDisplay=null] - Configurazione mini display secondari (max 2). Array di uno o due oggetti (default: null)
-   * @param {string} miniDisplay[].position - Posizione: 'sx' | 'dx' (alias: 'left' | 'right').
-   * @param {number} miniDisplay[].value - Valore numerico da rappresentare.
-   * @param {string} miniDisplay[].type - Tipo di visualizzazione: 'gauge' (tachimetro) o 'value' (testo di `value`).
-   * @param {Object} [miniDisplay[].typeValueFont] - oggetto analogo a quelli definito in displayLabel per la rappresentazione di `type: value`. Se typeValueFont.label non è presente, viene utilizzato `value` (arrotondato all'intero)
-   * @param {Object[]} [miniDisplay[].mdLabel] - Array di etichette per il mini display (stessa struttura di displayLabel).
-   * @param {Object} [miniDisplay[].mdArcAttrs] - oggetto simile a displayBackgroundAttrs, è relativo all'arco che avvolge il mini display
-   * @param {Object} [miniDisplay[].mdRodAttrs] - Attributi per l'asticella del mini display.
-   */
   miniDisplay = null,
 
-  /**
-    * @param {number} [miniDisplayTopMargin=0] - Distanza verticale tra la base del display principale e l'inizio dei mini display. (default: 0)
-   */
   miniDisplayTopMargin = 0,
 
-  /**
-    * @param {number} [miniDisplayLabelTopMargin=0] - Distanza verticale tra la base dell'arco del mini display e le sue etichette. (default: 0)
-   */
   miniDisplayLabelTopMargin = 0,
 
-  /**
-   * @param {number} [miniDisplayLabelRowGap=2] - Distanza tra le righe di testo (mdLabel) del mini display. (default: 2)
-   */
   miniDisplayLabelRowGap = 2,
 
-  /**
-   * @param {boolean} [animation=false] - Se true, abilita l'animazione dell'asticella (richiede implementazione specifica). (default: false)
-   */
   animation = false,
 
   // animation_ms = 100, // number
   // animation_fps = 60, // number
-
 
 }) {
 
@@ -186,7 +177,7 @@ export async function ratingDisplay({
 
     // =>> display principale
     // raggio circonferenza esterna
-    const mainRadius = (width/2) - parseFloat(displayBackgroundAttrs?.['stroke-width']??0) - displayPadding??0,
+    const mainRadius = (width/2) - parseFloat(displayBackgroundAttrs?.['stroke-width']??0) - (displayPadding??0),
 
       /*
         altezza dell'area del display
@@ -201,7 +192,7 @@ export async function ratingDisplay({
           // spessore traccia arco esterno, se presente (solo per la parte superiore)
           parseFloat(displayBackgroundAttrs?.['stroke-width']??0) +
           // padding
-          displayPadding??0 * 2,
+          (displayPadding??0) * 2,
       /*
         centro circonferenza principale = centro di rotazione dell'asticella
       */

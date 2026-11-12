@@ -1,14 +1,3 @@
-/*
-  per utilizzo con applicazioni node, di default non utilizzato.
-  Dove necessario rimpiazza la funzione `createSvgCanvas` di default
-  Vedi ./demo/node-demo/index.mjs
-
-  {
-    utils: { createSvgCanvas: createSvgCanvasNode}
-    // ...
-  }
-
-*/
 
 import { createSVGWindow } from 'svgdom';
 import { SVG, registerWindow } from '@svgdotjs/svg.js';
@@ -21,6 +10,20 @@ import { SVG, registerWindow } from '@svgdotjs/svg.js';
 // https://github.com/svgdotjs/svgdom#readme
 
 
+/**
+ * Crea l'elemento SVG radice del grafico per l'uso con applicazioni Node (di default non utilizzata).
+ * Dove necessario rimpiazza la funzione `createSvgCanvas` di default, passandola al costruttore di `MinimoCharts`.
+ * Richiede il package `svgdom` (da installare a parte), che fornisce `window` e `document` a svg.js.
+ * Non utilizza i parametri `container` e `debug` della funzione di default: i grafici vanno creati
+ * con `container: null`, in modo che restituiscano il codice SVG.
+ *
+ * @example
+ * const chartInstance = new MinimoCharts({
+ *   createSvgCanvas: createSvgCanvasNode,
+ * });
+ *
+ * @returns {import('@svgdotjs/svg.js').Svg} L'elemento SVG radice
+ */
 export function createSvgCanvasNode() {
 
   // restituisce una window con un document e un nodo radice svg

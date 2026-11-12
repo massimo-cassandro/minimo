@@ -37,7 +37,15 @@ export function polarToCartesian(degrees_angle, cx, cy, circleRadius) {
 
 }
 
-// come il precedente, ma restituisce una stringa
+/**
+ * Come `polarToCartesian`, ma restituisce le coordinate come stringa `x,y`
+ * (utilizzabile direttamente nell'attributo `d` di un path SVG).
+ * @param {number} degrees_angle - L'angolo in gradi.
+ * @param {number} cx - Coordinata X del centro.
+ * @param {number} cy - Coordinata Y del centro.
+ * @param {number} circleRadius - Il raggio del cerchio.
+ * @returns {string} Le coordinate cartesiane nel formato `x,y`.
+ */
 export function polarToCartesianString(degrees_angle, cx, cy, circleRadius) {
   const {x,y} = polarToCartesian(degrees_angle, cx, cy, circleRadius);
 
@@ -108,15 +116,15 @@ export function calcArcCoords(options) {
 
   return {
     arc_length: arc_length,
-    start: polarToCartesian(options.start_angle, options.center, options.radius),
-    end: polarToCartesian(end_angle, options.center, options.radius),
+    start: polarToCartesian(options.start_angle, options.center.x, options.center.y, options.radius),
+    end: polarToCartesian(end_angle, options.center.x, options.center.y, options.radius),
   };
 }
 
 /**
  * Calcola l'attributo `d` per un elemento SVG path che rappresenta un arco.
- * Accetta le stesse opzioni di `calcArcCoords`.
- * * @param {Object} options - Opzioni per il calcolo dell'arco.
+ * Accetta le stesse opzioni di `calcArcCoords` (vedi).
+ * @param {Parameters<typeof calcArcCoords>[0]} options - Opzioni per il calcolo dell'arco.
  * @returns {string} La stringa da utilizzare nell'attributo `d` del path SVG.
  */
 export function calcAttrD(options) {
@@ -134,14 +142,14 @@ export function calcAttrD(options) {
 
 /**
  * Recupera un elemento DOM da un selettore stringa o lo restituisce se è già un elemento.
- * @param {string|Element|null} container - Il selettore CSS o l'elemento DOM.
- * @returns {Element|null} L'elemento DOM o null.
+ * @param {string|HTMLElement|null} container - Il selettore CSS o l'elemento DOM.
+ * @returns {HTMLElement|null} L'elemento DOM o null.
  */
 export function getElementFromContainer(container) {
   if (!container) {
     return null;
   } else if (typeof container === 'string') {
-    return document.querySelector(container);
+    return /** @type {HTMLElement|null} */ (document.querySelector(container));
   } else if (container instanceof Element) {
     return container;
   } else {
@@ -152,10 +160,10 @@ export function getElementFromContainer(container) {
 /**
  * Analizza il contenitore e restituisce informazioni sulle sue dimensioni, eseguendo alcune azioni di base.
  * @param {Object} params - Parametri di input.
- * @param {string|Element|null} [params.container=null] - Il contenitore del grafico. (default: null)
+ * @param {string|HTMLElement|null} [params.container=null] - Il contenitore del grafico. (default: null)
  * @param {number|null} [params.width=null] - Larghezza predefinita (opzionale). (default: null)
  * @param {number|null} [params.height=null] - Altezza predefinita (opzionale). (default: null)
- * @returns {[Element|null, number|null, number|null]} Un array contenente l'elemento, la larghezza e l'altezza.
+ * @returns {[HTMLElement|null, number|null, number|null]} Un array contenente l'elemento, la larghezza e l'altezza.
  */
 export function parseContainer({ container = null, width = null, height = null }) {
   const containerElement = getElementFromContainer(container);
@@ -175,9 +183,9 @@ export function parseContainer({ container = null, width = null, height = null }
  * attende che torni visibile. Non ha timeout: se il container non torna mai visibile
  * la promise resta in sospeso.
  * @param {Element|null} containerElement - L'elemento container (può essere null).
- * @param {Object} size - Dimensioni già note.
- * @param {number|null} size.width - Larghezza già nota (se valida, non si attende il container).
- * @param {number|null} size.height - Altezza già nota (se valida, non si attende il container).
+ * @param {Object} [size] - Dimensioni già note. (default: {})
+ * @param {number|null} [size.width=null] - Larghezza già nota (se valida, non si attende il container). (default: null)
+ * @param {number|null} [size.height=null] - Altezza già nota (se valida, non si attende il container). (default: null)
  * @param {boolean} [debug=false] - Se true, logga in console quando l'attesa ha inizio. (default: false)
  * @returns {Promise<{width: number, height: number}>} Le dimensioni effettive una volta disponibili.
  */

@@ -21,4 +21,5 @@ declare module '*.svg?inline' {
 // Optional peer dependencies — not installed in the dev environment.
 declare module 'blurhash';
 declare module '@tarekraafat/autocomplete.js';
+declare module 'opentype.js';
 declare module '@massimo-cassandro/modal-alert';

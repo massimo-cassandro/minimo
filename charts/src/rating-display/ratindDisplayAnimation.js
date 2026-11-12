@@ -1,3 +1,13 @@
+// @ts-nocheck
+// il controllo dei tipi è disattivato perché la funzione è un abbozzo non ancora funzionante (vedi sotto)
+
+/**
+ * Animazione dell'asticella del rating display (WIP, non utilizzata).
+ * Abbozzo estratto da una versione precedente: fa riferimento a variabili non definite in questo modulo
+ * (`parsedDisplayValue`, `animation_ms`, `animation_fps`, `displayScaleStartValue`, `scale`, `svgElement`),
+ * che dovranno diventare parametri quando l'animazione verrà implementata (vedi TODO in `index.js`).
+ * @returns {void}
+ */
 export function ratindDisplayAnimation() {
   const runAnimation = () => {
 

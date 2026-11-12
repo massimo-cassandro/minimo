@@ -1,23 +1,111 @@
-// costruisce un sistema di assi cartesiani
-// restituisce due gruppi delle assi X e Y da posizionare successivamente
-
 import { G } from '@svgdotjs/svg.js';
 import { createTextEl } from './create-text-element.js';
 
 /**
-  dispatcher: orientation 'vertical' (barre/linee verticali, default) o 'horizontal' (barre orizzontali).
-  Gli argomenti sono gli stessi per entrambi gli orientamenti (vedi cartesianAxisVertical),
-  interpretati diversamente da ciascun ramo (vedi commenti in cartesianAxisHorizontal)
-*/
+ * Parametri di `cartesianAxis`: corrispondono a quelli dei grafici con assi (`bars`, `hbars`, `lines`),
+ * con l'aggiunta dei valori calcolati da `parseStdAxisOpts`.
+ * NB: i nomi `stepY_*`, `labelY*` e `showYgrid` si riferiscono sempre all'asse dei valori,
+ * `stepX_*`, `labelX*`, `xLabels` e `showXgrid` all'asse delle categorie, anche con orientamento orizzontale
+ * (dove l'asse dei valori è in basso e quello delle categorie a sinistra).
+ * @typedef {Object} CartesianAxisParams
+ * @property {'vertical'|'horizontal'} [orientation] - Orientamento del grafico (default: "vertical")
+ * @property {boolean} [debug] - Se true aggiunge gli attributi `data-debug-info` agli elementi (default: false)
+ * @property {import('./parse-std-axis-opts.js').ChartArea} chart_area - Area del grafico, calcolata da `parseStdAxisOpts`
+ * @property {number} [padding] - Spazio intorno ai bordi del grafico (default: 0)
+ * @property {number|null} [width] - Larghezza dell'svg, di fatto obbligatoria
+ * @property {number|null} [height] - Altezza dell'svg, di fatto obbligatoria
+ * @property {Object} [axisAttrs] - Attributi svg.js delle linee degli assi (default: {})
+ * @property {Object} [ticksAttrs] - Attributi svg.js dei ticks (default: {})
+ * @property {import('./core.js').ChartFontAttrs} [labelYAttrs] - Attributi font delle etichette dell'asse dei valori (default: {})
+ * @property {string|null} [labelYFontFilePath] - Percorso del file del font delle etichette dell'asse dei valori (solo textToPath) (default: null)
+ * @property {import('./core.js').ChartFontAttrs} [labelXAttrs] - Attributi font delle etichette dell'asse delle categorie (default: {})
+ * @property {string|null} [labelXFontFilePath] - Percorso del file del font delle etichette dell'asse delle categorie (solo textToPath) (default: null)
+ * @property {number} stepY_count - Numero di suddivisioni dell'asse dei valori
+ * @property {number} stepY_size - Lunghezza in px di ogni suddivisione dell'asse dei valori
+ * @property {number} stepY_value - Valore corrispondente a ogni suddivisione dell'asse dei valori
+ * @property {number} min_value - Valore minimo dell'asse dei valori
+ * @property {number} zero_y - Coordinata della linea dello zero (y con orientamento verticale, x con orientamento orizzontale)
+ * @property {number} stepX_size - Lunghezza in px di ogni suddivisione dell'asse delle categorie
+ * @property {number} stepX_count - Numero di suddivisioni dell'asse delle categorie
+ * @property {number} [ticksLength] - Lunghezza dei ticks in px, di fatto obbligatoria
+ * @property {boolean} [showXgrid] - Mostra la griglia ortogonale all'asse delle categorie (verticale, oppure orizzontale con orientamento orizzontale) (default: true)
+ * @property {boolean} [showYgrid] - Mostra la griglia ortogonale all'asse dei valori (orizzontale, oppure verticale con orientamento orizzontale) (default: true)
+ * @property {Object} [gridLinesAttrs] - Attributi svg.js delle linee della griglia (default: {})
+ * @property {string|null} [yAxisTitle] - Titolo dell'asse a sinistra (default: null)
+ * @property {import('./core.js').ChartFontAttrs} [yAxisTitleAttrs] - Attributi font del titolo dell'asse a sinistra (default: {})
+ * @property {string|null} [yAxisTitleFontFilePath] - Percorso del file del font del titolo dell'asse a sinistra (solo textToPath) (default: null)
+ * @property {string|null} [xAxisTitle] - Titolo dell'asse in basso (default: null)
+ * @property {import('./core.js').ChartFontAttrs} [xAxisTitleAttrs] - Attributi font del titolo dell'asse in basso (default: {})
+ * @property {string|null} [xAxisTitleFontFilePath] - Percorso del file del font del titolo dell'asse in basso (solo textToPath) (default: null)
+ * @property {Array<string|number>} [xLabels] - Etichette dell'asse delle categorie
+ * @property {boolean} [xLabelsOnTicks] - Se true le etichette di categoria sono posizionate in corrispondenza dei ticks, altrimenti sono centrate nello spazio di ogni suddivisione (default: true)
+ * @property {(value: number) => string|number} [labelYFormatter] - Funzione per formattare le etichette dell'asse dei valori; il default è null, ma è di fatto obbligatoria: viene sempre eseguita (default: null)
+ */
+
+/**
+ * Costruisce un sistema di assi cartesiani completo di ticks, etichette, griglia e titoli degli assi.
+ * Smista la richiesta in base a `params.orientation`: `vertical` (barre/linee verticali, default)
+ * o `horizontal` (barre orizzontali). Gli argomenti sono gli stessi per entrambi gli orientamenti,
+ * interpretati diversamente da ciascun ramo (vedi `cartesianAxisVertical` e `cartesianAxisHorizontal`).
+ * Il gruppo restituito non è aggiunto ad alcun svg. In caso di errore lo registra in console e restituisce `undefined`.
+ *
+ * @example
+ * // Tutti i parametri (valori di default dove previsti):
+ * await cartesianAxis(chartInstance, { // istanza di MinimoCharts, OBBL
+ *   orientation: 'vertical', // orientamento del grafico, FAC
+ *   debug: false, // attributi data-debug-info, FAC
+ *   chart_area: parsed.chart_area, // area del grafico (da parseStdAxisOpts), OBBL
+ *   padding: 0, // spazio intorno ai bordi, FAC
+ *   width: 600, // larghezza dell'svg, OBBL
+ *   height: 300, // altezza dell'svg, OBBL
+ *   axisAttrs: {}, // attributi linee degli assi, FAC
+ *   ticksAttrs: {}, // attributi ticks, FAC
+ *   labelYAttrs: {}, // font etichette asse valori, FAC
+ *   labelYFontFilePath: null, // file font etichette asse valori, FAC
+ *   labelXAttrs: {}, // font etichette asse categorie, FAC
+ *   labelXFontFilePath: null, // file font etichette asse categorie, FAC
+ *   stepY_count: parsed.stepY_count, // suddivisioni asse valori, OBBL
+ *   stepY_size: parsed.stepY_size, // px per suddivisione asse valori, OBBL
+ *   stepY_value: parsed.stepY_value, // valore per suddivisione asse valori, OBBL
+ *   min_value: parsed.min_value, // valore minimo asse valori, OBBL
+ *   zero_y: parsed.zero_y, // coordinata della linea dello zero, OBBL
+ *   stepX_size: parsed.stepX_size, // px per suddivisione asse categorie, OBBL
+ *   stepX_count: 6, // suddivisioni asse categorie, OBBL
+ *   ticksLength: 8, // lunghezza ticks, OBBL
+ *   showXgrid: true, // griglia asse categorie, FAC
+ *   showYgrid: true, // griglia asse valori, FAC
+ *   gridLinesAttrs: {}, // attributi linee griglia, FAC
+ *   yAxisTitle: null, // titolo asse a sinistra, FAC
+ *   yAxisTitleAttrs: {}, // font titolo asse a sinistra, FAC
+ *   yAxisTitleFontFilePath: null, // file font titolo asse a sinistra, FAC
+ *   xAxisTitle: null, // titolo asse in basso, FAC
+ *   xAxisTitleAttrs: {}, // font titolo asse in basso, FAC
+ *   xAxisTitleFontFilePath: null, // file font titolo asse in basso, FAC
+ *   xLabels: [], // etichette di categoria, FAC
+ *   xLabelsOnTicks: true, // etichette di categoria sui ticks, FAC
+ *   labelYFormatter: value => value, // formattazione etichette asse valori, OBBL
+ * });
+ *
+ * @param {import('./core.js').MinimoCharts} chartInstance - Istanza di `MinimoCharts`
+ * @param {CartesianAxisParams} params - Parametri degli assi (vedi `CartesianAxisParams`)
+ * @returns {Promise<import('@svgdotjs/svg.js').G>} Il gruppo svg.js con assi, ticks, etichette, griglia e titoli
+ */
 export async function cartesianAxis(chartInstance, params) {
   return params.orientation === 'horizontal'
     ? cartesianAxisHorizontal(chartInstance, params)
     : cartesianAxisVertical(chartInstance, params);
 }
 
+/**
+ * Variante verticale (barre/linee verticali): asse dei valori a sinistra (asse Y), con griglia orizzontale;
+ * asse delle categorie in basso (asse X), disegnato sulla linea dello zero, con griglia verticale.
+ * @param {import('./core.js').MinimoCharts} chartInstance - Istanza di `MinimoCharts`
+ * @param {CartesianAxisParams} params - Parametri degli assi (vedi `CartesianAxisParams`)
+ * @returns {Promise<import('@svgdotjs/svg.js').G>} Il gruppo svg.js con assi, ticks, etichette, griglia e titoli
+ */
 async function cartesianAxisVertical(chartInstance, {
   debug = false,
-  chart_area = {},
+  chart_area = /** @type {import('./parse-std-axis-opts.js').ChartArea} */ ({}),
   padding = 0,
   width,
   height,
@@ -91,6 +179,8 @@ async function cartesianAxisVertical(chartInstance, {
 
     for await (const stepIdx of Array.from(Array(stepY_count + 1).keys())) {
 
+      // TODO[epic=charts] `labelYFormatter` viene sempre eseguita: con null (il default, descritto nei grafici come "nessuna elaborazione")
+      // questa riga va in errore. Usare il valore non formattato quando la funzione è assente
       const y = chart_area.bottom - (stepY_size * stepIdx)
         ,label = labelYFormatter(min_value + stepY_value * stepIdx);
 
@@ -267,18 +357,22 @@ async function cartesianAxisVertical(chartInstance, {
 }
 
 /**
-  Variante orizzontale (barre orizzontali): rispetto a cartesianAxisVertical i ruoli sono invertiti:
-    - l'asse dei VALORI (numerico, formattato con labelYFormatter) è fisso in basso (come l'asse X
-      di cartesianAxisVertical), con griglia verticale. La linea dello zero (baseline delle barre)
-      è una linea verticale che si sposta in base al segno dei dati (zero_y qui è una coordinata X)
-    - l'asse delle CATEGORIE (testuale, da xLabels) è fisso a sinistra (come l'asse Y di
-      cartesianAxisVertical), con griglia orizzontale
-  stepY_count/stepY_size/stepY_value/zero_y e stepX_size/stepX_count sono gli stessi campi
-  restituiti da parseStdAxisOpts con orientation:'horizontal' (vedi commenti lì)
-*/
+ * Variante orizzontale (barre orizzontali): rispetto a `cartesianAxisVertical` i ruoli sono invertiti:
+ * - l'asse dei VALORI (numerico, formattato con `labelYFormatter`) è fisso in basso (come l'asse X
+ *   di `cartesianAxisVertical`), con griglia verticale. La linea dello zero (baseline delle barre)
+ *   è una linea verticale che si sposta in base al segno dei dati (`zero_y` qui è una coordinata X)
+ * - l'asse delle CATEGORIE (testuale, da `xLabels`) è fisso a sinistra (come l'asse Y di
+ *   `cartesianAxisVertical`), con griglia orizzontale
+ *
+ * `stepY_count`/`stepY_size`/`stepY_value`/`zero_y` e `stepX_size`/`stepX_count` sono gli stessi campi
+ * restituiti da `parseStdAxisOpts` con `orientation: 'horizontal'` (vedi commenti lì).
+ * @param {import('./core.js').MinimoCharts} chartInstance - Istanza di `MinimoCharts`
+ * @param {CartesianAxisParams} params - Parametri degli assi (vedi `CartesianAxisParams`)
+ * @returns {Promise<import('@svgdotjs/svg.js').G>} Il gruppo svg.js con assi, ticks, etichette, griglia e titoli
+ */
 async function cartesianAxisHorizontal(chartInstance, {
   debug = false,
-  chart_area = {},
+  chart_area = /** @type {import('./parse-std-axis-opts.js').ChartArea} */ ({}),
   padding = 0,
   width,
   height,
@@ -349,6 +443,8 @@ async function cartesianAxisHorizontal(chartInstance, {
 
     for await (const stepIdx of Array.from(Array(stepY_count + 1).keys())) {
 
+      // TODO[epic=charts] `labelYFormatter` viene sempre eseguita: con null (il default, descritto nei grafici come "nessuna elaborazione")
+      // questa riga va in errore. Usare il valore non formattato quando la funzione è assente
       const x = chart_area.left + (stepY_size * stepIdx)
         ,label = labelYFormatter(min_value + stepY_value * stepIdx);
 

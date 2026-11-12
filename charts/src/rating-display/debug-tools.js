@@ -1,6 +1,34 @@
 import { G } from '@svgdotjs/svg.js';
-import { polarToCartesian, polarToCartesianString } from '../../chart-utils.js';
+import { polarToCartesianString } from '../helpers/chart-utils.js';
 
+/**
+ * Costruisce gli indicatori grafici per il debug del rating display: assi, raggi di riferimento,
+ * centri e circonferenze interne. Viene caricata dinamicamente da `ratingDisplay` quando `debug` è attivo.
+ *
+ * @example
+ * // Tutti i parametri (valori di default dove previsti):
+ * run({
+ *   mainDisplayCenter: { x: 100, y: 100 }, // centro del display principale, OBBL
+ *   width: 200, // larghezza dell'svg, OBBL
+ *   height: 150, // altezza dell'svg, OBBL
+ *   mainRadius: 90, // raggio della circonferenza esterna, OBBL
+ *   centroSx: { x: 90, y: 105 }, // centro circonferenza sinistra, OBBL
+ *   rSx: 80, // raggio circonferenza sinistra, OBBL
+ *   centroDx: { x: 110, y: 95 }, // centro circonferenza destra, OBBL
+ *   rDx: 60, // raggio circonferenza destra, OBBL
+ * });
+ *
+ * @param {Object} params - Parametri degli indicatori
+ * @param {{x: number, y: number}} params.mainDisplayCenter - Centro della circonferenza principale (centro di rotazione dell'asticella)
+ * @param {number} params.width - Larghezza dell'svg
+ * @param {number} params.height - Altezza dell'svg
+ * @param {number} params.mainRadius - Raggio della circonferenza esterna
+ * @param {{x: number, y: number}} params.centroSx - Centro della circonferenza interna sinistra (C nella documentazione)
+ * @param {number} params.rSx - Raggio della circonferenza interna sinistra (c)
+ * @param {{x: number, y: number}} params.centroDx - Centro della circonferenza interna destra (B nella documentazione)
+ * @param {number} params.rDx - Raggio della circonferenza interna destra (b)
+ * @returns {import('@svgdotjs/svg.js').G} Il gruppo svg.js con gli indicatori, da aggiungere all'svg
+ */
 export function run({
   mainDisplayCenter,
   width,
@@ -25,18 +53,18 @@ export function run({
   });
 
   // assi orizzontali e verticali
-  debug_group.line({
-    x1: 0,
-    y1: mainDisplayCenter.y,
-    x2: width,
-    y2: mainDisplayCenter.y}
+  debug_group.line(
+    0,
+    mainDisplayCenter.y,
+    width,
+    mainDisplayCenter.y
   )
     .attr({'data-debug-info': 'Asse orizzontale'});
-  debug_group.line({
-    x1: mainDisplayCenter.x,
-    y1: 0,
-    x2: mainDisplayCenter.x,
-    y2: height}
+  debug_group.line(
+    mainDisplayCenter.x,
+    0,
+    mainDisplayCenter.x,
+    height
   )
     .attr({'data-debug-info': 'Asse verticale'});
 

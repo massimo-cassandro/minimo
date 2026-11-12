@@ -1,4 +1,9 @@
 
+/**
+ * Colori di default delle serie di dati, utilizzati (nell'ordine indicato) quando non vengono
+ * impostati colori personalizzati in `MinimoCharts` o nei parametri dei singoli grafici.
+ * @type {Object<string, string>}
+ */
 export const default_colors = {
   azzurro        : '#2387e2',
   rosaScuro      : '#fc1484',

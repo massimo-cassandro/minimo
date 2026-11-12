@@ -1,22 +1,80 @@
-// prima elaborazione e controlli delle impostazioni comuni a tutti i grafici con assi
-// NB non nel prototypoe della classe, va importato dove richiesto
-/*
-  l'argomento params è un oggetto che deve contenere i parametri con cui vengono effettuati i vari calcoli:
-    width, height, ecc... (vedi default)
+/**
+ * Coordinate e dimensioni del rettangolo interno all'svg entro cui viene disegnato il grafico.
+ * I lati sinistro e inferiore corrispondono agli assi.
+ * @typedef {Object} ChartArea
+ * @property {number} top - Coordinata y superiore
+ * @property {number} right - Coordinata x destra
+ * @property {number} bottom - Coordinata y inferiore
+ * @property {number} left - Coordinata x sinistra
+ * @property {number} width - Larghezza dell'area
+ * @property {number} height - Altezza dell'area
+ */
 
-    values è un array flat contentente tutti i valori da rappresentare
+/**
+ * Parametri calcolati da `parseStdAxisOpts`.
+ * NB: i nomi `stepY_*` si riferiscono sempre all'asse dei valori e `stepX_*` all'asse delle categorie,
+ * anche con orientamento orizzontale (dove l'asse dei valori è l'asse X).
+ * @typedef {Object} ParsedAxisOpts
+ * @property {number} max_value - Valore massimo dell'asse dei valori (quello impostato, o quello calcolato dai dati)
+ * @property {number} min_value - Valore minimo dell'asse dei valori (quello impostato, o quello calcolato dai dati)
+ * @property {number} stepY_count - Numero di suddivisioni dell'asse dei valori (può differire da quello richiesto se i valori attraversano lo zero)
+ * @property {ChartArea} chart_area - Area del grafico
+ * @property {number} stepY_value - Valore corrispondente a ogni suddivisione dell'asse dei valori
+ * @property {number} stepY_size - Lunghezza in px di ogni suddivisione dell'asse dei valori
+ * @property {number} stepX_size - Lunghezza in px di ogni suddivisione dell'asse delle categorie
+ * @property {number} zero_y - Coordinata corrispondente al valore 0 (coordinata y con orientamento verticale, x con orientamento orizzontale), limitata ai bordi dell'area del grafico
+ */
 
-  restituisce un offetto `parsed` con i nuovi parametri calcolati
-*/
-
-export function parseStdAxisOpts(params = {} ) {
+/**
+ * Prima elaborazione e controlli delle impostazioni comuni a tutti i grafici con assi:
+ * calcola valori minimo e massimo, area del grafico, dimensioni delle suddivisioni e posizione dello zero.
+ * NB: non fa parte della classe `MinimoCharts`, va importata dove richiesto.
+ * In caso di errore (es. uno dei parametri obbligatori è null) lo registra in console e restituisce `undefined`.
+ *
+ * @example
+ * // Tutti i parametri (valori di default dove previsti):
+ * parseStdAxisOpts({
+ *   max_value: null, // valore massimo, null = calcolato da `values`, FAC
+ *   min_value: null, // valore minimo, null = calcolato da `values`, FAC
+ *   values: [], // array flat dei valori da rappresentare, FAC
+ *   legenda: null, // parametri della legenda (viene letta `height`), FAC
+ *   padding: 0, // spazio intorno ai bordi del grafico, FAC
+ *   padding_right: null, // padding del solo lato destro, FAC
+ *   width: 600, // larghezza dell'svg, OBBL
+ *   height: 300, // altezza dell'svg, OBBL
+ *   eti_asseX_height: 50, // altezza area etichette asse X, OBBL
+ *   eti_asseY_width: 60, // larghezza area etichette asse Y, OBBL
+ *   stepY_count: 4, // suddivisioni asse dei valori, OBBL
+ *   stepX_count: 6, // suddivisioni asse delle categorie, OBBL
+ *   ticksLength: 0, // lunghezza dei ticks, FAC
+ *   orientation: 'vertical', // orientamento del grafico, FAC
+ * });
+ *
+ * @param {Object} params - Parametri con cui vengono effettuati i calcoli
+ * @param {number|null} [params.max_value] - Valore massimo dell'asse dei valori; se null viene calcolato da `values` (mai inferiore a 0) (default: null)
+ * @param {number|null} [params.min_value] - Valore minimo dell'asse dei valori; se null viene calcolato da `values` (default: null)
+ * @param {Array<number|null>} [params.values] - Array flat con tutti i valori da rappresentare, usato per il calcolo di `max_value` e `min_value` quando sono null (default: [])
+ * @param {{height?: number}|null} [params.legenda] - Parametri della legenda: ne viene letta solo l'altezza, per riservarle lo spazio sopra il grafico (default: null)
+ * @param {number} [params.padding] - Spazio intorno ai bordi del grafico (default: 0)
+ * @param {number|null} [params.padding_right] - Padding del solo lato destro; se null viene usato `padding` (default: null)
+ * @param {number} params.width - Larghezza dell'svg (default: null)
+ * @param {number} params.height - Altezza dell'svg (default: null)
+ * @param {number} params.eti_asseX_height - Altezza dell'area delle etichette dell'asse X (default: null)
+ * @param {number} params.eti_asseY_width - Larghezza dell'area delle etichette dell'asse Y (default: null)
+ * @param {number} params.stepY_count - Numero di suddivisioni dell'asse dei valori (default: null)
+ * @param {number} params.stepX_count - Numero di suddivisioni dell'asse delle categorie (default: null)
+ * @param {number} [params.ticksLength] - Lunghezza dei ticks in px (default: 0)
+ * @param {'vertical'|'horizontal'} [params.orientation] - Orientamento: con `vertical` l'asse dei valori è l'asse Y, con `horizontal` è l'asse X (default: "vertical")
+ * @returns {ParsedAxisOpts} I parametri calcolati
+ */
+export function parseStdAxisOpts(params) {
 
   try {
 
 
     // TODO eti_asseX_height e eti_asseY_width capire se è possibile inserire un calcolo dinamico delle dimensioni
     //     mettere quindi auto (o null) come default che innesci il calcolo automatico
-    const parsed = {};
+    const parsed = /** @type {ParsedAxisOpts} */ ({});
 
     // default
     params = {
@@ -95,12 +153,12 @@ export function parseStdAxisOpts(params = {} ) {
     // =>> chart area
     // coordinate e dimensioni del rettangolo interno all'svg entro cui viene disegnato il grafico
     // i lati sx e inferiore corrispondono agli assi
-    parsed.chart_area = {
+    parsed.chart_area = /** @type {ChartArea} */ ({
       top       : legenda_height + gap_legenda + params.padding, // coordinata y superiore
       right     : params.width - (params.padding_right?? params.padding), // coordinata x dx
       bottom    : params.height - params.eti_asseX_height - params.ticksLength - params.padding, // coordinata y inferiore
       left      : params.eti_asseY_width + params.ticksLength + params.padding // coordinata x sx
-    };
+    });
     parsed.chart_area.width = parsed.chart_area.right - parsed.chart_area.left;
     parsed.chart_area.height = parsed.chart_area.bottom - parsed.chart_area.top;
 
