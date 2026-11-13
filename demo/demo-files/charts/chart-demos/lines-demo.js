@@ -58,7 +58,7 @@ export async function linesTest(chartInstance, nodeCfg = null) {
 
     data_lines_widths: [null, null, 4],
 
-    labelYFormatter: etiValue => etiValue.toLocaleString('it-IT', {
+    yLabelFormatter: etiValue => etiValue.toLocaleString('it-IT', {
       minimumFractionDigits: 0,
       maximumFractionDigits: 0
     }),

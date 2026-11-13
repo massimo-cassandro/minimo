@@ -56,7 +56,7 @@ export async function hBarsTest(chartInstance, nodeCfg = null) {
 
     yAxisLabelWidth: 80,
 
-    labelYFormatter: etiValue => etiValue.toLocaleString('it-IT', {
+    yLabelFormatter: etiValue => etiValue.toLocaleString('it-IT', {
       minimumFractionDigits: 0,
       maximumFractionDigits: 0
     }),

@@ -25,9 +25,39 @@ const legacyParamNames = {
   use_warning_icon: 'useAltIcon'
 };
 
-// TODO aggiungere metodo setDefaults per cambiare a livello globale i valori di default
-//      senza doverli ripetere ad ogni istanza del modulo
+/**
+ * Mappa i vecchi nomi di parametro snake_case sul rispettivo equivalente camelCase (modifica l'oggetto passato)
+ * @param {Record<string, any>} obj - Oggetto parametri
+ * @returns {Record<string, any>}
+ */
+const mapLegacyParams = obj => {
+  Object.entries(legacyParamNames).forEach(([legacyKey, newKey]) => {
+    if(legacyKey in obj && !(newKey in obj)) {
+      obj[newKey] = obj[legacyKey];
+    }
+  });
+  return obj;
+};
 
+/**
+ * Default a livello di progetto, impostati con `modalAlert.setDefaults()`.
+ * Stessa struttura di `defaults`: `globals` per tutti i tipi, più una chiave per ogni tipo.
+ *
+ * Sono salvati su `globalThis` con una chiave `Symbol.for()` (registro globale dei simboli), e non
+ * in una variabile di modulo: in questo modo sono condivisi da tutte le istanze del modulo presenti
+ * nella pagina, anche quando `modal-alert.js` viene incluso più volte (più entry webpack con runtime
+ * separati, bundle di build diverse, ecc.).
+ */
+const PROJECT_DEFAULTS_KEY = Symbol.for('@massimo-cassandro/minimo/modal-alert/defaults');
+
+/**
+ * Restituisce (creandolo se necessario) l'oggetto condiviso dei default di progetto.
+ * @returns {Record<string, Record<string, any>>}
+ */
+const getProjectDefaults = () => {
+  const g = /** @type {Record<symbol, any>} */ (globalThis);
+  return (g[PROJECT_DEFAULTS_KEY] ??= {});
+};
 
 const defaults = {
 
@@ -202,25 +232,26 @@ export function modalAlert(params = {}) {
       document.querySelector('.modal-alert')?.remove();
 
       // retrocompatibilità: mappa le vecchie chiavi snake_case sul rispettivo equivalente camelCase
-      const rawParams = /** @type {Record<string, any>} */ (params);
-      Object.entries(legacyParamNames).forEach(([legacyKey, newKey]) => {
-        if(legacyKey in rawParams && !(newKey in rawParams)) {
-          rawParams[newKey] = rawParams[legacyKey];
-        }
-      });
-
-      const typedDefaults = /** @type {Record<string, any>} */ (defaults);
-
-      params = /** @type {ModalAlertParams} */ ({
-        ...(typedDefaults.globals ?? {}),
-        ...(typedDefaults[params.type ?? ''] ?? {}),
-        ...params
-      });
+      mapLegacyParams(/** @type {Record<string, any>} */ (params));
 
       // retrocompatibilità: 'danger' è un alias di 'error'
+      // (normalizzato prima dell'unione con i default, così da applicare quelli del tipo 'error')
       if(params.type === 'danger') {
-        params.type = 'error';
+        params = { ...params, type: 'error' };
       }
+
+      const typedDefaults = /** @type {Record<string, any>} */ (defaults);
+      const projectDefaults = getProjectDefaults();
+      const typeKey = params.type ?? '';
+
+      // precedenza: params > default di progetto del tipo > default di progetto globali > default del tipo > default globali
+      params = /** @type {ModalAlertParams} */ ({
+        ...(typedDefaults.globals ?? {}),
+        ...(typedDefaults[typeKey] ?? {}),
+        ...(projectDefaults.globals ?? {}),
+        ...(projectDefaults[typeKey] ?? {}),
+        ...params
+      });
 
       if(!params.type || Object.keys(defaults).filter(item => item !== 'globals').indexOf(params.type) === -1) {
         throw 'Missing or incorrect `type` parameter';
@@ -405,3 +436,87 @@ export function modalAlert(params = {}) {
   });
 
 }
+
+
+const dialogTypes = Object.keys(defaults).filter(item => item !== 'globals');
+
+/**
+ * Imposta i default a livello di progetto per la sessione corrente (pagina), condivisi da tutte le chiamate
+ * successive di `modalAlert`, anche da file o bundle diversi (i default sono salvati su `globalThis`).
+ * I valori vengono uniti a quelli impostati in precedenza.
+ *
+ * Le chiavi corrispondenti a un tipo di dialog (`success`, `error`, `warning`, `info`, `confirm`, più l'alias
+ * `danger` → `error`) accettano un oggetto di parametri applicato solo a quel tipo; tutte le altre chiavi
+ * vengono applicate a tutti i tipi.
+ *
+ * Precedenza: parametri della chiamata > default di progetto del tipo > default di progetto globali >
+ * default predefiniti del tipo > default predefiniti globali.
+ *
+ * Il parametro `type` viene ignorato. Sono accettati anche i vecchi nomi snake_case.
+ *
+ * @param {Partial<ModalAlertParams> & Partial<Record<'success'|'error'|'danger'|'warning'|'info'|'confirm', Partial<ModalAlertParams>>>} [newDefaults] - Parametri da sovrascrivere (default: {})
+ * @returns {void}
+ *
+ * @example
+ * // file A
+ * import { modalAlert } from '@massimo-cassandro/minimo';
+ * modalAlert.setDefaults({
+ *   animation: false,                                // tutti i tipi
+ *   success: { timer: 2000 },                        // solo success
+ *   confirm: { okBtnText: 'Sì', cancelBtnText: 'No' } // solo confirm
+ * });
+ *
+ * // file B (stessa pagina)
+ * import { modalAlert } from '@massimo-cassandro/minimo';
+ * modalAlert({ type: 'confirm', mes: 'Eliminare il record?' }); // usa 'Sì' / 'No', senza animazione
+ */
+modalAlert.setDefaults = (newDefaults = {}) => {
+  const { type: _ignored, ...rest } = /** @type {Record<string, any>} */ (newDefaults); // eslint-disable-line no-unused-vars
+  const projectDefaults = getProjectDefaults();
+  /** @type {Record<string, any>} */
+  const globals = {};
+
+  Object.entries(rest).forEach(([key, value]) => {
+    const typeKey = key === 'danger' ? 'error' : key;
+
+    if(dialogTypes.includes(typeKey) && value && typeof value === 'object') {
+      const { type: _t, ...typeParams } = mapLegacyParams({ ...value }); // eslint-disable-line no-unused-vars
+      projectDefaults[typeKey] = { ...(projectDefaults[typeKey] ?? {}), ...typeParams };
+
+    } else {
+      globals[key] = value;
+    }
+  });
+
+  projectDefaults.globals = { ...(projectDefaults.globals ?? {}), ...mapLegacyParams(globals) };
+};
+
+/**
+ * Cancella i default a livello di progetto impostati con `modalAlert.setDefaults()`.
+ * @returns {void}
+ */
+modalAlert.resetDefaults = () => {
+  // svuotato sul posto, così da restare lo stesso oggetto condiviso
+  const projectDefaults = getProjectDefaults();
+  Object.keys(projectDefaults).forEach(key => delete projectDefaults[key]);
+};
+
+/**
+ * Restituisce i parametri di default effettivi (predefiniti + di progetto) per un tipo di dialog.
+ * @param {string} type - Tipo di dialog (`success`, `error`, `danger`, `warning`, `info` o `confirm`)
+ * @returns {ModalAlertParams}
+ *
+ * @example
+ * modalAlert.getDefaults('confirm').okBtnText; // → 'OK' (o il valore impostato con setDefaults)
+ */
+modalAlert.getDefaults = type => {
+  const typeKey = type === 'danger' ? 'error' : type;
+  const typedDefaults = /** @type {Record<string, any>} */ (defaults);
+  const projectDefaults = getProjectDefaults();
+  return {
+    ...typedDefaults.globals,
+    ...(typedDefaults[typeKey] ?? {}),
+    ...(projectDefaults.globals ?? {}),
+    ...(projectDefaults[typeKey] ?? {})
+  };
+};

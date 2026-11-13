@@ -4,8 +4,8 @@ import { createTextEl } from './create-text-element.js';
 /**
  * Parametri di `cartesianAxis`: corrispondono a quelli dei grafici con assi (`bars`, `hbars`, `lines`),
  * con l'aggiunta dei valori calcolati da `parseStdAxisOpts`.
- * NB: i nomi `stepY_*`, `labelY*` e `showYgrid` si riferiscono sempre all'asse dei valori,
- * `stepX_*`, `labelX*`, `xLabels` e `showXgrid` all'asse delle categorie, anche con orientamento orizzontale
+ * NB: i nomi `stepY_*`, `yLabel*` e `showYgrid` si riferiscono sempre all'asse dei valori,
+ * `stepX_*`, `xLabel*`, `xLabels` e `showXgrid` all'asse delle categorie, anche con orientamento orizzontale
  * (dove l'asse dei valori è in basso e quello delle categorie a sinistra).
  * @typedef {Object} CartesianAxisParams
  * @property {'vertical'|'horizontal'} [orientation] - Orientamento del grafico (default: "vertical")
@@ -16,10 +16,10 @@ import { createTextEl } from './create-text-element.js';
  * @property {number} height - Altezza dell'svg
  * @property {Object} [axisAttrs] - Attributi svg.js delle linee degli assi (default: {})
  * @property {Object} [ticksAttrs] - Attributi svg.js dei ticks (default: {})
- * @property {import('./core.js').ChartFontAttrs} [labelYAttrs] - Attributi font delle etichette dell'asse dei valori (default: {})
- * @property {string|null} [labelYFontFilePath] - Percorso del file del font delle etichette dell'asse dei valori (solo textToPath) (default: null)
- * @property {import('./core.js').ChartFontAttrs} [labelXAttrs] - Attributi font delle etichette dell'asse delle categorie (default: {})
- * @property {string|null} [labelXFontFilePath] - Percorso del file del font delle etichette dell'asse delle categorie (solo textToPath) (default: null)
+ * @property {import('./core.js').ChartFontAttrs} [yLabelAttrs] - Attributi font delle etichette dell'asse dei valori (default: {})
+ * @property {string|null} [yLabelFontFilePath] - Percorso del file del font delle etichette dell'asse dei valori (solo textToPath) (default: null)
+ * @property {import('./core.js').ChartFontAttrs} [xLabelAttrs] - Attributi font delle etichette dell'asse delle categorie (default: {})
+ * @property {string|null} [xLabelFontFilePath] - Percorso del file del font delle etichette dell'asse delle categorie (solo textToPath) (default: null)
  * @property {number} stepY_count - Numero di suddivisioni dell'asse dei valori
  * @property {number} stepY_size - Lunghezza in px di ogni suddivisione dell'asse dei valori
  * @property {number} stepY_value - Valore corrispondente a ogni suddivisione dell'asse dei valori
@@ -39,7 +39,7 @@ import { createTextEl } from './create-text-element.js';
  * @property {string|null} [xAxisTitleFontFilePath] - Percorso del file del font del titolo dell'asse in basso (solo textToPath) (default: null)
  * @property {Array<string|number>} [xLabels] - Etichette dell'asse delle categorie
  * @property {boolean} [xLabelsOnTicks] - Se true le etichette di categoria sono posizionate in corrispondenza dei ticks, altrimenti sono centrate nello spazio di ogni suddivisione (default: true)
- * @property {((value: number) => string|number)|null} [labelYFormatter] - Funzione per formattare le etichette dell'asse dei valori; se null viene mostrato il valore senza elaborazione (default: null)
+ * @property {((value: number) => string|number)|null} [yLabelFormatter] - Funzione per formattare le etichette dell'asse dei valori; se null viene mostrato il valore senza elaborazione (default: null)
  */
 
 /**
@@ -52,38 +52,38 @@ import { createTextEl } from './create-text-element.js';
  * @example
  * // Tutti i parametri (valori di default dove previsti):
  * await cartesianAxis(chartInstance, { // istanza di MinimoCharts, OBBL
- *   orientation: 'vertical', // orientamento del grafico, FAC
- *   debug: false, // attributi data-debug-info, FAC
- *   chart_area: parsed.chart_area, // area del grafico (da parseStdAxisOpts), OBBL
- *   padding: 0, // spazio intorno ai bordi, FAC
- *   width: 600, // larghezza dell'svg, OBBL
- *   height: 300, // altezza dell'svg, OBBL
  *   axisAttrs: {}, // attributi linee degli assi, FAC
- *   ticksAttrs: {}, // attributi ticks, FAC
- *   labelYAttrs: {}, // font etichette asse valori, FAC
- *   labelYFontFilePath: null, // file font etichette asse valori, FAC
- *   labelXAttrs: {}, // font etichette asse categorie, FAC
- *   labelXFontFilePath: null, // file font etichette asse categorie, FAC
+ *   chart_area: parsed.chart_area, // area del grafico (da parseStdAxisOpts), OBBL
+ *   debug: false, // attributi data-debug-info, FAC
+ *   gridLinesAttrs: {}, // attributi linee griglia, FAC
+ *   height: 300, // altezza dell'svg, OBBL
+ *   min_value: parsed.min_value, // valore minimo asse valori, OBBL
+ *   orientation: 'vertical', // orientamento del grafico, FAC
+ *   padding: 0, // spazio intorno ai bordi, FAC
+ *   showXgrid: true, // griglia asse categorie, FAC
+ *   showYgrid: true, // griglia asse valori, FAC
+ *   stepX_count: 6, // suddivisioni asse categorie, OBBL
+ *   stepX_size: parsed.stepX_size, // px per suddivisione asse categorie, OBBL
  *   stepY_count: parsed.stepY_count, // suddivisioni asse valori, OBBL
  *   stepY_size: parsed.stepY_size, // px per suddivisione asse valori, OBBL
  *   stepY_value: parsed.stepY_value, // valore per suddivisione asse valori, OBBL
- *   min_value: parsed.min_value, // valore minimo asse valori, OBBL
- *   zero_y: parsed.zero_y, // coordinata della linea dello zero, OBBL
- *   stepX_size: parsed.stepX_size, // px per suddivisione asse categorie, OBBL
- *   stepX_count: 6, // suddivisioni asse categorie, OBBL
+ *   ticksAttrs: {}, // attributi ticks, FAC
  *   ticksLength: 8, // lunghezza ticks, FAC
- *   showXgrid: true, // griglia asse categorie, FAC
- *   showYgrid: true, // griglia asse valori, FAC
- *   gridLinesAttrs: {}, // attributi linee griglia, FAC
- *   yAxisTitle: null, // titolo asse a sinistra, FAC
- *   yAxisTitleAttrs: {}, // font titolo asse a sinistra, FAC
- *   yAxisTitleFontFilePath: null, // file font titolo asse a sinistra, FAC
+ *   width: 600, // larghezza dell'svg, OBBL
  *   xAxisTitle: null, // titolo asse in basso, FAC
  *   xAxisTitleAttrs: {}, // font titolo asse in basso, FAC
  *   xAxisTitleFontFilePath: null, // file font titolo asse in basso, FAC
+ *   xLabelAttrs: {}, // font etichette asse categorie, FAC
+ *   xLabelFontFilePath: null, // file font etichette asse categorie, FAC
  *   xLabels: [], // etichette di categoria, FAC
  *   xLabelsOnTicks: true, // etichette di categoria sui ticks, FAC
- *   labelYFormatter: null, // formattazione etichette asse valori, FAC
+ *   yAxisTitle: null, // titolo asse a sinistra, FAC
+ *   yAxisTitleAttrs: {}, // font titolo asse a sinistra, FAC
+ *   yAxisTitleFontFilePath: null, // file font titolo asse a sinistra, FAC
+ *   yLabelAttrs: {}, // font etichette asse valori, FAC
+ *   yLabelFontFilePath: null, // file font etichette asse valori, FAC
+ *   yLabelFormatter: null, // formattazione etichette asse valori, FAC
+ *   zero_y: parsed.zero_y, // coordinata della linea dello zero, OBBL
  * });
  *
  * @param {import('./core.js').MinimoCharts} chartInstance - Istanza di `MinimoCharts`
@@ -111,10 +111,10 @@ async function cartesianAxisVertical(chartInstance, {
   height,
   axisAttrs = {},
   ticksAttrs = {},
-  labelYAttrs = {},
-  labelYFontFilePath = null,
-  labelXAttrs = {},
-  labelXFontFilePath = null,
+  yLabelAttrs = {},
+  yLabelFontFilePath = null,
+  xLabelAttrs = {},
+  xLabelFontFilePath = null,
   stepY_count,
   stepY_size,
   stepY_value,
@@ -139,7 +139,7 @@ async function cartesianAxisVertical(chartInstance, {
   // se true le etichette sono posizionate in corrispondenza dei ticks
   // altrimenti sono centrate nello spazio corispondente a stepX_size
   xLabelsOnTicks = true,
-  labelYFormatter = null, // funzione
+  yLabelFormatter = null, // funzione
 }) {
 
   try {
@@ -181,7 +181,7 @@ async function cartesianAxisVertical(chartInstance, {
 
       const y = chart_area.bottom - (stepY_size * stepIdx)
         ,stepValue = min_value + stepY_value * stepIdx
-        ,label = labelYFormatter? labelYFormatter(stepValue) : stepValue; // senza funzione il valore non viene elaborato
+        ,label = yLabelFormatter? yLabelFormatter(stepValue) : stepValue; // senza funzione il valore non viene elaborato
 
       // =>> ticks Y
       ticksYGroup
@@ -194,9 +194,9 @@ async function cartesianAxisVertical(chartInstance, {
       // =>> etichette Y
       const labelEl = await createTextEl(chartInstance, {
           text: label,
-          textFill: labelYAttrs.fill?? '#000',
-          fontAttr: labelYAttrs,
-          fontFilePath: labelYFontFilePath,
+          textFill: yLabelAttrs.fill?? '#000',
+          fontAttr: yLabelAttrs,
+          fontFilePath: yLabelFontFilePath,
           parentElement: labelsYGroup
         }),
         label_bbox = labelEl.bbox();
@@ -294,9 +294,9 @@ async function cartesianAxisVertical(chartInstance, {
       // =>> etichette X
       const labelEl = await createTextEl (chartInstance, {
           text: thisLabel,
-          textFill: labelXAttrs.fill?? '#000',
-          fontAttr: labelXAttrs,
-          fontFilePath: labelXFontFilePath,
+          textFill: xLabelAttrs.fill?? '#000',
+          fontAttr: xLabelAttrs,
+          fontFilePath: xLabelFontFilePath,
           parentElement: labelsXGroup
         }),
         label_bbox = labelEl.bbox();
@@ -358,7 +358,7 @@ async function cartesianAxisVertical(chartInstance, {
 
 /**
  * Variante orizzontale (barre orizzontali): rispetto a `cartesianAxisVertical` i ruoli sono invertiti:
- * - l'asse dei VALORI (numerico, formattato con `labelYFormatter`) è fisso in basso (come l'asse X
+ * - l'asse dei VALORI (numerico, formattato con `yLabelFormatter`) è fisso in basso (come l'asse X
  *   di `cartesianAxisVertical`), con griglia verticale. La linea dello zero (baseline delle barre)
  *   è una linea verticale che si sposta in base al segno dei dati (`zero_y` qui è una coordinata X)
  * - l'asse delle CATEGORIE (testuale, da `xLabels`) è fisso a sinistra (come l'asse Y di
@@ -378,10 +378,10 @@ async function cartesianAxisHorizontal(chartInstance, {
   height,
   axisAttrs = {},
   ticksAttrs = {},
-  labelYAttrs = {},
-  labelYFontFilePath = null,
-  labelXAttrs = {},
-  labelXFontFilePath = null,
+  yLabelAttrs = {},
+  yLabelFontFilePath = null,
+  xLabelAttrs = {},
+  xLabelFontFilePath = null,
   stepY_count,
   stepY_size,
   stepY_value,
@@ -404,7 +404,7 @@ async function cartesianAxisHorizontal(chartInstance, {
 
   xLabels, // array con le etichette di categoria, mostrate sull'asse verticale (a sinistra)
   xLabelsOnTicks = true,
-  labelYFormatter = null, // funzione, formatta le etichette numeriche dell'asse valori (in basso)
+  yLabelFormatter = null, // funzione, formatta le etichette numeriche dell'asse valori (in basso)
 }) {
 
   try {
@@ -445,7 +445,7 @@ async function cartesianAxisHorizontal(chartInstance, {
 
       const x = chart_area.left + (stepY_size * stepIdx)
         ,stepValue = min_value + stepY_value * stepIdx
-        ,label = labelYFormatter? labelYFormatter(stepValue) : stepValue; // senza funzione il valore non viene elaborato
+        ,label = yLabelFormatter? yLabelFormatter(stepValue) : stepValue; // senza funzione il valore non viene elaborato
 
       // =>> ticks asse valori
       ticksValueGroup
@@ -458,9 +458,9 @@ async function cartesianAxisHorizontal(chartInstance, {
       // =>> etichette asse valori
       const labelEl = await createTextEl(chartInstance, {
           text: label,
-          textFill: labelYAttrs.fill?? '#000',
-          fontAttr: labelYAttrs,
-          fontFilePath: labelYFontFilePath,
+          textFill: yLabelAttrs.fill?? '#000',
+          fontAttr: yLabelAttrs,
+          fontFilePath: yLabelFontFilePath,
           parentElement: labelsValueGroup
         }),
         label_bbox = labelEl.bbox();
@@ -559,9 +559,9 @@ async function cartesianAxisHorizontal(chartInstance, {
       // =>> etichette categorie
       const labelEl = await createTextEl (chartInstance, {
           text: thisLabel,
-          textFill: labelXAttrs.fill?? '#000',
-          fontAttr: labelXAttrs,
-          fontFilePath: labelXFontFilePath,
+          textFill: xLabelAttrs.fill?? '#000',
+          fontAttr: xLabelAttrs,
+          fontFilePath: xLabelFontFilePath,
           parentElement: labelsCategoryGroup
         }),
         label_bbox = labelEl.bbox();

@@ -1,5 +1,5 @@
 import { parseStdAxisOpts } from './helpers/parse-std-axis-opts.js';
-import { parseContainer, waitForContainerSize } from './helpers/chart-utils.js';
+import { normalizeLegacyLabelParams, parseContainer, waitForContainerSize } from './helpers/chart-utils.js';
 import { cartesianAxis } from './helpers/cartesian-axis.js';
 import { legenda } from './helpers/legenda.js';
 
@@ -122,11 +122,11 @@ const default_params = {
   showYgrid: true, // griglia orizzontale
   gridLinesAttrs: default_lines_attrs,
 
-  labelXAttrs: default_font_attrs, // contiene gli attributi fonts (come in MinimoCharts.defaults.font) e l'attributo `fill`
-  labelXFontFilePath: null,  // percorso font per textToPath
+  xLabelAttrs: default_font_attrs, // contiene gli attributi fonts (come in MinimoCharts.defaults.font) e l'attributo `fill`
+  xLabelFontFilePath: null,  // percorso font per textToPath
 
-  labelYAttrs: default_font_attrs, // contiene gli attributi fonts (come in MinimoCharts.defaults.font) e l'attributo `fill`
-  labelYFontFilePath: null,  // percorso font per textToPath
+  yLabelAttrs: default_font_attrs, // contiene gli attributi fonts (come in MinimoCharts.defaults.font) e l'attributo `fill`
+  yLabelFontFilePath: null,  // percorso font per textToPath
 
   /**
     attributi delle varie linee dati
@@ -167,7 +167,7 @@ const default_params = {
     Null per nessuna eleborazione.
     La funzione di default assume che il valore sia di tipo numerico
   */
-  labelYFormatter: (/** @type {number} */ etiValue) =>  (Math.ceil(etiValue / 1e3) || 0) // `|| 0` normalizza -0 (altrimenti mostrato come "-0")
+  yLabelFormatter: (/** @type {number} */ etiValue) =>  (Math.ceil(etiValue / 1e3) || 0) // `|| 0` normalizza -0 (altrimenti mostrato come "-0")
     .toLocaleString('it-IT', {
       minimumFractionDigits: 0,
       maximumFractionDigits: 0
@@ -183,42 +183,42 @@ const default_params = {
  * @example
  * // Tutti i parametri (valori di default dove previsti):
  * linesChart(chartInstance, {
- *   debug: false, // info per il debug, FAC
+ *   addValuesTitle: true, // data-title sui punti, FAC
+ *   axisAttrs: { stroke: '#999', 'stroke-width': 2 }, // attributi assi, FAC
  *   container: '#chart', // selettore o elemento DOM, FAC
- *   width: null, // larghezza, null = container, FAC
+ *   data_colors: null, // colori, null = default istanza, FAC
+ *   data_lines_attrs: { 'stroke-width': 2 }, // attributi linee dati, FAC
+ *   data_lines_widths: null, // spessori linee, FAC
+ *   data_points_attrs: { r: 4 }, // attributi punti, FAC
+ *   debug: false, // info per il debug, FAC
+ *   gridLinesAttrs: { stroke: '#999', 'stroke-width': 1 }, // attributi griglia, FAC
  *   height: 300, // altezza, null = container, FAC
- *   svgAttrs: {}, // attributi svg, FAC
- *   values: [[10, 20, 30]], // una serie per ogni linea, OBBL
- *   xLabels: ['A', 'B', 'C'], // etichette di categoria, FAC
- *   padding: 10, // spazio attorno al bordo, FAC
- *   stepY_count: 4, // suddivisioni asse valori, FAC
- *   ticksLength: 8, // lunghezza ticks, FAC
  *   legenda: { items: [{ text: 'Serie 1' }] }, // legenda, null per ometterla, FAC
- *   yAxisLabelWidth: 60, // larghezza etichette a sinistra, FAC
+ *   max_value: null, // massimo, null = automatico, FAC
+ *   min_value: null, // minimo, null = automatico, FAC
+ *   padding: 10, // spazio attorno al bordo, FAC
+ *   showXgrid: true, // griglia verticale, FAC
+ *   showYgrid: true, // griglia orizzontale, FAC
+ *   stepY_count: 4, // suddivisioni asse valori, FAC
+ *   svgAttrs: {}, // attributi svg, FAC
+ *   ticksAttrs: { stroke: '#999', 'stroke-width': 1 }, // attributi ticks, FAC
+ *   ticksLength: 8, // lunghezza ticks, FAC
+ *   values: [[10, 20, 30]], // una serie per ogni linea, OBBL
+ *   width: null, // larghezza, null = container, FAC
  *   xAxisLabelHeight: 50, // altezza etichette in basso, FAC
- *   yAxisTitle: null, // titolo asse a sinistra, FAC
- *   yAxisTitleAttrs: { size: 18, weight: 400, fill: '#999' }, // font titolo a sinistra, FAC
- *   yAxisTitleFontFilePath: null, // file font titolo a sinistra, FAC
  *   xAxisTitle: null, // titolo asse in basso, FAC
  *   xAxisTitleAttrs: { size: 18, weight: 400, fill: '#999' }, // font titolo in basso, FAC
  *   xAxisTitleFontFilePath: null, // file font titolo in basso, FAC
- *   max_value: null, // massimo, null = automatico, FAC
- *   min_value: null, // minimo, null = automatico, FAC
- *   axisAttrs: { stroke: '#999', 'stroke-width': 2 }, // attributi assi, FAC
- *   ticksAttrs: { stroke: '#999', 'stroke-width': 1 }, // attributi ticks, FAC
- *   showXgrid: true, // griglia verticale, FAC
- *   showYgrid: true, // griglia orizzontale, FAC
- *   gridLinesAttrs: { stroke: '#999', 'stroke-width': 1 }, // attributi griglia, FAC
- *   labelXAttrs: { size: 14, weight: 400, fill: '#999' }, // font etichette di categoria, FAC
- *   labelXFontFilePath: null, // file font etichette di categoria, FAC
- *   labelYAttrs: { size: 14, weight: 400, fill: '#999' }, // font etichette dei valori, FAC
- *   labelYFontFilePath: null, // file font etichette dei valori, FAC
- *   data_lines_attrs: { 'stroke-width': 2 }, // attributi linee dati, FAC
- *   data_points_attrs: { r: 4 }, // attributi punti, FAC
- *   data_colors: null, // colori, null = default istanza, FAC
- *   data_lines_widths: null, // spessori linee, FAC
- *   addValuesTitle: true, // data-title sui punti, FAC
- *   labelYFormatter: value => value.toLocaleString('it-IT'), // formattazione etichette dei valori, FAC
+ *   xLabelAttrs: { size: 14, weight: 400, fill: '#999' }, // font etichette di categoria, FAC
+ *   xLabelFontFilePath: null, // file font etichette di categoria, FAC
+ *   xLabels: ['A', 'B', 'C'], // etichette di categoria, FAC
+ *   yAxisLabelWidth: 60, // larghezza etichette a sinistra, FAC
+ *   yAxisTitle: null, // titolo asse a sinistra, FAC
+ *   yAxisTitleAttrs: { size: 18, weight: 400, fill: '#999' }, // font titolo a sinistra, FAC
+ *   yAxisTitleFontFilePath: null, // file font titolo a sinistra, FAC
+ *   yLabelAttrs: { size: 14, weight: 400, fill: '#999' }, // font etichette dei valori, FAC
+ *   yLabelFontFilePath: null, // file font etichette dei valori, FAC
+ *   yLabelFormatter: value => value.toLocaleString('it-IT'), // formattazione etichette dei valori, FAC
  * });
  *
  * @param {import('./helpers/core.js').MinimoCharts} chartInstance - Istanza di `MinimoCharts`
@@ -249,16 +249,16 @@ const default_params = {
  * @param {boolean} [params.showXgrid] - Mostra la griglia verticale, in corrispondenza dei ticks dell'asse X (default: true)
  * @param {boolean} [params.showYgrid] - Mostra la griglia orizzontale, in corrispondenza dei ticks dell'asse Y (default: true)
  * @param {Object} [params.gridLinesAttrs] - Attributi svg.js delle linee della griglia (default: linee grigie (#999) di spessore 1)
- * @param {import('./helpers/core.js').ChartFontAttrs} [params.labelXAttrs] - Attributi font (come in `MinimoCharts.defaults.font`, incluso `fill`) delle etichette dell'asse X (default: { size: 14, weight: 400, fill: "#999" })
- * @param {string|null} [params.labelXFontFilePath] - Percorso del file del font delle etichette dell'asse X (solo textToPath) (default: null)
- * @param {import('./helpers/core.js').ChartFontAttrs} [params.labelYAttrs] - Attributi font (come in `MinimoCharts.defaults.font`, incluso `fill`) delle etichette dell'asse Y (default: { size: 14, weight: 400, fill: "#999" })
- * @param {string|null} [params.labelYFontFilePath] - Percorso del file del font delle etichette dell'asse Y (solo textToPath) (default: null)
+ * @param {import('./helpers/core.js').ChartFontAttrs} [params.xLabelAttrs] - Attributi font (come in `MinimoCharts.defaults.font`, incluso `fill`) delle etichette dell'asse X (default: { size: 14, weight: 400, fill: "#999" })
+ * @param {string|null} [params.xLabelFontFilePath] - Percorso del file del font delle etichette dell'asse X (solo textToPath) (default: null)
+ * @param {import('./helpers/core.js').ChartFontAttrs} [params.yLabelAttrs] - Attributi font (come in `MinimoCharts.defaults.font`, incluso `fill`) delle etichette dell'asse Y (default: { size: 14, weight: 400, fill: "#999" })
+ * @param {string|null} [params.yLabelFontFilePath] - Percorso del file del font delle etichette dell'asse Y (solo textToPath) (default: null)
  * @param {Record<string, any>|Array<Record<string, any>>} [params.data_lines_attrs] - Attributi svg.js delle linee dati. Se è un oggetto ne viene letto solo `stroke-width`, come spessore di default; se è un array, ogni elemento contiene gli attributi della linea con lo stesso indice. Il colore (`stroke`) è sempre ricavato da `data_colors` (default: linee di spessore 2)
  * @param {Record<string, any>} [params.data_points_attrs] - Attributi svg.js dei cerchi aggiunti a ogni punto delle linee (NB: non aggiungere `cx` o `cy`). `r` può essere un numero (uguale per tutti i punti) o un array, in cui ogni valore si applica alla linea con lo stesso indice (default: { r: 4 })
  * @param {string[]|null} [params.data_colors] - Colori delle linee; se null vengono usati i colori di default dell'istanza (`chartInstance.defaults.colors`) (default: null)
  * @param {Array<number|null>|null} [params.data_lines_widths] - Spessori delle linee: array in cui ogni valore si applica alla linea con lo stesso indice; i valori null o undefined, o l'intero parametro null, corrispondono a `data_lines_attrs['stroke-width']` (in sua mancanza a 1) (default: null)
  * @param {boolean} [params.addValuesTitle] - Aggiunge un attributo `data-title` in corrispondenza dei punti (al momento non attivo, vedi TODO nel codice) (default: true)
- * @param {(value: number) => string|number} [params.labelYFormatter] - Funzione per formattare le etichette dell'asse Y; quella di default assume che il valore sia numerico (default: migliaia arrotondate per eccesso, con suffisso K)
+ * @param {(value: number) => string|number} [params.yLabelFormatter] - Funzione per formattare le etichette dell'asse Y; quella di default assume che il valore sia numerico (default: migliaia arrotondate per eccesso, con suffisso K)
  * @returns {Promise<string|undefined>} Il codice SVG se `container` è null, altrimenti `undefined` (il grafico viene aggiunto al container)
  */
 export function linesChart(chartInstance, params) {
@@ -278,7 +278,7 @@ export async function lines(userParams) {
   const chartInstance = this;
 
   // `userParams` resta distinto da `params` perché quest'ultimo assuma il tipo risultante dall'unione con i default
-  const params = {...default_params, ...userParams};
+  const params = {...default_params, ...normalizeLegacyLabelParams(userParams)}; // fallback per i vecchi nomi `labelX*` e `labelY*`
   const data_colors = params.data_colors?? chartInstance.defaults.colors;
 
   try {

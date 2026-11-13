@@ -217,3 +217,67 @@ export function waitForContainerSize(containerElement, { width = null, height = 
     observer.observe(containerElement);
   });
 }
+
+
+/**
+ * Corrispondenza tra i vecchi nomi dei parametri delle etichette degli assi (`labelX*`, `labelY*`)
+ * e quelli attuali (`xLabel*`, `yLabel*`).
+ */
+const legacyLabelParamsMap = {
+  labelXAttrs: 'xLabelAttrs',
+  labelXFontFilePath: 'xLabelFontFilePath',
+  labelYAttrs: 'yLabelAttrs',
+  labelYFontFilePath: 'yLabelFontFilePath',
+  labelYFormatter: 'yLabelFormatter',
+};
+
+/** Vecchi nomi già segnalati in console, per mostrare l'avviso di deprecazione una sola volta per nome */
+const legacyLabelParamsWarned = new Set();
+
+/**
+ * True in ambiente di sviluppo (`process.env.NODE_ENV === 'development'`, sostituito da webpack in build).
+ * Il try/catch evita il ReferenceError se `process` non è definito (es. script usato senza bundler).
+ * @returns {boolean}
+ */
+function isDevEnv() {
+  try {
+    // eslint-disable-next-line no-undef
+    return process.env.NODE_ENV === 'development';
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Fallback per i vecchi nomi dei parametri delle etichette degli assi (`labelX*`, `labelY*`),
+ * sostituiti da `xLabel*` e `yLabel*`: se presenti, vengono convertiti nel nuovo nome
+ * (a meno che non sia già impostato anche quello, che ha la precedenza) e rimossi.
+ * Restituisce una copia dell'oggetto, quello originale non viene modificato.
+ * Solo in ambiente di sviluppo, per ogni vecchio nome usato viene mostrato (una volta) un avviso di deprecazione in console.
+ * @template {Object|null|undefined} T
+ * @param {T} userParams - Parametri passati dall'utente al grafico
+ * @returns {T} Copia dei parametri con i nomi aggiornati
+ */
+export function normalizeLegacyLabelParams(userParams) {
+  if(!userParams) {
+    return userParams;
+  }
+
+  const normalized = /** @type {Record<string, any>} */ ({...userParams});
+
+  Object.entries(legacyLabelParamsMap).forEach(([oldKey, newKey]) => {
+    if(oldKey in normalized) {
+      if(!legacyLabelParamsWarned.has(oldKey) && isDevEnv()) {
+        legacyLabelParamsWarned.add(oldKey);
+        // eslint-disable-next-line no-console
+        console.warn(`[minimo charts] il parametro \`${oldKey}\` è deprecato, usare \`${newKey}\``);
+      }
+      if(!(newKey in normalized)) {
+        normalized[newKey] = normalized[oldKey];
+      }
+      delete normalized[oldKey];
+    }
+  });
+
+  return /** @type {T} */ (normalized);
+}
