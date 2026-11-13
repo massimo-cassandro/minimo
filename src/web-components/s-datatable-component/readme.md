@@ -3,6 +3,8 @@
 
 >**NB: deprecato, utilizzare [json-table](../json-table/readme.md)** 
 
+>**I design token di s-datatable (`simple-datatable.minimo.tokens.mjs`, custom properties `--sdt-*`) non sono più inclusi di default nella compilazione di `buildTokens`**: il pattern dei token dei componenti nel `tokens-config.mjs` di minimo e nel template `dev-tools/design-tokens-builder/tokens-config-sample.mjs` esclude la cartella `s-datatable-component`. Nei progetti che usano ancora questo componente, utilizzare in `source` (o in `sourceModes.light`) il pattern completo `` `${minimo_path}/src/**/*.tokens.{mjs,jsonc}` ``.
+
 
 ## Installazione
 

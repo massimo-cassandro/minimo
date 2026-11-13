@@ -346,13 +346,6 @@
   --radius-xl: var(--size-xl);
   --radius-pill: 9999rem;
 
-  --sdt-hover-background-color: var(--btn-primary-background-color);
-  --sdt-hover-color: var(--btn-primary-color);
-  --sdt-pagination-border: var(--btn-border-width) var(--neutral-100);
-  --sdt-pagination-padding-block: var(--size-xxs);
-  --sdt-pagination-padding-inline: var(--size-xs);
-  --sdt-thead-hover-background-color: color-mix(in srgb, var(--table-thead-background-color) 90%, var(--accent));
-
   --sf-macro-btn-close-background-color: var(--btn-close-background-color);
   --sf-macro-btn-close-position-bottom: auto;
   --sf-macro-btn-close-position-left: auto;

@@ -144,6 +144,8 @@ predefiniti (`"@sum"`, ...).
 ```
 
 ```javascript
+import '@massimo-cassandro/minimo/json-table';
+
 const jtable = document.querySelector('json-table');
 // oppure: const jtable = document.createElement('json-table');
 

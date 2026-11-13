@@ -31,7 +31,8 @@ const config = {
   sourceModes: {
     light: [
       './_src/**/*.tokens.mjs',
-      '../src/**/*.tokens.mjs',
+      // token dei componenti; s-datatable-component (deprecato) è escluso
+      '../src/**/!(s-datatable-component)/*.tokens.mjs',
     ],
     dark: [
       './_src/**/*.tokens-dark.mjs',

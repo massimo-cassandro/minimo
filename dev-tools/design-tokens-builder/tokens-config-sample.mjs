@@ -114,7 +114,9 @@ const config = {
   */
   source: [
     `${minimo_path}/design-tokens/_src/**/*.tokens.{mjs,jsonc}`, // token principali
-    `${minimo_path}/src/**/*.tokens.{mjs,jsonc}`, // token dei componenti
+    `${minimo_path}/src/**/!(s-datatable-component)/*.tokens.{mjs,jsonc}`, // token dei componenti (escluso s-datatable, deprecato)
+    // se il progetto usa ancora s-datatable (deprecato), usare questa riga al posto della precedente:
+    // `${minimo_path}/src/**/*.tokens.{mjs,jsonc}`, // token dei componenti, s-datatable incluso
 
     // sorgente di token extra opzionale (in questo esempio, openProps, https://open-props.style/)
     // { src: `${node_modules_path}/open-props/open-props.style-dictionary-tokens.json`, prefix: 'op' },
@@ -169,7 +171,7 @@ const config = {
     sourceModes: {
       light: [
         `${minimo_path}/design-tokens/_src/**\/*.tokens.{mjs,jsonc}`,
-        `${minimo_path}/src/**\/*.tokens.{mjs,jsonc}`,
+        `${minimo_path}/src/**\/!(s-datatable-component)/*.tokens.{mjs,jsonc}`, // escluso s-datatable (deprecato)
 
         // project tokens:
         './design-tokens/!(*-dark).{js,mjs,jsonc,json}',
