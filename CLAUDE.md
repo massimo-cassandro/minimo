@@ -56,7 +56,7 @@ minimo/
 │   │   ├── TODO form-multiselect/       # spostato da _wrk, in attesa di integrazione
 │   │   └── vanilla-cookie-consent/      # wrapper di vanilla-cookieconsent (peer dep opzionale) — integrazione in corso, vedi TODO.md
 │   └── web-components/
-│       ├── s-datatable-component/  # web component per simple-datatables ⚠️ da deprecare (verrà sostituito da json-table)
+│       ├── s-datatable-component/  # ⚠️ deprecato, da non usare più (sostituito da json-table)
 │       ├── json-table/             # ★ in corso di realizzazione, sostituto di s-datatable-component (vedi sotto)
 │       ├── TODO json-table/        # spostato da _wrk, materiale sorgente di riferimento per lo sviluppo di json-table/ (vedi sotto)
 │       └── TODO js-file-uploader/  # progetto esterno (non da _wrk), in attesa di integrazione — vedi TODO.md sezione FILE-UPLOADER
@@ -257,7 +257,7 @@ L'opzione preferibile sarebbe strutturare meglio l'integrazione con **PurgeCSS**
 
 `src/web-components/TODO json-table/` (spostato da `_wrk/json-table/`) **non è il nuovo componente**: resta come materiale sorgente di riferimento (piano di sviluppo, vecchia implementazione) durante la riscrittura, e verrà eliminato — TODO.md incluso — a fine lavoro.
 
-**json-table** è un generatore di tabelle HTML da dati JSON (Ajax o statici), con search, sorting, paginazione, senza dipendenze esterne (no jQuery, no librerie terze come simple-datatables). Già pubblicato separatamente come `@massimo-cassandro/json-table`.
+**json-table** è un generatore di tabelle HTML da dati JSON (Ajax o statici), con search, sorting, paginazione, senza dipendenze esterne (no jQuery, nessuna libreria di terze parti). Già pubblicato separatamente come `@massimo-cassandro/json-table`.
 
 Struttura di riferimento in `src/web-components/TODO json-table/src/`:
 - `js/` — moduli: `main-builder`, `table-builder`, `table-row/thead/tfoot`, `parse-data-row`, `parse-params`, `get-ajax-data`, `init-ajax-table`, `init-static-table`, `set-search-listener`, `set-sort-listeners`, `static-data-sorting`, `info-section`, `update-info`, `utilities`, `defaults`, `default-columns-data-types`

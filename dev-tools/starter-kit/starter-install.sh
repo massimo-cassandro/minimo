@@ -90,7 +90,6 @@ optionalPackages=(
   "postcss-jit-props                                 | dev | include nel CSS compilato solo le custom properties effettivamente usate"
   "@svgdotjs/svg.js                                  |     | richiesto da charts/"
   "blurhash                                          |     | richiesto da unsplash-page (create-blurhash-canvas)"
-  "simple-datatables                                 |     | richiesto da s-datatable-component"
   "style-dictionary                                  | dev | richiesto da dev-tools/design-tokens-builder (build-tokens)"
   "@cybozu/eslint-config                             | dev | utilizzato da eslint per il check dei file css"
   "sass                                              | dev | per email (scss)"

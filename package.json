@@ -1,6 +1,6 @@
 {
   "name": "@massimo-cassandro/minimo",
-  "version": "1.64.3",
+  "version": "1.64.4",
   "description": "Light css framework & utilities",
   "type": "module",
   "main": "./src/index.js",
@@ -45,8 +45,8 @@
   },
   "scripts": {
     "UPD-version": "npx update-version  # --config=./dev-utilities.config.mjs",
-    "verdaccio": "launchctl print gui/$(id -u)/local.verdaccio >/dev/null 2>&1 || launchctl bootstrap gui/$(id -u) ~/Sites/_verdaccio/local.verdaccio.plist",
     "npm-publish": "npm publish",
+    "verdaccio": "launchctl print gui/$(id -u)/local.verdaccio >/dev/null 2>&1 || launchctl bootstrap gui/$(id -u) ~/Sites/_verdaccio/local.verdaccio.plist",
     "build-tokens": "node ./dev-tools/design-tokens-builder/build-tokens.mjs --config ./design-tokens/tokens-config.mjs",
     "build-margin-padding-css": "node ./scripts/build-margin-padding-css.mjs",
     "generate:types": "node ./scripts/generate-class-types.mjs",
@@ -88,7 +88,6 @@
   "peerDependencies": {
     "@svgdotjs/svg.js": "^3.2.8",
     "blurhash": "^2.0.5",
-    "simple-datatables": "^10.3.0",
     "style-dictionary": "^5.0.0",
     "vanilla-cookieconsent": "^3.3.0"
   },
@@ -97,9 +96,6 @@
       "optional": true
     },
     "blurhash": {
-      "optional": true
-    },
-    "simple-datatables": {
       "optional": true
     },
     "style-dictionary": {
