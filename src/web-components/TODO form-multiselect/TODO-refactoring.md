@@ -170,7 +170,7 @@ Con la ricerca locale su un gruppo di checkbox (prevista nel piano dell'autocomp
 3. [ ] **Tastiera, accessibilità, form** — frecce, attributi ARIA (`legend`, help), `required`, `disabled`, stato di errore, reset.
 4. [ ] **Form theme** — aggiornamento di `choice_widget_expanded` in `minimo-form-layout.html.twig` (starter-kit), prova con checkbox, radio, `required`, `disabled`, `no_items_mes`, errori di validazione.
 5. [ ] **Funzioni facoltative** — `filter`, `selectAll`.
-6. [ ] **Chiusura** — readme (compreso l'uso con il form theme), aggiornamento di `CLAUDE.md` e `TODO.md` della root (dove il percorso indicato, `src/components/TODO form-multiselect/`, è da correggere), eliminazione di `TODO form-multiselect/`.
+6. [ ] **Chiusura** — readme (compreso l'uso con il form theme), aggiornamento di `CLAUDE.md` e `src/TODO.md` (se pertinente), eliminazione di `TODO form-multiselect/`.
 7. [ ] **Successive** — conversione di `select[multiple]` in checkbox (vedi [Decisioni aperte](#decisioni-aperte)).
 
 ---

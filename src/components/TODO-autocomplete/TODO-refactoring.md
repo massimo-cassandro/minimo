@@ -22,7 +22,7 @@ Legati alla libreria:
 
 - **Ricerca fatta due volte**: i risultati arrivano già filtrati dal server, ma la libreria li filtra di nuovo con il proprio motore sulla chiave `list_display`. Se il server trova un record per un campo che non compare in `list_display`, o con una logica diversa (più parole, sinonimi), il risultato rischia di non essere mostrato. **Da verificare con un caso concreto**, ma è il comportamento documentato di `data.keys`.
 - **Evidenziazione sulla stringa HTML**: `list_display` contiene markup (`<br><small>…`) e `<mark>` viene inserito con una sostituzione sulla stringa, quindi una ricerca può corrispondere a nomi di tag o attributi e rompere il markup. Anche questo da verificare, stessa origine del punto precedente.
-- **Selettore come stringa**: la libreria cerca il campo con `document.querySelector('#id')`. Il campo deve avere un `id` ed essere già nel documento: da qui l'errore con i callback di `domBuilder` (`Cannot use 'in' operator to search for 'aria-controls' in null`), descritto nel TODO della root.
+- **Selettore come stringa**: la libreria cerca il campo con `document.querySelector('#id')`. Il campo deve avere un `id` ed essere già nel documento: da qui l'errore con i callback di `domBuilder` (`Cannot use 'in' operator to search for 'aria-controls' in null`): in `dom-builder.js` i children vengono costruiti, e i loro callback eseguiti, prima che l'elemento radice del blocco venga appeso a `params.root`, quindi quando scatta il callback il campo esiste ma vive in un sottoalbero staccato dal documento; `select()` di autoComplete.js restituisce `null` e `create(this.input, {'aria-controls': …})` va in errore. Con la versione attuale si aggira chiamando `autocompleteEngine` dopo l'esecuzione di `domBuilder`; in alternativa autoComplete.js accetta una funzione come `selector` e `resultsList.destination` (`() => params.autocomplete_field`).
 - **Markup dell'elenco non controllabile**: il `<div>` dentro ogni `li`, su cui si basano i CSS dei progetti (ADA), dipende da come ogni chiamante scrive `list_display`.
 - **Nessun controllo sulle richieste**: `debounce` della libreria non impostato (una richiesta per ogni tasto), nessun annullamento delle richieste superate (una risposta lenta può sovrascrivere una più recente), errori di rete restituiti come dati (`return error`).
 - Dipendenza non dichiarata in `peerDependencies` e CSS derivato da quello della libreria.
@@ -163,7 +163,7 @@ Convenzioni uguali a json-table dove applicabili: `Autocomplete.setDefaults()`, 
 - **Richieste**: `debounce` (default 250 ms), `minChars` (default 3), annullamento della richiesta precedente, stato di caricamento visibile, errori di rete mostrati nell'elenco e segnalati con `ac:error`.
 - **URL**: costruito con `URL`/`URLSearchParams`. `queryParam` (es. `q`) per inviare la ricerca come parametro; se `null`, la ricerca viene accodata al percorso come oggi (continuità). `extraParams` come oggetto o funzione (valori letti al momento della richiesta, es. da altri campi del form).
 - **Risultati**: `fetchResultFunction(data)` restituisce `{ id, val, listDisplay, … }` come oggi (accettato anche `list_display`). `listDisplay` può essere una stringa HTML (inserita con `setHTML`, come in json-table e `domBuilder`) o un elemento.
-- **Markup dell'elenco**: `ul[role=listbox] > li[role=option] > div`. Il `<div>` è garantito dal componente; se `listDisplay` è già un unico `<div>` radice non ne viene aggiunto un secondo (le classi esistenti, es. `alert-item`, restano). È la voce «div wrapper garantito» del TODO della root.
+- **Markup dell'elenco**: `ul[role=listbox] > li[role=option] > div`. Il `<div>` è garantito dal componente; se `listDisplay` è già un unico `<div>` radice non ne viene aggiunto un secondo (le classi esistenti, es. `alert-item`, restano). È la voce «div wrapper garantito» (richiesta per i CSS di ADA, che usano `li[aria-selected='true'] > div` e `li > div:hover`): a rilascio avvenuto, togliere i `<div>` espliciti dalle sei implementazioni in `ada-frontend/src/shared/autocomplete/`.
 - **Accessibilità**: `role="combobox"`, `aria-expanded`, `aria-controls`, `aria-activedescendant` sul campo; `aria-selected` sulle opzioni; zona `aria-live` per numero di risultati e «nessun risultato».
 - **Selezione rigorosa** (`strict`, default `true`): se all'uscita dal campo il testo non corrisponde alla selezione, campo e valore vengono azzerati. Sostituisce `check_ac` e `checkAutocomplete`, con un solo punto di controllo (`blur`/`change`, non `keydown`). Con `strict: false` il testo libero resta nel campo senza id.
 - **Posizionamento dell'elenco**: vedi [Decisioni aperte](#decisioni-aperte).
@@ -224,7 +224,7 @@ Dal `TODO.md` di questa cartella (eliminato):
 | Definire uso CSS | CSS module importato dal componente |
 | Unificare tokens | file token `--ac-*` |
 
-Dalla sezione AUTOCOMPLETE del [TODO.md della root](../../../TODO.md) (non modificata: va aggiornata quando il piano viene approvato):
+Dalla sezione AUTOCOMPLETE del vecchio TODO.md della root (eliminato il 14/11/2026, voci confluite qui):
 
 | Voce | Destinazione |
 |---|---|
@@ -251,7 +251,7 @@ Dai commenti nel codice: «attivare la selezione dell'autocomplete» (`check-aut
 6. [ ] **Modalità multipla** — select multipla e checkbox, badge, rimozione, selezioni già presenti all'avvio, `ac:remove`.
 7. [ ] **Ricerca locale** — `local-search.js`, tra le scelte del campo o in `data`.
 8. [ ] **Symfony** — `params.autocomplete` in `minimo-form-layout.html.twig`, prove con hidden, `EntityType`, `ChoiceType` (anche `expanded`) ed errori di validazione; esempio di form type che accetta le scelte aggiunte dalla ricerca remota (snippet in `snippets/`).
-9. [ ] **Chiusura** — readme, demo con i casi reali (riprendere le sei implementazioni di ADA come banco di prova), aggiornamento di `CLAUDE.md` e `TODO.md` della root, eliminazione di `TODO-autocomplete/`.
+9. [ ] **Chiusura** — readme, demo con i casi reali (riprendere le sei implementazioni di ADA come banco di prova), aggiornamento di `CLAUDE.md` e `src/TODO.md` (se pertinente), eliminazione di `TODO-autocomplete/`.
 10. [ ] **Successive** — raggruppamento dei risultati, eventuale helper per `domBuilder`.
 
 ---

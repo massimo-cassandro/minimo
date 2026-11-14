@@ -282,7 +282,7 @@ Ogni fase termina con qualcosa di verificabile nella demo; le pagine della [Demo
 4. [ ] **Form** — `ElementInternals`: valore, validità (`required`, caricamento in corso), `disabled`, reset, blocco dell'invio.
 5. [ ] **Rimozione, riordino, campi aggiuntivi** — `deleteVarname`, `registeredVarname` e `useRelId`, `sortable` (trascinamento + tastiera), `extraFields` predefiniti e con markup, opzioni per i file registrati.
 6. [ ] **Anteprime** — `<dialog>` per le immagini, icone per tipo di documento, anteprima con `filetype: 'auto'`.
-7. [ ] **Chiusura** — `readme.md`, demo completa (vedi [Demo](#demo)), include Twig e controller PHP di esempio in `snippets/`, aggiornamento di `CLAUDE.md` e `TODO.md` della root, eliminazione di `TODO js-file-uploader/`.
+7. [ ] **Chiusura** — `readme.md`, demo completa (vedi [Demo](#demo)), include Twig e controller PHP di esempio in `snippets/`, aggiornamento di `CLAUDE.md` e `src/TODO.md` (se pertinente), eliminazione di `TODO js-file-uploader/`.
 8. [ ] **Successive** — ritaglio delle immagini, caricamento a blocchi per file grandi, eventuale `en` per `labels`.
 
 ---

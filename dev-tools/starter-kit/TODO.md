@@ -136,3 +136,95 @@ cosa fa ogni modulo, come aggiornare i moduli in un progetto esistente.
 - Criterio di "fatto": si deve poter copiare l'intera `webpack-modules/` aggiornata
   in un progetto esistente senza toccare il suo `webpack.config.mjs` e ottenere
   una build identica (o migliorata) senza errori.
+
+## Plugin per aggiunta dinamica layers CSS
+
+in webpack.config, opzione per l'aggiunta dei layers, da passare a css_rules:
+  
+```javascript
+addCssLayers = false // (o null ecc)
+// oppure
+addCssLayers = [
+  {
+    layerName: 'base',
+    include: [
+      path.resolve(__dirname, 'node_modules/@massimo-cassandro/minimo/src/css'),
+    ],
+  },
+  {
+    layerName: 'components',
+    include: [
+      path.resolve(__dirname, 'node_modules/@massimo-cassandro/minimo/src/components'),
+      path.resolve(__dirname, 'node_modules/@massimo-cassandro/minimo/src/web-components'),
+    ],
+  },
+]
+```
+
+Creare plugin postcss:
+
+```javascript
+// postcss-wrap-in-layer.js
+const wrapInLayer = (layerName = 'vendor') => ({
+  postcssPlugin: 'wrap-in-layer',
+  Once(root, { AtRule }) {
+    const layer = new AtRule({ name: 'layer', params: layerName });
+    layer.append(root.nodes);
+    root.removeAll();
+    root.append(layer);
+  }
+});
+wrapInLayer.postcss = true;
+
+module.exports = wrapInLayer;
+```
+
+Configurazione da aggiungere a css_rules (esempio) (NB: se possibile NON usare common-js):
+
+```javascript
+{
+  test: /\.css$/,
+  oneOf: [
+    {
+      // solo i file che vuoi avvolgere in un layer
+      include: [
+        path.resolve(__dirname, 'node_modules/qualche-libreria'),
+        path.resolve(__dirname, 'src/vendor'),
+      ],
+      use: [
+        MiniCssExtractPlugin.loader,
+        'css-loader',
+        {
+          loader: 'postcss-loader',
+          options: {
+            postcssOptions: {
+              plugins: [require('./postcss-wrap-in-layer')('vendor')],
+            },
+          },
+        },
+      ],
+    },
+    {
+      // tutti gli altri CSS, pipeline normale
+      use: [MiniCssExtractPlugin.loader, 'css-loader', 'postcss-loader'],
+    },
+  ],
+}
+```
+
+rendere l'utilizzo condizionale (esempio):
+
+```javascript
+//...
+{
+  loader: 'postcss-loader',
+  options: {
+    postcssOptions: {
+      plugins: useLayer
+        ? [require('./postcss-wrap-in-layer')('vendor')]
+        : [],
+    },
+  },
+}
+//...
+```

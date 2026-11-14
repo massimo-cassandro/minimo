@@ -54,12 +54,12 @@ minimo/
 │   │   ├── spinner/                # solo CSS
 │   │   ├── unsplash-page/          # pagina foto Unsplash
 │   │   ├── TODO form-multiselect/       # spostato da _wrk, in attesa di integrazione
-│   │   └── vanilla-cookie-consent/      # wrapper di vanilla-cookieconsent (peer dep opzionale) — integrazione in corso, vedi TODO.md
+│   │   └── vanilla-cookie-consent/      # wrapper di vanilla-cookieconsent (peer dep opzionale) — integrazione in corso, vedi TODO.md nella dir
 │   └── web-components/
 │       ├── s-datatable-component/  # ⚠️ deprecato, da non usare più (sostituito da json-table)
 │       ├── json-table/             # ★ in corso di realizzazione, sostituto di s-datatable-component (vedi sotto)
 │       ├── TODO json-table/        # spostato da _wrk, materiale sorgente di riferimento per lo sviluppo di json-table/ (vedi sotto)
-│       └── TODO js-file-uploader/  # progetto esterno (non da _wrk), in attesa di integrazione — vedi TODO.md sezione FILE-UPLOADER
+│       └── TODO js-file-uploader/  # progetto esterno (non da _wrk), in attesa di integrazione — vedi TODO-refactoring.md nella dir
 ├── charts/                         # grafici SVG (usa @svgdotjs/svg.js come peer dep opzionale)
 │   ├── index.js                    # export: barsChart, goalChart, linesChart, MinimoCharts
 │   ├── src/
@@ -196,7 +196,7 @@ Esempi attuali/previsti:
 
 Ogni nuovo componente che introduce una dipendenza esterna deve seguire questa stessa logica: aggiungere la libreria a `peerDependencies` con `"optional": true` in `peerDependenciesMeta`, e documentare l'installazione richiesta.
 
-**Deroga per i config di lint condivisi:** `stylelint-config` (incorporato in `dev-tools/stylelint-config/`, vedi sopra) fa eccezione a questa policy: i pacchetti che richiede (`stylelint`, `@stylistic/stylelint-config`, `@stylistic/stylelint-plugin`, `stylelint-config-css-modules`, `stylelint-config-recess-order`, `stylelint-config-standard`, `stylelint-config-standard-scss`, `stylelint-order`, `stylelint-scss`) sono dichiarati in `dependencies`, non in `peerDependencies`. Motivo: servono anche a minimo stesso per lintare il proprio codice, e mettendoli in `dependencies` arrivano automaticamente ai progetti consumer che installano `@massimo-cassandro/minimo` e usano `extends: ['@massimo-cassandro/minimo/stylelint-config']`, senza passi d'installazione aggiuntivi. Stessa logica prevista per `eslint-config` quando verrà incorporato allo stesso modo (vedi [TODO.md § ESLINT-CONFIG](TODO.md#eslint-config)).
+**Deroga per i config di lint condivisi:** `stylelint-config` (incorporato in `dev-tools/stylelint-config/`, vedi sopra) fa eccezione a questa policy: i pacchetti che richiede (`stylelint`, `@stylistic/stylelint-config`, `@stylistic/stylelint-plugin`, `stylelint-config-css-modules`, `stylelint-config-recess-order`, `stylelint-config-standard`, `stylelint-config-standard-scss`, `stylelint-order`, `stylelint-scss`) sono dichiarati in `dependencies`, non in `peerDependencies`. Motivo: servono anche a minimo stesso per lintare il proprio codice, e mettendoli in `dependencies` arrivano automaticamente ai progetti consumer che installano `@massimo-cassandro/minimo` e usano `extends: ['@massimo-cassandro/minimo/stylelint-config']`, senza passi d'installazione aggiuntivi. Stessa logica prevista per `eslint-config` quando verrà incorporato allo stesso modo (vedi [dev-tools/TODO-eslint.md](dev-tools/TODO-eslint.md)).
 
 ---
 
@@ -227,7 +227,7 @@ Ogni componente/web-component con CSS (`src/components/*`, `src/web-components/*
 
 A questo scopo ogni cartella componente/web-component ha un proprio file `<nome-componente>.minimo.tokens.mjs` colocato al suo interno (accanto al CSS/JS). Il file token del componente può referenziare token generici di minimo (es. `{status.success.background.color}`) — la risoluzione avviene in fase di build tramite `build-tokens` — ma il CSS del componente vede solo l'output namespaced, non la catena di riferimenti. Questo rende più semplice portare il componente in framework diversi da minimo (basta il proprio file token, non l'intero `custom-properties.css`).
 
-**Stato:** fatto per `modal-alert`, `inner-nav` e `vanilla-cookie-consent` (quest'ultimo con prefisso `--vcc-*`, per non entrare in conflitto con le variabili `--cc-*` della libreria). Per lo stato degli altri componenti vedi le rispettive sezioni in [TODO.md](TODO.md).
+**Stato:** fatto per `modal-alert`, `inner-nav` e `vanilla-cookie-consent` (quest'ultimo con prefisso `--vcc-*`, per non entrare in conflitto con le variabili `--cc-*` della libreria). Per lo stato degli altri componenti vedi i `TODO.md` nelle rispettive cartelle.
 
 ---
 
@@ -274,7 +274,7 @@ TODO aperti su json-table ([src/web-components/TODO json-table/TODO.md](src/web-
 
 ### Altri elementi in `_wrk/`
 
-`js-utilities/` e `recaptcha/` sono stati **cestinati** (rimossi senza migrazione). `modal-popup/` è stato integrato in produzione in `src/components/modal-popup/`. `vanilla-cookie-consent/` è stato spostato in `src/components/vanilla-cookie-consent/` (prefisso `TODO` rimosso e rifattorizzato il 9/11/2026, da verificare nel browser: vedi [TODO.md § VANILLA-COOKIE-CONSENT](TODO.md#vanilla-cookie-consent)). `json-table/` è stato spostato in `src/web-components/TODO json-table/` come riferimento per lo sviluppo del nuovo componente (vedi sopra). `unsplash-page-demo/` e `modal-alert-demo/` sono stati rimossi da `_wrk/`; quest'ultimo è ora in `demo/demo-files/TODO modal-alert-demo/`. `charts/` (vecchia versione 1a vers da rifattorizzare) è stato spostato in `charts/TODO charts/`, accanto alla nuova versione. `__snippets/twig/` (snippet Twig/Symfony: form theme, shared includes, select2, sf-macro, contenuti, error-pages, ...) è stato smistato: le parti ancora utili sono confluite in `archived/` e `snippets/`, il resto è stato **cestinato**; sono rimaste in `__snippets/` solo le sottocartelle `style-dictionary/` e `utilities/`. `auto-datatable-customization/` è stato **eliminato definitivamente** (12/9/2026, nessuna migrazione). `js-file-uploader` (progetto esterno, non proveniente da `_wrk/`) è stato aggiunto direttamente in `src/web-components/TODO js-file-uploader/`, in attesa di integrazione (vedi [TODO.md sezione FILE-UPLOADER](TODO.md#file-uploader)).
+`js-utilities/` e `recaptcha/` sono stati **cestinati** (rimossi senza migrazione). `modal-popup/` è stato integrato in produzione in `src/components/modal-popup/`. `vanilla-cookie-consent/` è stato spostato in `src/components/vanilla-cookie-consent/` (prefisso `TODO` rimosso e rifattorizzato il 9/11/2026, da verificare nel browser: vedi [src/components/vanilla-cookie-consent/TODO.md](src/components/vanilla-cookie-consent/TODO.md)). `json-table/` è stato spostato in `src/web-components/TODO json-table/` come riferimento per lo sviluppo del nuovo componente (vedi sopra). `unsplash-page-demo/` e `modal-alert-demo/` sono stati rimossi da `_wrk/`; quest'ultimo è ora in `demo/demo-files/TODO modal-alert-demo/`. `charts/` (vecchia versione 1a vers da rifattorizzare) è stato spostato in `charts/TODO charts/`, accanto alla nuova versione. `__snippets/twig/` (snippet Twig/Symfony: form theme, shared includes, select2, sf-macro, contenuti, error-pages, ...) è stato smistato: le parti ancora utili sono confluite in `archived/` e `snippets/`, il resto è stato **cestinato**; sono rimaste in `__snippets/` solo le sottocartelle `style-dictionary/` e `utilities/`. `auto-datatable-customization/` è stato **eliminato definitivamente** (12/9/2026, nessuna migrazione). `js-file-uploader` (progetto esterno, non proveniente da `_wrk/`) è stato aggiunto direttamente in `src/web-components/TODO js-file-uploader/`, in attesa di integrazione (vedi [TODO-refactoring.md](src/web-components/TODO%20js-file-uploader/TODO-refactoring.md)).
 
 Elementi ancora presenti in `_wrk/`:
 

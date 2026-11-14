@@ -1,7 +1,7 @@
 
 // utilities
 export { arrayShuffle } from './utilities/array-shuffle.js';
-export { betterText } from './utilities/better-text.js';
+export { betterText, PARTICELLE } from './utilities/better-text.js';
 export { betterTextWithPlaces } from './utilities/better-text-with-places.js';
 export { classnames, classnamesNull } from './utilities/classnames.js';
 export { createId } from './utilities/create-id.js';
