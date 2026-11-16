@@ -42,3 +42,6 @@
 * 1.63 (09 nov 2026) - vanilla-cookie-consent: servizi personalizzati (`services`), modulo `googleMaps`, categorie `show`/`reloadOnRevoke`, righe con `type` e `cookieTableHeaders`, helper `isAccepted`/`acceptCategoryKeepingOthers`/`onCategoryAccepted`
 * 1.64 (10 nov 2026) - cookie-consent: get-cookie-list
 * 1.65 (13 nov 2026) - modalAlert setDefaults e rename parametri charts
+* 1.66 (16 nov 2026) - responsive grid
+* 1.67 (16 nov 2026) - layout-tools: viewport size e callback
+* 1.68 (16 nov 2026) - charts: legenda su più righe

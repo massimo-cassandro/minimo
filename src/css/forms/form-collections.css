@@ -11,7 +11,7 @@
 
     &.form-collection-inline {
       flex-flow: row wrap;
-      gap: var(--size-md);
+      gap: 0 var(--size-md);
     }
   }
 }

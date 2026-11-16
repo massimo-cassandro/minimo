@@ -221,7 +221,7 @@ const default_params = {
  * @param {number} [params.padding] - Spazio extra attorno al bordo (default: 10)
  * @param {number} [params.stepY_count] - Numero di suddivisioni dell'asse dei valori (in basso); può variare se i valori attraversano lo zero (default: 4)
  * @param {number} [params.ticksLength] - Lunghezza dei ticks in px (default: 8)
- * @param {Partial<Parameters<typeof legenda>[1]>} params.legenda - Opzioni della legenda, sempre mostrata: `items` è obbligatorio. Chiavi: `height` (20), `elements_gap` (25), `circles_radius` (20), `fontAttrs`, `fontFilePath` e `items`, array di oggetti di cui basta impostare `text`: `shape` è sempre `circle` e il colore è ricavato da `data_colors` (default: {})
+ * @param {Partial<Parameters<typeof legenda>[1]>} params.legenda - Opzioni della legenda, sempre mostrata: `items` è obbligatorio. Chiavi: `height` (20, altezza di ogni riga), `elements_gap` (25), `rows_gap` (8), `circles_radius` (20), `fontAttrs`, `fontFilePath` e `items`, array di oggetti di cui basta impostare `text`: `shape` è sempre `circle` e il colore è ricavato da `data_colors` (default: {})
  * @param {number} [params.yAxisLabelWidth] - Larghezza dell'area delle etichette di categoria (asse verticale, a sinistra) (default: 60)
  * @param {number} [params.xAxisLabelHeight] - Altezza dell'area delle etichette dell'asse dei valori (in basso) (default: 50)
  * @param {string|null} [params.yAxisTitle] - Titolo dell'asse delle categorie (a sinistra) (default: null)
@@ -349,6 +349,15 @@ export async function hbars(userParams) {
       .attr({...params.svgAttrs});
 
 
+    // =>> costruzione legenda
+    // viene costruita prima del calcolo dell'area del grafico, per riservarle lo spazio effettivo
+    // (può disporsi su più righe se più larga dell'svg)
+    const legendaEl = await legenda(chartInstance, {
+      ...legenda_params,
+      max_width: params.width - params.padding * 2
+    });
+    legendaEl.attr({ 'data-cfg.debug-info': params.debug? 'Legenda' : null });
+
     // pre-elaborazione e calcolo di alcuni elementi (chartArea)
     // nuove variabili definite da parseStdAxisOpts (orientation:'horizontal':
     // stepY_* si riferiscono all'asse dei valori (X), stepX_* all'asse delle categorie (Y))
@@ -366,7 +375,7 @@ export async function hbars(userParams) {
       max_value: params.max_value,
       min_value: params.min_value,
       values: flatValues,
-      legenda: legenda_params,
+      legenda: { height: legendaEl.bbox().height },
       padding: params.padding,
       width: params.width,
       height: params.height,
@@ -503,17 +512,9 @@ export async function hbars(userParams) {
     // *********************************
     // =>> Legenda
     // *********************************
-    const legendaEl = await legenda(chartInstance, legenda_params);
-    legendaEl.attr({ 'data-cfg.debug-info': params.debug? 'Legenda' : null });
-    const legendaBbox = legendaEl.bbox();
-
-    legendaEl.dmove(
-      (params.width - legendaBbox.width) / 2,
-      params.padding
-    );
+    // posizionamento: centrata in orizzontale, in alto
     legendaEl.y(params.padding);
-
-    legendaEl.x((params.width - legendaBbox.width) / 2);
+    legendaEl.x((params.width - legendaEl.bbox().width) / 2);
 
     svgCanvas.add(legendaEl);
 

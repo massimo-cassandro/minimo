@@ -34,6 +34,7 @@
 @import '@minimoCss/table.css';
 @import '@minimoCss/flex.css';
 @import '@minimoCss/grid.css';
+@import '@minimoCss/grid-responsive.css';
 @import '@minimoCss/details.css';
 
 @import '@minimoCss/sizes.css';

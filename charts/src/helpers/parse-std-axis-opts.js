@@ -54,7 +54,7 @@
  * @param {number|null} [params.max_value] - Valore massimo dell'asse dei valori; se null viene calcolato da `values` (mai inferiore a 0) (default: null)
  * @param {number|null} [params.min_value] - Valore minimo dell'asse dei valori; se null viene calcolato da `values` (default: null)
  * @param {Array<number|null>} [params.values] - Array flat con tutti i valori da rappresentare, usato per il calcolo di `max_value` e `min_value` quando sono null (default: [])
- * @param {{height?: number}|null} [params.legenda] - Parametri della legenda: ne viene letta solo l'altezza, per riservarle lo spazio sopra il grafico (default: null)
+ * @param {{height?: number}|null} [params.legenda] - Parametri della legenda: ne viene letta solo l'altezza complessiva (tutte le righe), per riservarle lo spazio sopra il grafico (default: null)
  * @param {number} [params.padding] - Spazio intorno ai bordi del grafico (default: 0)
  * @param {number|null} [params.padding_right] - Padding del solo lato destro; se null viene usato `padding` (default: null)
  * @param {number} params.width - Larghezza dell'svg (default: null)

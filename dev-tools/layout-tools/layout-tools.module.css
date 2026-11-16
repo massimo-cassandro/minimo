@@ -1,44 +1,17 @@
 /* TODO custom props per variare colore, posizione ecc.., */
 
-.layoutTools {
+/* NB: il contenuto (breakpoint e larghezza viewport) è gestito via JS */
 
+.layoutTools {
   position: fixed;
   bottom: 0;
   left: 0;
   padding: 2px 8px;
   font-size: 14px;
   font-weight: 500;
+  font-variant-numeric: tabular-nums;
   color: #fff;
+  text-transform: uppercase;
   background-color: #000;
   border-top-right-radius: 4px;
-
-  &, &::before {
-    text-transform: uppercase;
-  }
-
-
-  &[data-framework='minimo'] {
-    --content: 'phone';
-
-    &::before {
-      content: var(--content);
-
-      @media (--media-small-viewport-up) {
-        --content: 'small';
-      }
-      @media (--media-medium-viewport-up) {
-        --content: 'medium';
-      }
-      @media (--media-large-viewport-up) {
-        --content: 'large';
-      }
-      @media (--media-xlarge-viewport-up) {
-        --content: 'x-large';
-      }
-      @media (--media-xxlarge-viewport-up) {
-        --content: 'xx-large';
-      }
-    }
-  }
 }
-

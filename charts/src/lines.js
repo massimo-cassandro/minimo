@@ -233,7 +233,7 @@ const default_params = {
  * @param {number} [params.padding] - Spazio extra attorno al bordo (default: 10)
  * @param {number} [params.stepY_count] - Numero di suddivisioni dell'asse Y; può variare se i valori attraversano lo zero (default: 4)
  * @param {number} [params.ticksLength] - Lunghezza dei ticks in px (default: 8)
- * @param {Partial<Parameters<typeof legenda>[1]>|null} [params.legenda] - Opzioni della legenda; con null la legenda non viene mostrata, altrimenti `items` è obbligatorio. Chiavi: `height` (20), `elements_gap` (25), `lines_width` (20), `fontAttrs`, `fontFilePath` e `items`, array di oggetti di cui basta impostare `text`: `shape` è sempre `line` e `attrs` è ricavato dagli attributi delle linee dati (default: {})
+ * @param {Partial<Parameters<typeof legenda>[1]>|null} [params.legenda] - Opzioni della legenda; con null la legenda non viene mostrata, altrimenti `items` è obbligatorio. Chiavi: `height` (20, altezza di ogni riga), `elements_gap` (25), `rows_gap` (8), `lines_width` (20), `fontAttrs`, `fontFilePath` e `items`, array di oggetti di cui basta impostare `text`: `shape` è sempre `line` e `attrs` è ricavato dagli attributi delle linee dati (default: {})
  * @param {number} [params.yAxisLabelWidth] - Larghezza dell'area delle etichette dell'asse Y (default: 60)
  * @param {number} [params.xAxisLabelHeight] - Altezza dell'area delle etichette dell'asse X (default: 50)
  * @param {string|null} [params.yAxisTitle] - Titolo dell'asse Y (default: null)
@@ -400,6 +400,19 @@ export async function lines(userParams) {
     const maxPointRadius = Math.max(0, ...radii.map(r => Number(r) || 0));
     const paddingRight = Math.max(params.padding, maxPointRadius);
 
+    // =>> costruzione legenda
+    // viene costruita prima del calcolo dell'area del grafico, per riservarle lo spazio effettivo
+    // (può disporsi su più righe se più larga dell'svg)
+    /** @type {import('@svgdotjs/svg.js').G|null} */
+    let legendaEl = null;
+    if(legendaOpts) {
+      legendaEl = await legenda(chartInstance, {
+        ...legendaOpts,
+        max_width: params.width - params.padding * 2
+      });
+      legendaEl.attr({ 'data-cfg.debug-info': params.debug? 'Legenda' : null });
+    }
+
     // pre-elaborazione e calcolo di alcuni elementi (chartArea)
     // nuove variabili definite da parseStdAxisOpts
     const {
@@ -415,7 +428,7 @@ export async function lines(userParams) {
       max_value: params.max_value,
       min_value: params.min_value,
       values: flatValues,
-      legenda: legendaOpts,
+      legenda: legendaEl? { height: legendaEl.bbox().height } : null,
       padding: params.padding,
       padding_right: paddingRight,
       width: params.width,
@@ -502,18 +515,10 @@ export async function lines(userParams) {
 
 
     // =>> Legenda
-    if(legendaOpts) {
-      const legendaEl = await legenda(chartInstance, legendaOpts);
-      legendaEl.attr({ 'data-cfg.debug-info': params.debug? 'Legenda' : null });
-      const legendaBbox = legendaEl.bbox();
-
-      legendaEl.dmove(
-        (params.width - legendaBbox.width) / 2,
-        params.padding
-      );
+    if(legendaEl) {
+      // posizionamento: centrata in orizzontale, in alto
       legendaEl.y(params.padding);
-
-      legendaEl.x((params.width - legendaBbox.width) / 2);
+      legendaEl.x((params.width - legendaEl.bbox().width) / 2);
 
       svgCanvas.add(legendaEl);
     }

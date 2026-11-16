@@ -1,6 +1,6 @@
 {
   "name": "@massimo-cassandro/minimo",
-  "version": "1.65.1",
+  "version": "1.68.0",
   "description": "Light css framework & utilities",
   "type": "module",
   "main": "./src/index.js",
@@ -44,19 +44,20 @@
     "url": "git+https://github.com/massimo-cassandro/minimo.git"
   },
   "scripts": {
-    "UPD-version": "npx update-version  # --config=./dev-utilities.config.mjs",
-    "npm-publish": "npm publish",
+    "npm-publish": "npm run 'UPD-version' && npm publish",
     "verdaccio": "launchctl print gui/$(id -u)/local.verdaccio >/dev/null 2>&1 || launchctl bootstrap gui/$(id -u) ~/Sites/_verdaccio/local.verdaccio.plist",
     "build-tokens": "node ./dev-tools/design-tokens-builder/build-tokens.mjs --config ./design-tokens/tokens-config.mjs",
     "build-margin-padding-css": "node ./scripts/build-margin-padding-css.mjs",
     "generate:types": "node ./scripts/generate-class-types.mjs",
     "prepack": "npm run generate:types",
     "build custom media": "node ./dev-tools/custom-media-builder/custom-media-builder.mjs --src=./src/custom-media.js",
+    "build-grid-responsive-css": "node ./scripts/build-grid-responsive-css.mjs",
     "check unresolved props": "node ./dev-tools/design-tokens-builder/check-unresolved-custom-props.mjs --config ./design-tokens/tokens-config.mjs",
     "test": "node --test \"test/**/*.test.mjs\"",
     "test sideEffects tree-shaking": "node ./test/sideEffects-tree-shaking/run-test.mjs",
     "checkJS": "npx tsc --noEmit -p jsconfig.json",
     "checkJS ./src": "npx tsc --noEmit --allowJs --checkJs --target ES2023 --module ESNext --allowSyntheticDefaultImports --moduleResolution bundler declarations.d.ts types/global.d.ts src/**/*.js",
+    "UPD-version": "npx update-version  # --config=./dev-utilities.config.mjs",
     "npm outdated": "npm outdated --omit=peer",
     "upd@m": "npx upd@m",
     "npm upd": "npm update"

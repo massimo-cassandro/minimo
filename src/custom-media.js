@@ -39,6 +39,20 @@ export const breakpoints = {
   small: '25rem',
 };
 
+/**
+ * Etichette abbreviate dei breakpoint (usate ad es. da layout-tools).
+ * `xsmall` corrisponde al viewport inferiore al breakpoint `small`
+ * (non ha una media query propria).
+ */
+export const mediaLabels = {
+  xxlarge: 'XXL',
+  xlarge: 'XL',
+  large: 'LG',
+  medium: 'MD',
+  small: 'SM',
+  xsmall: 'XS',
+};
+
 const bp = breakpoints;
 
 /**
