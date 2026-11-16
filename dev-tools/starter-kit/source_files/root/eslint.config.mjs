@@ -1,4 +1,4 @@
-import eslint_config from '@massimo-cassandro/eslint-config';
+import eslint_config from '@massimo-cassandro/minimo/eslint-config';
 
 // https://github.com/cybozu/eslint-config
 // import cybozuEslintConfigBaseline from '@cybozu/eslint-config/flat/presets/css-baseline.js';

@@ -320,8 +320,6 @@ dependencies=(
 )
 
 devDependencies=(
-  @massimo-cassandro/eslint-config
-
   @babel/core
   @babel/preset-env
   @csstools/postcss-global-data

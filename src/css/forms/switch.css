@@ -66,6 +66,8 @@ background-image.
   }
 
   .form-label {
+    /* TODO: verificare se `!important` è davvero necessario (probabile conflitto di specificità con form-check) */
+    /* stylelint-disable-next-line declaration-no-important */
     padding-inline-start: 0 !important;
     cursor: pointer;
     user-select: none;

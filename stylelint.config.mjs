@@ -13,6 +13,9 @@ export default {
     'test/**/*.css',
     'docs/**/*.css',
     'demo/build/**/*.css',
+    // cartelle/file con prefisso TODO: materiale in attesa di integrazione
+    '**/TODO*/**',
+    '**/TODO*',
   ],
 
   // Overrides

@@ -91,7 +91,7 @@ minimo/
 | Build demo | Webpack |
 | Build token | Style Dictionary v5 |
 | CSS | PostCSS, CSS Modules (componenti) |
-| Linting | ESLint (`@massimo-cassandro/eslint-config`, esterno), Stylelint (incorporato in `dev-tools/stylelint-config/`, esposto come `@massimo-cassandro/minimo/stylelint-config`) |
+| Linting | ESLint (incorporato in `dev-tools/eslint-config/`, esposto come `@massimo-cassandro/minimo/eslint-config`), Stylelint (incorporato in `dev-tools/stylelint-config/`, esposto come `@massimo-cassandro/minimo/stylelint-config`) |
 | Formattazione | Prettier |
 
 ---
@@ -137,7 +137,7 @@ Dal `files` di `package.json`:
 - `design-tokens/tokens/**/*.{tokens.json,tokens.jsonc}`
 - `design-tokens/_src/**/*.{tokens.json,tokens.jsonc,mjs,js,md}`
 - `charts/**/*.{js,mjs,md}`
-- `dev-tools/**/*` (incluso `dev-tools/stylelint-config/`, `dev-tools/design-tokens-builder/`)
+- `dev-tools/**/*` (incluso `dev-tools/stylelint-config/`, `dev-tools/eslint-config/`, `dev-tools/design-tokens-builder/`)
 - `snippets/**/*`
 
 Escluse ovunque le cartelle/file con prefisso `TODO` (`!**/TODO*/**`, `!**/TODO*`).
@@ -196,7 +196,7 @@ Esempi attuali/previsti:
 
 Ogni nuovo componente che introduce una dipendenza esterna deve seguire questa stessa logica: aggiungere la libreria a `peerDependencies` con `"optional": true` in `peerDependenciesMeta`, e documentare l'installazione richiesta.
 
-**Deroga per i config di lint condivisi:** `stylelint-config` (incorporato in `dev-tools/stylelint-config/`, vedi sopra) fa eccezione a questa policy: i pacchetti che richiede (`stylelint`, `@stylistic/stylelint-config`, `@stylistic/stylelint-plugin`, `stylelint-config-css-modules`, `stylelint-config-recess-order`, `stylelint-config-standard`, `stylelint-config-standard-scss`, `stylelint-order`, `stylelint-scss`) sono dichiarati in `dependencies`, non in `peerDependencies`. Motivo: servono anche a minimo stesso per lintare il proprio codice, e mettendoli in `dependencies` arrivano automaticamente ai progetti consumer che installano `@massimo-cassandro/minimo` e usano `extends: ['@massimo-cassandro/minimo/stylelint-config']`, senza passi d'installazione aggiuntivi. Stessa logica prevista per `eslint-config` quando verrà incorporato allo stesso modo (vedi [dev-tools/TODO-eslint.md](dev-tools/TODO-eslint.md)).
+**Deroga per i config di lint condivisi:** `stylelint-config` e `eslint-config` (incorporati in `dev-tools/stylelint-config/` e `dev-tools/eslint-config/`, vedi sopra) fanno eccezione a questa policy: i pacchetti che richiedono (`stylelint`, `@stylistic/stylelint-config`, `@stylistic/stylelint-plugin`, `stylelint-config-css-modules`, `stylelint-config-recess-order`, `stylelint-config-standard`, `stylelint-config-standard-scss`, `stylelint-order`, `stylelint-scss`; `eslint`, `@eslint/js`, `globals`) sono dichiarati in `dependencies`, non in `peerDependencies`. Motivo: servono anche a minimo stesso per lintare il proprio codice, e mettendoli in `dependencies` arrivano automaticamente ai progetti consumer che installano `@massimo-cassandro/minimo` e usano `extends: ['@massimo-cassandro/minimo/stylelint-config']` o `import eslint_config from '@massimo-cassandro/minimo/eslint-config'`, senza passi d'installazione aggiuntivi. I vecchi pacchetti esterni `@massimo-cassandro/stylelint-config` e `@massimo-cassandro/eslint-config` non vanno più usati.
 
 ---
 
@@ -319,6 +319,7 @@ Da affrontare con calma in futuro (eventualmente con una utility condivisa che r
 | [src/css/forms/select.css](src/css/forms/select.css#L1) | 1–5 | multiselect; con `appearance: base-select` più supportato passare a `select::picker-icon` + `light-dark()` |
 | [src/css/forms/form-check.css](src/css/forms/form-check.css#L1) | 1, 15–16 | gruppi radio/checkbox; eliminare necessità di `.form-group`; esempi d'uso |
 | [src/css/forms/form-group.css](src/css/forms/form-group.css#L1) | 1 | `.form-grid` |
+| [src/css/forms/switch.css](src/css/forms/switch.css#L69) | 69 | verificare se `!important` su `padding-inline-start` di `.form-label` è necessario |
 | [src/css/buttons/status-buttons.css](src/css/buttons/status-buttons.css#L1) | 1 | rivedere tutto |
 | [src/css/buttons/buttons.css](src/css/buttons/buttons.css#L1) | 1, 93 | dividere per variante; button solo-icona da completare o eliminare |
 | [src/css/buttons/btn-close.css](src/css/buttons/btn-close.css#L6) | 6 | controllare allineamento x interna |

@@ -9,7 +9,6 @@ Interventi di carattere generale o che riguardano più parti di `src/`. I TODO s
 
 ## V2
   * vedi TODO con `epic=v2`
-  * vedi inclusione eslint-config in [dev-tools/TODO-eslint.md](../dev-tools/TODO-eslint.md) se non già eseguita (stylelint-config già incorporato)
   * aggiungi sezione `breaking changes` nel readme per documentare cosa va aggiornato nel passare da v1 a v2
 
 ## CUSTOM PROPERTIES

@@ -45,3 +45,4 @@
 * 1.66 (16 nov 2026) - responsive grid
 * 1.67 (16 nov 2026) - layout-tools: viewport size e callback
 * 1.68 (16 nov 2026) - charts: legenda su più righe
+* 1.69 (16 nov 2026) - Eslint config dev tool

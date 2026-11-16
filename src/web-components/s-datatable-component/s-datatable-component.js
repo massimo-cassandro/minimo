@@ -841,7 +841,7 @@ class SimpleDatatableAdapter extends HTMLElement {
           '</div>'
           : '') +
         '</div>' +
-        `<div class='${options.classes.container}'${options.scrollY.length ? ` style='height: ${options.scrollY}; overflow-Y: auto;'` : ""}></div>`+
+        `<div class='${options.classes.container}'${options.scrollY.length ? ` style='height: ${options.scrollY}; overflow-Y: auto;'` : ''}></div>`+
         `<div class='${options.classes.bottom}'>`+
           `<nav class='${options.classes.pagination}'></nav>` +
         '</div>'

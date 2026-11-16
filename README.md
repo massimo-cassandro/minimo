@@ -8,12 +8,9 @@ Demo: <https://massimo-cassandro.github.io/minimo/>
 
 ```bash
 npm i @massimo-cassandro/minimo
-
-# opzionale:
-npm i -D @massimo-cassandro/eslint-config
 ```
 
-> Nota: una configurazione stylelint è inclusa in minimo (non serve un'installazione separata) — vedi [dev-tools/stylelint-config/README.md](dev-tools/stylelint-config/README.md).
+> Nota: le configurazioni stylelint ed eslint sono incluse in minimo (non serve un'installazione separata) — vedi [dev-tools/stylelint-config/README.md](dev-tools/stylelint-config/README.md) e [dev-tools/eslint-config/README.md](dev-tools/eslint-config/README.md).
 
 > Nota: **minimo** è pensato per essere usato con webpack, con la configurazione disponibile nella [cartella starter-kit](./dev-tools/starter-kit/) di questo repository. Se vengono apportate modifiche (ad esempio al modo in cui vengono importati i file SVG), il funzionamento potrebbe non essere quello atteso.
 >
