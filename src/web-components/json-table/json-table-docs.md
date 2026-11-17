@@ -69,7 +69,8 @@
 // solo registrazione del tag
 import '@massimo-cassandro/minimo/json-table';
 
-// oppure, se necessario eseguire metodi della classe (es. `setDefaults`):
+// oppure, se, oltre a registrare il tag,
+// fosse necessario eseguire metodi della classe (es. `setDefaults`):
 import { JsonTable } from '@massimo-cassandro/minimo/json-table';
 ```
 

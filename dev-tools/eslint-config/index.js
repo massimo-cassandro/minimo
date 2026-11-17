@@ -9,7 +9,7 @@ export default [
     name: '@massimo-cassandro/eslint-config',
 
     languageOptions: {
-      ecmaVersion: 2023,
+      ecmaVersion: 'latest',
       sourceType: 'module',
       parserOptions: {
         ecmaFeatures: {
@@ -56,14 +56,13 @@ export default [
         'args': 'after-used',
         'argsIgnorePattern': '^_',
         'ignoreRestSiblings': false
-      }],
-      'import/no-anonymous-default-export': 0
+      }]
     }
   },
   {
     files: ['**/*.cjs'],
     languageOptions: {
-      ecmaVersion: 2023,
+      ecmaVersion: 'latest',
       sourceType: 'commonjs',
       globals: {
         ...globals.node
