@@ -5,7 +5,6 @@
   "scripts": {
     "webpack DEMO dev": "NODE_ENV=development webpack serve --config ./webpack.config.mjs",
     "docker DEMO up": "docker compose up -d",
-    "docker DEMO stop": "docker compose stop",
     "webpack DEMO prod": "NODE_ENV=production webpack --config ./webpack.config.mjs",
     "create-favicons DEMO": "node ../dev-tools/create-favicons/index.mjs --dir=./dev-tools-demo/create-favicons-demo"
   },

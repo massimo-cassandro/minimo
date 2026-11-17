@@ -54,6 +54,21 @@ export default {
             $value: 'color-mix(in srgb, {table.thead.background.color} 90%, {accent})'
           }
         }
+      },
+      'sorted-indicator': {
+        bg: {
+          $type: 'color',
+          $value: '{accent}'
+        },
+        height: {
+          $type: 'dimension',
+          $value: '8px'
+        },
+        offset: {
+          $type: 'dimension',
+          $value: 'calc(-1 * ({jt.thead.sorted-indicator.height} - {table.thead.border.width}))',
+          $description: 'Valore di spostamento dell\'indicatore rispetto alla base della cella `th`'
+        }
       }
     },
 

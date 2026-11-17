@@ -1,8 +1,21 @@
 /* purgecss start ignore */
 .sortable {
+  position: relative;
   @media (hover: hover) {
     &:hover {
       background-color: var(--jt-thead-hover-background-color);
+    }
+  }
+  &:is([aria-sort='ascending'], [aria-sort='descending']) {
+    &::after {
+      position: absolute;
+      bottom: var(--jt-thead-sorted-indicator-offset);
+      left: 0;
+      display: block;
+      width: 100%;
+      height: var(--jt-thead-sorted-indicator-height);
+      content: '';
+      background-color: var(--jt-thead-sorted-indicator-bg);
     }
   }
 }

@@ -256,6 +256,9 @@
   --jt-sort-icon-size: 1em;
   --jt-table-footer-padding-block-start: var(--size-xs);
   --jt-thead-hover-background-color: color-mix(in srgb, var(--table-thead-background-color) 90%, var(--accent));
+  --jt-thead-sorted-indicator-bg: var(--accent);
+  --jt-thead-sorted-indicator-height: 8px;
+  --jt-thead-sorted-indicator-offset: calc(calc(-1 * (var(--jt-thead-sorted-indicator-height) - var(--table-thead-border-width)))); /* Valore di spostamento dell'indicatore rispetto alla base della cella `th` */
   --jt-wrapper-margin-block: var(--size-md);
 
   --line-height-xs: 1.25;
