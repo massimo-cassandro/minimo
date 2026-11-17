@@ -21,7 +21,7 @@
  * @property {string} search - Termine di ricerca ('' = nessuno)
  * @property {Array<{key: string, searchable: boolean, sortable: boolean, sortKeys?: string[]|null, searchKeys?: string[]|null}>} [cols] -
  *   Colonne visualizzate (già analizzate); usate per `sort` e `searchFields` e, con `jqDatatableMode`, per inviare
- *   `columns[i][...]` e l'indice della colonna ordinata
+ *   `columns[i][...]` (seguite dalle colonne aggiuntive di `searchFields`) e l'indice della colonna ordinata
  */
 
 /**
@@ -85,6 +85,24 @@ function buildSearchFields(cols, searchFields = null) {
 
 
 /**
+ * Solo `jqDatatableMode`: campi di `searchFields` da inviare come colonne aggiuntive di `columns[i]`, esclusi i duplicati
+ * e quelli che coincidono con la `key` di una colonna visualizzata ricercabile. I nomi vengono inviati così come sono
+ * (la regola `tabella.nome` di `buildSearchFields` non si applica).
+ * @param {NonNullable<ServerRequest['cols']>} cols - Colonne visualizzate
+ * @param {string[]|null} [searchFields=null] - Campi aggiuntivi (default: null)
+ * @returns {string[]}
+ *
+ * @example
+ * buildJqExtraCols([{ key: 'zona', searchable: true }, { key: 'note', searchable: false }], ['zona', 'comune', 'note']);
+ * // → ['comune', 'note']
+ */
+function buildJqExtraCols(cols, searchFields = null) {
+  const searchableKeys = new Set(cols.filter(col => col.searchable).map(col => col.key));
+  return [...new Set(searchFields ?? [])].filter(field => !searchableKeys.has(field));
+}
+
+
+/**
  * Costruisce l'URL di una richiesta server-side: `params.jsonUrl` più i parametri della query string
  * indicati in `params.serverParams` (i parametri impostati a `null` vengono omessi; `sort`/`dir` vengono inviati
  * solo quando è attivo un ordinamento, `search` solo quando non è vuoto). I parametri della query string
@@ -96,7 +114,9 @@ function buildSearchFields(cols, searchFields = null) {
  * Con `params.jqDatatableMode` e `request.cols` vengono inviati anche, come fa jQuery DataTables, `draw=1`,
  * `columns[i][name|searchable|orderable]` e, per `sort`, l'indice della colonna al posto della sua chiave
  * (`order[i][column]` e `order[i][dir]` per ogni criterio, con i nomi predefiniti).
- * In questa modalità `sortKeys`, `searchKeys` e `searchFields` non vengono usati.
+ * In questa modalità `searchFields` non viene inviato come parametro: ogni campo viene accodato alle colonne visualizzate
+ * come colonna aggiuntiva (`searchable=true`, `orderable=false`), come le colonne `visible: false` di jQuery DataTables
+ * (vedi `buildJqExtraCols`). `sortKeys` e `searchKeys` non vengono usati.
  *
  * I valori del form di filtro (`filters`) vengono applicati prima dei parametri di `serverParams`, che in caso di
  * nomi coincidenti prevalgono.
@@ -136,6 +156,13 @@ export function buildServerUrl(params, request, filters = null) {
       set(`columns[${idx}][name]`, col.key);
       set(`columns[${idx}][searchable]`, col.searchable);
       set(`columns[${idx}][orderable]`, col.sortable);
+    });
+    // colonne aggiuntive da `searchFields`, dopo quelle visualizzate (gli indici di `order[i][column]` restano validi)
+    buildJqExtraCols(jqCols, /** @type {string[]|null} */ (params.searchFields)).forEach((field, idx) => {
+      const n = jqCols.length + idx;
+      set(`columns[${n}][name]`, field);
+      set(`columns[${n}][searchable]`, true);
+      set(`columns[${n}][orderable]`, false);
     });
   }
 

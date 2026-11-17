@@ -5,7 +5,7 @@ Materiale di riferimento (piano originale, vecchia implementazione): `src/web-co
 ## Prossimo step: `dt-legacy.js`
   * modulo on-demand per la compatibilità con il legacy jQuery DataTables / `auto-datatables-bs5` (ADA), con `mustache` come peer dep opzionale
 
-  * prerequisiti nel core: `hidden` per le colonne (campo usato solo per la ricerca, non mostrato); `serverParams` come funzione (o evento `jt:request`)
+  * prerequisiti nel core: `serverParams` come funzione (o evento `jt:request`); `hidden` per le colonne (campo usato solo per la ricerca, non mostrato) probabilmente non più necessario: con `jqDatatableMode` i campi di `searchFields` vengono inviati come colonne aggiuntive di `columns[i]` (17/11/2026), verificare se `dt-legacy.js` può convertire le colonne `visible: false` in `searchFields`
 
   * export di `JsonTable` da `index.js` + `**/json-table/json-table-component.js` in `sideEffects` di `package.json`
 

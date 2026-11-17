@@ -208,7 +208,7 @@ import {
  *   (ripetuta per ogni `sortKeys` della colonna); omesso quando non c'è un ordinamento attivo. Accetta `{i}` come `sort` (default: 'dir')
  * @property {string|null} [search] - Termine di ricerca; omesso quando vuoto (default: 'search')
  * @property {string|null} [searchFields] - Campi di ricerca uniti da virgola; inviato solo con un termine di ricerca e mai con
- *   `jqDatatableMode` (default: 'searchFields')
+ *   `jqDatatableMode`, dove i campi di `searchFields` diventano colonne aggiuntive di `columns[i]` (default: 'searchFields')
  */
 
 /**
@@ -219,6 +219,9 @@ import {
  *   Vengono usati i valori grezzi del JSON, senza la formattazione dei data type
  * - modalità server-side: nome del campo inviato al server, anche nella forma `tabella.campo`; il server deve accettare solo
  *   valori previsti. Le funzioni vengono ignorate con un avviso
+ * - `jqDatatableMode`: nome del campo, inviato come colonna aggiuntiva `columns[i][name]` (con `searchable=true` e
+ *   `orderable=false`), come una colonna `visible: false` di jQuery DataTables; il nome deve essere quello atteso dal server
+ *   per le colonne (es. con ADA una chiave di `$fields`, senza alias di tabella)
  *
  * @typedef {string|((row: Object) => *)} SearchField
  */
@@ -268,8 +271,8 @@ import {
  *   disponibile in questa modalità (default: false)
  * @property {ServerParams} serverParams - Solo modalità server-side: nomi dei parametri della query string (vedi `ServerParams`)
  * @property {SearchField[]|null} searchFields - Campi su cui cercare oltre a quelli delle colonne ricercabili, anche se non presenti
- *   in `cols` (vedi `SearchField`). Da attributo HTML: array JSON oppure stringa con i campi separati da virgola. Non disponibile
- *   con `jqDatatableMode` (default: null)
+ *   in `cols` (vedi `SearchField`). Da attributo HTML: array JSON oppure stringa con i campi separati da virgola. Con
+ *   `jqDatatableMode` i campi vengono inviati come colonne aggiuntive di `columns[i]` (default: null)
  * @property {string|HTMLFormElement|null} filterForm - Form di filtro collegato alla tabella: id del `<form>` oppure, solo
  *   tramite `init()`, l'elemento stesso. I valori non vuoti del form vengono aggiunti alla query string di `jsonUrl` (sostituendo
  *   gli eventuali parametri omonimi) in ogni richiesta, compresa la prima. Al submit (il form non viene inviato) e al reset del

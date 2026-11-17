@@ -959,7 +959,7 @@ I parametri da usare dipendono dalla modalità: in client-side il componente ela
 | `searchKeys` | colonna | ignorato, con avviso | sì |
 | `sortKeys` | colonna | ignorato, con avviso | sì |
 
-La [modalità jQuery DataTables](#server-side-datatables) è mantenuta solo per compatibilità: `searchFields`, `searchKeys` e `sortKeys` non sono disponibili e vengono ignorati con un avviso.
+La [modalità jQuery DataTables](#server-side-datatables) è mantenuta solo per compatibilità: `searchKeys` e `sortKeys` non sono disponibili e vengono ignorati con un avviso, mentre i campi di `searchFields` vengono inviati come colonne aggiuntive di `columns[i]` (vedi [`searchFields` con `jqDatatableMode`](#searchfields-jq)).
 
 ### <a id="ricerca-client"></a>Client-side
 
@@ -1409,7 +1409,7 @@ Precedenza: `init()` > attributo HTML > `JsonTable.setDefaults()` > modalità jQ
 
 Oltre ai `serverParams`, in questa modalità vengono inviati anche `draw=1` e, per ogni colonna visualizzata, `columns[i][name]` (la `key`), `columns[i][searchable]` e `columns[i][orderable]`. `order[i][column]` riceve l'**indice** della colonna ordinata (tra quelle visualizzate), non la chiave, con un `order[i]` per ogni criterio di ordinamento.
 
-Questa modalità è mantenuta solo per compatibilità: `sortKeys`, `searchKeys` e `searchFields` non sono disponibili e vengono ignorati con un avviso in console.
+Questa modalità è mantenuta solo per compatibilità: `sortKeys` e `searchKeys` non sono disponibili e vengono ignorati con un avviso in console. `searchFields` è invece disponibile, con le modalità descritte di seguito.
 
 ```html
 <json-table jsonurl="/api/rows" jqdatatablemode="true" cols='[{"key":"id"},{"key":"name"}]'></json-table>
@@ -1418,6 +1418,36 @@ Questa modalità è mantenuta solo per compatibilità: `sortKeys`, `searchKeys` 
 ```
 GET /api/rows?draw=1&columns[0][name]=id&columns[0][searchable]=true&columns[0][orderable]=true&columns[1][name]=name&…&start=25&length=25&order[0][column]=1&order[0][dir]=desc&search[value]=mar
 ```
+
+#### <a id="searchfields-jq"></a>`searchFields` con `jqDatatableMode`
+
+Il parametro di query `searchFields` non viene inviato. Ogni campo indicato viene invece accodato alle colonne visualizzate come colonna aggiuntiva, con `searchable=true` e `orderable=false`. È lo stesso meccanismo delle colonne `visible: false` di jQuery DataTables, quindi un endpoint che già le gestisce non richiede modifiche:
+
+```html
+<json-table
+  jsonurl="/api/zone"
+  jqdatatablemode="true"
+  searchfields="comune, note"
+  cols='[{"key":"id"},{"key":"zona"}]'
+></json-table>
+```
+
+```
+GET /api/zone?draw=1&columns[0][name]=id&…&columns[1][name]=zona&…
+  &columns[2][name]=comune&columns[2][searchable]=true&columns[2][orderable]=false
+  &columns[3][name]=note&columns[3][searchable]=true&columns[3][orderable]=false
+  &start=0&length=25&order[0][column]=1&order[0][dir]=asc&search[value]=rossi
+```
+
+* Le colonne aggiuntive seguono quelle visualizzate, quindi gli indici di `order[i][column]` restano validi
+* Un campo che coincide con la `key` di una colonna visualizzata ricercabile non viene ripetuto
+* I nomi vengono inviati così come sono e devono essere quelli che il server accetta per le colonne. La regola che scarta `cognome` quando c'è anche `clienti.cognome` (vedi [`searchFields`](#searchfields)) non si applica
+* Le funzioni vengono ignorate con un avviso, come in server-side
+
+**Backend ADA** (`App\Service\DataTable`): la ricerca considera ogni `columns[i]` il cui `name` è una chiave di `$fields` con `'searchable' => true`, e aggiunge al campo il `tableAlias` definito nel controller. I nomi in `searchFields` vanno quindi indicati senza alias (`comune`, non `rp.comune`). Un campo che non è in `$fields` viene ignorato senza errori: per usarlo va aggiunto a `$fields` nel controller.
+
+Il servizio confronta `columns[i][searchable]` con `== true`. In PHP la stringa `"false"` vale `true`, quindi una colonna con `searchable: false` viene cercata comunque se `$fields` lo consente (e lo stesso vale per `orderable`). Per escluderla va impostato `'searchable' => false` in `$fields`.
+
 
 ## <a id="api"></a>API dell'istanza
 

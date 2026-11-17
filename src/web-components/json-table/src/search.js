@@ -10,7 +10,7 @@
  * - una stringa (tipicamente da attributo HTML) viene divisa sulle virgole: `'nome, cognome'` → `['nome', 'cognome']`
  * - sono ammesse stringhe non vuote e, solo in modalità client-side, funzioni `row => valore`; in modalità server-side
  *   le funzioni vengono scartate con un avviso (il server riceve solo nomi di campi)
- * - con `jqDatatableMode` (server-side) il parametro viene ignorato con un avviso
+ * - con `jqDatatableMode` (server-side) i campi vengono inviati come colonne aggiuntive di `columns[i]` (vedi `buildServerUrl`)
  * - un valore di tipo diverso, o una voce non valida, viene segnalato in console e scartato
  *
  * @param {*} value - Valore risolto di `searchFields`
@@ -35,11 +35,6 @@ export function normalizeSearchFields(value, params) {
 
   if (!Array.isArray(list)) {
     console.warn('[json-table] `searchFields` deve essere un array (o una stringa con i campi separati da virgola): parametro ignorato');
-    return null;
-  }
-
-  if (params.serverSide && params.jqDatatableMode) {
-    console.warn('[json-table] `searchFields` non ha effetto con `jqDatatableMode`: parametro ignorato');
     return null;
   }
 
