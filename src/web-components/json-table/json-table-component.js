@@ -14,7 +14,11 @@ import { applySortState, setSortListener } from './src/thead.js';
 import { setSearchListener, filterRows, normalizeSearchFields } from './src/search.js';
 import { sortRows } from './src/sorting.js';
 import { calcTotPages, renderPagination } from './src/pagination.js';
-import { bindFilterForm } from './src/filter-form.js';
+import { bindFilterForm, rereadFilterForm } from './src/filter-form.js';
+import {
+  STATE_VERSION, buildStateKey, colsSignature, fillForm, getNavigationType, getStorage, isReferrerAllowed,
+  normalizeReferrers, parseSavedState, restorePage, restoreSort, storageRead, storageRemove, storageWrite
+} from './src/state-save.js';
 import { domBuilder } from '../../utilities/dom-builder/dom-builder.js';
 
 /** @typedef {import('./src/defaults.js').JsonTableParams} JsonTableParams */
@@ -23,6 +27,8 @@ import { domBuilder } from '../../utilities/dom-builder/dom-builder.js';
 /** @typedef {import('./src/parse-cols.js').ParsedCol} ParsedCol */
 /** @typedef {import('./src/parse-rows.js').ParsedRow} ParsedRow */
 /** @typedef {import('./src/main-builder.js').JsonTableElements} JsonTableElements */
+/** @typedef {import('./src/state-save.js').SavedState} SavedState */
+/** @typedef {import('./src/state-save.js').StateTarget} StateTarget */
 
 /**
  * Stato del rendering.
@@ -72,9 +78,13 @@ const emptyState = () => ({
  * I parametri (vedi `src/defaults.js` → `JsonTableParams`) si possono impostare come attributi HTML o tramite
  * `init()`; precedenza: `init()` > attributo HTML > `JsonTable.setDefaults()` > default predefinito.
  *
- * Eventi (entrambi con bubbling, `event.detail.jsonTable` è l'istanza del componente):
+ * Eventi (tutti con bubbling, `event.detail.jsonTable` è l'istanza del componente):
  * - `jt:ready`: emesso quando la struttura è stata costruita e i primi dati sono stati renderizzati
  * - `jt:update`: emesso dopo ogni cambio di pagina / ordinamento / ricerca / filtro e dopo `refresh()` (`event.detail.reason`)
+ * - `jt:stateload`: emesso (annullabile) prima della prima richiesta quando viene ripristinato uno stato salvato
+ *   (`event.detail.state`, vedi `stateSave`); `preventDefault()` scarta lo stato
+ * - `jt:statesave`: emesso (annullabile) prima di ogni salvataggio dello stato; `event.detail.state.extra` può essere
+ *   impostato con dati della pagina, restituiti da `jt:stateload`
  *
  * @example
  * // solo markup
@@ -115,6 +125,11 @@ const emptyState = () => ({
  *   searchFields: null,                 // default: null (campi di ricerca aggiuntivi, anche non presenti in cols)
  *   filterForm: null,                   // default: null (id del form di filtro, oppure l'elemento <form>)
  *   initialSort: { city: 'asc', name: 'desc' }, // default: null
+ *   stateSave: true,                    // default: true (senza id e stateKey l'id dell'elemento viene generato)
+ *   stateStorage: 'session',            // default: 'session' ('local' → localStorage)
+ *   stateKey: null,                     // default: null → 'json-table:<pathname>:<id>'
+ *   stateReferrers: ['/clienti/scheda'], // default: null (ripristino da qualunque pagina)
+ *   stateMaxAge: 0,                     // default: 0 (secondi, 0 = nessuna scadenza)
  *   tfoot: true,                        // default: false (non disponibile in modalità server-side)
  *   updateFooterOnPageChange: false,    // default: false
  *   infoText: null,                     // default: null → labels.info
@@ -191,6 +206,14 @@ export class JsonTable extends HTMLElement {
     this._filters = null;
     /** rimuove i listener del form di filtro @type {AbortController|null} */
     this._filterFormController = null;
+    /** form di filtro collegato (vedi `filter-form.js`) @type {HTMLFormElement|null} */
+    this._filterForm = null;
+    /** storage e chiave dello stato salvato, `null` quando `stateSave` non è attivo o disponibile @type {StateTarget|null} */
+    this._stateTarget = null;
+    /** dati della pagina salvati con lo stato (vedi `jt:statesave`) @type {*} */
+    this._stateExtra = null;
+    /** true durante `reload()`: lo stato salvato non viene ripristinato */
+    this._skipStateRestore = false;
 
     /** Parametri risolti, disponibili dopo il primo caricamento. @type {JsonTableParams} */
     this.params = /** @type {JsonTableParams} */ ({ ...defaults });
@@ -272,6 +295,9 @@ export class JsonTable extends HTMLElement {
     this._filterFormController?.abort();
     this._filterFormController = null;
     this._filters = null;
+    this._filterForm = null;
+    this._stateTarget = null;
+    this._stateExtra = null;
     this._loadStarted = false;
     this._loadGeneration++;
     this._requestGeneration++;
@@ -284,7 +310,8 @@ export class JsonTable extends HTMLElement {
 
   /**
    * Ricarica i dati e ricostruisce la struttura, sovrascrivendo opzionalmente alcuni parametri
-   * (uniti alla config passata a `init()`, se presente). Ricerca, ordinamento e pagina vengono azzerati.
+   * (uniti alla config passata a `init()`, se presente). Ricerca, ordinamento e pagina vengono azzerati: lo stato salvato
+   * (vedi `stateSave`) non viene ripristinato e viene sovrascritto dal nuovo stato.
    *
    * @param {Partial<JsonTableParams>} [overrides={}] - Parametri da sovrascrivere (default: {})
    * @returns {Promise<void>}
@@ -298,6 +325,7 @@ export class JsonTable extends HTMLElement {
     this._config = { ...(this._config ?? {}), ...overrides };
     this._loadStarted = false;
     this._loadGeneration++;
+    this._skipStateRestore = true;
     await this._load();
   }
 
@@ -394,6 +422,52 @@ export class JsonTable extends HTMLElement {
     this._update('search');
   }
 
+  /**
+   * Cancella lo stato salvato (vedi `stateSave`), compresi i dati extra della pagina. La tabella non cambia, e al prossimo
+   * aggiornamento (cambio di pagina, ordinamento, ricerca, filtro) viene salvato un nuovo stato; per tornare anche alla
+   * situazione iniziale chiamare poi `reload()`. Non fa nulla prima del caricamento o quando `stateSave` non è attivo.
+   *
+   * @returns {void}
+   *
+   * @example
+   * el.clearState();
+   * await el.reload(); // pagina 1, initialSort, ricerca vuota
+   */
+  clearState() {
+    if (this._stateTarget) {
+      storageRemove(this._stateTarget);
+    }
+    this._stateExtra = null;
+  }
+
+  /**
+   * Salva subito lo stato corrente (vedi `stateSave`), emettendo `jt:statesave`. Lo stato viene già salvato dopo ogni
+   * aggiornamento della tabella: serve, ad esempio, dopo una modifica dei dati extra della pagina.
+   *
+   * @returns {void}
+   */
+  saveState() {
+    this._saveState();
+  }
+
+  /**
+   * Restituisce lo stato salvato (vedi `SavedState` in `src/state-save.js`), oppure `null` se assente, non valido o se
+   * `stateSave` non è attivo. Disponibile dopo il primo caricamento.
+   *
+   * @returns {SavedState|null}
+   *
+   * @example
+   * el.getSavedState()?.extra;
+   */
+  getSavedState() {
+    if (!this._stateTarget) {
+      return null;
+    }
+    return parseSavedState(storageRead(this._stateTarget), {
+      sig: colsSignature(this.cols), maxAge: Number(this.params.stateMaxAge) || 0
+    }).state;
+  }
+
 
   // ─── Caricamento e costruzione ───────────────────────────────────────────────────────────
 
@@ -470,24 +544,74 @@ export class JsonTable extends HTMLElement {
       }
     }
 
-    /** @type {import('./src/get-data.js').DataResult|null} */
-    let result = null;
-    let failed = false;
+    // stato salvato (stateSave): ripristinato prima della prima richiesta, con la precedenza su initialSort
+    const restoreState = !this._skipStateRestore;
+    this._skipStateRestore = false;
+    const saved = this._initStateSave(restoreState);
+    let restored = false;
 
-    try {
-      result = await getData(params, params.serverSide ? this._serverRequest() : null, this._filters);
-    } catch (err) {
-      failed = true;
-      // eslint-disable-next-line no-console
-      console.error(err);
+    if (saved) {
+      const form = this._filterForm;
+      const formBefore = form ? [...(this._filters ?? [])] : null;
+      if (form && saved.filters) {
+        fillForm(form, saved.filters);
+      }
+
+      // nel microtask successivo, così che i listener registrati subito dopo init() ricevano l'evento
+      await Promise.resolve();
+      if (generation !== this._loadGeneration) {
+        return;
+      }
+
+      const event = new CustomEvent('jt:stateload', { detail: { jsonTable: this, state: saved }, bubbles: true, cancelable: true });
+      if (this.dispatchEvent(event)) {
+        // il form, eventualmente modificato dai listener, viene riletto: i suoi valori vanno nella prima richiesta
+        rereadFilterForm(this);
+        this.state.sort = restoreSort(saved.sort, this.cols);
+        this.state.searchTerm = String(saved.search ?? '').trim();
+        this.state.page = restorePage(saved.page, saved.perPage, params.perPage);
+        this._stateExtra = saved.extra ?? null;
+        restored = true;
+      } else {
+        // stato rifiutato: il form torna ai valori precedenti e lo stato salvato viene cancellato
+        if (form && formBefore && saved.filters) {
+          fillForm(form, formBefore);
+        }
+        this.clearState();
+      }
     }
+
+    /**
+     * Richiede i dati con lo stato corrente; `undefined` in caso di errore.
+     * @returns {Promise<import('./src/get-data.js').DataResult|null|undefined>}
+     */
+    const fetchData = async () => {
+      try {
+        return await getData(params, params.serverSide ? this._serverRequest() : null, this._filters);
+      } catch (err) {
+        // eslint-disable-next-line no-console
+        console.error(err);
+        return undefined;
+      }
+    };
+
+    let result = await fetchData();
 
     // un init()/reload()/destroy() più recente ha sostituito questo caricamento
     if (generation !== this._loadGeneration) {
       return;
     }
 
-    if (failed) {
+    // la pagina ripristinata non esiste più (l'insieme di dati si è ridotto): viene richiesta l'ultima disponibile
+    if (restored && params.serverSide && result && !result.rows.length && result.filteredRec > 0 && this.state.page > 1) {
+      this.state.page = calcTotPages(result.filteredRec, params.perPage);
+      result = await fetchData();
+      if (generation !== this._loadGeneration) {
+        return;
+      }
+    }
+
+    if (result === undefined) {
       this.innerHTML = '';
       return;
     }
@@ -508,8 +632,13 @@ export class JsonTable extends HTMLElement {
     setSortListener(this);
     setSearchListener(this);
 
+    if (this.elements.searchInput && this.state.searchTerm) {
+      this.elements.searchInput.value = this.state.searchTerm;
+    }
+
     this._computeState();
     this._render();
+    this._saveState();
 
     if (params.debug) {
       /* eslint-disable no-console */
@@ -520,6 +649,7 @@ export class JsonTable extends HTMLElement {
       console.log('data', this.data);
       console.log('state', this.state);
       console.log('filters', this._filters?.toString());
+      console.log('stateKey', this._stateTarget?.key ?? null, restored ? '(stato ripristinato)' : '');
       console.log('elements', this.elements);
       console.groupEnd();
       /* eslint-enable no-console */
@@ -582,7 +712,149 @@ export class JsonTable extends HTMLElement {
     }
 
     params.searchFields = normalizeSearchFields(params.searchFields, params);
+
+    if (params.stateSave) {
+      if (params.stateStorage !== 'session' && params.stateStorage !== 'local') {
+        console.warn(`[json-table] \`stateStorage\`: valore non valido (${params.stateStorage}), viene usato 'session'`);
+        params.stateStorage = 'session';
+      }
+      const maxAge = Number(params.stateMaxAge);
+      params.stateMaxAge = Number.isFinite(maxAge) && maxAge > 0 ? maxAge : 0;
+      params.stateReferrers = normalizeReferrers(params.stateReferrers);
+    }
     /* eslint-enable no-console */
+  }
+
+  /**
+   * Prepara la persistenza dello stato (vedi `stateSave`): ricava storage e chiave (`_stateTarget`) e, con `restore`,
+   * legge lo stato salvato. Lo stato viene cancellato quando la pagina di provenienza non è tra `stateReferrers` e quando
+   * non è valido (formato o colonne diversi, scaduto).
+   *
+   * @param {boolean} restore - Se leggere lo stato salvato (false durante `reload()`)
+   * @returns {SavedState|null} Lo stato da ripristinare, oppure `null`
+   */
+  _initStateSave(restore) {
+    /* eslint-disable no-console */
+    const { params } = this;
+    this._stateTarget = null;
+    this._stateExtra = null;
+
+    if (!params.stateSave) {
+      return null;
+    }
+
+    // senza id, tableId e stateKey viene assegnato all'elemento un id generato (vedi `_generateId`)
+    if (!this.id && !params.tableId && !(typeof params.stateKey === 'string' && params.stateKey.trim() !== '')) {
+      this.id = this._generateId();
+      if (params.debug) {
+        console.log(`[json-table] \`stateSave\`: elemento senza id, assegnato \`${this.id}\``);
+      }
+    }
+
+    const key = buildStateKey(params.stateKey, this.id || params.tableId, location.pathname);
+    if (!key) {
+      return null;
+    }
+
+    const storage = getStorage(params.stateStorage);
+    if (!storage) {
+      if (params.debug) {
+        console.warn(`[json-table] \`stateSave\`: ${params.stateStorage}Storage non disponibile, persistenza disattivata`);
+      }
+      return null;
+    }
+
+    const target = { storage, key };
+    this._stateTarget = target;
+
+    if (!restore) {
+      return null;
+    }
+
+    if (!isReferrerAllowed(/** @type {import('./src/defaults.js').StateReferrer[]|null} */ (params.stateReferrers),
+      document.referrer, location.href, getNavigationType())) {
+      storageRemove(target);
+      if (params.debug) {
+        console.log(`[json-table] \`stateSave\`: pagina di provenienza non ammessa da \`stateReferrers\` (${document.referrer}), stato cancellato`);
+      }
+      return null;
+    }
+
+    const { state, reason } = parseSavedState(storageRead(target), { sig: colsSignature(this.cols), maxAge: params.stateMaxAge });
+    if (reason) {
+      storageRemove(target);
+      if (params.debug) {
+        console.log(`[json-table] \`stateSave\`: stato salvato scartato (${reason})`);
+      }
+    }
+    return state;
+    /* eslint-enable no-console */
+  }
+
+  /**
+   * Genera un id per l'elemento, usato per la chiave dello stato (vedi `stateSave`): `json-table-<n>`, dove `n` è la posizione
+   * dell'elemento tra i `<json-table>` del documento (da 1). Non è casuale, così resta lo stesso a ogni caricamento della
+   * pagina e lo stato salvato viene ritrovato; se l'id è già usato da un altro elemento viene aggiunto un suffisso.
+   * @returns {string}
+   *
+   * @example
+   * // secondo <json-table> della pagina, senza id
+   * jt._generateId(); // → 'json-table-2'
+   */
+  _generateId() {
+    const all = Array.from(document.querySelectorAll('json-table'));
+    const idx = all.indexOf(this);
+    const base = `json-table-${idx >= 0 ? idx + 1 : all.length + 1}`;
+    let id = base;
+    for (let i = 2; document.getElementById(id) && document.getElementById(id) !== this; i++) {
+      id = `${base}-${i}`;
+    }
+    return id;
+  }
+
+  /**
+   * Salva lo stato corrente (vedi `stateSave`), dopo aver emesso `jt:statesave`: i listener possono impostare
+   * `event.detail.state.extra` o annullare il salvataggio con `preventDefault()`. Non fa nulla quando la persistenza non
+   * è attiva o la tabella non è ancora stata costruita.
+   * @returns {void}
+   */
+  _saveState() {
+    if (!this._stateTarget || !this.elements.wrapper) {
+      return;
+    }
+    const { state, params } = this;
+
+    /** @type {SavedState} */
+    const saved = {
+      v: STATE_VERSION,
+      sig: colsSignature(this.cols),
+      savedAt: Date.now(),
+      page: state.page,
+      perPage: params.perPage,
+      sort: state.sort.map(({ key, dir }) => ({ key, dir })),
+      search: state.searchTerm,
+      filters: this._filterForm ? /** @type {Array<[string, string]>} */ ([...(this._filters ?? [])]) : null,
+      extra: this._stateExtra
+    };
+
+    const event = new CustomEvent('jt:statesave', { detail: { jsonTable: this, state: saved }, bubbles: true, cancelable: true });
+    if (!this.dispatchEvent(event)) {
+      return;
+    }
+    this._stateExtra = saved.extra ?? null;
+
+    let json;
+    try {
+      json = JSON.stringify(saved);
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error('[json-table] `stateSave`: stato non serializzabile (verificare `extra`), non salvato', err);
+      return;
+    }
+    if (!storageWrite(this._stateTarget, json) && params.debug) {
+      // eslint-disable-next-line no-console
+      console.warn('[json-table] `stateSave`: scrittura dello storage non riuscita');
+    }
   }
 
   /**
@@ -715,6 +987,7 @@ export class JsonTable extends HTMLElement {
     }
 
     this._render(reason, focusTarget);
+    this._saveState();
 
     this.dispatchEvent(new CustomEvent('jt:update', { detail: { jsonTable: this, reason }, bubbles: true }));
   }

@@ -227,6 +227,15 @@ import {
  */
 
 /**
+ * Pagina di provenienza ammessa per il ripristino dello stato (vedi `stateReferrers`):
+ * - stringa: prefisso del path del referrer (es. `'/clienti/scheda'` ammette anche `/clienti/scheda/12`)
+ * - `RegExp` (solo tramite `init()`): verificata su path + query string del referrer
+ * - funzione (solo tramite `init()`): riceve l'oggetto `URL` del referrer e restituisce `true` se ammesso
+ *
+ * @typedef {string|RegExp|((url: URL) => boolean)} StateReferrer
+ */
+
+/**
  * Parametri di `<json-table>` (risolti: ogni chiave ha un valore, vedi `defaults`).
  *
  * Ogni parametro può essere impostato come attributo HTML dell'elemento `<json-table>`
@@ -282,6 +291,18 @@ import {
  * @property {Object<string, 'asc'|'desc'>|null} initialSort - Ordinamento applicato al caricamento: oggetto
  *   `chiave colonna → direzione`, in ordine di priorità, es. `{ city: 'asc', name: 'desc' }`. Le chiavi di tipo
  *   intero (es. `'2024'`) vengono sempre enumerate per prime in ordine numerico (default: null)
+ * @property {boolean} stateSave - Persistenza dello stato: pagina, ordinamento, ricerca e valori applicati di `filterForm`
+ *   vengono salvati a ogni aggiornamento e ripristinati al caricamento successivo della pagina, prima della prima richiesta
+ *   (con la precedenza su `initialSort`). La chiave è ricavata dall'`id` dell'elemento (o da `tableId`) oppure da `stateKey`;
+ *   in loro assenza all'elemento viene assegnato un id `json-table-<n>`, con `n` = posizione tra i `<json-table>` della
+ *   pagina (default: true)
+ * @property {'session'|'local'} stateStorage - Storage dello stato: `sessionStorage` o `localStorage` (default: 'session')
+ * @property {string|null} stateKey - Chiave dello stato nello storage; `null` → `json-table:<pathname>:<id>` (con l'id
+ *   eventualmente generato, vedi `stateSave`) (default: null)
+ * @property {StateReferrer[]|string|null} stateReferrers - Pagine di provenienza da cui lo stato viene ripristinato (vedi
+ *   `StateReferrer`); con un referrer diverso lo stato viene cancellato. `null` = ripristino da qualunque pagina.
+ *   Da attributo HTML: array JSON oppure stringa con i path separati da virgola (default: null)
+ * @property {number} stateMaxAge - Durata massima dello stato in secondi, `0` = nessuna scadenza (default: 0)
  * @property {boolean} tfoot - Se renderizzare il `<tfoot>` (vedi `ColDefinition.tfootRender`); ignorato in
  *   modalità server-side (default: false)
  * @property {boolean} updateFooterOnPageChange - Se true, `tfootRender` riceve solo le righe della pagina corrente
@@ -388,6 +409,11 @@ export const jqDatatableModeDefaults = {
  *   searchFields: null,                // es. ['note', 'owner.name'] (client-side), ['clienti.nome', 'comuni.nome'] (server-side)
  *   filterForm: null,                  // es. 'filtri-clienti' (id del form)
  *   initialSort: null,                 // es. { name: 'asc' }
+ *   stateSave: true,
+ *   stateStorage: 'session',           // oppure 'local'
+ *   stateKey: null,                    // → 'json-table:<pathname>:<id>'
+ *   stateReferrers: null,              // es. ['/clienti/scheda'] (null = qualunque pagina)
+ *   stateMaxAge: 0,                    // secondi, 0 = nessuna scadenza
  *   tfoot: false,
  *   updateFooterOnPageChange: false,
  *   infoText: null,                    // → labels.info
@@ -446,6 +472,11 @@ export const defaults = {
   searchFields: null,
   filterForm: null,
   initialSort: null,
+  stateSave: true,
+  stateStorage: 'session',
+  stateKey: null,
+  stateReferrers: null,
+  stateMaxAge: 0,
 
   tfoot: false,
   updateFooterOnPageChange: false,

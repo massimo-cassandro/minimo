@@ -88,10 +88,27 @@ function warnCollisions(filters, params) {
 
 
 /**
+ * Rilegge i valori del form di filtro collegato (`jt._filterForm`) e li memorizza in `jt._filters`, con le stesse
+ * verifiche del collegamento iniziale. Usato dopo il ripristino dello stato salvato (vedi `stateSave`).
+ *
+ * @param {JsonTable} jt - L'istanza del componente
+ * @returns {void}
+ */
+export function rereadFilterForm(jt) {
+  if (jt._filterForm) {
+    const filters = readFilterForm(jt._filterForm);
+    warnCollisions(filters, jt.params);
+    jt._filters = filters;
+  }
+}
+
+
+/**
  * Collega il form indicato da `filterForm` al componente:
  * - legge i valori correnti del form, usati già nella prima richiesta (`jt._filters`)
  * - al `submit` blocca l'invio del form, ne legge i valori e chiama `jt._applyFilters()`
- * - al `reset` (dopo che il form è stato azzerato) fa lo stesso con i valori iniziali del form
+ * - al `reset` (dopo che il form è stato azzerato) cancella lo stato salvato (vedi `stateSave`) e fa lo stesso con i
+ *   valori iniziali del form
  *
  * Un eventuale collegamento precedente viene rimosso (`jt._filterFormController`).
  *
@@ -106,11 +123,13 @@ export function bindFilterForm(jt) {
   jt._filterFormController?.abort();
   jt._filterFormController = null;
   jt._filters = null;
+  jt._filterForm = null;
 
   const form = resolveFilterForm(jt.params.filterForm);
   if (!form) {
     return;
   }
+  jt._filterForm = form;
 
   const controller = new AbortController();
   jt._filterFormController = controller;
@@ -132,6 +151,7 @@ export function bindFilterForm(jt) {
     // l'evento precede l'azzeramento dei campi: i valori vanno letti dopo
     setTimeout(() => {
       if (!e.defaultPrevented && !controller.signal.aborted) {
+        jt.clearState();
         jt._applyFilters(checked(readFilterForm(form)));
       }
     });

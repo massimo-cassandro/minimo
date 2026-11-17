@@ -120,7 +120,7 @@ export function formatNumber(value, params, formatOpts, wrap) {
  * | `datetime`    | come `date`, più la parte oraria (`timesLocaleOpts`)                |
  * | `bool`        | `boolTrueIcon`/`boolFalseIcon`                                      |
  * | `boolTrueOnly`| come `bool`, ma solo `boolTrueIcon`: false e null danno cella vuota |
- * | `email`       | a capo morbidi attorno a `@`                                        |
+ * | `email`       | `<wbr>` prima di `@`                                        |
  *
  * @param {JsonTableParams} params - Parametri risolti
  * @returns {Object<string, DataTypeDefinition>}
@@ -229,7 +229,7 @@ export function builtInDataTypes(params) {
     },
 
     email: {
-      render: value => String(value).replace('@', '<wbr>@<wbr>')
+      render: value => String(value).replace('@', '<wbr>@')
     }
   };
 

@@ -28,6 +28,12 @@
   * [`refresh()`](#filterform-refresh)
   * [Modalità client-side](#filterform-client)
   * [Lato server](#filterform-server)
+* [Persistenza dello stato (`stateSave`)](#statesave)
+  * [Chiave e storage](#statesave-chiave)
+  * [Pagina di provenienza (`stateReferrers`)](#statesave-referrers)
+  * [Cosa viene salvato e ripristinato](#statesave-contenuto)
+  * [Dati extra della pagina](#statesave-extra)
+  * [Azzerare lo stato](#statesave-reset)
 * [Ricerca e ordinamento](#ricerca-ordinamento)
   * [Quick start](#ricerca-quickstart)
   * [Ordinamento: pulsanti e `initialSort`](#ordinamento)
@@ -43,6 +49,7 @@
 * [Server Side](#modalita-server-side)
   * [Ordinamento e ricerca](#server-side-ordinamento)
   * [Modalità jQuery DataTables](#server-side-datatables)
+    * [Migrazione di `stateSave` / `storageAllowedReferrers` / `bindToForm`](#statesave-migrazione)
 * [API dell'istanza](#api)
 * [Backend Symfony per la modalità server-side](#backend-symfony)
   * [Il contratto in breve](#backend-contratto)
@@ -269,6 +276,11 @@ Tutti i parametri sono impostabili sia da attributo HTML che come oggetto in `in
 | `sortAscArrowIcon` | icona, vedi nota (icona `arrow-up`) | Icona del pulsante di ordinamento, ordinamento asc attivo |
 | `sortDescArrowIcon` | icona, vedi nota (icona `arrow-down`) | Icona del pulsante di ordinamento, ordinamento desc attivo |
 | `sortNoneArrowIcon` | icona, vedi nota (icona `arrows-down-up`) | Icona del pulsante di ordinamento, nessun ordinamento |
+| `stateKey` | string o null (`null`) | Chiave dello stato nello storage; `null` = `json-table:<pathname>:<id>`. Vedi [Persistenza dello stato](#statesave) |
+| `stateMaxAge` | number (`0`) | Durata massima dello stato salvato, in secondi; `0` = nessuna scadenza |
+| `stateReferrers` | array, string o null (`null`) | Pagine di provenienza da cui lo stato viene ripristinato: prefissi di path e, solo da `init()`, `RegExp` o funzioni `(url) => boolean`. `null` = qualunque pagina. Da attributo HTML: array JSON o path separati da virgola. Vedi [Pagina di provenienza](#statesave-referrers) |
+| `stateSave` | boolean (`true`) | Salva pagina, ordinamento, ricerca e valori applicati di `filterForm` e li ripristina al caricamento successivo. Senza `id`, `tableId` e `stateKey` all'elemento viene assegnato un id `json-table-<n>`. Vedi [Persistenza dello stato](#statesave) |
+| `stateStorage` | `'session'` o `'local'` (`'session'`) | Storage dello stato: `sessionStorage` o `localStorage` |
 | `tableId` | string (`null`) | Id del tag `<table>` |
 | `template` | Array (`[{ slot: 'infoSection' }, { slot: 'table' }]`) | Layout del contenitore principale (vedi "Template") |
 | `tfoot` | boolean (`false`) | Genera il tfoot (vedi `tfootRender` delle colonne). Non disponibile in modalità server-side |
@@ -790,7 +802,7 @@ GET /clienti-json?stato=attivo&dal=2025-01-01&zone[]=nord&zone[]=sud&page=1&star
 
 La validazione nativa del form resta attiva: con campi non validi (`required`, `min`, `pattern`…) l'evento `submit` non viene emesso e la tabella non cambia.
 
-**Reset.** Un `<button type="reset">` (o `form.reset()`) riporta i campi ai valori iniziali e aggiorna la tabella allo stesso modo del submit.
+**Reset.** Un `<button type="reset">` (o `form.reset()`) riporta i campi ai valori iniziali e aggiorna la tabella allo stesso modo del submit. Con [`stateSave`](#statesave) attivo cancella anche lo stato salvato, compresi i dati extra della pagina.
 
 **Richieste sovrapposte.** Se si invia il form più volte prima che arrivi la risposta, viene mostrata solo l'ultima.
 
@@ -828,6 +840,125 @@ In sintesi:
 - leggere i valori con i metodi tipizzati e validarli; i valori usati come nomi di campo o di colonna vanno tradotti con una whitelist;
 - applicare i filtri **dopo** il conteggio di `totRec` se il "totale generale" non deve risentirne, prima di quello di `filteredRec` in ogni caso;
 - in modalità client-side l'endpoint applica solo i filtri del form e restituisce tutte le righe, senza paginazione.
+
+## <a id="statesave"></a>Persistenza dello stato (`stateSave`)
+
+[⬆︎ Torna all'indice](#indice)
+
+Con `stateSave` attivo (è il default) la tabella salva il proprio stato a ogni aggiornamento e lo ripristina al caricamento successivo della pagina: tornando all'elenco, ad esempio dopo aver aperto la scheda di un record, si ritrovano la stessa pagina, lo stesso ordinamento, la stessa ricerca e gli stessi filtri. È l'equivalente di `stateSave` di jQuery DataTables (vedi la [nota di migrazione](#statesave-migrazione)).
+
+```html
+<json-table id="elenco-clienti" jsonurl="/clienti/json" serverside="true" filterform="filtri-clienti"
+  statereferrers="/clienti/scheda" cols='[...]'></json-table>
+```
+
+```javascript
+// attivazione o disattivazione per tutto il progetto
+JsonTable.setDefaults({ stateSave: !isSuperAdmin });
+```
+
+Il ripristino avviene **prima della prima richiesta**, quindi in modalità server-side (anche con `jqDatatableMode`) non viene inviata una richiesta in più: la prima contiene già pagina, ordinamento, ricerca e valori del form salvati. Lo stato ripristinato ha la precedenza su `initialSort`, che resta il valore usato in sua assenza; un ordinamento rimosso dall'utente (nessun criterio) resta rimosso.
+
+Ogni accesso allo storage è protetto: se lo storage non è disponibile o lancia un'eccezione (navigazione privata, quota esaurita, cookie bloccati) la tabella funziona normalmente senza persistenza (con un avviso se `debug` è attivo).
+
+### <a id="statesave-chiave"></a>Chiave e storage
+
+| Parametro | Default | Descrizione |
+|---|---|---|
+| `stateSave` | `true` | Attiva la persistenza |
+| `stateStorage` | `'session'` | `'session'` (`sessionStorage`: lo stato dura quanto la scheda del browser) o `'local'` (`localStorage`: lo stato sopravvive alla chiusura del browser, conviene impostare `stateMaxAge`) |
+| `stateKey` | `null` | Chiave nello storage. Con `null` viene usata `json-table:<pathname>:<id>`, dove `id` è l'id dell'elemento `<json-table>` (o, in sua assenza, `tableId`, o l'id generato) |
+| `stateMaxAge` | `0` | Secondi dopo i quali lo stato salvato viene scartato; `0` = nessuna scadenza |
+
+Senza `id`, `tableId` e `stateKey` all'elemento viene assegnato un id `json-table-<n>`, dove `n` è la sua posizione tra i `<json-table>` della pagina (da 1; con un suffisso se l'id è già usato). Non è casuale, così resta lo stesso a ogni caricamento e lo stato salvato viene ritrovato. Se le tabelle della pagina cambiano numero o ordine, lo stato può finire a una tabella diversa, dove di norma viene scartato perché le colonne non corrispondono. Con `sessionStorage` (default) è un caso raro, limitato in pratica alla fase di sviluppo; con `stateStorage: 'local'` conviene invece indicare un `id` esplicito. Il pathname nella chiave predefinita evita collisioni tra pagine diverse che usano lo stesso id; per condividere lo stato tra URL diversi indicare una `stateKey` esplicita.
+
+### <a id="statesave-referrers"></a>Pagina di provenienza (`stateReferrers`)
+
+Con `stateReferrers: null` (default) lo stato viene ripristinato qualunque sia la pagina di provenienza. Indicando una o più pagine, lo stato viene ripristinato solo arrivando da una di queste, e **cancellato** in tutti gli altri casi: così si ritrova lo stato tornando dalla scheda di un record, ma non arrivando all'elenco dal menu.
+
+Ogni voce può essere:
+
+- una **stringa**: prefisso del path del referrer. `'/clienti/scheda'` ammette `/clienti/scheda`, `/clienti/scheda/12` e `/clienti/scheda?id=12`;
+- una **`RegExp`** (solo da `init()`): verificata su path + query string del referrer, utile quando l'id è in mezzo al path (`/^\/clienti\/\d+\/scheda/`);
+- una **funzione** (solo da `init()`): riceve l'oggetto `URL` del referrer e restituisce `true` se la pagina è ammessa.
+
+```html
+<json-table id="clienti" statereferrers="/clienti/scheda, /clienti/modifica" ...></json-table>
+<json-table id="clienti" statereferrers='["/clienti/scheda"]' ...></json-table>
+```
+
+```javascript
+el.init({ stateReferrers: ['/clienti/scheda', /^\/clienti\/\d+\/allegati/, url => url.searchParams.has('cliente')] });
+```
+
+Il referrer deve avere la stessa origine della pagina. Lo stato viene comunque ripristinato:
+
+- quando il referrer è vuoto (pagina aperta da un segnalibro o con `rel="noreferrer"`), come in auto-datatables-bs5;
+- quando la pagina viene ricaricata o raggiunta con i pulsanti avanti/indietro del browser: in questi casi `document.referrer` è quello originale della voce di cronologia, non la pagina appena lasciata, e il controllo non sarebbe affidabile.
+
+### <a id="statesave-contenuto"></a>Cosa viene salvato e ripristinato
+
+Lo stato viene salvato dopo il primo rendering e dopo ogni aggiornamento (cambio pagina, ordinamento, ricerca, submit/reset del form, `refresh()`), in questo formato:
+
+```javascript
+{
+  v: 1,                             // versione del formato
+  sig: 'id,ragione_sociale,citta',  // firma delle colonne
+  savedAt: 1763380000000,           // timestamp del salvataggio
+  page: 3,
+  perPage: 25,
+  sort: [{ key: 'citta', dir: 'asc' }],
+  search: 'mar',
+  filters: [['anno', '2025'], ['stato[]', '1'], ['stato[]', '2']], // null senza filterForm
+  extra: null                       // dati della pagina, vedi sotto
+}
+```
+
+- **Colonne**: uno stato salvato con colonne diverse (aggiunte, rimosse, riordinate, anche per una `condition`) o con una versione del formato diversa viene scartato. I criteri di ordinamento sono salvati per chiave; quelli su colonne non più ordinabili vengono ignorati.
+- **Pagina**: se `perPage` è cambiato dal salvataggio, la pagina viene ricalcolata in modo che resti visibile lo stesso primo record. In modalità server-side, se la pagina salvata non esiste più (i dati si sono ridotti), viene richiesta l'ultima pagina disponibile: solo in questo caso le richieste sono due.
+- **Ricerca**: il termine viene ripristinato anche nell'input di ricerca.
+- **Form di filtro**: vengono salvati i valori **applicati** (quelli dell'ultimo submit), non quelli digitati senza inviare il form. Al ripristino il form viene ripopolato prima della prima richiesta: i campi con lo stesso nome (checkbox, `select multiple`, campi ripetuti) sono gestiti, e un campo assente dallo stato viene svuotato (i campi vuoti non vengono salvati). Campi disabilitati, file e pulsanti non vengono toccati; una `select` singola il cui valore salvato non è tra le opzioni resta invariata. Non vengono emessi eventi `input`/`change`.
+- **`reload()`** non ripristina lo stato: azzera ricerca, ordinamento e pagina come di consueto e salva il nuovo stato.
+
+### <a id="statesave-extra"></a>Dati extra della pagina
+
+I dati che il form non contiene (ad esempio il testo visibile di un autocomplete, il cui id è in un campo nascosto) si salvano e ripristinano con due eventi, emessi sull'elemento con `bubbles: true` e annullabili:
+
+| Evento | Quando | `event.detail` | `preventDefault()` |
+|---|---|---|---|
+| `jt:statesave` | prima di ogni salvataggio | `{ jsonTable, state }` | il salvataggio viene saltato |
+| `jt:stateload` | quando c'è uno stato da ripristinare, dopo il ripopolamento del form e prima della prima richiesta | `{ jsonTable, state }` | lo stato viene scartato e cancellato, il form torna ai valori precedenti |
+
+In `jt:statesave` si imposta `event.detail.state.extra` (qualunque valore serializzabile in JSON); se non viene modificato resta quello precedente. In `jt:stateload` lo si legge: le modifiche fatte al form dentro l'handler (che deve essere sincrono) vengono incluse nella prima richiesta.
+
+```javascript
+const jtable = document.getElementById('elenco-clienti');
+
+jtable.addEventListener('jt:statesave', e => {
+  e.detail.state.extra = { clienteLabel: document.getElementById('cliente-ac').value };
+});
+
+jtable.addEventListener('jt:stateload', e => {
+  document.getElementById('cliente-ac').value = e.detail.state.extra?.clienteLabel ?? '';
+});
+```
+
+`jt:stateload` viene emesso nel microtask successivo a `init()`, quindi un listener registrato subito dopo `init()` lo riceve comunque; per gestire tutte le tabelle di un progetto si può anche ascoltare su `document`.
+
+### <a id="statesave-reset"></a>Azzerare lo stato
+
+| Metodo | Descrizione |
+|---|---|
+| `clearState()` | Cancella lo stato salvato, compresi i dati extra. La tabella non cambia e al prossimo aggiornamento viene salvato un nuovo stato; per tornare anche alla situazione iniziale chiamare poi `reload()` |
+| `saveState()` | Salva subito lo stato corrente (emette `jt:statesave`), ad es. dopo una modifica dei dati extra |
+| `getSavedState()` | Restituisce lo stato salvato (formato sopra) oppure `null` |
+
+Il reset del [form di filtro](#filterform) cancella lo stato salvato prima di aggiornare la tabella.
+
+```javascript
+jtable.clearState();
+await jtable.reload(); // pagina 1, initialSort, ricerca vuota
+```
 
 ## <a id="ricerca-ordinamento"></a>Ricerca e ordinamento
 
@@ -1448,6 +1579,26 @@ GET /api/zone?draw=1&columns[0][name]=id&…&columns[1][name]=zona&…
 
 Il servizio confronta `columns[i][searchable]` con `== true`. In PHP la stringa `"false"` vale `true`, quindi una colonna con `searchable: false` viene cercata comunque se `$fields` lo consente (e lo stesso vale per `orderable`). Per escluderla va impostato `'searchable' => false` in `$fields`.
 
+#### <a id="statesave-migrazione"></a>Migrazione di `stateSave` / `storageAllowedReferrers` / `bindToForm`
+
+La persistenza dello stato di jQuery DataTables + auto-datatables-bs5 corrisponde a [`stateSave`](#statesave) di json-table:
+
+| auto-datatables-bs5 | json-table |
+|---|---|
+| `stateSave: true` (default) | `stateSave: true` (default); per escludere alcuni utenti `JsonTable.setDefaults({ stateSave: false })` |
+| `stateDuration: -1` (sessionStorage) | `stateStorage: 'session'` (default) |
+| `stateDuration` > 0 (localStorage) | `stateStorage: 'local'` + `stateMaxAge` (secondi) |
+| chiave `DataTables_<id>` | `json-table:<pathname>:<id>` (o `stateKey`) |
+| `storageAllowedReferrers: [path('…_scheda', { id: null })]` | `stateReferrers: ['/…/scheda']` |
+| `storageAllowedReferrers: null` | `stateReferrers: null` (default) |
+| `search_form_data` (valori di `bindToForm`) | salvati e ripristinati automaticamente con `filterForm` |
+| lettura diretta di `sessionStorage['DataTables_…']` dal JS della pagina | eventi `jt:statesave` / `jt:stateload` con `state.extra` |
+
+Differenze:
+
+- `storageAllowedReferrers` era una lista di regexp verificate sull'URL completo del referrer, quindi un path veniva trovato in qualunque punto dell'URL; in `stateReferrers` una stringa è un **prefisso del path**. Per i valori generati con `path()` di Symfony (path assoluti) basta usare la stessa stringa; per casi diversi usare una `RegExp` da `init()`.
+- Il vecchio sistema salvava i valori del form con `Object.fromEntries(new FormData(form))`, che conservava un solo valore per ogni nome; json-table gestisce anche checkbox e `select multiple` con lo stesso nome, e salva i valori applicati con l'ultimo submit (non quelli presenti nel form al momento del salvataggio).
+- Gli stati salvati dal vecchio sistema non vengono letti: alla prima apertura dopo la conversione la tabella parte dallo stato iniziale.
 
 ## <a id="api"></a>API dell'istanza
 
@@ -1455,11 +1606,14 @@ Il servizio confronta `columns[i][searchable]` con `== true`. In PHP la stringa 
 
 | Metodo | Descrizione |
 |---|---|
+| `clearState()` | Cancella lo stato salvato (vedi [Persistenza dello stato](#statesave-reset)) |
 | `destroy()` | Svuota il componente; `init()` può essere richiamato in seguito |
+| `getSavedState()` | Restituisce lo stato salvato oppure `null` (vedi [Persistenza dello stato](#statesave-contenuto)) |
 | `goToPage(page)` | Mostra la pagina indicata (limitata all'intervallo disponibile) |
 | `init(config)` | Avvia il componente (prima o dopo l'inserimento nel DOM) |
 | `refresh()` | Richiede di nuovo i dati con lo stato corrente (pagina, ordinamento, ricerca, valori applicati di [`filterForm`](#filterform)) e ridisegna la tabella senza ricostruirla (`Promise`) |
-| `reload(overrides)` | Ricarica i dati e ricostruisce la struttura, con eventuali parametri sovrascritti (`Promise`); ricerca, ordinamento e pagina vengono azzerati |
+| `reload(overrides)` | Ricarica i dati e ricostruisce la struttura, con eventuali parametri sovrascritti (`Promise`); ricerca, ordinamento e pagina vengono azzerati (lo stato salvato non viene ripristinato) |
+| `saveState()` | Salva subito lo stato corrente (vedi [Persistenza dello stato](#statesave-reset)) |
 | `setSearch(term)` | Filtra le righe con il termine indicato (stringa vuota = nessun filtro) e torna alla prima pagina; l'input di ricerca viene aggiornato |
 | `setSort(key, dir)` | Ordina per la colonna `key` (`'asc'`, `'desc'`, oppure `null` per rimuovere l'ordinamento) e torna alla prima pagina |
 
@@ -1883,12 +2037,14 @@ parametri nell'helper, lasciando invariato il resto.
 
 [⬆︎ Torna all'indice](#indice)
 
-Entrambi vengono emessi sull'elemento con `bubbles: true`; `event.detail.jsonTable` è l'istanza.
+Tutti vengono emessi sull'elemento con `bubbles: true`; `event.detail.jsonTable` è l'istanza.
 
 | Evento | Quando | `event.detail` |
 |---|---|---|
 | `jt:ready` | al termine della costruzione e del primo rendering (nel microtask successivo, quindi un listener registrato subito dopo `init()` lo intercetta comunque) | `{ jsonTable }` |
 | `jt:update` | dopo ogni cambio pagina, ordinamento o ricerca (anche via API), dopo il submit/reset del form di filtro e dopo `refresh()` | `{ jsonTable, reason }` con `reason` = `'page'`, `'sort'`, `'search'`, `'filter'` o `'refresh'` |
+| `jt:stateload` | con [`stateSave`](#statesave), quando viene ripristinato uno stato salvato, prima della prima richiesta (annullabile) | `{ jsonTable, state }` |
+| `jt:statesave` | con [`stateSave`](#statesave), prima di ogni salvataggio dello stato (annullabile; `state.extra` impostabile) | `{ jsonTable, state }` |
 
 ```javascript
 jtable.addEventListener('jt:ready', e => console.log(e.detail.jsonTable.data));

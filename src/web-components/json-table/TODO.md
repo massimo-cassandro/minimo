@@ -12,7 +12,7 @@ Materiale di riferimento (piano originale, vecchia implementazione): `src/web-co
   * `test/sideEffects-tree-shaking/webpack.config.mjs` rotto: importa `dev-tools/starter-kit/webpack-modules/css-rules.mjs`, spostato in `dev-tools/starter-kit/source_files/root/webpack-config-modules/`
 
 ## Punti aperti
-  * `refs` (ripristino pagina da cookie di sessione al ritorno da pagine indicate, come in s-datatable: vedi `_isReferrer`/`_savePageCookie`)
+  * `stateSave` (17/11/2026): da verificare nel browser e in ADA (ripristino con `filterForm`, autocomplete tramite `jt:stateload`/`jt:statesave`, navigazione indietro)
 
   * `_collapseKey` di s-datatable (raggruppamento visivo valori ripetuti): da decidere
 
