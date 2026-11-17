@@ -62,7 +62,7 @@ export default {
         },
         height: {
           $type: 'dimension',
-          $value: '8px'
+          $value: '6px'
         },
         offset: {
           $type: 'dimension',

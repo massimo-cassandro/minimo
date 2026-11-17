@@ -11,7 +11,7 @@ import { renderTbody } from './src/table-body.js';
 import { renderTfoot } from './src/tfoot.js';
 import { updateInfo } from './src/update-info.js';
 import { applySortState, setSortListener } from './src/thead.js';
-import { setSearchListener, filterRows } from './src/search.js';
+import { setSearchListener, filterRows, normalizeSearchFields } from './src/search.js';
 import { sortRows } from './src/sorting.js';
 import { calcTotPages, renderPagination } from './src/pagination.js';
 import { bindFilterForm } from './src/filter-form.js';
@@ -112,7 +112,7 @@ const emptyState = () => ({
  *   paginationDelta: 2,                 // default: 2
  *   serverSide: false,                  // default: false
  *   serverParams: { page: 'page', start: 'start', perPage: 'perPage', sort: 'sort', dir: 'dir', search: 'search', searchFields: 'searchFields' }, // default
- *   searchFields: null,                 // default: null (campi di ricerca aggiuntivi in modalità server-side)
+ *   searchFields: null,                 // default: null (campi di ricerca aggiuntivi, anche non presenti in cols)
  *   filterForm: null,                   // default: null (id del form di filtro, oppure l'elemento <form>)
  *   initialSort: { city: 'asc', name: 'desc' }, // default: null
  *   tfoot: true,                        // default: false (non disponibile in modalità server-side)
@@ -581,16 +581,7 @@ export class JsonTable extends HTMLElement {
       params.filterForm = null;
     }
 
-    if (params.searchFields != null) {
-      if (!Array.isArray(params.searchFields) || !params.searchFields.every(field => field && typeof field === 'string')) {
-        console.warn('[json-table] `searchFields` deve essere un array di stringhe non vuote: parametro ignorato');
-        params.searchFields = null;
-
-      } else if (!params.serverSide || params.jqDatatableMode) {
-        console.warn(`[json-table] \`searchFields\` non ha effetto con ${params.serverSide ? '`jqDatatableMode`' : 'modalità client-side'}: parametro ignorato`);
-        params.searchFields = null;
-      }
-    }
+    params.searchFields = normalizeSearchFields(params.searchFields, params);
     /* eslint-enable no-console */
   }
 

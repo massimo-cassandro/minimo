@@ -28,8 +28,10 @@
   * [`refresh()`](#filterform-refresh)
   * [Modalità client-side](#filterform-client)
   * [Lato server](#filterform-server)
-* [Ordinamento](#ordinamento)
 * [Ricerca e ordinamento](#ricerca-ordinamento)
+  * [Quick start](#ricerca-quickstart)
+  * [Ordinamento: pulsanti e `initialSort`](#ordinamento)
+  * [Parametri per modalità](#ricerca-parametri)
   * [Client-side](#ricerca-client)
   * [Server-side](#ricerca-server)
 * [Tabelle con `rowspan`](#tabelle-rowspan)
@@ -106,6 +108,7 @@ const other = document.createElement('json-table');
   filterForm='jt-filter'
   tfoot="true"
   serverSide="true"
+  searchfields="note, comune.nome, tags" <!-- permette la ricerca nei campi non inclusi in cols -->
   cols='[
     { "key": "id", "dataType": "id" },
     { "key": "name", "title": "Nome", "render": "<a href=\"/users/[[id]]\">[[name]]</a>" },
@@ -132,6 +135,8 @@ segnalato in console e ignorato).
 Da attributo non è possibile passare funzioni: per il rendering delle celle è disponibile la
 sintassi mustache-like `[[key]]` (vedi [`render`](#colonne-render)), per il footer gli aggregati
 predefiniti (`"@sum"`, ...).
+
+Vedi anche [Ricerca e ordinamento](#ricerca-ordinamento)
 
 ## <a id="utilizzo-script"></a>Utilizzo da script
 
@@ -175,6 +180,9 @@ jtable.init({
 // se appena creato, appendere dopo init():
 document.body.appendChild(jtable);
 ```
+
+Vedi anche [Ricerca e ordinamento](#ricerca-ordinamento)
+
 
 ### <a id="utilizzo-dombuilder"></a>Con `domBuilder`
 
@@ -255,7 +263,7 @@ Tutti i parametri sono impostabili sia da attributo HTML che come oggetto in `in
 | `renderZeroAs` | string o null (`null`) | Se non null, contenuto per i valori numerici pari a zero |
 | `search` | boolean (`true`) | Genera l'input di ricerca |
 | `searchDebounce` | number (`300`) | Millisecondi di attesa dopo l'ultimo tasto prima di eseguire la ricerca |
-| `searchFields` | string[] o null (`null`) | Solo server-side: campi su cui cercare oltre a quelli delle colonne ricercabili, anche nella forma `tabella.campo`. Vedi [Ricerca e ordinamento](#searchfields) |
+| `searchFields` | array o null (`null`) | Campi su cui cercare oltre a quelli delle colonne ricercabili, anche se non presenti in `cols`: percorsi del JSON o funzioni `row => valore` in client-side, nomi di campo (anche `tabella.campo`) in server-side. Da attributo HTML: array JSON o stringa separata da virgole. Vedi [Ricerca e ordinamento](#ricerca-quickstart) |
 | `serverParams` | Object | Nomi dei parametri di query string in modalità server-side, uniti ai default (vedi sotto) |
 | `serverSide` | boolean (`false`) | Paginazione, ordinamento e ricerca delegati al server (vedi "Modalità server-side"). Richiede `jsonUrl` |
 | `sortAscArrowIcon` | icona, vedi nota (icona `arrow-up`) | Icona del pulsante di ordinamento, ordinamento asc attivo |
@@ -440,17 +448,25 @@ cols: [
 | `rowHeading` | boolean | `false` | Se `true` la cella è un'intestazione di riga (`th[scope=row]`) |
 | `rowspan` | number o `row => number` | `null` | Numero di `<tr>` occupati dal record, vedi sotto |
 | `searchable` | boolean | `true` | Abilita la ricerca sulla colonna |
-| `searchKeys` | array di stringhe | `null` | Solo server-side: campi di ricerca della colonna, al posto di `key`. In genere è preferibile il parametro [`searchFields`](#searchfields) della tabella |
-| `searchValue` | valore o `row => valore` | non impostato (tipo di dato / valore grezzo) | Valore usato per la ricerca; prevale su quello del tipo di dato |
+| `searchKeys` | array di stringhe | `null` | Solo server-side: campi di ricerca inviati al posto di `key` ([vedi sotto](#colonne-ricerca)) |
+| `searchValue` | valore o `row => valore` | non impostato (tipo di dato / valore grezzo) | Solo client-side: valore usato per la ricerca ([vedi sotto](#colonne-ricerca)) |
 | `sortable` | boolean | `true` | Abilita l'ordinamento sulla colonna |
-| `sortKeys` | array di stringhe | `null` | Solo server-side: chiavi inviate in `sort` al posto di `key`, vedi [Ricerca e ordinamento](#sortkeys) |
-| `sortValue` | valore o `row => valore` | non impostato (tipo di dato / valore grezzo) | Valore usato per l'ordinamento; prevale su quello del tipo di dato |
+| `sortKeys` | array di stringhe | `null` | Solo server-side: chiavi di ordinamento inviate al posto di `key` ([vedi sotto](#colonne-ricerca)) |
+| `sortValue` | valore o `row => valore` | non impostato (tipo di dato / valore grezzo) | Solo client-side: valore usato per l'ordinamento ([vedi sotto](#colonne-ricerca)) |
 | `tfootRender` | `(rows, td) => contenuto`, aggregato `'@…'` o stringa statica | `null` | Contenuto della cella del tfoot (solo se `tfoot` è `true`). `null` = cella vuota |
 | `title` | testo, HTML, Node, array domBuilder o funzione | la chiave | Contenuto del `<th>`. Nelle colonne ordinabili è il testo del pulsante |
 
 ### <a id="colonne-ricerca"></a>Ricerca e ordinamento
 
-`sortValue` e `searchValue` agiscono solo in modalità client-side, `sortKeys` e `searchKeys` solo in modalità server-side: nella modalità sbagliata vengono ignorati con un avviso in console. Vedi [Ricerca e ordinamento](#ricerca-ordinamento).
+Riepilogo dei parametri di colonna; descrizione completa, esempi e parametri di tabella (`initialSort`, `searchFields`) in [Ricerca e ordinamento](#ricerca-ordinamento).
+
+| Parametri | Modalità | Funzione |
+|---|---|---|
+| `searchable`, `sortable` | entrambe | Includono o escludono la colonna da ricerca e ordinamento |
+| `searchValue`, `sortValue` | solo client-side | Valore usato al posto di quello del tipo di dato |
+| `searchKeys`, `sortKeys` | solo server-side | Nomi di campo inviati al server al posto di `key` |
+
+Nella modalità sbagliata i parametri vengono ignorati con un avviso in console.
 
 ### <a id="colonne-condition"></a>`condition`
 
@@ -813,9 +829,97 @@ In sintesi:
 - applicare i filtri **dopo** il conteggio di `totRec` se il "totale generale" non deve risentirne, prima di quello di `filteredRec` in ogni caso;
 - in modalità client-side l'endpoint applica solo i filtri del form e restituisce tutte le righe, senza paginazione.
 
-## <a id="ordinamento"></a>Ordinamento
+## <a id="ricerca-ordinamento"></a>Ricerca e ordinamento
 
 [⬆︎ Torna all'indice](#indice)
+
+### <a id="ricerca-quickstart"></a>Quick start
+
+Di default tutte le colonne sono ricercabili e ordinabili (salvo i tipi di dato che lo escludono, vedi [DataTypes](#datatypes)). Negli esempi seguenti la colonna `azioni` è esclusa da ricerca e ordinamento, la tabella parte ordinata per `cognome` e la ricerca considera anche campi del JSON che non sono colonne della tabella (`searchFields`).
+
+Dati di esempio (una riga):
+
+```json
+{ "id": 12, "cognome": "Rossi", "nome": "Mario", "note": "cliente storico", "comune": { "nome": "Bologna" }, "tags": ["vip", "newsletter"] }
+```
+
+#### Client-side, da script
+
+```javascript
+jtable.init({
+  jsonUrl: '/api/clienti.json',
+  initialSort: { cognome: 'asc' },
+  // campi su cui cercare oltre alle colonne: percorsi del JSON e funzioni
+  searchFields: [
+    'note',
+    'comune.nome',                         // valore annidato
+    'tags',                                // array: viene considerato ogni elemento
+    row => `${row.nome} ${row.cognome}`    // valore calcolato (solo da script)
+  ],
+  cols: [
+    { key: 'cognome', title: 'Cognome' },
+    { key: 'nome', title: 'Nome' },
+    { key: 'azioni', title: '', searchable: false, sortable: false, render: row => `<a href="/clienti/${row.id}">Modifica</a>` }
+  ]
+});
+```
+
+#### Client-side, da HTML
+
+```html
+<json-table
+  jsonurl="/api/clienti.json"
+  initialsort='{ "cognome": "asc" }'
+  searchfields="note, comune.nome, tags"
+  cols='[
+    { "key": "cognome", "title": "Cognome" },
+    { "key": "nome", "title": "Nome" },
+    { "key": "azioni", "title": "", "searchable": false, "sortable": false, "render": "<a href=\"/clienti/[[id]]\">Modifica</a>" }
+  ]'
+></json-table>
+```
+
+`searchfields` accetta anche un array JSON (`searchfields='["note", "comune.nome", "tags"]'`); le funzioni sono disponibili solo da script.
+
+#### Server-side, da script
+
+```javascript
+jtable.init({
+  jsonUrl: '/api/clienti',
+  serverSide: true,
+  initialSort: { cognome: 'asc' },
+  // nomi dei campi inviati al server (le tabelle devono essere in join nella query);
+  // `clienti.nome` è necessario perché `comuni.nome` farebbe scartare la key `nome` della colonna
+  searchFields: ['clienti.nome', 'clienti.note', 'comuni.nome'],
+  cols: [
+    { key: 'cognome', title: 'Cognome', sortKeys: ['clienti.cognome', 'clienti.nome'] },
+    { key: 'nome', title: 'Nome' },
+    { key: 'azioni', title: '', searchable: false, sortable: false, render: row => `<a href="/clienti/${row.id}">Modifica</a>` }
+  ]
+});
+// cercando "rossi":
+// GET /api/clienti?page=1&start=0&perPage=25&sort=clienti.cognome,clienti.nome&dir=asc,asc&search=rossi&searchFields=cognome,clienti.nome,clienti.note,comuni.nome
+```
+
+#### Server-side, da HTML
+
+```html
+<json-table
+  jsonurl="/api/clienti"
+  serverside
+  initialsort='{ "cognome": "asc" }'
+  searchfields="clienti.nome, clienti.note, comuni.nome"
+  cols='[
+    { "key": "cognome", "title": "Cognome", "sortKeys": ["clienti.cognome", "clienti.nome"] },
+    { "key": "nome", "title": "Nome" },
+    { "key": "azioni", "title": "", "searchable": false, "sortable": false, "render": "<a href=\"/clienti/[[id]]\">Modifica</a>" }
+  ]'
+></json-table>
+```
+
+In server-side il server riceve solo i nomi dei campi: è suo compito cercare sul termine e ordinare (vedi [Server-side](#ricerca-server) e [Backend Symfony](#backend-symfony)). Le funzioni in `searchFields` vengono ignorate con un avviso, e un nome semplice viene scartato se è presente anche nella forma `tabella.nome` (vedi [`searchFields`](#searchfields)).
+
+### <a id="ordinamento"></a>Ordinamento: pulsanti e `initialSort`
 
 Ogni colonna con `sortable: true` (default) ha un pulsante nel
 `<th>` che cicla tra nessun ordinamento → ascendente → discendente → nessuno; l'attributo
@@ -823,11 +927,6 @@ Ogni colonna con `sortable: true` (default) ha un pulsante nel
 descrivono l'azione del click successivo (`labels.sortAsc/sortDesc/sortNone`). Il click ordina
 per la sola colonna cliccata, sostituendo gli eventuali criteri multipli di `initialSort`; il cambio
 di ordinamento riporta alla prima pagina.
-
-Lato client il confronto usa i valori precalcolati per ogni riga (`sortValue` di colonna, poi del
-tipo di dato, poi il valore grezzo): i valori vuoti (`null`, `''`, `NaN`) vanno sempre in coda,
-i numeri sono confrontati numericamente, il resto con `localeCompare` (`locale`, collazione
-numerica, insensibile a maiuscole e accenti). L'ordinamento è stabile.
 
 `initialSort` applica al caricamento uno o più criteri, in ordine di priorità: il secondo decide
 solo tra le righe uguali per il primo, e così via.
@@ -846,9 +945,7 @@ JavaScript: le chiavi di tipo intero (es. `'2024'`) vengono sempre enumerate per
 numerico. `aria-sort` e l'icona compaiono solo sulla colonna del
 primo criterio. `setSort(key, dir)` imposta via script l'ordinamento per una sola colonna.
 
-## <a id="ricerca-ordinamento"></a>Ricerca e ordinamento
-
-[⬆︎ Torna all'indice](#indice)
+### <a id="ricerca-parametri"></a>Parametri per modalità
 
 I parametri da usare dipendono dalla modalità: in client-side il componente elabora tutti i dati in locale, in server-side riceve solo la pagina corrente e ricerca e ordinamento spettano al server.
 
@@ -858,7 +955,7 @@ I parametri da usare dipendono dalla modalità: in client-side il componente ela
 | `sortable` | colonna | sì | sì |
 | `searchValue` | colonna | sì | ignorato, con avviso |
 | `sortValue` | colonna | sì | ignorato, con avviso |
-| `searchFields` | tabella | ignorato, con avviso | sì |
+| `searchFields` | tabella | sì (percorsi del JSON e funzioni) | sì (nomi di campo; funzioni ignorate con avviso) |
 | `searchKeys` | colonna | ignorato, con avviso | sì |
 | `sortKeys` | colonna | ignorato, con avviso | sì |
 
@@ -874,13 +971,43 @@ Ogni parola del termine di ricerca, senza distinzione tra maiuscole e minuscole,
 2. `searchValue` del tipo di dato
 3. valore della cella (il risultato di `parse`, se definito, altrimenti il valore grezzo)
 
-Per cercare su un campo non visibile basta includerlo nel `searchValue` di una colonna visibile:
+Al testo vengono poi aggiunti i valori di [`searchFields`](#searchfields-client).
+
+Una colonna con `condition: false` viene eliminata e non partecipa alla ricerca: se serve, il suo campo va indicato in `searchFields`.
+
+##### <a id="searchfields-client"></a>`searchFields`
+
+Aggiunge alla ricerca campi del JSON che non sono colonne della tabella (o che lo sono, ma con `searchable: false`). Ogni voce può essere:
+
+- un **percorso** nel JSON della riga: il punto indica un valore annidato, come in `key` (`'comune.nome'`)
+- una **funzione** `row => valore`, che può restituire una stringa, un numero o un array di valori (solo da script o da `JsonTable.setDefaults()`)
+
+```javascript
+searchFields: [
+  'codiceInterno',
+  'comune.nome',
+  'tags',                                  // ['vip', 'newsletter'] → entrambi i valori
+  row => row.contatti.map(c => c.email)    // valori dentro un array di oggetti
+]
+```
+
+```html
+<json-table searchfields="codiceInterno, comune.nome, tags" …></json-table>
+```
+
+Accorgimenti:
+
+- vengono usati i **valori grezzi** del JSON, senza la formattazione del tipo di dato: una data `2026-11-17` si trova cercando `2026-11`, non `17/11`. Se serve il valore formattato, usare una funzione
+- i valori array vengono appiattiti; `null`, stringhe vuote e oggetti vengono scartati (per un oggetto va indicato il percorso fino al valore, es. `comune.nome`, non `comune`)
+- un percorso non attraversa gli array: per `contatti.email`, con `contatti` array di oggetti, va usata una funzione come nell'esempio
+- da attributo HTML il valore può essere un array JSON o una stringa con i campi separati da virgola
+- un valore che non è un array (o una stringa) viene ignorato con un avviso in console, come ogni voce che non sia una stringa non vuota o una funzione
+
+In alternativa, per un campo legato a una sola colonna si può usare il `searchValue` della colonna, ricordando che sostituisce il valore di ricerca della colonna stessa:
 
 ```javascript
 { key: 'nome', searchValue: row => `${row.nome} ${row.codiceInterno}` }
 ```
-
-Una colonna con `condition: false`, invece, viene eliminata e non partecipa alla ricerca.
 
 #### Ordinamento
 
@@ -890,7 +1017,7 @@ Il valore di confronto di una colonna con `sortable: true` viene scelto in quest
 2. `sortValue` del tipo di dato
 3. valore della cella (il risultato di `parse`, se definito, altrimenti il valore grezzo)
 
-I valori vuoti (`null`, `''`, `NaN`) vanno sempre in coda, i numeri vengono confrontati numericamente e il resto con `localeCompare`. La funzione può contenere una condizione, perché viene eseguita su tutte le righe:
+I valori vuoti (`null`, `''`, `NaN`) vanno sempre in coda, i numeri vengono confrontati numericamente e il resto con `localeCompare` (`locale`, collazione numerica, insensibile a maiuscole e accenti). L'ordinamento è stabile. La funzione può contenere una condizione, perché viene eseguita su tutte le righe:
 
 ```javascript
 {
@@ -913,7 +1040,7 @@ GET /api/clienti?…&search=rossi&searchFields=codice,citta
 
 L'elenco contiene la `key` delle colonne con `searchable: true` e i campi indicati con i parametri descritti di seguito. Il nome del parametro di query si cambia con `serverParams.searchFields`, e `null` lo omette.
 
-##### `searchFields`
+##### <a id="searchfields"></a>`searchFields`
 
 È il modo preferibile per indicare i campi di ricerca: si definisce una sola volta per la tabella e aggiunge i campi indicati a quelli delle colonne ricercabili, anche se non sono visualizzati. Sono ammessi i nomi nella forma `tabella.campo`, ma le tabelle devono essere già in join nella query del server.
 
@@ -932,7 +1059,7 @@ jtable.init({
 ?search=rossi&searchFields=codice,clienti.denominazione_sociale,clienti.nome,clienti.cognome,comuni.nome
 ```
 
-Un valore diverso da un array di stringhe non vuote viene ignorato con un avviso in console.
+Da attributo HTML il valore può essere un array JSON o una stringa con i campi separati da virgola (`searchfields="clienti.nome, comuni.nome"`). Le funzioni, ammesse in client-side, qui vengono ignorate con un avviso, come ogni voce che non sia una stringa non vuota; un valore che non è un array (o una stringa) viene ignorato del tutto.
 
 **Campi già presenti in `cols`.** Ogni campo viene inviato una sola volta:
 
@@ -1260,7 +1387,11 @@ viene ignorato con un avviso in console.
 
 ### <a id="server-side-ordinamento"></a>Ordinamento e ricerca
 
-`sortValue` e `searchValue` non hanno effetto in questa modalità. Per indicare al server i campi da usare sono disponibili `searchFields`, `searchKeys` e `sortKeys`: vedi [Ricerca e ordinamento](#ricerca-ordinamento).
+Per maggiori dettagli ed esempi vedi  [Ricerca e ordinamento → Server-side](#ricerca-server).
+
+* Ricerca e ordinamento sono eseguiti dal server, che riceve il termine (`search`), i campi su cui cercare (`searchFields`) e i criteri di ordinamento (`sort`, `dir`)
+* I campi inviati si definiscono con `searchFields` (tabella), `searchKeys` e `sortKeys` (colonna); in loro assenza viene usata la `key` delle colonne
+* `sortValue`, `searchValue` e le funzioni in `searchFields` vengono ignorati con un avviso in console
 
 ### <a id="server-side-datatables"></a>Modalità jQuery DataTables
 

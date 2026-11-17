@@ -178,7 +178,9 @@ export function warnIneffectiveColParams(cols, params) {
     ].filter(Boolean).map(name => `\`${name}\``);
 
     if (names.length) {
-      const hint = keysAvailable ? ': usare `sortKeys` / `searchFields`' : '';
+      const hint = keysAvailable
+        ? ': usare `sortKeys` / `searchFields`'
+        : (!serverSide && col.searchKeys != null ? ': per cercare su altri campi usare `searchFields`' : '');
       // eslint-disable-next-line no-console
       console.warn(`[json-table] colonna \`${col.key}\`: ${names.join(', ')} ${names.length > 1 ? 'non hanno' : 'non ha'} effetto con ${mode}${hint}`);
     }

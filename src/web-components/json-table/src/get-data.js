@@ -157,7 +157,8 @@ export function buildServerUrl(params, request, filters = null) {
   }
   set(names.search, request.search);
   if (request.search && !params.jqDatatableMode) {
-    set(names.searchFields, buildSearchFields(cols, params.searchFields));
+    // in server-side `normalizeSearchFields` lascia solo stringhe
+    set(names.searchFields, buildSearchFields(cols, /** @type {string[]|null} */ (params.searchFields)));
   }
 
   return url.toString();

@@ -1,5 +1,5 @@
 
-import { getCellValue, getCellValues } from './content-utils.js';
+import { getCellValue, getCellValues, getNestedValue } from './content-utils.js';
 
 /** @typedef {import('./defaults.js').JsonTableParams} JsonTableParams */
 /** @typedef {import('./parse-cols.js').ParsedCol} ParsedCol */
@@ -10,7 +10,7 @@ import { getCellValue, getCellValues } from './content-utils.js';
  * @property {number} idx - Indice della riga nell'insieme di dati originale
  * @property {Object} row - L'oggetto riga originale
  * @property {Object<string, *>} sortValues - Valore di ordinamento di ogni colonna ordinabile, indicizzato per chiave della colonna
- * @property {string} searchText - Concatenazione in minuscolo dei valori di ricerca delle colonne ricercabili
+ * @property {string} searchText - Concatenazione in minuscolo dei valori di ricerca delle colonne ricercabili e di `searchFields`
  */
 
 /**
@@ -39,6 +39,7 @@ function resolveValue(colValue, typeFn, value, row, params) {
  * calcolati una sola volta e non a ogni operazione di ordinamento/ricerca (vedi `sorting.js` e `search.js`).
  * Nelle colonne ripetute su più `<tr>` (`col._subRows`) con valore array, l'ordinamento usa il primo elemento e
  * la ricerca li considera tutti. Il valore di partenza è quello restituito da `parse`, se definito nella colonna.
+ * Al testo di ricerca vengono aggiunti i valori di `searchFields` (vedi `searchFieldsValues`).
  * In modalità server-side i valori non vengono calcolati: ordinamento e ricerca spettano al server.
  *
  * @param {Array<Object>} rows - Righe di dati grezze
@@ -82,6 +83,36 @@ export function parseRows(rows, cols, params) {
       }
     });
 
+    searchParts.push(...searchFieldsValues(row, params.searchFields));
+
     return { idx, row, sortValues, searchText: searchParts.join(' ').toLowerCase() };
   });
+}
+
+
+/**
+ * Valori di ricerca aggiuntivi di una riga, da `searchFields` (solo modalità client-side): ogni voce è un percorso nel JSON
+ * della riga (il punto indica un valore annidato, come in `key`) oppure una funzione `row => valore`.
+ * I valori array vengono appiattiti; `null`, stringhe vuote e oggetti vengono scartati (per un oggetto va indicato il percorso
+ * fino al valore, es. `owner.name`). I valori sono quelli grezzi del JSON, senza la formattazione dei data type.
+ *
+ * @param {Object} row - Oggetto riga
+ * @param {import('./defaults.js').SearchField[]|null} searchFields - Voci di `searchFields`, già normalizzate (vedi `normalizeSearchFields`)
+ * @returns {string[]}
+ *
+ * @example
+ * searchFieldsValues({ note: 'urgente', tags: ['a', 'b'], owner: { name: 'Mario' } }, ['note', 'tags', 'owner.name']);
+ * // → ['urgente', 'a', 'b', 'Mario']
+ * searchFieldsValues({ items: [{ name: 'x' }, { name: 'y' }] }, [row => row.items.map(item => item.name)]);
+ * // → ['x', 'y']
+ */
+function searchFieldsValues(row, searchFields) {
+  if (!searchFields?.length) {
+    return [];
+  }
+
+  return searchFields
+    .flatMap(field => [typeof field === 'function' ? field(row) : getNestedValue(row, field)].flat(Infinity))
+    .filter(value => value != null && value !== '' && typeof value !== 'object')
+    .map(String);
 }

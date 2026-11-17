@@ -212,6 +212,18 @@ import {
  */
 
 /**
+ * Voce di `searchFields`.
+ *
+ * - modalità client-side: percorso nel JSON della riga (il punto indica un valore annidato, come in `key`, es. `owner.name`)
+ *   oppure, solo tramite `init()`/`setDefaults()`, funzione `row => valore` (stringa, numero o array di valori).
+ *   Vengono usati i valori grezzi del JSON, senza la formattazione dei data type
+ * - modalità server-side: nome del campo inviato al server, anche nella forma `tabella.campo`; il server deve accettare solo
+ *   valori previsti. Le funzioni vengono ignorate con un avviso
+ *
+ * @typedef {string|((row: Object) => *)} SearchField
+ */
+
+/**
  * Parametri di `<json-table>` (risolti: ogni chiave ha un valore, vedi `defaults`).
  *
  * Ogni parametro può essere impostato come attributo HTML dell'elemento `<json-table>`
@@ -255,8 +267,9 @@ import {
  *   righe della pagina richiesta, più `totRecField` e `filteredRecField`. Richiede `jsonUrl`; `tfoot` non è
  *   disponibile in questa modalità (default: false)
  * @property {ServerParams} serverParams - Solo modalità server-side: nomi dei parametri della query string (vedi `ServerParams`)
- * @property {string[]|null} searchFields - Solo modalità server-side, escluso `jqDatatableMode`: campi su cui cercare, oltre a
- *   quelli delle colonne ricercabili, anche nella forma `tabella.campo`. Il server deve accettare solo valori previsti (default: null)
+ * @property {SearchField[]|null} searchFields - Campi su cui cercare oltre a quelli delle colonne ricercabili, anche se non presenti
+ *   in `cols` (vedi `SearchField`). Da attributo HTML: array JSON oppure stringa con i campi separati da virgola. Non disponibile
+ *   con `jqDatatableMode` (default: null)
  * @property {string|HTMLFormElement|null} filterForm - Form di filtro collegato alla tabella: id del `<form>` oppure, solo
  *   tramite `init()`, l'elemento stesso. I valori non vuoti del form vengono aggiunti alla query string di `jsonUrl` (sostituendo
  *   gli eventuali parametri omonimi) in ogni richiesta, compresa la prima. Al submit (il form non viene inviato) e al reset del
@@ -369,7 +382,7 @@ export const jqDatatableModeDefaults = {
  *   paginationDelta: 2,
  *   serverSide: false,
  *   serverParams: { page: 'page', start: 'start', perPage: 'perPage', sort: 'sort', dir: 'dir', search: 'search', searchFields: 'searchFields' },
- *   searchFields: null,                // es. ['clienti.nome', 'comuni.nome']
+ *   searchFields: null,                // es. ['note', 'owner.name'] (client-side), ['clienti.nome', 'comuni.nome'] (server-side)
  *   filterForm: null,                  // es. 'filtri-clienti' (id del form)
  *   initialSort: null,                 // es. { name: 'asc' }
  *   tfoot: false,
