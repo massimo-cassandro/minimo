@@ -48,3 +48,5 @@
 * 1.69 (16 nov 2026) - Eslint config dev tool
 * 1.70 (17 nov 2026) - json-table state
 * 1.71 (18 nov 2026) - stylelint 18
+* 1.72 (18 nov 2026) - json-table: **cambio di comportamento** nei `render` stringa, `[[key]]` ora esegue l'escape HTML (`[[& key]]` per il valore grezzo); sezioni condizionali `[[#key]]`/`[[^key]]`; parametri `iconFile`/`iconClass` e icone sprite `[[@icon:nome classi]]` / `'@icon:nome'`; icone bool di colonna `boolTrueIcon`/`boolFalseIcon`/`boolNullIcon` (e `boolNullIcon` di tabella); `filterForm` legge i valori al submit dopo i listener della pagina; codice di `jqDatatableMode` spostato in un modulo opzionale caricato su richiesta (precaricabile con `import '@massimo-cassandro/minimo/json-table/jq-datatable-mode'`)
+* 1.72 (18 nov 2026) - json-table dt-legacy on demand

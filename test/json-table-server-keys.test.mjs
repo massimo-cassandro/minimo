@@ -25,7 +25,9 @@ globalThis.customElements = { define: () => {}, get: () => undefined };
 const { parseCols, warnIneffectiveColParams } = await import('../src/web-components/json-table/src/parse-cols.js');
 const { parseRows } = await import('../src/web-components/json-table/src/parse-rows.js');
 const { buildServerUrl } = await import('../src/web-components/json-table/src/get-data.js');
-const { defaults, jqDatatableModeDefaults } = await import('../src/web-components/json-table/src/defaults.js');
+const { defaults } = await import('../src/web-components/json-table/src/defaults.js');
+// modulo opzionale: nel componente viene caricato da `_load()`, qui direttamente
+const { jqDatatableModeDefaults } = await import('../src/web-components/json-table/src/jq-datatable-mode.js');
 const { JsonTable } = await import('../src/web-components/json-table/json-table-component.js');
 
 const dataTypes = { string: {}, euro: { sortValue: Number, searchValue: String } };
@@ -38,7 +40,7 @@ const jqParams = {
   serverParams: { ...defaults.serverParams, ...jqDatatableModeDefaults.serverParams }
 };
 
-const query = (urlParams, request) => new URL(buildServerUrl(urlParams, { page: 1, perPage: 25, sort: null, search: '', ...request })).searchParams;
+const query = (urlParams, request) => new URL(buildServerUrl(urlParams, { page: 1, perPage: 25, sort: [], search: '', ...request })).searchParams;
 const parse = defs => parseCols(defs, dataTypes, params);
 const fields = (colDefs, searchFields = null) => query({ ...params, searchFields }, { cols: parse(colDefs), search: 'mar' }).get('searchFields');
 
@@ -58,10 +60,16 @@ test('parseCols: sortKeys/searchKeys devono essere array di stringhe non vuoti',
 });
 
 test('buildServerUrl: sort usa sortKeys, altrimenti la key', () => {
-  assert.equal(query(params, { cols, sort: { key: 'cognome', dir: 'desc' } }).get('sort'), 'cognome,nome');
-  assert.equal(query(params, { cols, sort: { key: 'citta', dir: 'asc' } }).get('sort'), 'citta');
-  assert.equal(query(params, { sort: { key: 'citta', dir: 'asc' } }).get('sort'), 'citta');
+  assert.equal(query(params, { cols, sort: [{ key: 'cognome', dir: 'desc' }] }).get('sort'), 'cognome,nome');
+  assert.equal(query(params, { cols, sort: [{ key: 'citta', dir: 'asc' }] }).get('sort'), 'citta');
+  assert.equal(query(params, { sort: [{ key: 'citta', dir: 'asc' }] }).get('sort'), 'citta');
   assert.equal(query(params, { cols }).get('sort'), null);
+});
+
+test('buildServerUrl: più criteri, sort e dir come liste parallele (sortKeys ripetono la direzione)', () => {
+  const result = query(params, { cols, sort: [{ key: 'citta', dir: 'asc' }, { key: 'cognome', dir: 'desc' }] });
+  assert.equal(result.get('sort'), 'citta,cognome,nome');
+  assert.equal(result.get('dir'), 'asc,desc,desc');
 });
 
 test('searchFields: senza parametro invia le colonne ricercabili, con searchKeys al posto della key', () => {
@@ -98,14 +106,14 @@ test('searchFields: omesso senza ricerca o se disattivato', () => {
 });
 
 test('jqDatatableMode: nessun parametro nuovo, invariato il formato', () => {
-  const result = query(jqParams, { cols, sort: { key: 'cognome', dir: 'asc' }, search: 'mar' });
+  const result = query(jqParams, { cols, sort: [{ key: 'cognome', dir: 'asc' }], search: 'mar' });
   assert.equal(result.get('order[0][column]'), '0');
   assert.equal(result.get('columns[0][name]'), 'cognome');
   assert.equal(result.get('search[value]'), 'mar');
   assert.equal(result.get('searchFields'), null);
 });
 
-test('_validateParams: searchFields non valido o senza effetto viene azzerato con un avviso', t => {
+test('_validateParams: searchFields normalizzato, voci non valide scartate con un avviso', t => {
   const warn = t.mock.method(console, 'warn', () => {});
   const validate = overrides => {
     const validated = { ...params, perPage: 25, paginationDelta: 2, ...overrides };
@@ -113,14 +121,19 @@ test('_validateParams: searchFields non valido o senza effetto viene azzerato co
     return validated.searchFields;
   };
 
+  // forme valide: array, stringa separata da virgole (attributo HTML), client-side, jqDatatableMode
   assert.deepEqual(validate({ searchFields: ['a.b'] }), ['a.b']);
+  assert.deepEqual(validate({ searchFields: ' a , b ' }), ['a', 'b']);
+  assert.deepEqual(validate({ searchFields: ['a'], serverSide: false }), ['a']);
+  assert.deepEqual(validate({ searchFields: ['a'], jqDatatableMode: true }), ['a']);
+  assert.equal(validate({ searchFields: '' }), null);
   assert.equal(warn.mock.callCount(), 0);
 
-  assert.equal(validate({ searchFields: 'a,b' }), null);
+  // forme non valide
+  assert.equal(validate({ searchFields: 42 }), null);
   assert.equal(validate({ searchFields: [''] }), null);
-  assert.equal(validate({ searchFields: ['a'], serverSide: false }), null);
-  assert.equal(validate({ searchFields: ['a'], jqDatatableMode: true }), null);
-  assert.equal(warn.mock.callCount(), 4);
+  assert.deepEqual(validate({ searchFields: ['a', () => 1] }), ['a']); // funzioni ignorate in server-side
+  assert.equal(warn.mock.callCount(), 3);
 });
 
 test('parseRows: in server-side non calcola sortValue/searchValue', () => {
@@ -190,5 +203,5 @@ test('warnIneffectiveColParams: con jqDatatableMode segnala anche sortKeys/searc
   warnIneffectiveColParams(parse([{ key: 'keys', sortKeys: ['a'], searchKeys: ['b'] }]), { serverSide: true, jqDatatableMode: true });
 
   assert.equal(warn.mock.callCount(), 1);
-  assert.match(warn.mock.calls[0].arguments[0], /`sortKeys`, `searchKeys` non hanno effetto con `jqDatatableMode`$/);
+  assert.match(warn.mock.calls[0].arguments[0], /`sortKeys`, `searchKeys` non hanno effetto con `jqDatatableMode`: per cercare su altri campi usare `searchFields`$/);
 });

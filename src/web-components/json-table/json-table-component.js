@@ -1,7 +1,8 @@
 /*! minimo - json-table */
 
 import { defaults } from './src/defaults.js';
-import { resolveParams } from './src/resolve-params.js';
+import { resolveParams, getParam } from './src/resolve-params.js';
+import { getJqMode, loadJqMode } from './src/jq-mode-registry.js';
 import { getData } from './src/get-data.js';
 import { buildDataTypes } from './src/data-types.js';
 import { MISSING_COLS_MESSAGE, parseCols, warnIneffectiveColParams } from './src/parse-cols.js';
@@ -69,7 +70,6 @@ let projectDefaults = {};
 const emptyState = () => ({
   totRec: 0, filteredRec: 0, rows: [], filtered: [], pageRows: [], searchTerm: '', sort: [], page: 1, totPages: 1
 });
-
 
 /**
  * `<json-table>` – generatore di tabelle HTML da dati JSON (inline o recuperati via fetch), custom element in light DOM,
@@ -484,7 +484,32 @@ export class JsonTable extends HTMLElement {
     clearTimeout(this._searchTimer);
     const generation = this._loadGeneration;
 
-    const params = resolveParams(this, this._config, projectDefaults);
+    // modulo opzionale `jqDatatableMode`: caricato (chunk separato) solo dalle tabelle che lo usano
+    if (getParam(this, this._config, projectDefaults, 'jqDatatableMode') === true && !getJqMode()) {
+      try {
+        await loadJqMode();
+      } catch (err) {
+        // eslint-disable-next-line no-console
+        console.error('[json-table] `jqDatatableMode`: impossibile caricare il modulo `jq-datatable-mode.js`', err);
+        this.innerHTML = '';
+        return;
+      }
+      if (generation !== this._loadGeneration) {
+        return;
+      }
+    }
+
+    /** @type {JsonTableParams} */
+    let params;
+    try {
+      // con `jqDatatableMode` lancia un errore se il modulo opzionale non è disponibile
+      params = resolveParams(this, this._config, projectDefaults);
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error(err);
+      this.innerHTML = '';
+      return;
+    }
     this.params = params;
 
     // form di filtro indicato per id ma non ancora presente (markup successivo alla tabella, documento in caricamento)

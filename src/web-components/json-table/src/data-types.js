@@ -118,7 +118,7 @@ export function formatNumber(value, params, formatOpts, wrap) {
  * | `euro`        | come `currency`, EUR forzato                                        |
  * | `date`        | elemento `<time>`, `datesLocaleOpts`                                |
  * | `datetime`    | come `date`, più la parte oraria (`timesLocaleOpts`)                |
- * | `bool`        | `boolTrueIcon`/`boolFalseIcon`                                      |
+ * | `bool`        | `boolTrueIcon`/`boolFalseIcon`/`boolNullIcon`                       |
  * | `boolTrueOnly`| come `bool`, ma solo `boolTrueIcon`: false e null danno cella vuota |
  * | `email`       | `<wbr>` prima di `@`                                        |
  *
@@ -181,13 +181,15 @@ export function builtInDataTypes(params) {
     render: (value, row, p) => {
       const bool = toBool(value);
       if (bool === true) {
-        return iconContent(p.boolTrueIcon);
+        return iconContent(p.boolTrueIcon, p.iconFile, p.iconClass);
       }
       if (bool === false) {
-        return iconContent(p.boolFalseIcon);
+        return iconContent(p.boolFalseIcon, p.iconFile, p.iconClass);
       }
-      return p.renderNullAs ?? '';
+      return p.boolNullIcon != null ? iconContent(p.boolNullIcon, p.iconFile, p.iconClass) : (p.renderNullAs ?? '');
     },
+    // i valori null/undefined non arrivano a `render`: vedi `cellContent`
+    _boolNullIcon: true,
     sortValue: value => {
       const bool = toBool(value);
       return bool === null ? -1 : (bool ? 1 : 0);
@@ -225,7 +227,8 @@ export function builtInDataTypes(params) {
 
     boolTrueOnly: {
       ...boolType,
-      render: (value, row, p) => (toBool(value) === true ? iconContent(p.boolTrueIcon) : '')
+      render: (value, row, p) => (toBool(value) === true ? iconContent(p.boolTrueIcon, p.iconFile, p.iconClass) : ''),
+      _boolNullIcon: false
     },
 
     email: {

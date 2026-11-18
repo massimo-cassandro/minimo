@@ -1,5 +1,6 @@
 import { getCellValue, getCellValues, resolveMustache } from './content-utils.js';
 import { toNumber } from './data-types.js';
+import { iconContent } from './icons.js';
 
 /** @typedef {import('./defaults.js').JsonTableParams} JsonTableParams */
 /** @typedef {import('./defaults.js').CellContent} CellContent */
@@ -9,12 +10,15 @@ import { toNumber } from './data-types.js';
  * Calcola il contenuto di una cella del body.
  *
  * Pipeline:
- * 1. `render` della colonna: funzione `(row, tr, td, subIdx)` o stringa in stile mustache (`[[key]]`); una funzione
+ * 1. `render` della colonna: funzione `(row, tr, td, subIdx)` o stringa in stile mustache (`[[key]]`, vedi
+ *    `resolveMustache`: il risultato è markup, da inserire con `setContent(td, content, true)`); una funzione
  *    che restituisce `undefined` lascia proseguire la pipeline (utile per decorare solo `td`/`tr`), `null`
  *    dà `renderNullAs`
  * 2. valore della cella: il risultato di `parse` della colonna, se definito, altrimenti il valore grezzo
- * 3. valore `null`/`undefined` → `nullContent` del data type, se definito, altrimenti `renderNullAs`
- * 4. `render(value, row, params)` del data type
+ * 3. valore `null`/`undefined` → `boolNullIcon` (tipo `bool`, se impostata), `nullContent` del data type, se definito,
+ *    altrimenti `renderNullAs`
+ * 4. `render(value, row, params)` del data type; `params` contiene le eventuali icone bool della colonna
+ *    (`boolTrueIcon`, `boolFalseIcon`, `boolNullIcon`)
  * 5. valore così com'è
  *
  * @param {ParsedCol} col - Colonna analizzata
@@ -40,6 +44,7 @@ import { toNumber } from './data-types.js';
  * cellContent({ ...col, key: 'amount', _type: types.euro }, { amount: 12 }, params);   // → '12,00 €'
  * cellContent({ ...col, key: 'amount', _type: types.euro }, { amount: null }, params); // → '—' (renderNullAs)
  * cellContent({ ...col, render: '<b>[[name]]</b>' }, { name: 'Mario' }, params);      // → '<b>Mario</b>'
+ * cellContent({ ...col, render: '<b>[[name]]</b>' }, { name: '<i>' }, params);        // → '<b>&lt;i&gt;</b>'
  * cellContent({ ...col, render: (row, tr, td) => { td.title = row.name; } }, row, params, tr, td);
  * // → data type / valore grezzo (render ha restituito undefined)
  * cellContent({ ...col, key: 'amount', parse: row => row.amount * 2, _type: types.euro }, { amount: 12 }, params); // → '24,00 €'
@@ -47,6 +52,8 @@ import { toNumber } from './data-types.js';
 export function cellContent(col, row, params, tr, td, subIdx = 0) {
 
   const nullAs = params.renderNullAs ?? '';
+  // parametri con le eventuali icone bool della colonna (vedi `parseCols`)
+  const typeParams = col._params ?? params;
 
   if (col.render != null) {
     const content = typeof col.render === 'function'
@@ -61,11 +68,14 @@ export function cellContent(col, row, params, tr, td, subIdx = 0) {
   const value = getCellValue(row, col, subIdx);
 
   if (value == null) {
+    if (col._type._boolNullIcon && typeParams.boolNullIcon != null) {
+      return iconContent(typeParams.boolNullIcon, typeParams.iconFile, typeParams.iconClass);
+    }
     return col._type.nullContent ?? nullAs;
   }
 
   if (typeof col._type.render === 'function') {
-    return col._type.render(value, row, params) ?? nullAs;
+    return col._type.render(value, row, typeParams) ?? nullAs;
   }
 
   return value;

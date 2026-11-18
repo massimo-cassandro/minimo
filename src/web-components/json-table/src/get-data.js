@@ -1,3 +1,5 @@
+import { getJqMode } from './jq-mode-registry.js';
+
 
 /** @typedef {import('./defaults.js').JsonTableParams} JsonTableParams */
 /** @typedef {import('./defaults.js').SortDef} SortDef */
@@ -85,24 +87,6 @@ function buildSearchFields(cols, searchFields = null) {
 
 
 /**
- * Solo `jqDatatableMode`: campi di `searchFields` da inviare come colonne aggiuntive di `columns[i]`, esclusi i duplicati
- * e quelli che coincidono con la `key` di una colonna visualizzata ricercabile. I nomi vengono inviati così come sono
- * (la regola `tabella.nome` di `buildSearchFields` non si applica).
- * @param {NonNullable<ServerRequest['cols']>} cols - Colonne visualizzate
- * @param {string[]|null} [searchFields=null] - Campi aggiuntivi (default: null)
- * @returns {string[]}
- *
- * @example
- * buildJqExtraCols([{ key: 'zona', searchable: true }, { key: 'note', searchable: false }], ['zona', 'comune', 'note']);
- * // → ['comune', 'note']
- */
-function buildJqExtraCols(cols, searchFields = null) {
-  const searchableKeys = new Set(cols.filter(col => col.searchable).map(col => col.key));
-  return [...new Set(searchFields ?? [])].filter(field => !searchableKeys.has(field));
-}
-
-
-/**
  * Costruisce l'URL di una richiesta server-side: `params.jsonUrl` più i parametri della query string
  * indicati in `params.serverParams` (i parametri impostati a `null` vengono omessi; `sort`/`dir` vengono inviati
  * solo quando è attivo un ordinamento, `search` solo quando non è vuoto). I parametri della query string
@@ -115,8 +99,9 @@ function buildJqExtraCols(cols, searchFields = null) {
  * `columns[i][name|searchable|orderable]` e, per `sort`, l'indice della colonna al posto della sua chiave
  * (`order[i][column]` e `order[i][dir]` per ogni criterio, con i nomi predefiniti).
  * In questa modalità `searchFields` non viene inviato come parametro: ogni campo viene accodato alle colonne visualizzate
- * come colonna aggiuntiva (`searchable=true`, `orderable=false`), come le colonne `visible: false` di jQuery DataTables
- * (vedi `buildJqExtraCols`). `sortKeys` e `searchKeys` non vengono usati.
+ * come colonna aggiuntiva (`searchable=true`, `orderable=false`), come le colonne `visible: false` di jQuery DataTables.
+ * `sortKeys` e `searchKeys` non vengono usati. Questa parte è nel modulo opzionale `jq-datatable-mode.js`, che deve essere
+ * già caricato (vedi `loadJqMode`).
  *
  * I valori del form di filtro (`filters`) vengono applicati prima dei parametri di `serverParams`, che in caso di
  * nomi coincidenti prevalgono.
@@ -125,6 +110,7 @@ function buildJqExtraCols(cols, searchFields = null) {
  * @param {ServerRequest} request - Stato della richiesta
  * @param {URLSearchParams|null} [filters=null] - Valori del form di filtro (vedi `filterForm`) (default: null)
  * @returns {string}
+ * @throws {Error} Con `jqDatatableMode` se il modulo `jq-datatable-mode.js` non è stato caricato
  *
  * @example
  * buildServerUrl(
@@ -149,29 +135,22 @@ export function buildServerUrl(params, request, filters = null) {
   set(names.page, request.page);
   set(names.start, (request.page - 1) * request.perPage);
   set(names.perPage, request.perPage);
-  const jqCols = params.jqDatatableMode ? request.cols : null;
-  if (jqCols) {
-    set('draw', 1);
-    jqCols.forEach((col, idx) => {
-      set(`columns[${idx}][name]`, col.key);
-      set(`columns[${idx}][searchable]`, col.searchable);
-      set(`columns[${idx}][orderable]`, col.sortable);
-    });
-    // colonne aggiuntive da `searchFields`, dopo quelle visualizzate (gli indici di `order[i][column]` restano validi)
-    buildJqExtraCols(jqCols, /** @type {string[]|null} */ (params.searchFields)).forEach((field, idx) => {
-      const n = jqCols.length + idx;
-      set(`columns[${n}][name]`, field);
-      set(`columns[${n}][searchable]`, true);
-      set(`columns[${n}][orderable]`, false);
-    });
+
+  const jq = params.jqDatatableMode ? getJqMode() : null;
+  if (params.jqDatatableMode && !jq) {
+    throw new Error('[json-table] `jqDatatableMode`: modulo `jq-datatable-mode.js` non caricato');
+  }
+  const jqCols = jq ? request.cols : null;
+  if (jq && jqCols) {
+    jq.appendColumns(set, jqCols, /** @type {string[]|null} */ (params.searchFields));
   }
 
   const cols = request.cols ?? [];
   const sortDefs = request.sort ?? [];
   // valori inviati per ogni criterio: indice della colonna (jqDatatableMode), oppure `sortKeys` o `key`
-  const sortValues = sortDefs.map(({ key }) => jqCols
-    ? [jqCols.findIndex(col => col.key === key)]
-    : cols.find(col => col.key === key)?.sortKeys ?? [key]);
+  const sortValues = jq && jqCols
+    ? jq.sortValues(jqCols, sortDefs)
+    : sortDefs.map(({ key }) => cols.find(col => col.key === key)?.sortKeys ?? [key]);
 
   if (names.sort?.includes('{i}')) {
     sortDefs.forEach(({ dir }, idx) => {

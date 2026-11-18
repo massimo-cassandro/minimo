@@ -78,7 +78,7 @@ export default {
         padding: {
           block: {
             $type: 'dimension',
-            $value: '{table.cell.padding.block}'
+            $value: '{table.thead.padding.block}'
           },
           inline: {
             $type: 'dimension',

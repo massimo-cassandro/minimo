@@ -106,7 +106,8 @@ export function rereadFilterForm(jt) {
 /**
  * Collega il form indicato da `filterForm` al componente:
  * - legge i valori correnti del form, usati già nella prima richiesta (`jt._filters`)
- * - al `submit` blocca l'invio del form, ne legge i valori e chiama `jt._applyFilters()`
+ * - al `submit` blocca l'invio del form (in modo sincrono) e, in un task successivo (`setTimeout`), ne legge i valori e chiama
+ *   `jt._applyFilters()`: i listener di submit della pagina registrati dopo questo vengono così eseguiti prima della lettura
  * - al `reset` (dopo che il form è stato azzerato) cancella lo stato salvato (vedi `stateSave`) e fa lo stesso con i
  *   valori iniziali del form
  *
@@ -144,7 +145,22 @@ export function bindFilterForm(jt) {
 
   form.addEventListener('submit', e => {
     e.preventDefault();
-    jt._applyFilters(checked(readFilterForm(form, /** @type {SubmitEvent} */ (e).submitter)));
+
+    /*
+      La lettura è rimandata a un task successivo, così che i listener di submit registrati dalla pagina dopo questo
+      (autocomplete, campi nascosti aggiornati al submit…) abbiano già sistemato i campi. Non va usato un microtask:
+      con un submit dell'utente i microtask vengono eseguiti dopo ogni listener, quindi prima di quelli della pagina.
+      Il pulsante che ha inviato il form viene catturato subito, dato che l'evento non è più disponibile dopo.
+    */
+    const submitter = /** @type {SubmitEvent} */ (e).submitter ?? null;
+
+    setTimeout(() => {
+      if (!controller.signal.aborted) {
+        // un pulsante rimosso o spostato nel frattempo non è più un submitter valido per `FormData`
+        const validSubmitter = submitter && /** @type {HTMLButtonElement} */ (submitter).form === form ? submitter : null;
+        jt._applyFilters(checked(readFilterForm(form, validSubmitter)));
+      }
+    });
   }, { signal: controller.signal });
 
   form.addEventListener('reset', e => {

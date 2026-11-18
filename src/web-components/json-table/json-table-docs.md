@@ -1,68 +1,75 @@
 # <a id="indice"></a>`<json-table>` – datatable da JSON
 
-* [Installazione](#installazione)
-  * [Tipi per gli script consumer](#installazione-tipi)
-* [Utilizzo da markup](#utilizzo-markup)
-* [Utilizzo da script](#utilizzo-script)
-  * [Con `domBuilder`](#utilizzo-dombuilder)
-* [Utilizzo misto – attributi HTML + script](#utilizzo-misto)
-* [Parametri del componente](#parametri)
-  * [`classes`](#parametri-classes)
-  * [`labels`](#parametri-labels)
-  * [`infoText`](#parametri-infotext)
-  * [`trCallback`](#parametri-trcallback)
-* [Parametri colonne](#colonne)
-  * [Ricerca e ordinamento](#colonne-ricerca)
-  * [`condition`](#colonne-condition)
-  * [`parse`](#colonne-parse)
-  * [`render`](#colonne-render)
-  * [`rowspan`](#colonne-rowspan)
-  * [`tfootRender`](#colonne-tfootrender)
-* [DataTypes](#datatypes)
-  * [Tipi personalizzati](#datatypes-tipi)
-* [Input ricerca rapida](#ricerca-rapida)
-* [Form di filtro collegato (`filterForm`)](#filterform)
-  * [Utilizzo](#filterform-utilizzo)
-  * [Cosa viene inviato](#filterform-invio)
-  * [Comportamento](#filterform-comportamento)
-  * [`refresh()`](#filterform-refresh)
-  * [Modalità client-side](#filterform-client)
-  * [Lato server](#filterform-server)
-* [Persistenza dello stato (`stateSave`)](#statesave)
-  * [Chiave e storage](#statesave-chiave)
-  * [Pagina di provenienza (`stateReferrers`)](#statesave-referrers)
-  * [Cosa viene salvato e ripristinato](#statesave-contenuto)
-  * [Dati extra della pagina](#statesave-extra)
-  * [Azzerare lo stato](#statesave-reset)
-* [Ricerca e ordinamento](#ricerca-ordinamento)
-  * [Quick start](#ricerca-quickstart)
-  * [Ordinamento: pulsanti e `initialSort`](#ordinamento)
-  * [Parametri per modalità](#ricerca-parametri)
-  * [Client-side](#ricerca-client)
-  * [Server-side](#ricerca-server)
-* [Tabelle con `rowspan`](#tabelle-rowspan)
-  * [`subIdx`](#rowspan-subidx)
-  * [Accorgimenti comuni](#rowspan-accorgimenti)
-  * [Client-side](#rowspan-client)
-  * [Server-side](#rowspan-server)
-* [Default di progetto – `JsonTable.setDefaults()`](#set-defaults)
-* [Server Side](#modalita-server-side)
-  * [Ordinamento e ricerca](#server-side-ordinamento)
-  * [Modalità jQuery DataTables](#server-side-datatables)
-    * [Migrazione di `stateSave` / `storageAllowedReferrers` / `bindToForm`](#statesave-migrazione)
-* [API dell'istanza](#api)
-* [Backend Symfony per la modalità server-side](#backend-symfony)
-  * [Il contratto in breve](#backend-contratto)
-  * [Struttura dell'azione](#backend-struttura)
-  * [Linee guida](#backend-linee)
-  * [Helper riutilizzabile](#backend-helper)
-  * [Checklist](#backend-checklist)
-* [Eventi](#eventi)
-* [Paginazione](#paginazione-tabella)
-  * [Caption e paginazione](#paginazione-caption)
-* [Template](#template)
-* [Struttura generata](#struttura)
-* [Custom properties CSS](#custom-properties)
+1. [Installazione](#installazione)
+    - 1.1 [Tipi per gli script consumer](#installazione-tipi)
+2. [Utilizzo da markup](#utilizzo-markup)
+3. [Sintassi Mustache](#sintassi-mustache)
+    - 3.1 [Sezioni condizionali](#mustache-sezioni)
+    - 3.2 [Icone](#mustache-icone)
+4. [Utilizzo da script](#utilizzo-script)
+    - 4.1 [Con `domBuilder`](#utilizzo-dombuilder)
+5. [Utilizzo misto – attributi HTML + script](#utilizzo-misto)
+6. [Parametri del componente](#parametri)
+    - 6.1 [`classes`](#parametri-classes)
+    - 6.2 [`labels`](#parametri-labels)
+    - 6.3 [`infoText`](#parametri-infotext)
+    - 6.4 [`trCallback`](#parametri-trcallback)
+7. [Parametri colonne](#colonne)
+    - 7.1 [Ricerca e ordinamento](#colonne-ricerca)
+    - 7.2 [`condition`](#colonne-condition)
+    - 7.3 [`parse`](#colonne-parse)
+    - 7.4 [`render`](#colonne-render)
+    - 7.5 [`rowspan`](#colonne-rowspan)
+    - 7.6 [`tfootRender`](#colonne-tfootrender)
+    - 7.7 [Icone bool di colonna](#colonne-bool-icone)
+8. [DataTypes](#datatypes)
+    - 8.1 [Tipi personalizzati](#datatypes-tipi)
+9. [Input ricerca rapida](#ricerca-rapida)
+10. [Form di filtro collegato (`filterForm`)](#filterform)
+    - 10.1 [Utilizzo](#filterform-utilizzo)
+    - 10.2 [Cosa viene inviato](#filterform-invio)
+    - 10.3 [Comportamento](#filterform-comportamento)
+    - 10.4 [`refresh()`](#filterform-refresh)
+    - 10.5 [Modalità client-side](#filterform-client)
+    - 10.6 [Lato server](#filterform-server)
+11. [Persistenza dello stato (`stateSave`)](#statesave)
+    - 11.1 [Chiave e storage](#statesave-chiave)
+    - 11.2 [Pagina di provenienza (`stateReferrers`)](#statesave-referrers)
+    - 11.3 [Cosa viene salvato e ripristinato](#statesave-contenuto)
+    - 11.4 [Dati extra della pagina](#statesave-extra)
+    - 11.5 [Azzerare lo stato](#statesave-reset)
+12. [Ricerca e ordinamento](#ricerca-ordinamento)
+    - 12.1 [Quick start](#ricerca-quickstart)
+    - 12.2 [Ordinamento: pulsanti e `initialSort`](#ordinamento)
+    - 12.3 [Parametri per modalità](#ricerca-parametri)
+    - 12.4 [Client-side](#ricerca-client)
+    - 12.5 [Server-side](#ricerca-server)
+13. [Tabelle con `rowspan`](#tabelle-rowspan)
+    - 13.1 [`subIdx`](#rowspan-subidx)
+    - 13.2 [Accorgimenti comuni](#rowspan-accorgimenti)
+    - 13.3 [Client-side](#rowspan-client)
+    - 13.4 [Server-side](#rowspan-server)
+14. [Default di progetto – `JsonTable.setDefaults()`](#set-defaults)
+15. [Server Side](#modalita-server-side)
+    - 15.1 [Ordinamento e ricerca](#server-side-ordinamento)
+    - 15.2 [Modalità jQuery DataTables](#server-side-datatables)
+        - 15.2.1 [Caricamento del modulo](#jq-caricamento)
+        - 15.2.2 [Migrazione delle colonne: `key` e `name`](#jq-colonne)
+        - 15.2.3 [`searchable` e `orderable`: stringhe `"true"`/`"false"`](#jq-booleani)
+        - 15.2.4 [Migrazione di `stateSave` / `storageAllowedReferrers` / `bindToForm`](#statesave-migrazione)
+16. [API dell'istanza](#api)
+17. [Backend Symfony per la modalità server-side](#backend-symfony)
+    - 17.1 [Il contratto in breve](#backend-contratto)
+    - 17.2 [Struttura dell'azione](#backend-struttura)
+    - 17.3 [Linee guida](#backend-linee)
+    - 17.4 [Helper riutilizzabile](#backend-helper)
+    - 17.5 [Checklist](#backend-checklist)
+18. [Eventi](#eventi)
+19. [Paginazione](#paginazione-tabella)
+    - 19.1 [Caption e paginazione](#paginazione-caption)
+20. [Template](#template)
+21. [Struttura generata](#struttura)
+22. [Custom properties CSS](#custom-properties)
 
 ---
 
@@ -81,6 +88,12 @@ import '@massimo-cassandro/minimo/json-table';
 // oppure, se, oltre a registrare il tag,
 // fosse necessario eseguire metodi della classe (es. `setDefaults`):
 import { JsonTable } from '@massimo-cassandro/minimo/json-table';
+
+// se fosse necessario utilizzare la modalità di compatibilità con un backend 
+// che utilizzi le api di jQuery-Datatables, utilizzando il parametro
+// `jqDatatableMode: true`
+// vedi sezione relativa
+import '@massimo-cassandro/minimo/json-table/jq-datatable-mode';
 ```
 
 Il CSS (`json-table-component.module.css`) è importato dal componente stesso; le custom
@@ -140,10 +153,96 @@ I valori che iniziano con `[` o `{` vengono interpretati come JSON (un JSON malf
 segnalato in console e ignorato).
 
 Da attributo non è possibile passare funzioni: per il rendering delle celle è disponibile la
-sintassi mustache-like `[[key]]` (vedi [`render`](#colonne-render)), per il footer gli aggregati
+[sintassi Mustache](#sintassi-mustache) (`[[key]]`, sezioni condizionali, icone), per il footer gli aggregati
 predefiniti (`"@sum"`, ...).
 
+La configurazione da attributi è un **ripiego** per i casi semplici: la strada principale resta la configurazione da script ([`init()`](#utilizzo-script)), in particolare `render` come funzione, che permette qualsiasi logica e restituisce direttamente nodi DOM senza passare da stringhe di markup.
+
 Vedi anche [Ricerca e ordinamento](#ricerca-ordinamento)
+
+## <a id="sintassi-mustache"></a>Sintassi Mustache
+
+[⬆︎ Torna all'indice](#indice)
+
+Il `render` di colonna può essere una stringa con una sintassi ispirata a [Mustache](https://mustache.github.io/), con i segnaposti tra doppie parentesi quadre (`[[…]]`, per non entrare in conflitto con le `{{…}}` di Twig). È l'unico modo per personalizzare le celle da attributo HTML e può essere usata anche da script per i casi semplici:
+
+```html
+<json-table
+  jsonurl="/clienti-json"
+  iconfile="/build/icons.svg"
+  cols='[
+    { "key": "nome", "render": "<a href=\"/clienti/[[id]]\">[[nome]]</a>" },
+    { "key": "email", "render": "[[#email]]<a href=\"mailto:[[email]]\">[[email]]</a>[[/email]][[^email]]<em>non indicata</em>[[/email]]" },
+    { "key": "vip", "render": "[[#vip]][[@icon:star text-warning]][[/vip]]", "sortable": false }
+  ]'
+></json-table>
+```
+
+| Segnaposto | Risultato |
+|---|---|
+| `[[key]]` | valore della riga, con **escape HTML** (`&`, `<`, `>`, `"`, `'`) |
+| `[[& key]]` | valore della riga così com'è, **senza escape** |
+| `[[#key]]…[[/key]]` | contenuto mostrato solo se il valore è vero ([Sezioni condizionali](#mustache-sezioni)) |
+| `[[^key]]…[[/key]]` | contenuto mostrato solo se il valore è falso |
+| `[[@icon:nome classi]]` | icona del file sprite `iconFile` ([Icone](#mustache-icone)) |
+
+- `key` ammette la notazione con punto per i valori annidati (`[[owner.name]]`); gli spazi attorno alla chiave vengono ignorati (`[[ name ]]`, `[[& html]]`)
+- i valori `null`/`undefined` vengono sostituiti con [`renderNullAs`](#parametri), inserito senza escape
+- il risultato viene inserito come markup tramite la Sanitizer API (`Element.setHTML`, dove supportata, altrimenti `innerHTML`): script, attributi handler di eventi e URL `javascript:` vengono rimossi, mentre `class`, `id`, `style` e `data-*` sono conservati
+- la sintassi vale solo per il `render` di colonna: `infoText` e le label usano segnaposti propri (`{start}`, `{page}`…), `tfootRender` accetta solo testo statico o aggregati
+- non è utilizzabile nelle colonne senza `rowspan` di una tabella con [`rowspan`](#colonne-rowspan)
+
+**Escape dei valori (cambio di comportamento).** Fino alla versione 1.71 `[[key]]` inseriva il valore senza escape: un valore come `<img src=x onerror=…>` veniva interpretato come markup e, nei browser senza Sanitizer API, diventava un XSS. Ora `[[key]]` esegue l'escape: un valore che contiene markup voluto (ad es. HTML già preparato dal server) va inserito con `[[& key]]`, solo se la sorgente è affidabile.
+
+```javascript
+render: '<b>[[name]]</b>'   // { name: '<i>Mario</i>' } → <b>&lt;i&gt;Mario&lt;/i&gt;</b> (testo "<i>Mario</i>")
+render: '<b>[[& name]]</b>' // { name: '<i>Mario</i>' } → <b><i>Mario</i></b>
+```
+
+### <a id="mustache-sezioni"></a>Sezioni condizionali
+
+`[[#key]]…[[/key]]` mostra il contenuto se il valore è vero, `[[^key]]…[[/key]]` se è falso. Sono falsi `null`, `undefined`, `false`, `''`, `0` e gli array vuoti; ogni altro valore è vero, compresa la stringa `'0'` (un flag che il server invia come stringa va convertito, oppure gestito con un `render` funzione).
+
+```javascript
+// testo alternativo quando il valore manca
+render: '[[#email]]<a href="mailto:[[email]]">[[email]]</a>[[/email]][[^email]]—[[/email]]'
+
+// sezioni annidate, con chiavi diverse
+render: '[[#attivo]][[nome]][[#scadenza]] <small>(scade il [[scadenza]])</small>[[/scadenza]][[/attivo]][[^attivo]]<s>[[nome]]</s>[[/attivo]]'
+```
+
+Rispetto a Mustache le sezioni sono **solo condizioni**:
+
+- non iterano sugli array: `[[#items]]…[[/items]]` mostra il contenuto una volta sola se l'array non è vuoto
+- non cambiano il contesto: le chiavi all'interno della sezione si riferiscono sempre alla riga (`[[#owner]][[name]][[/owner]]` mostra `row.name`, non `row.owner.name`)
+- possono essere annidate, con chiavi diverse
+
+Una sezione non chiusa, chiusa con una chiave diversa o una chiusura senza apertura producono un avviso in console, una sola volta per colonna, all'avvio della tabella. Il rendering prosegue comunque: una sezione non chiusa si estende fino alla fine del template, una chiusura senza apertura viene ignorata.
+
+Non sono supportati partial, commenti, lambda, delimitatori personalizzati né la notazione `[[{key}]]` / `[[.]]`: per logiche più complesse va usato `render` come funzione.
+
+### <a id="mustache-icone"></a>Icone
+
+`[[@icon:nome]]` inserisce un'icona del file sprite SVG indicato dal parametro [`iconFile`](#parametri), impostabile anche da attributo (`iconfile="…"`) o con [`JsonTable.setDefaults()`](#set-defaults). Dopo il nome si possono aggiungere classi, separate da spazi:
+
+```javascript
+JsonTable.setDefaults({ iconFile: '/build/icons.svg' });
+
+render: '[[@icon:check]] [[stato]]'
+render: '[[#urgente]][[@icon:warning text-danger icon-lg]][[/urgente]]'
+```
+
+```html
+<svg class="icon text-danger icon-lg" aria-hidden="true" focusable="false"><use href="/build/icons.svg#warning"></use></svg>
+```
+
+- `nome` è l'`id` del `<symbol>` nello sprite; la classe di base indicata dal parametro `iconClass` (default `icon`, vedi `src/css/icons.css` di minimo) è sempre presente, le altre si aggiungono. Con `iconClass` si può usare la classe del proprio progetto (`JsonTable.setDefaults({ iconClass: 'svg-icon' })`) oppure nessuna (`null` o `''`)
+- l'icona è decorativa (`aria-hidden`): se ha un significato, va affiancata da un testo (anche `visually-hidden`)
+- la Sanitizer API rimuove o conserva `<use>` a seconda del browser, quindi l'SVG non passa dal markup: la stringa contiene un segnaposto (`<span data-jt-icon="…">`) che, dopo l'inserimento nella cella, viene sostituito con un elemento costruito via DOM
+- senza `iconFile` l'icona viene omessa, con un avviso in console
+- impostare `iconFile` non cambia le icone predefinite del componente (`boolTrueIcon`, `boolFalseIcon`, icone di ordinamento e paginazione), che restano gli SVG inline di minimo: per prenderle dallo sprite vanno impostate esplicitamente (es. `JsonTable.setDefaults({ iconFile: '/build/icons.svg', boolTrueIcon: '@icon:check' })`)
+- lo sprite deve trovarsi sulla stessa origine della pagina: i browser non caricano `<use>` da altri domini
+- la stessa forma (`'@icon:nome classi'`, senza parentesi quadre) è accettata da tutte le icone del componente: `boolTrueIcon`, `boolFalseIcon`, `boolNullIcon` (anche di [colonna](#colonne-bool-icone)), icone di ordinamento e paginazione
 
 ## <a id="utilizzo-script"></a>Utilizzo da script
 
@@ -240,8 +339,9 @@ Tutti i parametri sono impostabili sia da attributo HTML che come oggetto in `in
 
 | Parametro | Tipo / default | Descrizione |
 |---|---|---|
-| `boolFalseIcon` | icona, vedi nota (icona `x-bold`) | Icona per i valori `false` |
-| `boolTrueIcon` | icona, vedi nota (icona `check-bold` di minimo (Phosphor)) | Icona per i valori `true` (tipo bool) |
+| `boolFalseIcon` | icona, vedi nota (icona `x-bold`) | Icona per i valori `false` (tipo bool). Sovrascrivibile per colonna ([Icone bool di colonna](#colonne-bool-icone)) |
+| `boolNullIcon` | icona, vedi nota (`null`) | Icona per i valori nulli o non booleani (tipo bool), al posto di `renderNullAs`. Sovrascrivibile per colonna |
+| `boolTrueIcon` | icona, vedi nota (icona `check-bold` di minimo (Phosphor)) | Icona per i valori `true` (tipi bool e boolTrueOnly). Sovrascrivibile per colonna |
 | `caption` | string o Function (`null`) | Caption della tabella (testo o HTML), oppure funzione che restituisce stringa o Node. Mostrata sotto la tabella (vedi "Caption e paginazione") |
 | `classes` | Object | Classi consumer (vedi sotto), unite ai default |
 | `cols` | ColDefinition[] | **OBBLIGATORIO**: definizione delle colonne (vedi sotto). Se assente o vuoto la tabella non viene generata e viene segnalato un errore in console. Senza `init()` l'errore compare al termine del caricamento della pagina, così `cols` può essere passato anche da uno script separato; un `init()` chiamato dopo il caricamento della pagina (ad es. dopo un `await`) funziona, ma l'errore può comparire comunque |
@@ -253,9 +353,11 @@ Tutti i parametri sono impostabili sia da attributo HTML che come oggetto in `in
 | `debug` | boolean (`false`) | Log in console di parametri, colonne, dati, stato ed elementi generati |
 | `filterForm` | string o HTMLFormElement (`null`) | Id del form di filtro collegato (da `init()` anche l'elemento): i suoi valori vengono aggiunti alla query string di `jsonUrl` e al submit/reset la tabella viene aggiornata. Richiede `jsonUrl`. Vedi [Form di filtro collegato](#filterform) |
 | `filteredRecField` | string (`'filteredRec'`) | Solo server-side: chiave del JSON con il numero di record che soddisfano la ricerca corrente; se assente vale `totRecField` |
+| `iconClass` | string o null (`'icon'`) | Classe/i di base delle icone del file sprite (`[[@icon:nome]]`, `'@icon:nome'`), a cui si aggiungono le classi indicate dopo il nome; `null` o `''` = nessuna classe di base (vedi [Icone](#mustache-icone)) |
+| `iconFile` | string (`null`) | URL del file sprite SVG usato da `[[@icon:nome]]` nei `render` stringa e dalle icone `'@icon:nome'` (vedi [Icone](#mustache-icone)). Non sostituisce le icone predefinite (`boolTrueIcon`, `boolFalseIcon`, icone di ordinamento e paginazione), che restano gli SVG inline di minimo: per usare lo sprite vanno impostate esplicitamente, es. `boolTrueIcon: '@icon:check'` |
 | `infoText` | string, Function o null (`null`) | Contenuto dell'area info: stringa mustache-like con i segnaposto `{start}`, `{end}`, `{totRec}`, `{filteredRec}`, `{page}`, `{totPages}`, oppure funzione `(start, end, totRec, filteredRec, page, totPages) => string\|Node`. `null` = viene usato `labels.info` ([Altre info](#parametri-infotext)) |
 | `initialSort` | oggetto { chiave: 'asc'\|'desc' } o null (`null`) | Ordinamento applicato al caricamento: uno o più criteri in ordine di priorità, es. `{ city: 'asc', name: 'desc' }` |
-| `jqDatatableMode` | boolean (`false`) | Se `true` imposta come default i valori compatibili con il formato server-side di jQuery DataTables: `jsonDataField: 'data'`, `totRecField: 'recordsTotal'`, `filteredRecField: 'recordsFiltered'`, `serverSide: true` e i `serverParams` indicati in "Modalità jQuery DataTables". Ogni valore resta sovrascrivibile |
+| `jqDatatableMode` | boolean (`false`) | Se `true` imposta come default i valori compatibili con il formato server-side di jQuery DataTables: `jsonDataField: 'data'`, `totRecField: 'recordsTotal'`, `filteredRecField: 'recordsFiltered'`, `serverSide: true` e i `serverParams` indicati in "Modalità jQuery DataTables". Ogni valore resta sovrascrivibile. Il codice della modalità è un modulo opzionale, caricato solo quando serve ([Caricamento del modulo](#jq-caricamento)) |
 | `jsonDataField` | string o null (`'data'`) | Chiave del JSON che contiene l'array delle righe (es. `'data'` per `{ data: [...] }`); `null` o `''` = la root del JSON è l'array stesso |
 | `jsonUrl` | string (`null`) | URL del JSON da caricare. Ignorato se `data` è presente |
 | `labels` | Object | Testi (vedi sotto), uniti ai default |
@@ -289,7 +391,7 @@ Tutti i parametri sono impostabili sia da attributo HTML che come oggetto in `in
 | `trCallback` | (tr, row, params, subIdx) => void (`null`) | **[solo JS]** Callback invocata dopo il rendering di ogni `<tr>` del body. `subIdx` è l'indice del `<tr>` all'interno del record (sempre 0 se nessuna colonna usa [`rowspan`](#colonne-rowspan)) ([Altre info](#parametri-trcallback)) |
 | `updateFooterOnPageChange` | boolean (`false`) | Se `true` `tfootRender` riceve solo i record della pagina corrente (subtotali di pagina) e il footer si aggiorna a ogni cambio pagina; se `false` riceve l'intero set filtrato e si aggiorna solo al cambio filtro |
 
-**Nota sulle icone**: ogni icona può essere una stringa SVG/HTML (es. import `?inline`), un Node, un oggetto domBuilder o una funzione che restituisce uno di questi valori.
+**Nota sulle icone**: ogni icona può essere una stringa SVG/HTML (es. import `?inline`) o di testo semplice (es. `'B'`), una stringa `'@icon:nome classi'` che fa riferimento al file sprite `iconFile` (vedi [Icone](#mustache-icone)), un Node, un oggetto domBuilder o una funzione che restituisce uno di questi valori.
 
 ### <a id="parametri-classes"></a>`classes`
 
@@ -450,13 +552,16 @@ cols: [
 
 | Key | Tipo | Default | Descrizione |
 |---|---|---|---|
+| `boolFalseIcon` | icona | `null` (icona della tabella) | Solo tipo `bool`: icona dei valori `false` della colonna ([Icone bool di colonna](#colonne-bool-icone)) |
+| `boolNullIcon` | icona | `null` (icona della tabella) | Solo tipo `bool`: icona dei valori nulli della colonna, al posto di `renderNullAs` |
+| `boolTrueIcon` | icona | `null` (icona della tabella) | Solo tipi `bool` e `boolTrueOnly`: icona dei valori `true` della colonna |
 | `cellClass` | string | `null` (classi del tipo di dato) | Classi delle celle body/tfoot, in sostituzione di quelle del tipo. Se solo una tra `headerClass` e `cellClass` è presente, l'altra assume lo stesso valore |
 | `condition` | boolean o `params => boolean` | `true` | Se `false` la colonna non viene renderizzata ([Altre info](#colonne-condition)) |
 | `dataType` | string | `'string'` | Tipo di dato, una delle chiavi di `dataTypes`; `type` è un alias equivalente. Vedi [dataTypes](#datatypes) |
 | `headerClass` | string | `null` (classi del tipo di dato) | Classi del `<th>`, in sostituzione di quelle del tipo di dato |
 | `key` | string | – | **OBBLIGATORIO**: chiave dell'oggetto riga (ammessa la notazione con punto per valori annidati, es. `'owner.name'`) |
 | `parse` | `(row, subIdx) => valore` | `null` | **[solo JS]** Preelabora il valore della cella prima del tipo di dato, vedi sotto |
-| `render` | `(row, tr, td, subIdx) => contenuto` o stringa mustache-like | `null` | Vedi sotto |
+| `render` | `(row, tr, td, subIdx) => contenuto` o stringa [Mustache](#sintassi-mustache) | `null` | Vedi sotto |
 | `rowHeading` | boolean | `false` | Se `true` la cella è un'intestazione di riga (`th[scope=row]`) |
 | `rowspan` | number o `row => number` | `null` | Numero di `<tr>` occupati dal record, vedi sotto |
 | `searchable` | boolean | `true` | Abilita la ricerca sulla colonna |
@@ -507,6 +612,7 @@ jtable.init({
 - non è un sistema di sicurezza: i dati della colonna restano comunque nel JSON ricevuto dal browser. Per i dati riservati il filtro va fatto lato server
 - da attributo HTML è ammesso solo il valore booleano
 
+### <a id="colonne-parse"></a>`parse`
 
 Preelabora il valore della cella, che viene poi formattato dal tipo di dato della colonna: evita di scrivere un `render` che duplicherebbe la formattazione standard. Riceve l'oggetto dati della riga e `subIdx`, l'indice del `<tr>` all'interno del record (sempre 0 se nessuna colonna usa [`rowspan`](#colonne-rowspan)), e restituisce un valore invece del contenuto della cella.
 
@@ -557,17 +663,23 @@ domBuilder. Casi particolari:
 
 - `null`: viene mostrato `renderNullAs`
 
-Da attributo HTML (o da script, per i casi semplici) `render` può essere una stringa
-mustache-like: ogni segnaposto `[[key]]` viene sostituito con il valore corrispondente della
-riga (chiavi annidate ammesse; i valori null diventano `renderNullAs`):
+Da attributo HTML (o da script, per i casi semplici) `render` può essere una stringa con la
+[sintassi Mustache](#sintassi-mustache): `[[key]]` viene sostituito con il valore corrispondente della
+riga, **con escape HTML** (chiavi annidate ammesse; i valori null diventano `renderNullAs`), `[[& key]]` senza escape;
+sono disponibili anche le sezioni condizionali (`[[#key]]…[[/key]]`, `[[^key]]…[[/key]]`) e le icone (`[[@icon:nome]]`):
 
 ```javascript
 render: '<a href="/users/[[id]]">[[owner.name]]</a>'
+render: '[[#email]]<a href="mailto:[[email]]">[[email]]</a>[[/email]][[^email]]—[[/email]]'
 ```
 
-Le stringhe HTML vengono inserite tramite la Sanitizer API (`Element.setHTML`, dove supportata):
-script, attributi handler di eventi e URL `javascript:` vengono rimossi, mentre `class`, `id`,
-`style` e `data-*` sono conservati.
+Le stringhe HTML (anche quelle restituite dalla funzione) vengono inserite tramite la Sanitizer API
+(`Element.setHTML`, dove supportata): script, attributi handler di eventi e URL `javascript:` vengono rimossi,
+mentre `class`, `id`, `style` e `data-*` sono conservati. Dove la Sanitizer API non è disponibile viene usato
+`innerHTML`: i valori dei dati inseriti in una stringa restituita da una funzione `render` vanno quindi trattati
+con attenzione (con la sintassi Mustache l'escape di `[[key]]` è automatico).
+
+La stringa Mustache è un ripiego per la configurazione da attributi: la strada principale resta `render` come funzione.
 
 ### <a id="colonne-rowspan"></a>`rowspan`
 
@@ -629,6 +741,38 @@ footer ricevono le stesse classi (`cellClass`) delle celle del body.
 Il `tfoot` non è disponibile in modalità server-side (il componente riceve solo la pagina
 corrente, gli aggregati sarebbero parziali): se richiesto viene ignorato con un avviso in console.
 
+### <a id="colonne-bool-icone"></a>Icone bool di colonna
+
+Nelle colonne di tipo `bool` (e `boolTrueOnly`, e nei tipi personalizzati derivati con `inheritsFrom`) le proprietà `boolTrueIcon`, `boolFalseIcon` e `boolNullIcon` sostituiscono, per la sola colonna, le icone omonime della tabella. Accettano gli stessi valori delle icone della tabella (vedi la [nota sulle icone](#parametri)), in particolare:
+
+- testo semplice, es. `'B'` / `'C'`
+- markup, es. `'<span class="badge">sì</span>'`
+- `'@icon:nome classi'`, con il file sprite [`iconFile`](#mustache-icone)
+
+```html
+<json-table
+  iconfile="/build/icons.svg"
+  cols='[
+    { "key": "tipo", "title": "B/C", "dataType": "bool", "boolTrueIcon": "B", "boolFalseIcon": "C" },
+    { "key": "verificato", "dataType": "bool", "boolTrueIcon": "@icon:seal-check", "boolNullIcon": "@icon:question" }
+  ]'
+></json-table>
+```
+
+```javascript
+cols: [
+  { key: 'tipo', dataType: 'bool', boolTrueIcon: 'B', boolFalseIcon: 'C' },
+  { key: 'pagato', dataType: 'boolTrueOnly', boolTrueIcon: '@icon:currency-eur text-success' }
+]
+```
+
+- senza valore (o con `null`) resta l'icona della tabella (`boolTrueIcon`/`boolFalseIcon`/`boolNullIcon` dei parametri, di default le icone `check-bold`/`x-bold` di minimo e nessuna icona per i valori nulli)
+- `boolNullIcon` si applica ai valori `null`/`undefined` e a quelli non interpretabili come booleani (es. `'abc'`), al posto di `renderNullAs`
+- con `boolTrueOnly` viene usata solo `boolTrueIcon`: `false` e i valori nulli restano celle vuote, anche se la colonna definisce `boolFalseIcon` o `boolNullIcon`
+- classi e stili non cambiano: le celle mantengono le classi interne del tipo e le classi `boolTrue`/`boolFalse` di [`classes`](#parametri-classes) in base al valore (nessuna classe per i valori nulli), quindi anche un testo come `'B'` assume i colori `--jt-bool-true-color`/`--jt-bool-false-color`
+- ordinamento e ricerca non cambiano (le colonne `bool` sono ordinabili sul valore e non ricercabili)
+- con un `render` di colonna che restituisce un contenuto le icone non vengono usate
+
 ## <a id="datatypes"></a>DataTypes
 
 [⬆︎ Torna all'indice](#indice)
@@ -652,7 +796,7 @@ e valori di ordinamento/ricerca. Tipi predefiniti:
 
 | Tipo | Descrizione | Classi di default  delle celle |
 |---|---|---|
-| `bool` | icone `boolTrueIcon`/`boolFalseIcon` (accetta anche `1`/`0`, `'true'`/`'false'`); `null` → `renderNullAs`; ordinabile, non ricercabile | stili interni delle icone |
+| `bool` | icone `boolTrueIcon`/`boolFalseIcon` (accetta anche `1`/`0`, `'true'`/`'false'`); `null` → `boolNullIcon` se impostata, altrimenti `renderNullAs`; ordinabile, non ricercabile. Icone sovrascrivibili per colonna ([Icone bool di colonna](#colonne-bool-icone)) | stili interni delle icone |
 | `boolTrueOnly` | come `bool`, ma mostra solo `boolTrueIcon`: le celle con valore `false` o `null` restano vuote | stili interni delle icone |
 | `currency` | formato valuta `Intl` con `currency` | `textEnd numeric nowrap` |
 | `date` | elemento `<time>`, `datesLocaleOpts`; accetta stringhe ISO, timestamp, `Date` e oggetti data Symfony | `textEnd nowrap` |
@@ -801,6 +945,8 @@ GET /clienti-json?stato=attivo&dal=2025-01-01&zone[]=nord&zone[]=sud&page=1&star
 - ridisegna corpo, footer, paginazione e testo informativo, senza ricostruire la struttura (niente spinner: durante l'attesa il contenitore ha `aria-busy="true"`).
 
 La validazione nativa del form resta attiva: con campi non validi (`required`, `min`, `pattern`…) l'evento `submit` non viene emesso e la tabella non cambia.
+
+**Listener di submit della pagina.** L'invio viene bloccato subito (`preventDefault()` sincrono), ma i valori vengono letti in un task successivo (`setTimeout`), dopo tutti i listener di `submit`: anche quelli che la pagina registra dopo la tabella per sistemare i campi al momento dell'invio (autocomplete, campi nascosti valorizzati al submit…) vengono quindi eseguiti prima della lettura. Il pulsante che ha inviato il form viene comunque incluso. Non serve quindi preoccuparsi dell'ordine di registrazione dei listener; i listener della pagina non devono però rimandare a loro volta la modifica dei campi (ad es. dopo un `await`), perché la lettura avverrebbe prima.
 
 **Reset.** Un `<button type="reset">` (o `form.reset()`) riporta i campi ai valori iniziali e aggiorna la tabella allo stesso modo del submit. Con [`stateSave`](#statesave) attivo cancella anche lo stato salvato, compresi i dati extra della pagina.
 
@@ -1090,7 +1236,7 @@ I parametri da usare dipendono dalla modalità: in client-side il componente ela
 | `searchKeys` | colonna | ignorato, con avviso | sì |
 | `sortKeys` | colonna | ignorato, con avviso | sì |
 
-La [modalità jQuery DataTables](#server-side-datatables) è mantenuta solo per compatibilità: `searchKeys` e `sortKeys` non sono disponibili e vengono ignorati con un avviso, mentre i campi di `searchFields` vengono inviati come colonne aggiuntive di `columns[i]` (vedi [`searchFields` con `jqDatatableMode`](#searchfields-jq)).
+La [modalità jQuery DataTables](#server-side-datatables) è pensata per la compatibilità con gli endpoint esistenti: `searchKeys` e `sortKeys` non sono disponibili e vengono ignorati con un avviso, mentre i campi di `searchFields` vengono inviati come colonne aggiuntive di `columns[i]` (vedi [`searchFields` con `jqDatatableMode`](#searchfields-jq)).
 
 ### <a id="ricerca-client"></a>Client-side
 
@@ -1526,6 +1672,8 @@ Per maggiori dettagli ed esempi vedi  [Ricerca e ordinamento → Server-side](#r
 
 ### <a id="server-side-datatables"></a>Modalità jQuery DataTables
 
+> La modalità serve alla compatibilità con gli endpoint esistenti nel formato di jQuery DataTables, il cui formato è fissato: per i nuovi endpoint è preferibile la modalità server-side standard ([Server Side](#modalita-server-side), [Backend Symfony](#backend-symfony)), che dispone anche di `sortKeys` e `searchKeys`. Il codice della modalità non fa parte del core del componente ma è un modulo opzionale, caricato solo dalle tabelle che lo usano (vedi [Caricamento del modulo](#jq-caricamento)).
+
 Con `jqDatatableMode: true` (o l'attributo `jqdatatablemode="true"`) i default dei parametri server-side diventano quelli del formato di jQuery DataTables, utile per riutilizzare endpoint già esistenti:
 
 | Parametro | Default con `jqDatatableMode` |
@@ -1540,7 +1688,7 @@ Precedenza: `init()` > attributo HTML > `JsonTable.setDefaults()` > modalità jQ
 
 Oltre ai `serverParams`, in questa modalità vengono inviati anche `draw=1` e, per ogni colonna visualizzata, `columns[i][name]` (la `key`), `columns[i][searchable]` e `columns[i][orderable]`. `order[i][column]` riceve l'**indice** della colonna ordinata (tra quelle visualizzate), non la chiave, con un `order[i]` per ogni criterio di ordinamento.
 
-Questa modalità è mantenuta solo per compatibilità: `sortKeys` e `searchKeys` non sono disponibili e vengono ignorati con un avviso in console. `searchFields` è invece disponibile, con le modalità descritte di seguito.
+In questa modalità `sortKeys` e `searchKeys` non sono disponibili e vengono ignorati con un avviso in console. `searchFields` è invece disponibile, con le modalità descritte di seguito.
 
 ```html
 <json-table jsonurl="/api/rows" jqdatatablemode="true" cols='[{"key":"id"},{"key":"name"}]'></json-table>
@@ -1549,6 +1697,21 @@ Questa modalità è mantenuta solo per compatibilità: `sortKeys` e `searchKeys`
 ```
 GET /api/rows?draw=1&columns[0][name]=id&columns[0][searchable]=true&columns[0][orderable]=true&columns[1][name]=name&…&start=25&length=25&order[0][column]=1&order[0][dir]=desc&search[value]=mar
 ```
+
+#### <a id="jq-caricamento"></a>Caricamento del modulo
+
+Il codice specifico della modalità (default di modalità, parametri `columns[i]`, `draw` e indici di `order[i][column]`) è nel modulo opzionale `jq-datatable-mode.js`, separato dal core: chi non usa la modalità non lo scarica.
+
+- **Caricamento automatico.** Una tabella con `jqDatatableMode` attivo carica il modulo con un `import()` dinamico prima della prima richiesta. Con webpack il modulo diventa un chunk separato (`json-table-jq-mode`), scaricato una sola volta anche con più tabelle nella pagina. Richiede che il `publicPath` di webpack consenta di caricare i chunk (con il default `'auto'` e con la configurazione dello starter-kit non serve altro).
+- **Precaricamento.** Per evitare la richiesta aggiuntiva al primo caricamento della tabella, il modulo si può includere nel bundle con un import statico, ad esempio nello script condiviso in cui si usa `JsonTable.setDefaults()`:
+
+  ```javascript
+  import '@massimo-cassandro/minimo/json-table';
+  import '@massimo-cassandro/minimo/json-table/jq-datatable-mode'; // incluso nel bundle, nessun chunk separato
+  ```
+
+  L'import si registra da solo e non attiva la modalità: le tabelle la usano comunque solo con `jqDatatableMode: true`. Non va impostato `jqDatatableMode: true` in `setDefaults()` a questo scopo, perché attiverebbe la modalità su tutte le tabelle.
+- **Errore di caricamento.** Se il chunk non può essere scaricato (es. `publicPath` errato) la tabella non viene generata e l'errore viene segnalato in console; un caricamento successivo (`reload()`) riprova. In generale, ogni volta che `jqDatatableMode` è attivo ma il modulo non è disponibile viene mostrato un errore in console (`modulo jq-datatable-mode.js non caricato`) e la tabella non viene generata, invece di ripiegare in silenzio sulla modalità server-side standard.
 
 #### <a id="searchfields-jq"></a>`searchFields` con `jqDatatableMode`
 
@@ -1577,7 +1740,42 @@ GET /api/zone?draw=1&columns[0][name]=id&…&columns[1][name]=zona&…
 
 **Backend ADA** (`App\Service\DataTable`): la ricerca considera ogni `columns[i]` il cui `name` è una chiave di `$fields` con `'searchable' => true`, e aggiunge al campo il `tableAlias` definito nel controller. I nomi in `searchFields` vanno quindi indicati senza alias (`comune`, non `rp.comune`). Un campo che non è in `$fields` viene ignorato senza errori: per usarlo va aggiunto a `$fields` nel controller.
 
-Il servizio confronta `columns[i][searchable]` con `== true`. In PHP la stringa `"false"` vale `true`, quindi una colonna con `searchable: false` viene cercata comunque se `$fields` lo consente (e lo stesso vale per `orderable`). Per escluderla va impostato `'searchable' => false` in `$fields`.
+Il servizio confronta `columns[i][searchable]` con `== true`. In PHP la stringa `"false"` vale `true`, quindi una colonna con `searchable: false` viene cercata comunque se `$fields` lo consente (e lo stesso vale per `orderable`). Per escluderla va impostato `'searchable' => false` in `$fields`, oppure va corretta la lettura del parametro (vedi [`searchable` e `orderable`](#jq-booleani)).
+
+#### <a id="jq-colonne"></a>Migrazione delle colonne: `key` e `name`
+
+In jQuery DataTables una colonna definita solo con `data` (senza `name`) inviava `columns[i][name]=""`: il server non la riconosceva e la ignorava per ordinamento e ricerca, anche se `searchable`/`orderable` erano attivi. Con json-table la `key` diventa sempre il `name` inviato, quindi la stessa colonna, convertita, **viene usata** dal server.
+
+Per ogni colonna migrata:
+
+- se il backend conosce il campo con quel nome (con ADA, una chiave di `$fields`), verificare che sia l'alias giusto e che ordinamento e ricerca su quel campo siano voluti
+- se il backend non deve usarla (come prima), indicare una `key` che non corrisponde a nessun campo del backend e ricavare il contenuto con `render`, disattivando l'ordinamento:
+
+```javascript
+// prima: { data: 'nominativo' } → columns[i][name]="" (colonna ignorata dal server)
+// dopo:
+{ key: '_nominativo', title: 'Nominativo', render: '[[nominativo]]', sortable: false }
+// oppure, da script:
+{ key: '_nominativo', title: 'Nominativo', render: row => row.nominativo, sortable: false }
+```
+
+Con `searchable: true` (default) la colonna viene comunque inviata con `searchable=true`, ma un `name` sconosciuto viene ignorato dal backend; per chiarezza si può impostare anche `searchable: false`.
+
+#### <a id="jq-booleani"></a>`searchable` e `orderable`: stringhe `"true"`/`"false"`
+
+`columns[i][searchable]` e `columns[i][orderable]` vengono inviati come stringhe `"true"`/`"false"`, come fa jQuery DataTables: il formato resta questo per compatibilità (`ssp.class.php`, l'esempio ufficiale di DataTables, confronta con `'true'`).
+
+Un backend PHP che li confronta con `== true` (o li usa come condizione, `if ($col['searchable'])`) tratta la stringa `"false"` come vera, quindi cerca e ordina anche sulle colonne escluse. Il valore va convertito con `filter_var`:
+
+```php
+foreach ($request->query->all('columns') as $i => $col) {
+  $searchable = filter_var($col['searchable'] ?? false, FILTER_VALIDATE_BOOLEAN);
+  $orderable  = filter_var($col['orderable'] ?? false, FILTER_VALIDATE_BOOLEAN);
+  // …
+}
+```
+
+La conversione va comunque sempre combinata con la whitelist dei campi sul server (vedi [Sicurezza](#sicurezza)): il client può inviare qualsiasi valore.
 
 #### <a id="statesave-migrazione"></a>Migrazione di `stateSave` / `storageAllowedReferrers` / `bindToForm`
 
@@ -1749,6 +1947,10 @@ public function elencoJson(Request $request, JsonTableHelper $jt): JsonResponse
   di login o alla dashboard produce un errore di parsing poco chiaro. Usare
   `denyAccessUnlessGranted()` / `#[IsGranted]` (403) oppure restituire una `JsonResponse` con
   lo status appropriato.
+- **Parametri booleani come stringhe** (solo [modalità jQuery DataTables](#server-side-datatables)):
+  `columns[i][searchable]` e `columns[i][orderable]` arrivano come `"true"`/`"false"`. In PHP la stringa
+  `"false"` è vera in un confronto `== true` o in un `if`: convertire con
+  `filter_var($value, FILTER_VALIDATE_BOOLEAN)` (vedi [`searchable` e `orderable`](#jq-booleani)).
 
 #### Conteggi
 
@@ -2018,7 +2220,8 @@ final class JsonTableHelper
 
 Se il progetto usa nomi diversi per i parametri (`serverParams`) o la
 [modalità jQuery DataTables](#server-side-datatables), adattare la lettura dei
-parametri nell'helper, lasciando invariato il resto.
+parametri nell'helper, lasciando invariato il resto; in quest'ultimo caso i flag `columns[i][searchable]`
+e `columns[i][orderable]` vanno letti con `filter_var(…, FILTER_VALIDATE_BOOLEAN)`.
 
 ### <a id="backend-checklist"></a>Checklist
 
@@ -2032,6 +2235,7 @@ parametri nell'helper, lasciando invariato il resto.
 - [ ] righe normalizzate (date ISO, booleani, oggetti annidati) con le `key` delle colonne
 - [ ] filtri di pagina (`filterForm`): parametro assente = nessun filtro, valori tipizzati e validati, campi multipli con `[]`, nomi che non collidono con `serverParams`
 - [ ] form di filtro generato con Symfony Form: `getBlockPrefix()` restituisce `''`, oppure i valori vengono letti con `$request->query->all('<prefisso>')`
+- [ ] solo modalità jQuery DataTables: `columns[i][searchable]`/`[orderable]` letti con `filter_var(…, FILTER_VALIDATE_BOOLEAN)`, nomi delle colonne (`key`) verificati rispetto ai campi del backend
 
 ## <a id="eventi"></a>Eventi
 
@@ -2209,7 +2413,7 @@ Definite in `json-table.minimo.tokens.mjs` (namespace `--jt-*`):
 | `--jt-pagination-radius` | `{radius.xxs}` |
 | `--jt-search-max-width` | `20rem` |
 | `--jt-sort-btn-line-height` | `{table.cell.line-height}` |
-| `--jt-sort-btn-padding-block` | `{table.cell.padding.block}` |
+| `--jt-sort-btn-padding-block` | `{table.thead.padding.block}` |
 | `--jt-sort-btn-padding-inline` | `{table.cell.padding.inline}` |
 | `--jt-sort-icon-gap` | `.4em` |
 | `--jt-sort-icon-none-opacity` | `.4` |

@@ -207,7 +207,7 @@ export function renderPagination(jt, focusTarget = null) {
         tag: 'button',
         className: classnames(btnClass, styles.paginationArrow),
         attrs: { type: 'button', 'data-page': target, 'aria-label': label, title: label, disabled: disabled ? '' : null },
-        content: iconContent(icon)
+        content: iconContent(icon, params.iconFile, params.iconClass)
       }
     ]
   });

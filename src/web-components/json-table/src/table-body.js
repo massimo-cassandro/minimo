@@ -4,6 +4,7 @@ import { domBuilder } from '../../../utilities/dom-builder/dom-builder.js';
 import { classnames } from '../../../utilities/classnames.js';
 import { setContent, getCellValue } from './content-utils.js';
 import { cellContent } from './cell-content.js';
+import { replaceIconPlaceholders } from './icons.js';
 
 /** @typedef {import('../json-table-component.js').JsonTable} JsonTable */
 /** @typedef {import('./parse-rows.js').ParsedRow} ParsedRow */
@@ -38,7 +39,7 @@ function recordSpan(row, cols) {
  * Struttura generata:
  * ```
  * tr[data-jt-idx]
- *   td[data-key][cellClass][internalCellClass]           ← cellContent()
+ *   td[data-key][cellClass][internalCellClass]           ← cellContent() (+ icone `[[@icon:…]]` dei `render` stringa)
  *   th[scope=row][data-key]…                             ← quando col.rowHeading è true
  *   td[rowspan][data-key]…                               ← quando col.rowspan è definito (solo nel primo tr)
  * ```
@@ -83,7 +84,12 @@ export function rowItems(parsed, jt) {
 
         trCols.forEach((col, i) => {
           const td = cells[i];
-          setContent(td, cellContent(col, row, params, tr, td, subIdx));
+          // `render` stringa: markup mustache (valori con escape) e segnaposti `[[@icon:…]]` da sostituire dopo il sanitizer
+          const mustache = typeof col.render === 'string';
+          setContent(td, cellContent(col, row, params, tr, td, subIdx), mustache);
+          if (mustache) {
+            replaceIconPlaceholders(td, params.iconFile, params.iconClass);
+          }
         });
 
         if (typeof params.trCallback === 'function') {

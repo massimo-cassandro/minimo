@@ -12,9 +12,12 @@ import { domBuilder } from '../../../utilities/dom-builder/dom-builder.js';
  * che la configurazione predefinita del browser rimuove, mentre il contenuto non sicuro (script,
  * gestori di eventi, URL `javascript:`) viene sempre eliminato.
  * Una funzione viene invocata e il suo risultato usato. `null`/`undefined` svuotano l'elemento.
+ * Con `asHtml` una stringa viene sempre trattata come markup, anche senza `<`: serve per i risultati di
+ * `resolveMustache`, in cui i valori con escape (es. `&amp;`) non devono essere mostrati alla lettera.
  *
  * @param {HTMLElement} el - Elemento di destinazione (svuotato prima)
  * @param {CellContent|(() => CellContent)} content - Contenuto da impostare
+ * @param {boolean} [asHtml=false] - Tratta sempre le stringhe come markup (default: false)
  * @returns {void}
  *
  * @example
@@ -24,8 +27,9 @@ import { domBuilder } from '../../../utilities/dom-builder/dom-builder.js';
  * setContent(td, document.createElement('span'));
  * setContent(td, [{ tag: 'a', attrs: { href: '#' }, content: 'link' }]);
  * setContent(td, null); // → cella vuota
+ * setContent(td, 'Rossi &amp; Figli', true); // → testo "Rossi & Figli"
  */
-export function setContent(el, content) {
+export function setContent(el, content, asHtml = false) {
 
   const resolved = typeof content === 'function' ? content() : content;
 
@@ -46,7 +50,7 @@ export function setContent(el, content) {
 
   const text = String(resolved);
 
-  if (!text.includes('<')) {
+  if (!asHtml && !text.includes('<')) {
     el.textContent = text;
 
   } else if (typeof el.setHTML === 'function') {
@@ -128,23 +132,199 @@ export function getCellValues(row, col) {
 
 
 /**
- * Risolve un template in stile mustache: ogni segnaposto `[[key]]` viene sostituito con il
- * corrispondente valore della riga (chiavi annidate ammesse); i segnaposto che risultano `null`/`undefined`
- * vengono sostituiti con `nullAs`. Utile per la configurazione senza JS tramite attributi HTML.
+ * Esegue l'escape dei caratteri speciali HTML (`&`, `<`, `>`, `"`, `'`), così che il valore possa essere inserito
+ * in un markup, anche all'interno di un attributo, senza essere interpretato.
+ *
+ * @param {*} value - Valore da convertire (convertito con `String()`)
+ * @returns {string}
+ *
+ * @example
+ * escapeHtml('<img src=x onerror="alert(1)">'); // → '&lt;img src=x onerror=&quot;alert(1)&quot;&gt;'
+ * escapeHtml('Rossi & Figli');                  // → 'Rossi &amp; Figli'
+ */
+export function escapeHtml(value) {
+  return String(value).replace(/[&<>"']/g, ch => /** @type {Record<string, string>} */ ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', '\'': '&#39;'
+  })[ch]);
+}
+
+
+/**
+ * Indica se un valore è "vero" per le sezioni mustache (`[[#key]]`): sono falsi `null`, `undefined`, `false`, `''`,
+ * `0`, `NaN` e gli array vuoti; ogni altro valore (compresa la stringa `'0'`) è vero.
+ *
+ * @param {*} value
+ * @returns {boolean}
+ *
+ * @example
+ * isMustacheTruthy([]);  // → false
+ * isMustacheTruthy('0'); // → true
+ */
+export function isMustacheTruthy(value) {
+  return Array.isArray(value) ? value.length > 0 : Boolean(value);
+}
+
+
+/** Segnaposti `[[…]]` di un template mustache. */
+const MUSTACHE_TAG = /\[\[(.*?)\]\]/g;
+
+/** Prefisso dei segnaposti icona (`[[@icon:nome classi]]`). */
+const ICON_TAG_PREFIX = '@icon:';
+
+
+/**
+ * Analizza il contenuto di un segnaposto `[[…]]`.
+ *
+ * @param {string} raw - Testo tra `[[` e `]]`
+ * @returns {{ kind: 'open'|'inverted'|'close'|'raw'|'icon'|'value', key: string }}
+ */
+function parseMustacheTag(raw) {
+  const tag = raw.trim();
+
+  if (tag.startsWith(ICON_TAG_PREFIX)) {
+    return { kind: 'icon', key: tag.slice(ICON_TAG_PREFIX.length).trim() };
+  }
+
+  /** @type {Record<string, 'open'|'inverted'|'close'|'raw'>} */
+  const sigils = { '#': 'open', '^': 'inverted', '/': 'close', '&': 'raw' };
+  const kind = sigils[tag.charAt(0)];
+
+  return kind ? { kind, key: tag.slice(1).trim() } : { kind: 'value', key: tag };
+}
+
+
+/**
+ * Risolve un template in stile mustache con i valori di una riga (chiavi annidate ammesse):
+ *
+ * - `[[key]]`: valore con escape HTML (`&`, `<`, `>`, `"`, `'`)
+ * - `[[& key]]`: valore così com'è, senza escape (da usare solo per markup affidabile)
+ * - `[[#key]]…[[/key]]`: contenuto mostrato se il valore è vero, vedi `isMustacheTruthy`
+ * - `[[^key]]…[[/key]]`: contenuto mostrato se il valore è falso (`null`, `undefined`, `false`, `''`, `0`, array vuoto)
+ * - `[[@icon:nome classe1 classe2]]`: segnaposto `<span data-jt-icon="nome classe1 classe2"></span>`, da sostituire
+ *   con l'icona dopo l'inserimento nel DOM (vedi `replaceIconPlaceholders` in `icons.js`)
+ *
+ * Le sezioni sono solo condizioni: non iterano sugli array e non cambiano il contesto (le chiavi si riferiscono sempre
+ * alla riga). Sono ammesse sezioni annidate. I valori `null`/`undefined` vengono sostituiti con `nullAs`, inserito
+ * senza escape (è configurazione, non un dato). Gli errori di struttura (sezioni non chiuse o chiuse male) non
+ * interrompono la risoluzione e vengono segnalati da `checkMustache`.
  *
  * @param {string} tpl - Stringa del template
  * @param {Object} row - Oggetto riga
  * @param {string} [nullAs=''] - Sostituto dei valori null/undefined (default: '')
- * @returns {string}
+ * @returns {string} Markup risultante
  *
  * @example
- * resolveMustache('<a href="/users/[[id]]">[[name]]</a>', { id: 12, name: 'Mario' });
- * // → '<a href="/users/12">Mario</a>'
- * resolveMustache('[[owner.name]]', { owner: null }, '—'); // → '—'
+ * resolveMustache('<a href="/users/[[id]]">[[name]]</a>', { id: 12, name: 'Mario & C.' });
+ * // → '<a href="/users/12">Mario &amp; C.</a>'
+ * resolveMustache('[[& html]]', { html: '<b>ok</b>' });               // → '<b>ok</b>'
+ * resolveMustache('[[owner.name]]', { owner: null }, '—');            // → '—'
+ * resolveMustache('[[#active]]sì[[/active]][[^active]]no[[/active]]', { active: 0 }); // → 'no'
+ * resolveMustache('[[@icon:check text-success]]', {});
+ * // → '<span data-jt-icon="check text-success"></span>'
  */
 export function resolveMustache(tpl, row, nullAs = '') {
-  return tpl.replace(/\[\[(.*?)\]\]/g, (_, key) => {
-    const value = getNestedValue(row, key.trim());
-    return value == null ? nullAs : String(value);
-  });
+
+  let out = '';
+  let last = 0;
+  let visible = true;
+
+  /** @type {Array<{ key: string, parentVisible: boolean }>} */
+  const stack = [];
+
+  for (const match of tpl.matchAll(MUSTACHE_TAG)) {
+
+    if (visible) {
+      out += tpl.slice(last, match.index);
+    }
+    last = /** @type {number} */ (match.index) + match[0].length;
+
+    const { kind, key } = parseMustacheTag(match[1]);
+
+    if (kind === 'open' || kind === 'inverted') {
+      const truthy = isMustacheTruthy(getNestedValue(row, key));
+      stack.push({ key, parentVisible: visible });
+      visible = visible && (kind === 'open' ? truthy : !truthy);
+      continue;
+    }
+
+    if (kind === 'close') {
+      // chiude la sezione corrispondente (e quelle interne non chiuse); una chiusura senza apertura viene ignorata
+      const idx = stack.findLastIndex(section => section.key === key);
+      if (idx !== -1) {
+        visible = stack[idx].parentVisible;
+        stack.length = idx;
+      }
+      continue;
+    }
+
+    if (!visible) {
+      continue;
+    }
+
+    if (kind === 'icon') {
+      out += `<span data-jt-icon="${escapeHtml(key)}"></span>`;
+      continue;
+    }
+
+    const value = getNestedValue(row, key);
+    out += value == null ? nullAs : (kind === 'raw' ? String(value) : escapeHtml(value));
+  }
+
+  if (visible) {
+    out += tpl.slice(last);
+  }
+
+  return out;
+}
+
+
+/**
+ * Verifica la struttura delle sezioni di un template mustache (vedi `resolveMustache`) e restituisce la descrizione
+ * degli errori: sezioni non chiuse, chiuse con una chiave diversa o chiusure senza apertura, segnaposti vuoti.
+ * Viene usata una sola volta per colonna (vedi `parseCols`), così che gli avvisi non vengano ripetuti per ogni riga.
+ *
+ * @param {string} tpl - Stringa del template
+ * @returns {string[]} Elenco degli errori (vuoto se il template è corretto)
+ *
+ * @example
+ * checkMustache('[[#a]]x[[/a]]');  // → []
+ * checkMustache('[[#a]]x');        // → ['sezione `a` non chiusa']
+ * checkMustache('[[#a]]x[[/b]]');  // → ['chiusura `[[/b]]` senza sezione aperta corrispondente', 'sezione `a` non chiusa']
+ */
+export function checkMustache(tpl) {
+
+  /** @type {string[]} */
+  const errors = [];
+  /** @type {string[]} */
+  const stack = [];
+
+  for (const match of tpl.matchAll(MUSTACHE_TAG)) {
+
+    const { kind, key } = parseMustacheTag(match[1]);
+
+    if (!key) {
+      errors.push(`segnaposto \`${match[0]}\` senza chiave`);
+      continue;
+    }
+
+    if (kind === 'open' || kind === 'inverted') {
+      stack.push(key);
+
+    } else if (kind === 'close') {
+      const idx = stack.lastIndexOf(key);
+
+      if (idx === -1) {
+        errors.push(`chiusura \`${match[0]}\` senza sezione aperta corrispondente`);
+
+      } else {
+        stack.splice(idx).slice(1).forEach(inner => {
+          errors.push(`sezione \`${inner}\` non chiusa prima di \`${match[0]}\``);
+        });
+      }
+    }
+  }
+
+  stack.forEach(key => errors.push(`sezione \`${key}\` non chiusa`));
+
+  return errors;
 }

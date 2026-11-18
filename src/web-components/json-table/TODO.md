@@ -1,15 +1,7 @@
 # json-table TODO
 
-Materiale di riferimento (piano originale, vecchia implementazione): `src/web-components/TODO json-table/`, da eliminare a fine lavoro.
-
-## Prossimo step: `dt-legacy.js`
-  * modulo on-demand per la compatibilità con il legacy jQuery DataTables / `auto-datatables-bs5` (ADA), con `mustache` come peer dep opzionale
-
-  * prerequisiti nel core: `serverParams` come funzione (o evento `jt:request`); `hidden` per le colonne (campo usato solo per la ricerca, non mostrato) probabilmente non più necessario: con `jqDatatableMode` i campi di `searchFields` vengono inviati come colonne aggiuntive di `columns[i]` (17/11/2026), verificare se `dt-legacy.js` può convertire le colonne `visible: false` in `searchFields`
-
-  * export di `JsonTable` da `index.js` + `**/json-table/json-table-component.js` in `sideEffects` di `package.json`
-
-  * `test/sideEffects-tree-shaking/webpack.config.mjs` rotto: importa `dev-tools/starter-kit/webpack-modules/css-rules.mjs`, spostato in `dev-tools/starter-kit/source_files/root/webpack-config-modules/`
+## Da sistemare
+  * `npm run "test sideEffects tree-shaking"` ancora rotto: la build si ferma su `Can't resolve '@minimoCss/spinner-wrapper.css'` (alias `@minimoCss` non definito in `test/sideEffects-tree-shaking/webpack.config.mjs`)
 
 ## Punti aperti
   * `stateSave` (17/11/2026): da verificare nel browser e in ADA (ripristino con `filterForm`, autocomplete tramite `jt:stateload`/`jt:statesave`, navigazione indietro)

@@ -249,7 +249,7 @@
   --jt-pagination-radius: var(--radius-xxs);
   --jt-search-max-width: 20rem;
   --jt-sort-btn-line-height: var(--table-cell-line-height);
-  --jt-sort-btn-padding-block: var(--table-cell-padding-block);
+  --jt-sort-btn-padding-block: var(--table-thead-padding-block);
   --jt-sort-btn-padding-inline: var(--table-cell-padding-inline);
   --jt-sort-icon-gap: .4em;
   --jt-sort-icon-none-opacity: .4;
@@ -422,7 +422,7 @@
 
   --table-border-color: #333;
   --table-cell-line-height: 1.3;
-  --table-cell-padding-block: .3rem;
+  --table-cell-padding-block: .4rem;
   --table-cell-padding-inline: .6rem;
   --table-tbody-border-width: 1px;
   --table-tbody-rowspan-vertical-align: top;
@@ -435,6 +435,7 @@
   --table-tfoot-vertical-align: middle;
   --table-thead-background-color: #ddd;
   --table-thead-border-width: 3px;
+  --table-thead-padding-block: var(--table-cell-padding-block);
   --table-thead-vertical-align: middle;
 
   --text-color: light-dark(#000, #fff);

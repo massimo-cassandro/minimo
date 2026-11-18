@@ -1,6 +1,6 @@
 {
   "name": "@massimo-cassandro/minimo",
-  "version": "1.71.0",
+  "version": "1.72.0",
   "description": "Light css framework & utilities",
   "type": "module",
   "main": "./src/index.js",
@@ -9,6 +9,7 @@
     "./index.js": "./src/index.js",
     "./charts": "./charts/index.js",
     "./json-table": "./src/web-components/json-table/json-table-component.js",
+    "./json-table/jq-datatable-mode": "./src/web-components/json-table/src/jq-datatable-mode.js",
     "./vanilla-cookie-consent": "./src/components/vanilla-cookie-consent/index.js",
     "./layout-tools": "./dev-tools/layout-tools/layout-tools.js",
     "./stylelint-config": "./dev-tools/stylelint-config/index.js",

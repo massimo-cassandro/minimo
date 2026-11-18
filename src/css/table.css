@@ -26,6 +26,7 @@
     }
 
     th {
+      padding-block: var(--table-thead-padding-block, var(--table-cell-padding-block));
       vertical-align: var(--table-thead-vertical-align, top);
     }
   }

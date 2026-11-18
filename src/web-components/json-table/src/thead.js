@@ -50,7 +50,7 @@ export function setSortState(th, state, params) {
     const iconDef = state === 'none'
       ? params.sortNoneArrowIcon
       : (state === 'ascending' ? params.sortAscArrowIcon : params.sortDescArrowIcon);
-    setContent(/** @type {HTMLElement} */ (icon), iconContent(iconDef));
+    setContent(/** @type {HTMLElement} */ (icon), iconContent(iconDef, params.iconFile, params.iconClass));
   }
 }
 

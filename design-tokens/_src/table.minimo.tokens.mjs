@@ -13,6 +13,12 @@ export default {
           $value: '3px'
         }
       },
+      padding: {
+        block: {
+          $type: 'dimension',
+          $value: '{table.cell.padding.block}'
+        },
+      },
       'vertical-align': {
         $type: 'string',
         $value: 'middle',
@@ -90,7 +96,7 @@ export default {
       'padding' : {
         block: {
           $type: 'dimension',
-          $value: '.3rem'
+          $value: '.4rem'
         },
         inline: {
           $type: 'dimension',

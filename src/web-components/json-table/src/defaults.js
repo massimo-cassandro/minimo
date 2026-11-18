@@ -13,7 +13,8 @@ import {
 
 /**
  * Icona / markup usato per i booleani e per i pulsanti di ordinamento e paginazione: una stringa SVG/HTML (ad es. un
- * import `.svg?inline`), un nodo DOM, un elemento domBuilder o una funzione che ne restituisce uno.
+ * import `.svg?inline`) o di testo semplice (es. `'B'`), una stringa `'@icon:nome classi'` che fa riferimento al file sprite
+ * `iconFile` (vedi `spriteIcon` in `icons.js`), un nodo DOM, un elemento domBuilder o una funzione che ne restituisce uno.
  * @typedef {string|Node|DomBuilderItem|(() => string|Node|DomBuilderItem)} IconDef
  */
 
@@ -57,9 +58,11 @@ import {
  * @property {string} [type] - Alias di `dataType`
  * @property {ColParse|null} [parse] - Funzione `(row, subIdx) => value` che preelabora il valore prima del data type,
  *   evitando di scrivere un `render` che ne duplichi la formattazione. Non modifica `row` (default: null)
- * @property {ColRender|string|null} [render] - Renderer della cella: una funzione `(row, tr, td) => content` oppure,
- *   anche tramite attributo HTML, una stringa in stile mustache in cui i segnaposto `[[key]]` vengono sostituiti con i valori
- *   della riga (chiavi annidate ammesse). Sovrascrive il rendering del data type (default: null)
+ * @property {ColRender|string|null} [render] - Renderer della cella: una funzione `(row, tr, td) => content` (la strada
+ *   principale) oppure, anche tramite attributo HTML, una stringa in stile mustache: `[[key]]` valore della riga con escape HTML
+ *   (chiavi annidate ammesse), `[[& key]]` valore senza escape, `[[#key]]…[[/key]]` / `[[^key]]…[[/key]]` contenuto
+ *   condizionale, `[[@icon:nome classi]]` icona di `iconFile` (vedi `resolveMustache`). Sovrascrive il rendering del data type
+ *   (default: null)
  * @property {TfootRender|string|null} [tfootRender] - Contenuto della cella del footer (solo quando `tfoot` è true): una funzione
  *   `(rows, td) => content`, una stringa statica o uno degli aggregati predefiniti `'@sum'`, `'@avg'`, `'@min'`,
  *   `'@max'`, `'@count'` calcolati sui valori della colonna e formattati dal data type della colonna.
@@ -84,6 +87,11 @@ import {
  * @property {string|null} [headerClass] - Classe/i del `<th>`, che sostituiscono quelle del data type. Quando è impostato solo uno tra
  *   `headerClass`/`cellClass`, l'altro assume lo stesso valore (default: null)
  * @property {string|null} [cellClass] - Classe/i delle celle del body/footer, che sostituiscono quelle del data type (default: null)
+ * @property {IconDef|null} [boolTrueIcon] - Solo colonne `bool`/`boolTrueOnly` (e tipi derivati): icona dei valori `true` al posto di
+ *   quella della tabella; anche testo semplice (es. `'B'`) o `'@icon:nome'`. `null` = icona della tabella (default: null)
+ * @property {IconDef|null} [boolFalseIcon] - Solo colonne `bool`: come `boolTrueIcon`, per i valori `false` (default: null)
+ * @property {IconDef|null} [boolNullIcon] - Solo colonne `bool`: come `boolTrueIcon`, per i valori nulli o non booleani, al posto di
+ *   `renderNullAs` (default: null)
  */
 
 /**
@@ -104,6 +112,8 @@ import {
  * @property {Partial<ColDefinition>} [colDefaults] - Default delle colonne imposti da questo tipo (es. `{ sortable: false }`),
  *   comunque sovrascrivibili nella definizione della colonna
  * @property {string} [inheritsFrom] - Solo per i tipi personalizzati: chiave del tipo predefinito da estendere
+ * @property {boolean} [_boolNullIcon] - Interno: i valori nulli delle colonne di questo tipo usano `boolNullIcon`, se impostata
+ *   (tipo `bool` e tipi derivati)
  */
 
 /**
@@ -251,8 +261,9 @@ import {
  * @property {string|null} jsonUrl - URL del JSON da recuperare. Ignorato quando `data` è impostato (default: null)
  * @property {boolean} jqDatatableMode - Modalità di compatibilità con il formato server-side di jQuery DataTables: quando è true
  *   i default di `jsonDataField`, `totRecField`, `filteredRecField`, `serverSide` e `serverParams` diventano quelli di
- *   `jqDatatableModeDefaults`. Restano sovrascrivibili (precedenza: `init()` > attributo HTML > `setDefaults()` > modalità jQuery
- *   DataTables > default predefinito) (default: false)
+ *   `jqDatatableModeDefaults`. Restano sovrascrivibili (precedenza: `init()` > attributo HTML > `setDefaults()` > modalità
+ *   jQuery DataTables > default predefinito). Il codice della modalità è nel modulo opzionale `jq-datatable-mode.js`,
+ *   caricato automaticamente solo quando la modalità è attiva (default: false)
  * @property {string|null} jsonDataField - Chiave del JSON recuperato che contiene l'array delle righe (es. `{ data: [...] }`);
  *   `null` o una stringa vuota significa che la radice del JSON è l'array delle righe stesso (default: 'data')
  * @property {string} totRecField - Chiave del JSON recuperato che contiene il numero totale di record (numerico);
@@ -329,8 +340,16 @@ import {
  * @property {string|null} renderNullAs - Contenuto mostrato per i valori `null`/`undefined` (default: '—')
  * @property {string|null} renderZeroAs - Se non null, contenuto mostrato per i valori numerici uguali a zero (default: null)
  * @property {string|null} renderNaNAs - Contenuto mostrato dai tipi numerici per i valori non numerici (default: '—')
+ * @property {string|null} iconFile - URL del file sprite SVG usato dai segnaposti `[[@icon:nome]]` dei `render` stringa e dalle
+ *   icone `'@icon:nome'`, che generano `<svg class="{iconClass}"><use href="{iconFile}#nome"></use></svg>`. Non sostituisce le
+ *   icone predefinite (`boolTrueIcon`, `boolFalseIcon`, ordinamento, paginazione), che vanno impostate esplicitamente a
+ *   `'@icon:nome'` per usare lo sprite (default: null)
+ * @property {string|null} iconClass - Classe/i di base delle icone del file sprite (`[[@icon:nome]]`, `'@icon:nome'`), a cui si
+ *   aggiungono le eventuali classi indicate dopo il nome; `null` o `''` = nessuna classe di base (default: 'icon')
  * @property {IconDef} boolTrueIcon - Icona dei valori `true` nelle colonne `bool` (default: icona `check-bold` di minimo)
  * @property {IconDef} boolFalseIcon - Icona dei valori `false` nelle colonne `bool` (default: icona `x-bold` di minimo)
+ * @property {IconDef|null} boolNullIcon - Icona dei valori nulli o non booleani nelle colonne `bool`, al posto di `renderNullAs`
+ *   (default: null)
  * @property {IconDef} sortAscArrowIcon - Icona del pulsante di ordinamento, ordinamento crescente attivo (default: icona `arrow-up` di minimo)
  * @property {IconDef} sortDescArrowIcon - Icona del pulsante di ordinamento, ordinamento decrescente attivo (default: icona `arrow-down` di minimo)
  * @property {IconDef} sortNoneArrowIcon - Icona del pulsante di ordinamento, nessun ordinamento attivo (default: icona `arrows-down-up` di minimo)
@@ -351,39 +370,6 @@ import {
 export const mergedParams = ['classes', 'labels', 'dataTypes', 'serverParams'];
 
 /**
- * Default sostitutivi applicati quando `jqDatatableMode` è true (vedi `resolveParams`). Si inseriscono tra i default predefiniti
- * e quelli di `setDefaults()`. `serverParams` viene unito in modo superficiale come di consueto.
- *
- * In questa modalità `buildServerUrl` invia inoltre `draw=1`, `columns[i][name|searchable|orderable]` e, per
- * `order[i][column]`, l'indice della colonna (non la chiave), con un `order[i]` per ogni criterio di ordinamento.
- *
- * @type {Partial<JsonTableParams>}
- *
- * @example
- * {
- *   jsonDataField: 'data',
- *   totRecField: 'recordsTotal',
- *   filteredRecField: 'recordsFiltered',
- *   serverSide: true,
- *   serverParams: { page: null, start: 'start', perPage: 'length', sort: 'order[{i}][column]', dir: 'order[{i}][dir]', search: 'search[value]' }
- * }
- */
-export const jqDatatableModeDefaults = {
-  jsonDataField: 'data',
-  totRecField: 'recordsTotal',
-  filteredRecField: 'recordsFiltered',
-  serverSide: true,
-  serverParams: {
-    page: null,
-    start: 'start',
-    perPage: 'length',
-    sort: 'order[{i}][column]',
-    dir: 'order[{i}][dir]',
-    search: 'search[value]'
-  }
-};
-
-/**
  * Default predefiniti.
  *
  * @type {JsonTableParams}
@@ -392,7 +378,7 @@ export const jqDatatableModeDefaults = {
  * {
  *   debug: false,
  *   jsonUrl: null,
- *   jqDatatableMode: false,            // true → vedi jqDatatableModeDefaults
+ *   jqDatatableMode: false,            // true → vedi jqDatatableModeDefaults (jq-datatable-mode.js)
  *   jsonDataField: 'data',
  *   totRecField: 'totRec',
  *   filteredRecField: 'filteredRec',
@@ -427,8 +413,11 @@ export const jqDatatableModeDefaults = {
  *   renderNullAs: '—',
  *   renderZeroAs: null,
  *   renderNaNAs: '—',
+ *   iconFile: null,                    // es. '/build/icons.svg' (sprite per `[[@icon:nome]]` / '@icon:nome')
+ *   iconClass: 'icon',                 // classe di base delle icone sprite
  *   boolTrueIcon: '<svg …>',           // minimo check-bold
  *   boolFalseIcon: '<svg …>',          // minimo x-bold
+ *   boolNullIcon: null,                // null → renderNullAs
  *   sortAscArrowIcon: '<svg …>',       // minimo arrow-up
  *   sortDescArrowIcon: '<svg …>',      // minimo arrow-down
  *   sortNoneArrowIcon: '<svg …>',      // minimo arrows-down-up
@@ -495,8 +484,11 @@ export const defaults = {
   renderZeroAs: null,
   renderNaNAs: '—',
 
+  iconFile: null,
+  iconClass: 'icon',
   boolTrueIcon,
   boolFalseIcon,
+  boolNullIcon: null,
   sortAscArrowIcon,
   sortDescArrowIcon,
   sortNoneArrowIcon,

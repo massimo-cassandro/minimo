@@ -1,4 +1,6 @@
 
+import { checkMustache } from './content-utils.js';
+
 /** @typedef {import('./defaults.js').JsonTableParams} JsonTableParams */
 /** @typedef {import('./defaults.js').ColDefinition} ColDefinition */
 /** @typedef {import('./defaults.js').DataTypeDefinition} DataTypeDefinition */
@@ -8,12 +10,15 @@
  * booleano, `headerClass`/`cellClass` sono le stringhe di classi finali e `_type` è l'oggetto del data type.
  * `_subRows` è true per le colonne senza `rowspan` di una tabella in cui almeno un'altra colonna lo definisce:
  * le loro celle vengono ripetute su ogni `<tr>` del record.
+ * `_params` è presente solo nelle colonne che definiscono `boolTrueIcon`/`boolFalseIcon`/`boolNullIcon`: sono i parametri
+ * della tabella (come prototipo) con le icone della colonna, passati al `render` del data type.
  * @typedef {Required<Omit<ColDefinition, 'type'|'condition'|'sortValue'|'searchValue'>> & {
  *   condition: boolean,
  *   sortValue: *,
  *   searchValue: *,
  *   _type: DataTypeDefinition,
- *   _subRows: boolean
+ *   _subRows: boolean,
+ *   _params?: JsonTableParams
  * }} ParsedCol
  */
 
@@ -42,8 +47,14 @@ export const colDefaults = {
   searchKeys: null,
   condition: true,
   headerClass: null,
-  cellClass: null
+  cellClass: null,
+  boolTrueIcon: null,
+  boolFalseIcon: null,
+  boolNullIcon: null
 };
+
+/** Proprietà di colonna che sostituiscono le icone bool della tabella. */
+const colIconParams = /** @type {const} */ (['boolTrueIcon', 'boolFalseIcon', 'boolNullIcon']);
 
 
 /**
@@ -122,13 +133,28 @@ export function parseCols(cols, dataTypes, params) {
         ? merged.condition(params)
         : (merged.condition ?? true);
 
+      // template mustache: errori di struttura segnalati una sola volta, non a ogni riga
+      if (typeof merged.render === 'string') {
+        checkMustache(merged.render).forEach(error => {
+          // eslint-disable-next-line no-console
+          console.warn(`[json-table] colonna \`${merged.key}\`, \`render\`: ${error}`);
+        });
+      }
+
+      // icone bool della colonna: parametri della tabella (come prototipo) con le icone sostituite
+      const iconOverrides = colIconParams.filter(name => merged[name] != null);
+      const colParams = iconOverrides.length
+        ? Object.assign(Object.create(params), Object.fromEntries(iconOverrides.map(name => [name, merged[name]])))
+        : undefined;
+
       return /** @type {ParsedCol} */ ({
         ...merged,
         title: merged.title ?? merged.key,
         condition: Boolean(condition),
         headerClass: merged.headerClass ?? merged.cellClass ?? type.headerClass ?? null,
         cellClass: merged.cellClass ?? merged.headerClass ?? type.cellClass ?? null,
-        _type: type
+        _type: type,
+        ...(colParams ? { _params: colParams } : {})
       });
     })
     .filter(col => col.condition);

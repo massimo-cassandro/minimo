@@ -21,8 +21,9 @@
 }
 
 /* il pulsante di ordinamento riempie l'intera cella: il padding della cella passa al pulsante.
-   `table th.sortable` (0,1,2) supera `.table th` di minimo (0,1,1) indipendentemente dall'ordine dei CSS */
-table th.sortable {
+   `table thead th.sortable` (0,1,3) supera `.table th` (0,1,1) e `.table thead th` (0,1,2) di minimo
+   indipendentemente dall'ordine dei CSS */
+table thead th.sortable {
   padding: 0;
 }
 

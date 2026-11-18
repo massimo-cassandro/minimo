@@ -25,7 +25,11 @@ import { readFileSync, existsSync, symlinkSync, unlinkSync } from 'node:fs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const rootDir = path.resolve(__dirname, '../..');
-const webpackBin = path.resolve(rootDir, 'demo/node_modules/.bin/webpack');
+// con i workspaces npm webpack può essere installato nella root invece che in demo/node_modules
+const webpackBin = [
+  path.resolve(rootDir, 'demo/node_modules/.bin/webpack'),
+  path.resolve(rootDir, 'node_modules/.bin/webpack')
+].find(bin => existsSync(bin)) ?? path.resolve(rootDir, 'demo/node_modules/.bin/webpack');
 const configPath = path.resolve(__dirname, './webpack.config.mjs');
 const demoNodeModules = path.resolve(rootDir, 'demo/node_modules');
 
