@@ -56,7 +56,8 @@
         - 15.2.1 [Caricamento del modulo](#jq-caricamento)
         - 15.2.2 [Migrazione delle colonne: `key` e `name`](#jq-colonne)
         - 15.2.3 [`searchable` e `orderable`: stringhe `"true"`/`"false"`](#jq-booleani)
-        - 15.2.4 [Migrazione di `stateSave` / `storageAllowedReferrers` / `bindToForm`](#statesave-migrazione)
+        - 15.2.4 [Migrazione di `paging: false`](#jq-paging)
+        - 15.2.5 [Migrazione di `stateSave` / `storageAllowedReferrers` / `bindToForm`](#statesave-migrazione)
 16. [API dell'istanza](#api)
 17. [Backend Symfony per la modalità server-side](#backend-symfony)
     - 17.1 [Il contratto in breve](#backend-contratto)
@@ -1688,6 +1689,13 @@ Precedenza: `init()` > attributo HTML > `JsonTable.setDefaults()` > modalità jQ
 
 Oltre ai `serverParams`, in questa modalità vengono inviati anche `draw=1` e, per ogni colonna visualizzata, `columns[i][name]` (la `key`), `columns[i][searchable]` e `columns[i][orderable]`. `order[i][column]` riceve l'**indice** della colonna ordinata (tra quelle visualizzate), non la chiave, con un `order[i]` per ogni criterio di ordinamento.
 
+Paginazione: con `perPage` > 0 vengono inviati `start` (`(page - 1) * perPage`) e `length` (`perPage`). Con `perPage: 0` (nessuna paginazione) vengono inviati `start=0` e `length=-1`: nel protocollo di jQuery DataTables -1 indica "tutte le righe" (è ciò che inviava `paging: false`), mentre i backend compatibili (es. ADA, `App\Service\DataTable`) trattano `length=0` come limite zero e non restituiscono righe. Fuori da questa modalità `perPage: 0` viene inviato così com'è.
+
+| `perPage` | `start` | `length` |
+|---|---|---|
+| > 0 (es. `25`, pagina 3) | `(page - 1) * perPage` (`50`) | `perPage` (`25`) |
+| `0` | `0` | `-1` |
+
 In questa modalità `sortKeys` e `searchKeys` non sono disponibili e vengono ignorati con un avviso in console. `searchFields` è invece disponibile, con le modalità descritte di seguito.
 
 ```html
@@ -1776,6 +1784,23 @@ foreach ($request->query->all('columns') as $i => $col) {
 ```
 
 La conversione va comunque sempre combinata con la whitelist dei campi sul server (vedi [Sicurezza](#sicurezza)): il client può inviare qualsiasi valore.
+
+#### <a id="jq-paging"></a>Migrazione di `paging: false`
+
+L'opzione `paging: false` di jQuery DataTables (tabella senza paginazione, tutte le righe) corrisponde a `perPage: 0` (attributo `perpage="0"`):
+
+```javascript
+// prima (jQuery DataTables)
+{ paging: false }
+// dopo (json-table)
+{ perPage: 0 }
+```
+
+```html
+<json-table jsonurl="/api/rows" jqdatatablemode="true" perpage="0" cols='…'></json-table>
+```
+
+Con `jqDatatableMode` la richiesta contiene `start=0&length=-1`, come con `paging: false`, quindi l'endpoint non richiede modifiche.
 
 #### <a id="statesave-migrazione"></a>Migrazione di `stateSave` / `storageAllowedReferrers` / `bindToForm`
 

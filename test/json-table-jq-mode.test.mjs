@@ -80,6 +80,29 @@ test('dopo il caricamento: default di modalità e parametri di jQuery DataTables
   assert.equal(url.searchParams.get('q'), 'mar');
 });
 
+test('jqDatatableMode con perPage 0: length=-1 e start=0', () => {
+  const params = resolveParams(fakeEl({ jqDatatableMode: 'true', perPage: '0' }), { jsonUrl: '/api' });
+  assert.equal(params.perPage, 0);
+
+  const url = new URL(buildServerUrl(params, { ...request, page: 1, perPage: 0 }));
+  assert.equal(url.searchParams.get('length'), '-1');
+  assert.equal(url.searchParams.get('start'), '0');
+});
+
+test('jqDatatableMode con perPage > 0: start calcolato dalla pagina', () => {
+  const params = resolveParams(fakeEl({ jqDatatableMode: 'true' }), { jsonUrl: '/api' });
+  const url = new URL(buildServerUrl(params, { ...request, page: 3, perPage: 25 }));
+  assert.equal(url.searchParams.get('length'), '25');
+  assert.equal(url.searchParams.get('start'), '50');
+});
+
+test('senza jqDatatableMode perPage 0 resta invariato', () => {
+  const params = resolveParams(fakeEl(), { jsonUrl: '/api', serverSide: true });
+  const url = new URL(buildServerUrl(params, { ...request, page: 1, perPage: 0 }));
+  assert.equal(url.searchParams.get('perPage'), '0');
+  assert.equal(url.searchParams.get('start'), '0');
+});
+
 test('l\'import statico registra il modulo (precaricamento)', async () => {
   const mod = await import('../src/web-components/json-table/src/jq-datatable-mode.js');
   assert.equal(getJqMode().defaults, mod.jqDatatableModeDefaults);

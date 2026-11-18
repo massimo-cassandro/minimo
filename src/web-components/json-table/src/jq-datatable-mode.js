@@ -21,6 +21,7 @@ import { registerJqMode } from './jq-mode-registry.js';
  * @property {(projectDefaults: Partial<JsonTableParams>) => Partial<JsonTableParams>} applyDefaults - Vedi `applyJqDefaults`
  * @property {typeof appendJqColumns} appendColumns - Vedi `appendJqColumns`
  * @property {typeof jqSortValues} sortValues - Vedi `jqSortValues`
+ * @property {typeof jqPagingValues} pagingValues - Vedi `jqPagingValues`
  */
 
 
@@ -28,7 +29,7 @@ import { registerJqMode } from './jq-mode-registry.js';
  * Default sostitutivi applicati quando `jqDatatableMode` è true (vedi `resolveParams`). Si inseriscono tra i default predefiniti
  * e quelli di `setDefaults()`. `serverParams` viene unito in modo superficiale come di consueto.
  *
- * In questa modalità `buildServerUrl` invia inoltre `draw=1`, `columns[i][name|searchable|orderable]` e, per
+ * In questa modalità `buildServerUrl` invia inoltre `draw=1`, `length=-1` e `start=0` con `perPage` 0 (vedi `jqPagingValues`), `columns[i][name|searchable|orderable]` e, per
  * `order[i][column]`, l'indice della colonna (non la chiave), con un `order[i]` per ogni criterio di ordinamento.
  *
  * @type {Partial<JsonTableParams>}
@@ -139,9 +140,29 @@ export function jqSortValues(cols, sortDefs) {
 }
 
 
+/**
+ * Valori di `start` e `length` (nomi predefiniti) della richiesta. Con `perPage` 0 (nessuna paginazione) vengono inviati
+ * `length=-1` e `start=0`: nel protocollo server-side di jQuery DataTables -1 indica "tutte le righe" (è ciò che inviava
+ * `paging: false`), mentre 0 viene trattato dai backend compatibili come limite zero (nessuna riga).
+ * @param {number} page - Pagina richiesta (da 1)
+ * @param {number} perPage - Righe per pagina (0 = nessuna paginazione)
+ * @returns {{ start: number, length: number }}
+ *
+ * @example
+ * jqPagingValues(3, 25); // → { start: 50, length: 25 }
+ * jqPagingValues(1, 0);  // → { start: 0, length: -1 }
+ */
+export function jqPagingValues(page, perPage) {
+  return perPage > 0
+    ? { start: (page - 1) * perPage, length: perPage }
+    : { start: 0, length: -1 };
+}
+
+
 registerJqMode({
   defaults: jqDatatableModeDefaults,
   applyDefaults: applyJqDefaults,
   appendColumns: appendJqColumns,
-  sortValues: jqSortValues
+  sortValues: jqSortValues,
+  pagingValues: jqPagingValues
 });

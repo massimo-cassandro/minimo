@@ -97,7 +97,8 @@ function buildSearchFields(cols, searchFields = null) {
  *
  * Con `params.jqDatatableMode` e `request.cols` vengono inviati anche, come fa jQuery DataTables, `draw=1`,
  * `columns[i][name|searchable|orderable]` e, per `sort`, l'indice della colonna al posto della sua chiave
- * (`order[i][column]` e `order[i][dir]` per ogni criterio, con i nomi predefiniti).
+ * (`order[i][column]` e `order[i][dir]` per ogni criterio, con i nomi predefiniti). Con `perPage` 0 vengono inviati
+ * `length=-1` e `start=0` (tutte le righe, come `paging: false` di jQuery DataTables).
  * In questa modalità `searchFields` non viene inviato come parametro: ogni campo viene accodato alle colonne visualizzate
  * come colonna aggiuntiva (`searchable=true`, `orderable=false`), come le colonne `visible: false` di jQuery DataTables.
  * `sortKeys` e `searchKeys` non vengono usati. Questa parte è nel modulo opzionale `jq-datatable-mode.js`, che deve essere
@@ -132,14 +133,19 @@ export function buildServerUrl(params, request, filters = null) {
     }
   };
 
-  set(names.page, request.page);
-  set(names.start, (request.page - 1) * request.perPage);
-  set(names.perPage, request.perPage);
-
   const jq = params.jqDatatableMode ? getJqMode() : null;
   if (params.jqDatatableMode && !jq) {
     throw new Error('[json-table] `jqDatatableMode`: modulo `jq-datatable-mode.js` non caricato');
   }
+
+  // con jqDatatableMode, `perPage` 0 diventa `length=-1` (tutte le righe), vedi `jqPagingValues`
+  const paging = jq
+    ? jq.pagingValues(request.page, request.perPage)
+    : { start: (request.page - 1) * request.perPage, length: request.perPage };
+
+  set(names.page, request.page);
+  set(names.start, paging.start);
+  set(names.perPage, paging.length);
   const jqCols = jq ? request.cols : null;
   if (jq && jqCols) {
     jq.appendColumns(set, jqCols, /** @type {string[]|null} */ (params.searchFields));
