@@ -47,3 +47,4 @@
 * 1.68 (16 nov 2026) - charts: legenda su più righe
 * 1.69 (16 nov 2026) - Eslint config dev tool
 * 1.70 (17 nov 2026) - json-table state
+* 1.71 (18 nov 2026) - stylelint 18

@@ -1,0 +1,31 @@
+/* casi di test per minimo/css-modules-class-pattern */
+
+/* ok: classi del modulo in camelCase */
+.moduleClass .otherClass_Variant {
+  color: #000;
+}
+
+/* errore atteso: classe del modulo non camelCase */
+.module-class {
+  color: #000;
+}
+
+/* ok: classi kebab-case dentro :global() e :local() */
+.moduleClass :global(.non-module-class) :local(.another-class) {
+  color: #000;
+}
+
+/* ok: forma senza parentesi, vale fino alla fine del selettore */
+:global .non-module-class .other-global-class {
+  color: #000;
+}
+
+/* errore atteso: dentro :not() resta il pattern del modulo */
+.moduleClass:not(.wrong-class) {
+  color: #000;
+}
+
+/* ok: dentro :not() annidato in :global() vale il pattern esteso */
+:global(.global-class:not(.is-active)) {
+  color: #000;
+}

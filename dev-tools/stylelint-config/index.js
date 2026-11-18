@@ -1,7 +1,59 @@
 /** @type {import('stylelint').Config} */
 
+import cssModulesClassPatternPlugin from './plugins/css-modules-class-pattern.js';
+
 const tailwindAtRules = ['tailwind', 'apply', 'layer', 'variants', 'responsive', 'screen', 'config'],
-  postCSSRules = ['define-mixin', 'mixin'];
+  postCSSRules = ['define-mixin', 'mixin'],
+  scssAtRules = [
+    'extend', 'include', 'if', 'else', 'function', 'at-root',
+    'use', 'forward', 'each', 'while', 'for', 'error', 'warn', 'debug', 'return'
+  ],
+
+  // pattern dei nomi di classe
+  kebabCaseClassPattern = '^[a-z][a-z0-9\\-]*[a-z0-9]$',
+  cssModulesClassPattern = '^[a-z]+(_?[A-Z]?[a-z0-9]*)*$';
+
+/**
+ * Regole di @stylistic/stylelint-plugin, indicate con il nome breve.
+ * Da @stylistic v6 le regole con il nome base (`@stylistic/xxx`) leggono solo il CSS:
+ * per i file SCSS vanno ripetute nel namespace `@stylistic/scss/xxx`, altrimenti
+ * nei file SCSS valgono le impostazioni di @stylistic/stylelint-config e non queste.
+ */
+const stylisticRules = {
+  'at-rule-name-space-after': 'always',
+  'at-rule-semicolon-space-before': 'never',
+  'block-closing-brace-empty-line-before': null,
+  'block-closing-brace-newline-after': null,
+  'block-opening-brace-space-before': null,
+  'declaration-block-semicolon-newline-before': 'never-multi-line',
+  'declaration-colon-newline-after': null,
+  'function-max-empty-lines': 2,
+  'function-parentheses-space-inside': 'never-single-line',
+  'max-empty-lines': 2,
+  'max-line-length': null,
+  'no-empty-first-line': null,
+  'no-missing-end-of-source-newline': null,
+  'number-leading-zero': 'never',
+  'selector-list-comma-newline-after': 'always-multi-line',
+  'selector-list-comma-newline-before': 'never-multi-line',
+  'selector-list-comma-space-after': 'always-single-line',
+  'selector-list-comma-space-before': 'never-single-line',
+  'string-quotes': 'single',
+  'unicode-bom': 'never',
+  'value-list-comma-newline-after': 'always-multi-line',
+  'value-list-comma-newline-before': 'never-multi-line',
+  'value-list-comma-space-after': null,
+  'value-list-max-empty-lines': 3
+};
+
+/**
+ * Aggiunge il prefisso indicato ai nomi delle regole
+ * @param {string} prefix - Prefisso (es. `@stylistic/`, `@stylistic/scss/`)
+ * @param {Object<string, any>} rules - Regole con il nome breve
+ * @returns {Object<string, any>}
+ */
+const withPrefix = (prefix, rules) =>
+  Object.fromEntries(Object.entries(rules).map(([name, value]) => [prefix + name, value]));
 
 export default {
   extends: [
@@ -10,7 +62,8 @@ export default {
     '@stylistic/stylelint-config'
   ],
   plugins: [
-    '@stylistic/stylelint-plugin'
+    '@stylistic/stylelint-plugin',
+    cssModulesClassPatternPlugin
   ],
   ignoreFiles: [
     'node_modules/**/*.*',
@@ -53,7 +106,7 @@ export default {
     'property-no-vendor-prefix': true,
     'rule-empty-line-before': null,
     'selector-attribute-quotes': 'always',
-    'selector-class-pattern': ['^[a-z][a-z0-9\\-]*[a-z0-9]$', { resolveNestedSelectors: true }],
+    'selector-class-pattern': kebabCaseClassPattern,
     'selector-max-attribute': 2,
     'selector-max-class': 4,
     'selector-max-combinators': 4,
@@ -70,31 +123,8 @@ export default {
     'value-keyword-case': ['lower', { ignoreKeywords: ['currentColor'] }],
     'value-no-vendor-prefix': true,
 
-    // --- Stylistic ---
-    '@stylistic/at-rule-name-space-after': 'always',
-    '@stylistic/at-rule-semicolon-space-before': 'never',
-    '@stylistic/block-closing-brace-empty-line-before': null,
-    '@stylistic/block-closing-brace-newline-after': null,
-    '@stylistic/block-opening-brace-space-before': null,
-    '@stylistic/declaration-block-semicolon-newline-before': 'never-multi-line',
-    '@stylistic/declaration-colon-newline-after': null,
-    '@stylistic/function-max-empty-lines': 2,
-    '@stylistic/function-parentheses-space-inside': 'never-single-line',
-    '@stylistic/max-empty-lines': 2,
-    '@stylistic/max-line-length': null,
-    '@stylistic/no-empty-first-line': null,
-    '@stylistic/no-missing-end-of-source-newline': null,
-    '@stylistic/number-leading-zero': 'never',
-    '@stylistic/selector-list-comma-newline-after': 'always-multi-line',
-    '@stylistic/selector-list-comma-newline-before': 'never-multi-line',
-    '@stylistic/selector-list-comma-space-after': 'always-single-line',
-    '@stylistic/selector-list-comma-space-before': 'never-single-line',
-    '@stylistic/string-quotes': 'single',
-    '@stylistic/unicode-bom': 'never',
-    '@stylistic/value-list-comma-newline-after': 'always-multi-line',
-    '@stylistic/value-list-comma-newline-before': 'never-multi-line',
-    '@stylistic/value-list-comma-space-after': null,
-    '@stylistic/value-list-max-empty-lines': 3,
+    // --- Stylistic (CSS) ---
+    ...withPrefix('@stylistic/', stylisticRules)
   },
   overrides: [
     {
@@ -124,15 +154,7 @@ export default {
         'at-rule-no-unknown': null, // disabilita regola base per evitare conflitti
         'scss/at-rule-no-unknown': [
           true,
-          {
-            ignoreAtRules: [
-              ...tailwindAtRules,
-              ...postCSSRules,
-              // SCSS
-              'extend', 'include', 'if', 'else', 'function', 'at-root',
-              'use', 'forward', 'each', 'while', 'for', 'error', 'warn', 'debug', 'return'
-            ]
-          }
+          { ignoreAtRules: [...tailwindAtRules, ...postCSSRules, ...scssAtRules] }
         ],
         'scss/comment-no-empty': null,
         'scss/dimension-no-non-numeric-values': true,
@@ -150,36 +172,71 @@ export default {
         'scss/no-duplicate-mixins': true,
         'scss/operator-no-newline-after': true,
         'scss/operator-no-newline-before': true,
-        'scss/operator-no-unspaced': true
+        'scss/operator-no-unspaced': true,
+
+        // --- Stylistic (SCSS) ---
+        ...withPrefix('@stylistic/scss/', stylisticRules)
+      }
+    },
+
+    // --- CSS modules ---
+    // Regole riprese da stylelint-config-css-modules v4.6.0
+    // (https://github.com/pascalduez/stylelint-config-css-modules, licenza Unlicense)
+    // e incorporate per non dipendere dal pacchetto (al 18/11/2026 non supporta ancora stylelint 18).
+    // Differenze rispetto all'originale:
+    // - a `at-rule-no-unknown` e `scss/at-rule-no-unknown` vengono aggiunte le at-rule ignorate
+    //   dalla config di base, che altrimenti verrebbero sovrascritte;
+    // - omessa `at-rule-empty-line-before`, disattivata nella config di base (con il pacchetto
+    //   esterno, inserito tramite `extends`, l'impostazione della config di base aveva comunque la precedenza).
+    {
+      files: ['**/*.module.css', '**/*.module.scss'],
+      rules: {
+        'selector-pseudo-class-no-unknown': [
+          true,
+          { ignorePseudoClasses: ['export', 'import', 'global', 'local', 'external'] }
+        ],
+        'selector-type-no-unknown': [
+          true,
+          { ignore: ['custom-elements'], ignoreTypes: ['from'] }
+        ],
+        'property-no-unknown': [
+          true,
+          {
+            ignoreProperties: ['composes', 'compose-with'],
+            ignoreSelectors: [':export', /^:import/]
+          }
+        ],
+        'at-rule-no-unknown': [
+          true,
+          { ignoreAtRules: [...tailwindAtRules, ...postCSSRules, 'value'] }
+        ]
       }
     },
     {
-      files: ['**/*.module.scss', '**/*.module.css'],
-      extends: ['stylelint-config-css-modules'],
+      files: ['**/*.module.scss'],
       rules: {
-        'selector-class-pattern': [
-          '^[a-z]+(_?[A-Z]?[a-z0-9]*)*$',
-          {
-            ignoreSelectors: [/:global/], // non funziona
-            resolveNestedSelectors: true
-          }
+        'at-rule-no-unknown': null,
+        'scss/at-rule-no-unknown': [
+          true,
+          { ignoreAtRules: [...tailwindAtRules, ...postCSSRules, ...scssAtRules, 'value'] }
+        ]
+      }
+    },
+
+    // --- CSS modules: nomi delle classi (regola minimo) ---
+    // Le classi del modulo devono essere in camelCase; le classi dentro :global() / :local()
+    // (o dopo :global / :local senza parentesi, fino alla fine del selettore) possono seguire
+    // anche il pattern kebab-case della config di base.
+    // Vedi plugins/css-modules-class-pattern.js
+    {
+      files: ['**/*.module.css', '**/*.module.scss'],
+      rules: {
+        'selector-class-pattern': null,
+        'minimo/css-modules-class-pattern': [
+          cssModulesClassPattern,
+          { wrappedPattern: `${kebabCaseClassPattern}|${cssModulesClassPattern}` }
         ]
       }
     }
-    // da testare
-    // {
-    //   files: ['**/*.module.scss', '**/*.module.css'],
-    //   extends: ['stylelint-config-css-modules'],
-    //   rules: {
-    //     'selector-class-pattern': [
-    //       '^([a-z][a-z0-9]*([A-Z][a-z0-9]*)*|[a-z][a-z0-9-]*)$',
-    //       { resolveNestedSelectors: true }
-    //     ],
-    //     'selector-pseudo-class-no-unknown': [
-    //       true,
-    //       { ignorePseudoClasses: ['global', 'local'] }
-    //     ]
-    //   }
-    // }
   ]
 };
