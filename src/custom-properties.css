@@ -234,6 +234,14 @@
   --jt-info-font-size: var(--font-size-sm);
   --jt-info-gap: var(--size-sm);
   --jt-info-outer-padding-block-end: var(--size-xs);
+  --jt-loader-backdrop-filter: none; /* Filtro applicato al contenuto sotto l'overlay, es. `blur(2px)` */
+  --jt-loader-background-color: color-mix(in srgb, var(--body-background-color) 70%, transparent);
+  --jt-loader-justify-content: flex-start; /* Posizione verticale dello spinner nell'overlay: `flex-start` (in alto, sopra l'intestazione, visibile anche con tabelle lunghe), `center`, `flex-end` */
+  --jt-loader-padding-block: var(--size-md);
+  --jt-loader-spinner-color: var(--primary-100);
+  --jt-loader-spinner-size: var(--size-lg);
+  --jt-loader-spinner-stroke-width: 2px;
+  --jt-loader-z-index: 2;
   --jt-pagination-border-color: var(--table-border-color);
   --jt-pagination-border-width: 1px;
   --jt-pagination-btn-min-width: 2.2em;

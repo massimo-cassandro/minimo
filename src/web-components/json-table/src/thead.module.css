@@ -6,7 +6,8 @@
       background-color: var(--jt-thead-hover-background-color);
     }
   }
-  &:is([aria-sort='ascending'], [aria-sort='descending']) {
+  /* `data-jt-sort` è su tutte le colonne dei criteri attivi; `aria-sort` solo su quella del criterio principale */
+  &[data-jt-sort] {
     &::after {
       position: absolute;
       bottom: var(--jt-thead-sorted-indicator-offset);
@@ -58,8 +59,8 @@ table thead th.sortable {
     fill: currentColor;
   }
 
-  /* un ordinamento attivo (aria-sort sul th) mostra l'icona a piena opacità */
-  [aria-sort] & {
+  /* un ordinamento attivo (data-jt-sort sul th, anche criterio secondario) mostra l'icona a piena opacità */
+  [data-jt-sort] & {
     opacity: 1;
   }
 }

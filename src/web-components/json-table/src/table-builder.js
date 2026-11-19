@@ -2,6 +2,7 @@
 import * as styles from '../json-table-component.module.css';
 import { classnames } from '../../../utilities/classnames.js';
 import { theadPart } from './thead.js';
+import { loaderPart } from './loader.js';
 
 /** @typedef {import('./defaults.js').JsonTableParams} JsonTableParams */
 /** @typedef {import('../json-table-component.js').JsonTable} JsonTable */
@@ -98,10 +99,11 @@ export function tableFooterPart(jt, elements, children) {
  *     tbody                     ← riempito da `renderTbody()`
  *     tfoot                     (se `tfoot`) ← riempito da `renderTfoot()`
  * div.tableFooter               ← footerBar (caption + paginazione), se indicata
+ * div.loader                    ← overlay di caricamento (`loaderPart()`), se `loader`
  * ```
  *
  * I riferimenti agli elementi generati vengono memorizzati in `elements`
- * (`tableWrapper`, `table`, `thead`, `tbody`, `tfoot`).
+ * (`tableWrapper`, `table`, `thead`, `tbody`, `tfoot`, `loader`).
  *
  * @param {JsonTable} jt - L'istanza del componente (`params`, `cols`)
  * @param {JsonTableElements} elements - Oggetto che raccoglie gli elementi generati (modificato)
@@ -145,7 +147,8 @@ export function tablePart(jt, elements, footerBar = null, captionElId = null) {
           }
         ]
       },
-      ...(footerBar ? [footerBar] : [])
+      ...(footerBar ? [footerBar] : []),
+      loaderPart(jt, elements)
     ]
   };
 }

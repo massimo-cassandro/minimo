@@ -1,82 +1,87 @@
 # <a id="indice"></a>`<json-table>` – datatable da JSON
 
-1. [Installazione](#installazione)
+1. [Quick start](#quick-start)
     - 1.1 [Tipi per gli script consumer](#installazione-tipi)
-2. [Utilizzo da markup](#utilizzo-markup)
-3. [Sintassi Mustache](#sintassi-mustache)
-    - 3.1 [Sezioni condizionali](#mustache-sezioni)
-    - 3.2 [Icone](#mustache-icone)
-4. [Utilizzo da script](#utilizzo-script)
-    - 4.1 [Con `domBuilder`](#utilizzo-dombuilder)
-5. [Utilizzo misto – attributi HTML + script](#utilizzo-misto)
-6. [Parametri del componente](#parametri)
-    - 6.1 [`classes`](#parametri-classes)
-    - 6.2 [`labels`](#parametri-labels)
-    - 6.3 [`infoText`](#parametri-infotext)
-    - 6.4 [`trCallback`](#parametri-trcallback)
-7. [Parametri colonne](#colonne)
-    - 7.1 [Ricerca e ordinamento](#colonne-ricerca)
-    - 7.2 [`condition`](#colonne-condition)
-    - 7.3 [`parse`](#colonne-parse)
-    - 7.4 [`render`](#colonne-render)
-    - 7.5 [`rowspan`](#colonne-rowspan)
-    - 7.6 [`tfootRender`](#colonne-tfootrender)
-    - 7.7 [Icone bool di colonna](#colonne-bool-icone)
-8. [DataTypes](#datatypes)
-    - 8.1 [Tipi personalizzati](#datatypes-tipi)
-9. [Input ricerca rapida](#ricerca-rapida)
-10. [Form di filtro collegato (`filterForm`)](#filterform)
-    - 10.1 [Utilizzo](#filterform-utilizzo)
-    - 10.2 [Cosa viene inviato](#filterform-invio)
-    - 10.3 [Comportamento](#filterform-comportamento)
-    - 10.4 [`refresh()`](#filterform-refresh)
-    - 10.5 [Modalità client-side](#filterform-client)
-    - 10.6 [Lato server](#filterform-server)
-11. [Persistenza dello stato (`stateSave`)](#statesave)
-    - 11.1 [Chiave e storage](#statesave-chiave)
-    - 11.2 [Pagina di provenienza (`stateReferrers`)](#statesave-referrers)
-    - 11.3 [Cosa viene salvato e ripristinato](#statesave-contenuto)
-    - 11.4 [Dati extra della pagina](#statesave-extra)
-    - 11.5 [Azzerare lo stato](#statesave-reset)
-12. [Ricerca e ordinamento](#ricerca-ordinamento)
-    - 12.1 [Quick start](#ricerca-quickstart)
-    - 12.2 [Ordinamento: pulsanti e `initialSort`](#ordinamento)
-    - 12.3 [Parametri per modalità](#ricerca-parametri)
-    - 12.4 [Client-side](#ricerca-client)
-    - 12.5 [Server-side](#ricerca-server)
-13. [Tabelle con `rowspan`](#tabelle-rowspan)
-    - 13.1 [`subIdx`](#rowspan-subidx)
-    - 13.2 [Accorgimenti comuni](#rowspan-accorgimenti)
-    - 13.3 [Client-side](#rowspan-client)
-    - 13.4 [Server-side](#rowspan-server)
-14. [Default di progetto – `JsonTable.setDefaults()`](#set-defaults)
-15. [Server Side](#modalita-server-side)
-    - 15.1 [Ordinamento e ricerca](#server-side-ordinamento)
-    - 15.2 [Modalità jQuery DataTables](#server-side-datatables)
-        - 15.2.1 [Caricamento del modulo](#jq-caricamento)
-        - 15.2.2 [Migrazione delle colonne: `key` e `name`](#jq-colonne)
-        - 15.2.3 [`searchable` e `orderable`: stringhe `"true"`/`"false"`](#jq-booleani)
-        - 15.2.4 [Migrazione di `paging: false`](#jq-paging)
-        - 15.2.5 [Migrazione di `stateSave` / `storageAllowedReferrers` / `bindToForm`](#statesave-migrazione)
-16. [API dell'istanza](#api)
-17. [Backend Symfony per la modalità server-side](#backend-symfony)
-    - 17.1 [Il contratto in breve](#backend-contratto)
-    - 17.2 [Struttura dell'azione](#backend-struttura)
-    - 17.3 [Linee guida](#backend-linee)
-    - 17.4 [Helper riutilizzabile](#backend-helper)
-    - 17.5 [Checklist](#backend-checklist)
-18. [Eventi](#eventi)
-19. [Paginazione](#paginazione-tabella)
-    - 19.1 [Caption e paginazione](#paginazione-caption)
-20. [Template](#template)
-21. [Struttura generata](#struttura)
-22. [Custom properties CSS](#custom-properties)
+    - 1.2 [Utilizzo da markup](#utilizzo-markup)
+    - 1.3 [Sintassi Mustache](#sintassi-mustache)
+        - 1.3.1 [Sezioni condizionali](#mustache-sezioni)
+        - 1.3.2 [Icone](#mustache-icone)
+    - 1.4 [Utilizzo da script](#utilizzo-script)
+        - 1.4.1 [Con `domBuilder`](#utilizzo-dombuilder)
+    - 1.5 [Utilizzo misto – attributi HTML + script](#utilizzo-misto)
+    - 1.6 [Esempi](#quick-start-esempi)
+        - 1.6.1 [Esempio: form di filtro con autocomplete e stato salvato](#quick-start-autocomplete)
+        - 1.6.2 [Esempio completo con filtro](#quick-start-esempio-filtro)
+2. [Parametri del componente](#parametri)
+    - 2.1 [`classes`](#parametri-classes)
+    - 2.2 [`labels`](#parametri-labels)
+    - 2.3 [`infoText`](#parametri-infotext)
+    - 2.4 [`trCallback`](#parametri-trcallback)
+    - 2.5 [Spinner di caricamento (`loader`)](#parametri-loader)
+3. [Parametri colonne](#colonne)
+    - 3.1 [Ricerca e ordinamento](#colonne-ricerca)
+    - 3.2 [`condition`](#colonne-condition)
+    - 3.3 [`parse`](#colonne-parse)
+    - 3.4 [`render`](#colonne-render)
+    - 3.5 [`rowspan`](#colonne-rowspan)
+    - 3.6 [`tfootRender`](#colonne-tfootrender)
+    - 3.7 [Icone bool di colonna](#colonne-bool-icone)
+4. [DataTypes](#datatypes)
+    - 4.1 [Tipi personalizzati](#datatypes-tipi)
+5. [Input ricerca rapida](#ricerca-rapida)
+6. [Form di filtro collegato (`filterForm`)](#filterform)
+    - 6.1 [Utilizzo](#filterform-utilizzo)
+    - 6.2 [Cosa viene inviato](#filterform-invio)
+    - 6.3 [Comportamento](#filterform-comportamento)
+    - 6.4 [`refresh()`](#filterform-refresh)
+    - 6.5 [Modalità client-side](#filterform-client)
+    - 6.6 [Lato server](#filterform-server)
+7. [Persistenza dello stato (`stateSave`)](#statesave)
+    - 7.1 [Chiave e storage](#statesave-chiave)
+    - 7.2 [Pagina di provenienza (`stateReferrers`)](#statesave-referrers)
+    - 7.3 [Cosa viene salvato e ripristinato](#statesave-contenuto)
+    - 7.4 [Dati extra della pagina](#statesave-extra)
+        - 7.4.1 [Esempio completo: autocomplete in un form di filtro](#statesave-extra-autocomplete)
+    - 7.5 [Azzerare lo stato](#statesave-reset)
+8. [Ricerca e ordinamento](#ricerca-ordinamento)
+    - 8.1 [Esempi rapidi](#ricerca-esempi)
+    - 8.2 [Ordinamento: pulsanti e `initialSort`](#ordinamento)
+    - 8.3 [Parametri per modalità](#ricerca-parametri)
+    - 8.4 [Client-side](#ricerca-client)
+    - 8.5 [Server-side](#ricerca-server)
+9. [Tabelle con `rowspan`](#tabelle-rowspan)
+    - 9.1 [`subIdx`](#rowspan-subidx)
+    - 9.2 [Accorgimenti comuni](#rowspan-accorgimenti)
+    - 9.3 [Client-side](#rowspan-client)
+    - 9.4 [Server-side](#rowspan-server)
+10. [Default di progetto – `JsonTable.setDefaults()`](#set-defaults)
+11. [Server Side](#modalita-server-side)
+    - 11.1 [Ordinamento e ricerca](#server-side-ordinamento)
+    - 11.2 [Modalità jQuery DataTables](#server-side-datatables)
+        - 11.2.1 [Caricamento del modulo](#jq-caricamento)
+        - 11.2.2 [Migrazione delle colonne: `key` e `name`](#jq-colonne)
+        - 11.2.3 [`searchable` e `orderable`: stringhe `"true"`/`"false"`](#jq-booleani)
+        - 11.2.4 [Migrazione di `paging: false`](#jq-paging)
+        - 11.2.5 [Migrazione di `stateSave` / `storageAllowedReferrers` / `bindToForm`](#statesave-migrazione)
+12. [API dell'istanza](#api)
+13. [Backend Symfony per la modalità server-side](#backend-symfony)
+    - 13.1 [Il contratto in breve](#backend-contratto)
+    - 13.2 [Struttura dell'azione](#backend-struttura)
+    - 13.3 [Linee guida](#backend-linee)
+    - 13.4 [Helper riutilizzabile](#backend-helper)
+    - 13.5 [Checklist](#backend-checklist)
+14. [Eventi](#eventi)
+15. [Paginazione](#paginazione-tabella)
+    - 15.1 [Caption e paginazione](#paginazione-caption)
+16. [Template](#template)
+17. [Struttura generata](#struttura)
+18. [Custom properties CSS](#custom-properties)
 
 ---
 
 **json-table** costruisce una tabella HTML da un array di dati JSON (inline o caricato via fetch), a partire da una definizione delle colonne (`cols`) e da un insieme di tipi di dato predefiniti ed estendibili, con ordinamento, ricerca e paginazione (lato client oppure, con `serverSide: true`, delegati al server). È un web component light DOM senza dipendenze esterne: può quindi essere stilizzato direttamente dal CSS del progetto in cui è utilizzato.
 
-## <a id="installazione"></a>Installazione
+## <a id="quick-start"></a>Quick start
 
 [⬆︎ Torna all'indice](#indice)
 
@@ -115,9 +120,7 @@ jtable.init({ ... });
 const other = document.createElement('json-table');
 ```
 
----
-
-## <a id="utilizzo-markup"></a>Utilizzo da markup
+### <a id="utilizzo-markup"></a>Utilizzo da markup
 
 [⬆︎ Torna all'indice](#indice)
 
@@ -161,7 +164,7 @@ La configurazione da attributi è un **ripiego** per i casi semplici: la strada 
 
 Vedi anche [Ricerca e ordinamento](#ricerca-ordinamento)
 
-## <a id="sintassi-mustache"></a>Sintassi Mustache
+### <a id="sintassi-mustache"></a>Sintassi Mustache
 
 [⬆︎ Torna all'indice](#indice)
 
@@ -200,7 +203,7 @@ render: '<b>[[name]]</b>'   // { name: '<i>Mario</i>' } → <b>&lt;i&gt;Mario&lt
 render: '<b>[[& name]]</b>' // { name: '<i>Mario</i>' } → <b><i>Mario</i></b>
 ```
 
-### <a id="mustache-sezioni"></a>Sezioni condizionali
+#### <a id="mustache-sezioni"></a>Sezioni condizionali
 
 `[[#key]]…[[/key]]` mostra il contenuto se il valore è vero, `[[^key]]…[[/key]]` se è falso. Sono falsi `null`, `undefined`, `false`, `''`, `0` e gli array vuoti; ogni altro valore è vero, compresa la stringa `'0'` (un flag che il server invia come stringa va convertito, oppure gestito con un `render` funzione).
 
@@ -222,7 +225,7 @@ Una sezione non chiusa, chiusa con una chiave diversa o una chiusura senza apert
 
 Non sono supportati partial, commenti, lambda, delimitatori personalizzati né la notazione `[[{key}]]` / `[[.]]`: per logiche più complesse va usato `render` come funzione.
 
-### <a id="mustache-icone"></a>Icone
+#### <a id="mustache-icone"></a>Icone
 
 `[[@icon:nome]]` inserisce un'icona del file sprite SVG indicato dal parametro [`iconFile`](#parametri), impostabile anche da attributo (`iconfile="…"`) o con [`JsonTable.setDefaults()`](#set-defaults). Dopo il nome si possono aggiungere classi, separate da spazi:
 
@@ -245,7 +248,7 @@ render: '[[#urgente]][[@icon:warning text-danger icon-lg]][[/urgente]]'
 - lo sprite deve trovarsi sulla stessa origine della pagina: i browser non caricano `<use>` da altri domini
 - la stessa forma (`'@icon:nome classi'`, senza parentesi quadre) è accettata da tutte le icone del componente: `boolTrueIcon`, `boolFalseIcon`, `boolNullIcon` (anche di [colonna](#colonne-bool-icone)), icone di ordinamento e paginazione
 
-## <a id="utilizzo-script"></a>Utilizzo da script
+### <a id="utilizzo-script"></a>Utilizzo da script
 
 [⬆︎ Torna all'indice](#indice)
 
@@ -291,7 +294,7 @@ document.body.appendChild(jtable);
 Vedi anche [Ricerca e ordinamento](#ricerca-ordinamento)
 
 
-### <a id="utilizzo-dombuilder"></a>Con `domBuilder`
+#### <a id="utilizzo-dombuilder"></a>Con `domBuilder`
 
 ```javascript
 domBuilder([
@@ -303,7 +306,7 @@ domBuilder([
 ], container);
 ```
 
-## <a id="utilizzo-misto"></a>Utilizzo misto – attributi HTML + script
+### <a id="utilizzo-misto"></a>Utilizzo misto – attributi HTML + script
 
 [⬆︎ Torna all'indice](#indice)
 
@@ -332,6 +335,147 @@ I parametri oggetto `classes`, `labels`, `dataTypes` e `serverParams` vengono **
 jtable.init({ classes: { table: 'table' } }); // le altre classi restano quelle di default
 ```
 
+### <a id="quick-start-esempi"></a>Esempi
+
+[⬆︎ Torna all'indice](#indice)
+
+#### <a id="quick-start-autocomplete"></a>Esempio: form di filtro con autocomplete e stato salvato
+
+Con un autocomplete associato ad un id numerico in un [form di filtro](#filterform), al server viene inviata solo la variabile relativa al campo hidden legato al campo `input[search]` dell'autocomplete. Il testo visibile di quest'ultimo va salvato a parte nello stato tramite `extra`, così da ripopolare l'input al ritorno sulla pagina. L'input visibile non deve avere `name`: altrimenti verrebbe inviato al server in ogni richiesta.
+
+```html
+<form id="jt-filter">
+  <input type="text" id="cliente-ac">       <!-- testo visibile, senza name -->
+  <input type="hidden" name="cliente_id">   <!-- valore inviato al server -->
+  <button type="submit">Cerca</button>
+  <button type="reset">Reset</button>
+</form>
+
+<json-table id="elenco-ordini" jsonurl="/ordini-json" filterform="jt-filter" cols='[...]'></json-table>
+```
+
+```javascript
+const jtable = document.getElementById('elenco-ordini');
+
+jtable.addEventListener('jt:statesave', e => {
+  e.detail.state.extra = { clienteLabel: document.getElementById('cliente-ac').value };
+});
+
+jtable.addEventListener('jt:stateload', e => {
+  document.getElementById('cliente-ac').value = e.detail.state.extra?.clienteLabel ?? '';
+});
+```
+
+Spiegazione completa e varianti in [Esempio completo: autocomplete in un form di filtro](#statesave-extra-autocomplete).
+
+#### <a id="quick-start-esempio-filtro"></a>Esempio completo con filtro
+
+Esempio di una tabella json-table con filtro aggiuntivo (twig e javascript):
+
+**Twig**, con autocomplete e classi Bootstrap 5:
+
+```twig
+{{ form_start(form, { attr: {id: 'jt-filter', 'data-disable-submit': 'false', class: 'd-print-none'} }) }}
+{{ form_errors(form) }}
+
+
+  <fieldset class="fset">
+    <legend>Filtra ....</legend>
+    <div class="row align-items-end">
+      <div class="col-md-10 col-lg-5">
+        <div class="form-group">
+          <label for="ac-dest">Destinazioni</label>
+          <input class="form-control" id="ac-dest" value="" type="search">
+        </div>
+      </div>
+
+      <div class="col-md-2">
+        <div class="form-group">
+          <button type="submit" class="btn btn-primary">Filtra</button>
+        </div>
+
+        <div class="form-group">
+          <button type="reset" class="btn btn-outline-secondary">Reset</button>
+        </div>
+      </div>
+    </div>
+  </fieldset>
+
+{{ form_widget(form._token) }}
+{{ form_end(form, {'render_rest': false}) }}
+```
+
+**Javascript**
+
+```javascript
+import  { JsonTable } from '@massimo-cassandro/minimo/json-table'; // se non già inizializzato
+import '@massimo-cassandro/minimo/json-table/jq-datatable-mode';   // solo per compatibilita api jquery-datatable, se non già importato
+
+// autocomplete (versione legacy)
+// import { autocompleteDestinazioni } ....
+import { checkAutocomplete } from '@massimo-cassandro/autocomplete';
+
+
+const jtableId = 'jt-betogether'
+  ,jtable = document.querySelector('json-table')
+  ,linkScheda = jtable.dataset.linkScheda
+  ,jtFilterForm = document.getElementById('jt-filter')
+  ,jtStorageKey = jtableId + '-stateKey'
+
+  // campi form
+  ,acDestField = document.getElementById('ac-dest')
+;
+
+autocompleteDestinazioni({
+  autocomplete_field: acDestField,
+  extra_query_params: {},
+  hidden_id: 'dest'
+});
+
+const ac_dest_hidden = document.getElementById('dest');
+
+// `dataset.sel` (testo dell'ultima selezione) viene impostato all'inizializzazione dell'autocomplete:
+// dopo il ripristino dello stato va riallineato, altrimenti `checkAutocomplete` svuota i campi al submit
+// TODO: da eliminare con la revisione dell'autocomplete (vedi minimo, TODO-autocomplete/TODO-refactoring.md)
+jtable.addEventListener('jt:stateload', () => {
+  [acDestField].forEach(field => {
+    if(field) {
+      field.dataset.sel = field.value;
+    }
+  });
+});
+
+// json-table legge il form in un task successivo al submit: i campi sono già stati verificati
+jtFilterForm.addEventListener('submit', () => {
+  checkAutocomplete(acDestField, ac_dest_hidden);
+}, false);
+
+jtable.id = jtableId;
+
+
+jtable.addEventListener('jt:statesave', e => {
+  e.detail.state.extra = { acDestLabel: acDestField.value };
+});
+
+jtable.addEventListener('jt:stateload', e => {
+  acDestField.value = e.detail.state.extra?.acDestLabel ?? '';
+});
+
+
+jtable.init({
+  jqDatatableMode: true, // URL JSON: `action` del form (`filterForm`)
+  filterForm: jtFilterForm,
+  stateKey: jtStorageKey, // chiave dello storage
+  search: false,
+  perPage: 30,
+  serverSide: true,
+  initialSort: {xxxx: 'desc'},
+  cols: []
+});
+```
+
+---
+
 ## <a id="parametri"></a>Parametri del componente
 
 [⬆︎ Torna all'indice](#indice)
@@ -352,7 +496,7 @@ Tutti i parametri sono impostabili sia da attributo HTML che come oggetto in `in
 | `dataTypes` | Object (`{}`) | Tipi di dato personalizzati, uniti a quelli predefiniti (vedi [dataTypes](#datatypes)) |
 | `datesLocaleOpts` | Intl.DateTimeFormatOptions (`{ year: 'numeric', month: 'short', day: 'numeric' }`) | Parte data dei tipi date/datetime |
 | `debug` | boolean (`false`) | Log in console di parametri, colonne, dati, stato ed elementi generati |
-| `filterForm` | string o HTMLFormElement (`null`) | Id del form di filtro collegato (da `init()` anche l'elemento): i suoi valori vengono aggiunti alla query string di `jsonUrl` e al submit/reset la tabella viene aggiornata. Richiede `jsonUrl`. Vedi [Form di filtro collegato](#filterform) |
+| `filterForm` | string o HTMLFormElement (`null`) | Id del form di filtro collegato (da `init()` anche l'elemento): i suoi valori vengono aggiunti alla query string di `jsonUrl` e al submit/reset la tabella viene aggiornata. Senza `jsonUrl` viene usato l'attributo `action` del form. Vedi [Form di filtro collegato](#filterform) |
 | `filteredRecField` | string (`'filteredRec'`) | Solo server-side: chiave del JSON con il numero di record che soddisfano la ricerca corrente; se assente vale `totRecField` |
 | `iconClass` | string o null (`'icon'`) | Classe/i di base delle icone del file sprite (`[[@icon:nome]]`, `'@icon:nome'`), a cui si aggiungono le classi indicate dopo il nome; `null` o `''` = nessuna classe di base (vedi [Icone](#mustache-icone)) |
 | `iconFile` | string (`null`) | URL del file sprite SVG usato da `[[@icon:nome]]` nei `render` stringa e dalle icone `'@icon:nome'` (vedi [Icone](#mustache-icone)). Non sostituisce le icone predefinite (`boolTrueIcon`, `boolFalseIcon`, icone di ordinamento e paginazione), che restano gli SVG inline di minimo: per usare lo sprite vanno impostate esplicitamente, es. `boolTrueIcon: '@icon:check'` |
@@ -360,9 +504,12 @@ Tutti i parametri sono impostabili sia da attributo HTML che come oggetto in `in
 | `initialSort` | oggetto { chiave: 'asc'\|'desc' } o null (`null`) | Ordinamento applicato al caricamento: uno o più criteri in ordine di priorità, es. `{ city: 'asc', name: 'desc' }` |
 | `jqDatatableMode` | boolean (`false`) | Se `true` imposta come default i valori compatibili con il formato server-side di jQuery DataTables: `jsonDataField: 'data'`, `totRecField: 'recordsTotal'`, `filteredRecField: 'recordsFiltered'`, `serverSide: true` e i `serverParams` indicati in "Modalità jQuery DataTables". Ogni valore resta sovrascrivibile. Il codice della modalità è un modulo opzionale, caricato solo quando serve ([Caricamento del modulo](#jq-caricamento)) |
 | `jsonDataField` | string o null (`'data'`) | Chiave del JSON che contiene l'array delle righe (es. `'data'` per `{ data: [...] }`); `null` o `''` = la root del JSON è l'array stesso |
-| `jsonUrl` | string (`null`) | URL del JSON da caricare. Ignorato se `data` è presente |
+| `jsonUrl` | string (`null`) | URL del JSON da caricare. Ignorato se `data` è presente. Con `filterForm` può essere omesso: viene usato l'attributo `action` del form |
 | `labels` | Object | Testi (vedi sotto), uniti ai default |
 | `locale` | string (`'it-IT'`) | Locale per numeri, date e confronto stringhe nell'ordinamento |
+| `loader` | boolean (`true`) | Spinner di caricamento: al primo caricamento, al posto della tabella non ancora costruita, e in modalità server-side come overlay che copre la tabella a ogni richiesta successiva. Vedi [Spinner di caricamento](#parametri-loader) |
+| `loaderDelay` | number (`0`) | Solo server-side: ritardo (ms) prima della comparsa dell'overlay: le richieste più rapide non lo mostrano; `0` = immediato |
+| `loaderIcon` | icona, vedi nota (`null`) | Contenuto al posto dello spinner predefinito di minimo (es. uno SVG animato); `null` = spinner predefinito |
 | `numbersLocaleOpts` | Intl.NumberFormatOptions (`{ maximumFractionDigits: 2 }`) | Tipo `num` |
 | `paginationDelta` | number (`2`) | Pulsanti pagina mostrati a ciascun lato della pagina corrente |
 | `paginationNextIcon` | icona, vedi nota (icona `caret-right`) | Icona del pulsante "pagina successiva" |
@@ -373,7 +520,7 @@ Tutti i parametri sono impostabili sia da attributo HTML che come oggetto in `in
 | `renderZeroAs` | string o null (`null`) | Se non null, contenuto per i valori numerici pari a zero |
 | `search` | boolean (`true`) | Genera l'input di ricerca |
 | `searchDebounce` | number (`300`) | Millisecondi di attesa dopo l'ultimo tasto prima di eseguire la ricerca |
-| `searchFields` | array o null (`null`) | Campi su cui cercare oltre a quelli delle colonne ricercabili, anche se non presenti in `cols`: percorsi del JSON o funzioni `row => valore` in client-side, nomi di campo (anche `tabella.campo`) in server-side. Da attributo HTML: array JSON o stringa separata da virgole. Vedi [Ricerca e ordinamento](#ricerca-quickstart) |
+| `searchFields` | array o null (`null`) | Campi su cui cercare oltre a quelli delle colonne ricercabili, anche se non presenti in `cols`: percorsi del JSON o funzioni `row => valore` in client-side, nomi di campo (anche `tabella.campo`) in server-side. Da attributo HTML: array JSON o stringa separata da virgole. Vedi [Ricerca e ordinamento](#ricerca-esempi) |
 | `serverParams` | Object | Nomi dei parametri di query string in modalità server-side, uniti ai default (vedi sotto) |
 | `serverSide` | boolean (`false`) | Paginazione, ordinamento e ricerca delegati al server (vedi "Modalità server-side"). Richiede `jsonUrl` |
 | `sortAscArrowIcon` | icona, vedi nota (icona `arrow-up`) | Icona del pulsante di ordinamento, ordinamento asc attivo |
@@ -413,6 +560,8 @@ Nomi delle classi assegnate agli elementi generati. Le classi interne di layout 
 | `empty` | `null` | cella unica mostrata in assenza di righe |
 | `info` | `null` | sezione info (testo + ricerca) |
 | `infoOuter` | `null` | contenitore esterno della sezione info |
+| `loader` | `null` | contenitore dello spinner di caricamento (iniziale e overlay) |
+| `loaderSpinner` | `null` | spinner di caricamento (aggiunta a `spinner`, o al contenitore di `loaderIcon`) |
 | `nowrap` | `'text-nowrap'` | no-wrap |
 | `numeric` | `'text-numeric'` | cifre tabulari (tipi numerici) |
 | `pagination` | `null` | `<nav>` della paginazione |
@@ -444,7 +593,7 @@ tipi di dato predefiniti: modificandole si cambiano le classi di tutte le colonn
 |---|---|---|
 | `currentPage` | `'Pagina {page}, corrente'` | `title`/`aria-label` del pulsante della pagina corrente |
 | `info` | `'Stai visualizzando le righe da {start} a {end}, su un totale di {filteredRec} record trovati'` | template del testo info (vedi `infoText`) |
-| `loading` | `'Caricamento dati…'` | segnaposto di caricamento (visually hidden) |
+| `loading` | `'Caricamento dati…'` | testo dello spinner di caricamento (nascosto visivamente) |
 | `nextPage` | `'Pagina successiva'` | `title`/`aria-label` del pulsante successivo |
 | `noResults` | `'Nessun risultato per la ricerca'` | testo info e cella unica con ricerca senza risultati |
 | `noRows` | `'Nessun record trovato'` | testo info e cella unica con set di dati vuoto |
@@ -537,6 +686,38 @@ Accorgimenti:
 - con [`rowspan`](#colonne-rowspan) la funzione viene invocata una volta per ogni `<tr>` del record: per agire una sola volta per record va usato `subIdx === 0`, mentre per applicare un'impostazione all'intero record (es. un colore di sfondo) va ripetuta su ogni `<tr>`
 - non viene invocata per la cella unica mostrata in assenza di righe, né per le righe di `thead` e `tfoot`
 - non è utilizzabile da attributo HTML, che non può contenere funzioni
+
+### <a id="parametri-loader"></a>Spinner di caricamento (`loader`)
+
+Lo spinner di caricamento viene mostrato:
+
+- al **primo caricamento** (e a ogni `reload()`, che ricostruisce la tabella), in qualunque modalità: prima che la struttura della tabella venga costruita, al posto della tabella stessa;
+- solo in modalità **server-side**, a ogni richiesta successiva (cambio pagina, ordinamento, ricerca, submit/reset di `filterForm`, `refresh()`): come overlay semitrasparente che copre la tabella, compresa la barra del footer con la paginazione, con lo spinner in alto, sopra l'intestazione, così da restare visibile anche con tabelle lunghe. L'overlay blocca i click su intestazioni e paginazione finché la richiesta non termina; l'input di ricerca e il form di filtro restano utilizzabili.
+
+In modalità client-side le richieste successive al primo caricamento (`refresh()`, `filterForm`) riducono soltanto l'opacità della tabella (`--jt-busy-opacity`).
+
+Lo spinner predefinito è `.spinner` di minimo ([`src/css/spinner-circle-basic.css`](../../css/spinner-circle-basic.css), importato dal componente), le cui custom properties `--spinner-*` vengono ridefinite a partire dalle `--jt-loader-spinner-*`: colori, dimensioni e posizione si personalizzano con le [custom properties](#custom-properties) `--jt-loader-*`, le classi con `classes.loader` e `classes.loaderSpinner`, il testo per le tecnologie assistive con `labels.loading`.
+
+```javascript
+jtable.init({
+  loaderDelay: 200,                         // server-side: nessun overlay per le risposte più rapide di 200ms
+  loaderIcon: '<svg …>…</svg>',             // al posto dello spinner di minimo (anche '@icon:nome', Node, domBuilder)
+  classes: { loader: 'my-loader' },
+  labels: { loading: 'Caricamento clienti…' }
+});
+```
+
+```css
+json-table {
+  --jt-loader-background-color: rgb(255 255 255 / .8);
+  --jt-loader-backdrop-filter: blur(2px);
+  --jt-loader-justify-content: center;
+  --jt-loader-spinner-color: var(--accent);
+  --jt-loader-spinner-size: 3rem;
+}
+```
+
+Con `loader: false` non viene mostrato alcuno spinner: al primo caricamento l'elemento resta vuoto, durante le richieste server-side la tabella viene solo resa semitrasparente.
 
 ## <a id="colonne"></a>Parametri colonne
 
@@ -912,7 +1093,7 @@ jtable.init({
 });
 ```
 
-Funziona sia in modalità server-side sia in modalità client-side (vedi [Modalità client-side](#filterform-client)). Richiede `jsonUrl`: con `data` inline il parametro viene ignorato con un avviso in console.
+Funziona sia in modalità server-side sia in modalità client-side (vedi [Modalità client-side](#filterform-client)). Richiede `jsonUrl`: con `data` inline il parametro viene ignorato con un avviso in console. Se `jsonUrl` non è impostato viene usato l'URL indicato nell'attributo `action` del form (risolto in URL assoluto); se mancano entrambi viene segnalato un errore in console.
 
 ### <a id="filterform-invio"></a>Cosa viene inviato
 
@@ -943,7 +1124,7 @@ GET /clienti-json?stato=attivo&dal=2025-01-01&zone[]=nord&zone[]=sud&page=1&star
 - torna alla prima pagina;
 - **azzera la ricerca** dell'input interno alla tabella, per evitare che un termine rimasto attivo dalla ricerca precedente restringa i nuovi risultati senza che sia evidente;
 - **mantiene l'ordinamento** corrente;
-- ridisegna corpo, footer, paginazione e testo informativo, senza ricostruire la struttura (niente spinner: durante l'attesa il contenitore ha `aria-busy="true"`).
+- ridisegna corpo, footer, paginazione e testo informativo, senza ricostruire la struttura. Durante l'attesa il contenitore ha `aria-busy="true"`; in modalità server-side viene mostrato anche l'[overlay di caricamento](#parametri-loader).
 
 La validazione nativa del form resta attiva: con campi non validi (`required`, `min`, `pattern`…) l'evento `submit` non viene emesso e la tabella non cambia.
 
@@ -1092,6 +1273,88 @@ jtable.addEventListener('jt:stateload', e => {
 
 `jt:stateload` viene emesso nel microtask successivo a `init()`, quindi un listener registrato subito dopo `init()` lo riceve comunque; per gestire tutte le tabelle di un progetto si può anche ascoltare su `document`.
 
+#### <a id="statesave-extra-autocomplete"></a>Esempio completo: autocomplete in un form di filtro
+
+Caso tipico: un [form di filtro](#filterform) con un autocomplete per scegliere un cliente. L'autocomplete è composto da due campi:
+
+- un input di testo visibile, in cui l'utente digita e che mostra la scelta (es. "Rossi S.r.l.");
+- un campo nascosto con l'id del cliente scelto, scritto dallo script dell'autocomplete alla selezione.
+
+Al server serve solo l'id, quindi solo il campo nascosto ha `name`. Lo stato salvato contiene già l'id (in `filters`), ma non il testo visibile: senza `extra`, al ritorno sulla pagina la tabella risulterebbe filtrata sul cliente ma l'input sarebbe vuoto.
+
+Si potrebbe dare un `name` anche all'input visibile, così da farlo finire in `filters` e ripopolare automaticamente. Funziona, ma tutti i campi con `name` vengono aggiunti alla query string di ogni richiesta (vedi [Cosa viene inviato](#filterform-invio)), quindi il server riceverebbe sempre anche il testo, che non gli serve e che potrebbe entrare in conflitto con parametri omonimi. Con `extra` il testo resta solo nello stato salvato.
+
+```html
+<form id="jt-filter" class="d-print-none">
+  <fieldset class="fset">
+    <legend>Filtri</legend>
+
+    <div class="grid grid-3">
+      <div class="form-group">
+        <label class="form-label" for="cliente-ac">Cliente</label>
+        <!-- testo visibile: niente name, non viene inviato al server -->
+        <input type="text" id="cliente-ac" class="form-control" autocomplete="off">
+        <!-- valore effettivo del filtro, scritto dall'autocomplete alla selezione -->
+        <input type="hidden" id="cliente-id" name="cliente_id">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="anno">Anno</label>
+        <select id="anno" name="anno" class="form-select">
+          <option value="">Tutti</option>
+          <option>2026</option>
+          <option>2025</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="flex justify-content-space-between mbs">
+      <button type="submit" class="btn btn-primary">Avvia ricerca</button>
+      <button type="reset" class="btn btn-secondary btn-hollow">Reset</button>
+    </div>
+  </fieldset>
+</form>
+
+<json-table
+  id="elenco-ordini"
+  jsonurl="/ordini-json"
+  serverside="true"
+  filterform="jt-filter"
+  cols='[...]'
+></json-table>
+```
+
+```javascript
+const jtable = document.getElementById('elenco-ordini');
+const clienteAc = document.getElementById('cliente-ac');
+const clienteId = document.getElementById('cliente-id');
+
+// prima di ogni salvataggio: il testo visibile va in `extra`
+jtable.addEventListener('jt:statesave', e => {
+  e.detail.state.extra = { clienteLabel: clienteAc.value };
+});
+
+// al ripristino: il form (compreso `cliente_id`) è già stato ripopolato da json-table,
+// resta da riscrivere il testo visibile. L'handler deve essere sincrono
+jtable.addEventListener('jt:stateload', e => {
+  clienteAc.value = e.detail.state.extra?.clienteLabel ?? '';
+});
+
+// se l'utente cancella il testo, va svuotato anche l'id: altrimenti il filtro resterebbe attivo
+clienteAc.addEventListener('input', () => {
+  if (clienteAc.value.trim() === '') {
+    clienteId.value = '';
+  }
+});
+```
+
+Note:
+
+- `stateSave` è attivo di default, ma la chiave dello stato si basa sull'`id` dell'elemento (vedi [Chiave e storage](#statesave-chiave)): conviene sempre assegnarne uno stabile.
+- Lo stato viene salvato dopo ogni aggiornamento della tabella, quindi `extra` riflette il testo presente al momento dell'ultimo submit, di un cambio pagina o di un ordinamento. Se il testo cambia senza che la tabella si aggiorni e lo si vuole salvare subito, chiamare `jtable.saveState()`.
+- Il reset del form svuota anche l'input visibile (il reset agisce su tutti i campi, con o senza `name`) e cancella lo stato salvato, `extra` compreso.
+- Con più autocomplete nello stesso form basta usare un oggetto con più proprietà in `extra`, es. `{ clienteLabel, agenteLabel }`.
+
 ### <a id="statesave-reset"></a>Azzerare lo stato
 
 | Metodo | Descrizione |
@@ -1111,7 +1374,7 @@ await jtable.reload(); // pagina 1, initialSort, ricerca vuota
 
 [⬆︎ Torna all'indice](#indice)
 
-### <a id="ricerca-quickstart"></a>Quick start
+### <a id="ricerca-esempi"></a>Esempi rapidi
 
 Di default tutte le colonne sono ricercabili e ordinabili (salvo i tipi di dato che lo escludono, vedi [DataTypes](#datatypes)). Negli esempi seguenti la colonna `azioni` è esclusa da ricerca e ordinamento, la tabella parte ordinata per `cognome` e la ricerca considera anche campi del JSON che non sono colonne della tabella (`searchFields`).
 
@@ -1220,8 +1483,10 @@ initialSort: { city: 'asc', name: 'desc' }
 Ogni colonna deve esistere ed essere ordinabile: i criteri non validi vengono ignorati con un
 errore in console. La priorità segue l'ordine delle chiavi nell'oggetto, con un'eccezione propria di
 JavaScript: le chiavi di tipo intero (es. `'2024'`) vengono sempre enumerate per prime, in ordine
-numerico. `aria-sort` e l'icona compaiono solo sulla colonna del
-primo criterio. `setSort(key, dir)` imposta via script l'ordinamento per una sola colonna.
+numerico. Tutte le colonne dei criteri attivi ricevono l'attributo `data-jt-sort` (`asc`/`desc`),
+usato dal CSS per evidenziarle, e l'icona della propria direzione; `aria-sort` compare invece solo sulla
+colonna del primo criterio, perché le specifiche ARIA lo prevedono su una sola intestazione per volta.
+Il click su una colonna parte dalla direzione del suo criterio, anche se non è il principale. `setSort(key, dir)` imposta via script l'ordinamento per una sola colonna.
 
 ### <a id="ricerca-parametri"></a>Parametri per modalità
 
@@ -1656,7 +1921,8 @@ il totale dei record in `totRecField` e il numero di record che soddisfano la ri
 { "data": [ ...25 righe... ], "totRec": 1500, "filteredRec": 40 }
 ```
 
-Durante la richiesta il contenitore principale ha `aria-busy="true"` (la tabella viene resa
+Durante la richiesta il contenitore principale ha `aria-busy="true"` e la tabella è coperta
+dall'[overlay di caricamento](#parametri-loader) (con `loader: false` viene invece resa
 semitrasparente); le risposte superate da una richiesta più recente vengono ignorate. Se la
 pagina richiesta non esiste più (il set di dati si è ridotto), viene richiesta l'ultima
 disponibile. In questa modalità `data`, `filtered` e `pageRows` dello stato contengono solo la
@@ -2358,7 +2624,7 @@ riconosciuti vengono segnalati in console e ignorati.
         <table class="[table] table table-bordered" aria-labelledby="jt-1-caption">  <!-- classes.table; aria-labelledby solo se caption -->
           <thead>
             <tr>
-              <th scope="col" data-key="name" data-sortable="true" class="[sortable] ..." aria-sort="ascending">
+              <th scope="col" data-key="name" data-sortable="true" class="[sortable] ..." data-jt-sort="asc" aria-sort="ascending">
                 <button type="button" class="[sortBtn] btn-reset" title="Ordina ..." aria-label="Nome: Ordina ...">
                   <span class="[sortTitle]">Nome</span>
                   <span class="[sortIcon]" aria-hidden="true"><svg ...></svg></span>
@@ -2394,13 +2660,18 @@ riconosciuti vengono segnalati in console e ignorati.
           </ul>
         </nav>
       </div>
+      <div class="[loader] [loaderOverlay] [classes.loader]" hidden>  <!-- solo se loader; visibile durante le richieste server-side -->
+        <span class="spinner [classes.loaderSpinner]" aria-hidden="true"></span>  <!-- con loaderIcon: div.[loaderIcon] -->
+        <span class="[loaderLabel]">Caricamento dati…</span>
+      </div>
     </div>
   </section>
 </json-table>
 ```
 
 Le classi tra parentesi quadre sono quelle interne del CSS module. Nei `<th>` ordinabili
-l'attributo `aria-sort` (`ascending`/`descending`) è presente solo sulla colonna ordinata;
+l'attributo `data-jt-sort` (`asc`/`desc`) è presente su tutte le colonne dei criteri di ordinamento attivi,
+`aria-sort` (`ascending`/`descending`) solo su quella del criterio principale;
 `title` e `aria-label` del pulsante descrivono l'azione del click successivo.
 
 ## <a id="custom-properties"></a>Custom properties CSS
@@ -2423,6 +2694,14 @@ Definite in `json-table.minimo.tokens.mjs` (namespace `--jt-*`):
 | `--jt-info-font-size` | `{font.size.sm}` |
 | `--jt-info-gap` | `{size.sm}` |
 | `--jt-info-outer-padding-block-end` | `{size.xs}` |
+| `--jt-loader-backdrop-filter` | `none` (solo overlay, es. `blur(2px)`) |
+| `--jt-loader-background-color` | `color-mix(in srgb, {body.background.color} 70%, transparent)` (solo overlay) |
+| `--jt-loader-justify-content` | `flex-start` (solo overlay, posizione verticale dello spinner: `flex-start`, `center`, `flex-end`) |
+| `--jt-loader-padding-block` | `{size.md}` |
+| `--jt-loader-spinner-color` | `{primary.100}` |
+| `--jt-loader-spinner-size` | `{size.lg}` |
+| `--jt-loader-spinner-stroke-width` | `2px` |
+| `--jt-loader-z-index` | `2` (solo overlay) |
 | `--jt-pagination-border-color` | `{table.border.color}` |
 | `--jt-pagination-border-width` | `1px` |
 | `--jt-pagination-btn-min-width` | `2.2em` |

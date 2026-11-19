@@ -153,6 +153,7 @@ Ambiente di test e visualizzazione dei componenti di minimo. È **da completare*
 - La configurazione webpack è contenuta nella directory stessa (`demo/webpack.config.mjs` e `demo/webpack-modules/`)
 - Usa il proprio `package.json` e `node_modules` separati dal root
 - Una volta raggiunta una certa stabilità, verrà generata la directory **`demo-build/`** (build statica) per la visualizzazione tramite **GitHub Pages**
+- **Pianificato:** `demo/` diventerà `docs/`, riunendo demo e documentazione (ogni componente con un proprio URL dedicato, a partire da json-table); vedi [demo/TODO.md](demo/TODO.md)
 
 ---
 

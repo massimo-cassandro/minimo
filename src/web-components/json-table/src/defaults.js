@@ -143,6 +143,8 @@ import {
  * @property {string|null} [boolCell] - Classe extra di ogni cella `bool` (default: null)
  * @property {string|null} [boolTrue] - Classe extra delle celle `bool` il cui valore è `true` (default: null)
  * @property {string|null} [boolFalse] - Classe extra delle celle `bool` il cui valore è `false` (default: null)
+ * @property {string|null} [loader] - Contenitore dello spinner di caricamento, iniziale e overlay (vedi `loader`) (default: null)
+ * @property {string|null} [loaderSpinner] - Spinner di caricamento, aggiunta a `spinner` di minimo o al contenitore di `loaderIcon` (default: null)
  */
 
 /**
@@ -258,7 +260,8 @@ import {
  *
  * @typedef {Object} JsonTableParams
  * @property {boolean} debug - Scrive in console i parametri risolti, le colonne, i dati e gli elementi generati (default: false)
- * @property {string|null} jsonUrl - URL del JSON da recuperare. Ignorato quando `data` è impostato (default: null)
+ * @property {string|null} jsonUrl - URL del JSON da recuperare. Ignorato quando `data` è impostato. Con `filterForm` può
+ *   essere omesso: viene usato l'attributo `action` del form (se mancano entrambi, errore in console) (default: null)
  * @property {boolean} jqDatatableMode - Modalità di compatibilità con il formato server-side di jQuery DataTables: quando è true
  *   i default di `jsonDataField`, `totRecField`, `filteredRecField`, `serverSide` e `serverParams` diventano quelli di
  *   `jqDatatableModeDefaults`. Restano sovrascrivibili (precedenza: `init()` > attributo HTML > `setDefaults()` > modalità
@@ -297,8 +300,8 @@ import {
  *   tramite `init()`, l'elemento stesso. I valori non vuoti del form vengono aggiunti alla query string di `jsonUrl` (sostituendo
  *   gli eventuali parametri omonimi) in ogni richiesta, compresa la prima. Al submit (il form non viene inviato) e al reset del
  *   form i dati vengono richiesti di nuovo e la tabella ridisegnata, senza ricostruirne la struttura: si torna alla prima pagina,
- *   la ricerca interna viene azzerata e l'ordinamento mantenuto. Funziona in entrambe le modalità; richiede `jsonUrl`
- *   (ignorato con `data` inline) (default: null)
+ *   la ricerca interna viene azzerata e l'ordinamento mantenuto. Funziona in entrambe le modalità; richiede `jsonUrl`,
+ *   che se assente viene ricavato dall'attributo `action` del form (ignorato con `data` inline) (default: null)
  * @property {Object<string, 'asc'|'desc'>|null} initialSort - Ordinamento applicato al caricamento: oggetto
  *   `chiave colonna → direzione`, in ordine di priorità, es. `{ city: 'asc', name: 'desc' }`. Le chiavi di tipo
  *   intero (es. `'2024'`) vengono sempre enumerate per prime in ordine numerico (default: null)
@@ -340,6 +343,12 @@ import {
  * @property {string|null} renderNullAs - Contenuto mostrato per i valori `null`/`undefined` (default: '—')
  * @property {string|null} renderZeroAs - Se non null, contenuto mostrato per i valori numerici uguali a zero (default: null)
  * @property {string|null} renderNaNAs - Contenuto mostrato dai tipi numerici per i valori non numerici (default: '—')
+ * @property {boolean} loader - Spinner di caricamento: al primo caricamento, al posto della struttura non ancora costruita,
+ *   e, solo in modalità server-side, come overlay che copre la tabella a ogni richiesta successiva (pagina, ordinamento,
+ *   ricerca, filtro, `refresh()`). Con `false` nessuno spinner: resta solo la riduzione di opacità della tabella durante
+ *   le richieste (default: true)
+ * @property {number} loaderDelay - Solo modalità server-side: ritardo (ms) prima della comparsa dell'overlay di
+ *   caricamento; le richieste più rapide non lo mostrano, evitando lampeggiamenti; `0` = immediato (default: 0)
  * @property {string|null} iconFile - URL del file sprite SVG usato dai segnaposti `[[@icon:nome]]` dei `render` stringa e dalle
  *   icone `'@icon:nome'`, che generano `<svg class="{iconClass}"><use href="{iconFile}#nome"></use></svg>`. Non sostituisce le
  *   icone predefinite (`boolTrueIcon`, `boolFalseIcon`, ordinamento, paginazione), che vanno impostate esplicitamente a
@@ -355,6 +364,8 @@ import {
  * @property {IconDef} sortNoneArrowIcon - Icona del pulsante di ordinamento, nessun ordinamento attivo (default: icona `arrows-down-up` di minimo)
  * @property {IconDef} paginationPrevIcon - Icona del pulsante pagina precedente (default: icona `caret-left` di minimo)
  * @property {IconDef} paginationNextIcon - Icona del pulsante pagina successiva (default: icona `caret-right` di minimo)
+ * @property {IconDef|null} loaderIcon - Contenuto dello spinner di caricamento al posto di quello predefinito
+ *   (`span.spinner` di minimo), es. uno SVG animato; `null` = spinner predefinito (default: null)
  * @property {((tr: HTMLTableRowElement, row: Object, params: JsonTableParams, subIdx: number) => void)|null} trCallback - Callback
  *   invocata dopo il rendering di ogni `<tr>` del body; `subIdx` è l'indice del `<tr>` all'interno del record, vedi `rowspan` (default: null)
  * @property {string|null} tableId - Attributo `id` dell'elemento `<table>` (default: null)
@@ -413,6 +424,8 @@ export const mergedParams = ['classes', 'labels', 'dataTypes', 'serverParams'];
  *   renderNullAs: '—',
  *   renderZeroAs: null,
  *   renderNaNAs: '—',
+ *   loader: true,
+ *   loaderDelay: 0,                    // ms
  *   iconFile: null,                    // es. '/build/icons.svg' (sprite per `[[@icon:nome]]` / '@icon:nome')
  *   iconClass: 'icon',                 // classe di base delle icone sprite
  *   boolTrueIcon: '<svg …>',           // minimo check-bold
@@ -423,6 +436,7 @@ export const mergedParams = ['classes', 'labels', 'dataTypes', 'serverParams'];
  *   sortNoneArrowIcon: '<svg …>',      // minimo arrows-down-up
  *   paginationPrevIcon: '<svg …>',     // minimo caret-left
  *   paginationNextIcon: '<svg …>',     // minimo caret-right
+ *   loaderIcon: null,                  // null → spinner di minimo
  *   trCallback: null,
  *   tableId: null,
  *   classes: { … },                    // vedi JsonTableClasses
@@ -484,6 +498,9 @@ export const defaults = {
   renderZeroAs: null,
   renderNaNAs: '—',
 
+  loader: true,
+  loaderDelay: 0,
+
   iconFile: null,
   iconClass: 'icon',
   boolTrueIcon,
@@ -494,6 +511,7 @@ export const defaults = {
   sortNoneArrowIcon,
   paginationPrevIcon,
   paginationNextIcon,
+  loaderIcon: null,
 
   trCallback: null,
 
@@ -521,7 +539,9 @@ export const defaults = {
     numeric: 'text-numeric',
     boolCell: null,
     boolTrue: null,
-    boolFalse: null
+    boolFalse: null,
+    loader: null,
+    loaderSpinner: null
   },
 
   labels: {

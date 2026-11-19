@@ -58,6 +58,8 @@ Quello che la libreria fornisce davvero, nell'uso che ne fa minimo: ascolto dell
 
 Alternativa prudente, se si vuole ridurre il rischio: prima fase con il componente nativo affiancato al vecchio engine (che resta in `TODO-autocomplete/`), sostituzione nei progetti uno alla volta.
 
+In pratica, per i progetti esistenti la sostituzione graduale è già il percorso obbligato: ADA usa oggi il package separato `@massimo-cassandro/autocomplete`, non l'engine di minimo, quindi il nuovo componente non lo sostituisce in automatico. Ogni implementazione va migrata e verificata a mano (checklist in ADA: `ada-frontend/TODO-upg.md`, punto 4.2). Non serve quindi mantenere compatibilità con la vecchia API (`checkAutocomplete`, `dataset.sel`, parametri `snake_case`).
+
 ---
 
 ## Campi resi da Symfony
@@ -166,7 +168,25 @@ Convenzioni uguali a json-table dove applicabili: `Autocomplete.setDefaults()`, 
 - **Markup dell'elenco**: `ul[role=listbox] > li[role=option] > div`. Il `<div>` è garantito dal componente; se `listDisplay` è già un unico `<div>` radice non ne viene aggiunto un secondo (le classi esistenti, es. `alert-item`, restano). È la voce «div wrapper garantito» (richiesta per i CSS di ADA, che usano `li[aria-selected='true'] > div` e `li > div:hover`): a rilascio avvenuto, togliere i `<div>` espliciti dalle sei implementazioni in `ada-frontend/src/shared/autocomplete/`.
 - **Accessibilità**: `role="combobox"`, `aria-expanded`, `aria-controls`, `aria-activedescendant` sul campo; `aria-selected` sulle opzioni; zona `aria-live` per numero di risultati e «nessun risultato».
 - **Selezione rigorosa** (`strict`, default `true`): se all'uscita dal campo il testo non corrisponde alla selezione, campo e valore vengono azzerati. Sostituisce `check_ac` e `checkAutocomplete`, con un solo punto di controllo (`blur`/`change`, non `keydown`). Con `strict: false` il testo libero resta nel campo senza id.
+- **Ripristino del form dall'esterno**: vedi [Valori impostati senza eventi](#valori-impostati-senza-eventi-json-table-statesave).
 - **Posizionamento dell'elenco**: vedi [Decisioni aperte](#decisioni-aperte).
+
+### Valori impostati senza eventi (json-table `stateSave`)
+
+Caso emerso in ADA (`apps/betogether/betogether-edit-elenco.js`, 19/11/2026): json-table con `filterForm` e `stateSave` ripristina il form con `fillForm`, che assegna i valori a tutti i campi con `name` **senza emettere `input`/`change`** (scelta voluta). Con l'engine attuale:
+
+- `dataset.sel` (testo dell'ultima selezione) viene letto una sola volta, all'inizializzazione; se il testo arriva dopo da `fillForm`, `sel` resta `''`;
+- al submit successivo (ad es. cambiando solo un altro filtro) `checkAutocomplete` vede `value !== sel` e svuota testo e hidden: il filtro si perde;
+- inizializzare l'autocomplete dopo `fillForm` non basta, perché il campo hidden generato (`hidden_id`/`hidden_name`) deve già esistere quando `fillForm` lo ripopola.
+
+Oggi in ADA si aggira con un listener su `jt:stateload` che riallinea `dataset.sel = value`. Da rimuovere a riscrittura fatta.
+
+Requisiti per il nuovo componente:
+
+- **Nessuno stato «fotografato» all'avvio**: `strict` confronta il testo con la selezione corrente ricavata dal campo di destinazione (hidden / select / radio / checkbox) al momento del controllo, non con un valore memorizzato all'inizializzazione.
+- **Campo di destinazione come unica fonte**: se il suo valore cambia dall'esterno senza eventi, il testo visibile va ricostruito (etichetta dell'option/radio, `data-ac-label` per l'hidden). Servono un metodo pubblico `sync()` (rilegge il campo di destinazione e riallinea testo e badge) e, da valutare, l'ascolto di `jt:stateload` sul form o un evento generico di «form ripristinato» condiviso tra i componenti di minimo.
+- **Campo di testo senza `name`** per default: deve bastare il campo di destinazione per salvare e ripristinare lo stato, senza inviare al server anche il testo. Il testo visibile si ricava dal valore, quindi l'hidden ha bisogno dell'etichetta (`data-ac-label`) anche in questo caso, e json-table dovrebbe poterla ripristinare (da verificare: oggi `fillForm` assegna solo `value`).
+- **Correzione minima all'engine attuale** (se la riscrittura tarda): `checkAutocomplete` senza dipendenza da `sel` (testo vuoto → svuota l'hidden; hidden vuoto → svuota il testo), visto che l'engine azzera già l'hidden quando l'utente modifica il testo (`check_ac`).
 - **Ricerca locale**: senza `url`, la ricerca avviene tra le scelte già presenti nel campo Symfony (option, radio, checkbox) oppure in un array `data`; filtro insensibile ad accenti e maiuscole. Obbligatoria con radio e checkbox.
 
 ### API pubblica
@@ -246,7 +266,7 @@ Dai commenti nel codice: «attivare la selezione dell'autocomplete» (`check-aut
 1. [ ] **Scheletro** — cartella, `defaults.js` con typedef, `resolve-params.js`, classe `Autocomplete`, adattatori dei campi di destinazione (`targets.js`), campo di testo generato, campo Symfony nascosto (`required` ed etichetta spostati), involucro `<auto-complete>`, pagina nella demo con un JSON statico.
 2. [ ] **Ricerca e elenco** — `fetch-results.js` (URL, debounce, annullamento, errori), rendering con `li > div` garantito, stati di caricamento / nessun risultato / errore, file token e CSS.
 3. [ ] **Tastiera e accessibilità** — pattern combobox completo, zona `aria-live`, prova con tastiera e VoiceOver.
-4. [ ] **Selezione singola** — scrittura del valore (hidden / select / radio), `strict`, `required`, reset del form, ripristino del testo visibile dopo un errore di validazione Symfony, eventi `ac:select` e `ac:clear`.
+4. [ ] **Selezione singola** — scrittura del valore (hidden / select / radio), `strict`, `required`, reset del form, ripristino del testo visibile dopo un errore di validazione Symfony e dopo un ripristino senza eventi (`sync()`, prova con json-table `stateSave`), eventi `ac:select` e `ac:clear`.
 5. [ ] **Evidenziazione** — `highlight.js` sui nodi di testo.
 6. [ ] **Modalità multipla** — select multipla e checkbox, badge, rimozione, selezioni già presenti all'avvio, `ac:remove`.
 7. [ ] **Ricerca locale** — `local-search.js`, tra le scelte del campo o in `data`.

@@ -131,11 +131,56 @@ export default {
       }
     },
 
-    // opacità della tabella mentre è in corso una richiesta server-side
+    // opacità della tabella mentre è in corso una richiesta senza overlay di caricamento
+    // (`loader: false`, refetch client-side, attesa di `loaderDelay`)
     busy: {
       opacity: {
         $type: 'number',
         $value: '.5'
+      }
+    },
+
+    // spinner di caricamento: iniziale e overlay delle richieste server-side (vedi parametro `loader`)
+    loader: {
+      background: {
+        color: {
+          $type: 'color',
+          $value: 'color-mix(in srgb, {body.background.color} 70%, transparent)'
+        }
+      },
+      'backdrop-filter': {
+        $type: 'string',
+        $value: 'none',
+        $description: 'Filtro applicato al contenuto sotto l\'overlay, es. `blur(2px)`'
+      },
+      'justify-content': {
+        $type: 'string',
+        $value: 'flex-start',
+        $description: 'Posizione verticale dello spinner nell\'overlay: `flex-start` (in alto, sopra l\'intestazione, visibile anche con tabelle lunghe), `center`, `flex-end`'
+      },
+      padding: {
+        block: {
+          $type: 'dimension',
+          $value: '{size.md}'
+        }
+      },
+      'z-index': {
+        $type: 'number',
+        $value: '2'
+      },
+      spinner: {
+        color: {
+          $type: 'color',
+          $value: '{primary.100}'
+        },
+        size: {
+          $type: 'dimension',
+          $value: '{size.lg}'
+        },
+        'stroke-width': {
+          $type: 'dimension',
+          $value: '2px'
+        }
       }
     },
 

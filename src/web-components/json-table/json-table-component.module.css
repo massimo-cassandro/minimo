@@ -14,8 +14,8 @@ json-table {
   display: block;
   margin-block: var(--jt-wrapper-margin-block);
 
-  /* server-side request in progress */
-  &[aria-busy='true'] .table {
+  /* richiesta in corso senza overlay di caricamento (`loader: false`, refetch client-side, attesa di `loaderDelay`) */
+  &[aria-busy='true']:not(:has(.loader:not([hidden]))) .table {
     opacity: var(--jt-busy-opacity);
   }
 }
@@ -100,6 +100,75 @@ json-table {
   .boolFalse {
     color: var(--jt-bool-false-color);
   }
+}
+
+/* =>> overlay di caricamento */
+
+/* lo spinner è `.spinner` di minimo (src/css/spinner-circle-basic.css, importato da
+   src/loader.js), le cui custom properties vengono ridefinite qui a partire da quelle
+   del componente */
+.loader {
+  --spinner-color: var(--jt-loader-spinner-color);
+  --spinner-size: var(--jt-loader-spinner-size);
+  --spinner-stroke-width: var(--jt-loader-spinner-stroke-width);
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-block: var(--jt-loader-padding-block);
+
+  &[hidden] {
+    display: none;
+  }
+
+  /* lo spinner di minimo ha un margine proprio, qui gestito da padding-block */
+  :global(.spinner) {
+    margin: 0;
+  }
+}
+
+/* overlay delle richieste server-side: copre l'intero `.tableOuter` (tabella + barra del footer) */
+.loaderOverlay {
+  position: absolute;
+  inset: 0;
+  z-index: var(--jt-loader-z-index);
+  justify-content: var(--jt-loader-justify-content);
+  cursor: progress;
+  background-color: var(--jt-loader-background-color);
+  backdrop-filter: var(--jt-loader-backdrop-filter);
+}
+
+/* spinner del primo caricamento, prima della costruzione della struttura */
+.loaderInitial {
+  justify-content: center;
+}
+
+/* contenitore di `loaderIcon` */
+.loaderIcon {
+  display: grid;
+  place-items: center;
+  inline-size: var(--jt-loader-spinner-size);
+  block-size: var(--jt-loader-spinner-size);
+  color: var(--jt-loader-spinner-color);
+
+  svg {
+    inline-size: 100%;
+    block-size: 100%;
+    fill: currentColor;
+  }
+}
+
+/* testo di caricamento, nascosto visivamente */
+.loaderLabel {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  white-space: nowrap;
+  border: 0;
+  clip-path: inset(50%);
 }
 
 /* =>> footer bar: caption (start) + pagination (end) */

@@ -12,25 +12,36 @@ import { nextSortDir } from './sorting.js';
 /** @typedef {'none'|'ascending'|'descending'} SortState */
 
 /**
- * Aggiorna lo stato di ordinamento di un `<th>` ordinabile: attributo `aria-sort` (rimosso quando `none`),
- * icona e `title`/`aria-label` del pulsante di ordinamento (entrambi descrivono l'azione del prossimo
- * click, ad es. "ordina in modo decrescente" quando è attivo l'ordinamento crescente).
+ * Aggiorna lo stato di ordinamento di un `<th>` ordinabile: attributo `data-jt-sort` (`asc`/`desc`, rimosso quando `none`),
+ * attributo `aria-sort` (solo sul criterio principale, vedi `primary`), icona e `title`/`aria-label` del pulsante di
+ * ordinamento (entrambi descrivono l'azione del prossimo click, ad es. "ordina in modo decrescente" quando è attivo
+ * l'ordinamento crescente).
  *
  * @param {HTMLTableCellElement} th - Il `<th>` generato da `theadPart()`
  * @param {SortState} state - Stato di ordinamento da applicare
  * @param {JsonTableParams} params - Parametri risolti (icone e label)
+ * @param {boolean} [primary=true] - Indica se la colonna è il criterio principale: solo in questo caso riceve
+ *   `aria-sort`, che le specifiche ARIA prevedono su una sola intestazione per volta (default: true)
  * @returns {void}
  *
  * @example
  * setSortState(th, 'ascending', params);
- * // th[aria-sort=ascending], icon → params.sortAscArrowIcon, button title → params.labels.sortDesc
+ * // th[data-jt-sort=asc][aria-sort=ascending], icon → params.sortAscArrowIcon, button title → params.labels.sortDesc
+ * setSortState(th, 'descending', params, false);
+ * // th[data-jt-sort=desc] senza aria-sort (criterio secondario)
  */
-export function setSortState(th, state, params) {
+export function setSortState(th, state, params, primary = true) {
 
   const btn = th.querySelector('button');
   const icon = th.querySelector('[data-jt-sort-icon]');
 
   if (state === 'none') {
+    th.removeAttribute('data-jt-sort');
+  } else {
+    th.dataset.jtSort = state === 'descending' ? 'desc' : 'asc';
+  }
+
+  if (state === 'none' || !primary) {
     th.removeAttribute('aria-sort');
   } else {
     th.setAttribute('aria-sort', state);
@@ -56,16 +67,19 @@ export function setSortState(th, state, params) {
 
 
 /**
- * Applica l'ordinamento corrente (`jt.state.sort`) a ogni `<th>` ordinabile del thead: la colonna del primo
- * criterio riceve `aria-sort` e l'icona corrispondente, le altre vengono riportate a `none`. Come indicato dalle
- * specifiche ARIA, `aria-sort` va su una sola intestazione per volta: i criteri successivi non vengono mostrati.
+ * Applica l'ordinamento corrente (`jt.state.sort`) a ogni `<th>` ordinabile del thead: tutte le colonne dei criteri
+ * attivi ricevono `data-jt-sort` (`asc`/`desc`, usato dal CSS per evidenziarle) e l'icona corrispondente, le altre
+ * vengono riportate a `none`. Come indicato dalle specifiche ARIA, `aria-sort` va su una sola intestazione per volta:
+ * lo riceve solo la colonna del primo criterio.
  *
  * @param {JsonTable} jt - L'istanza del componente
  * @returns {void}
  *
  * @example
- * jt.state.sort = [{ key: 'name', dir: 'desc' }];
- * applySortState(jt); // th[data-key=name][aria-sort=descending], gli altri th senza aria-sort
+ * jt.state.sort = [{ key: 'city', dir: 'asc' }, { key: 'name', dir: 'desc' }];
+ * applySortState(jt);
+ * // th[data-key=city][data-jt-sort=asc][aria-sort=ascending]
+ * // th[data-key=name][data-jt-sort=desc] (senza aria-sort), gli altri th senza data-jt-sort né aria-sort
  */
 export function applySortState(jt) {
 
@@ -75,19 +89,19 @@ export function applySortState(jt) {
     return;
   }
 
-  const primary = state.sort[0];
-
   elements.thead.querySelectorAll('th[data-sortable]').forEach(el => {
     const th = /** @type {HTMLTableCellElement} */ (el);
-    const isSorted = primary != null && th.dataset.key === primary.key;
-    setSortState(th, isSorted ? (primary.dir === 'desc' ? 'descending' : 'ascending') : 'none', params);
+    const idx = state.sort.findIndex(s => s.key === th.dataset.key);
+    const sortState = idx === -1 ? 'none' : (state.sort[idx].dir === 'desc' ? 'descending' : 'ascending');
+    setSortState(th, sortState, params, idx <= 0);
   });
 }
 
 
 /**
  * Collega il listener `click` delegato al thead: un click su un pulsante di ordinamento fa scorrere
- * l'ordinamento della colonna (nessuno → asc → desc → nessuno, vedi `nextSortDir`) tramite `jt.setSort()`, che sostituisce
+ * l'ordinamento della colonna (nessuno → asc → desc → nessuno, vedi `nextSortDir`, partendo dalla direzione del criterio
+ * della colonna anche quando non è il principale) tramite `jt.setSort()`, che sostituisce
  * tutti i criteri attivi (anche quelli di `initialSort`) con la sola colonna cliccata.
  * Il thead non viene ricostruito all'ordinamento, quindi il focus resta sul pulsante cliccato.
  *
@@ -113,7 +127,8 @@ export function setSortListener(jt) {
       return;
     }
     const key = btn.dataset.key ?? '';
-    const current = jt.state.sort[0]?.key === key ? jt.state.sort[0].dir : null;
+    // la direzione corrente è quella del criterio della colonna, anche se non principale (icona coerente col click)
+    const current = jt.state.sort.find(s => s.key === key)?.dir ?? null;
     jt.setSort(key, nextSortDir(current));
   });
 }

@@ -27,6 +27,7 @@ import { paginationPart } from './pagination.js';
  * @property {HTMLElement} [tableFooter] - Barra del footer sotto la tabella (caption + paginazione), quando renderizzata
  * @property {HTMLElement} [caption] - Contenitore della caption (solo quando `caption` è impostato)
  * @property {HTMLElement} [pagination] - `<nav>` della paginazione (solo quando `perPage` > 0)
+ * @property {HTMLElement} [loader] - Overlay di caricamento con lo spinner (solo quando `loader` è true)
  */
 
 /**
@@ -147,6 +148,7 @@ export function expandSlots(items, parts) {
  *     div.tableFooter[classes.tableFooter]  (se `caption` o `perPage` > 0)
  *       div.caption                         (se `caption`)
  *       nav.pagination                      (se `perPage` > 0)
+ *     div.loader[classes.loader][hidden]    (se `loader`)
  * ```
  *
  * `<tbody>`, `<tfoot>` e paginazione vengono creati vuoti: vedi `renderTbody()`, `renderTfoot()`

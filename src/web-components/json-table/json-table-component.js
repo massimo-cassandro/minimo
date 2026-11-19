@@ -8,6 +8,7 @@ import { buildDataTypes } from './src/data-types.js';
 import { MISSING_COLS_MESSAGE, parseCols, warnIneffectiveColParams } from './src/parse-cols.js';
 import { parseRows } from './src/parse-rows.js';
 import { mainBuilder } from './src/main-builder.js';
+import { loaderPart, showLoader, hideLoader } from './src/loader.js';
 import { renderTbody } from './src/table-body.js';
 import { renderTfoot } from './src/tfoot.js';
 import { updateInfo } from './src/update-info.js';
@@ -15,7 +16,7 @@ import { applySortState, setSortListener } from './src/thead.js';
 import { setSearchListener, filterRows, normalizeSearchFields } from './src/search.js';
 import { sortRows } from './src/sorting.js';
 import { calcTotPages, renderPagination } from './src/pagination.js';
-import { bindFilterForm, rereadFilterForm } from './src/filter-form.js';
+import { bindFilterForm, rereadFilterForm, resolveFilterForm } from './src/filter-form.js';
 import {
   STATE_VERSION, buildStateKey, colsSignature, fillForm, getNavigationType, getStorage, isReferrerAllowed,
   normalizeReferrers, parseSavedState, restorePage, restoreSort, storageRead, storageRemove, storageWrite
@@ -102,7 +103,7 @@ const emptyState = () => ({
  * el.addEventListener('jt:ready', e => console.log(e.detail.jsonTable.data));
  * el.init({
  *   debug: false,                       // default: false
- *   jsonUrl: '/api/rows.json',          // default: null
+ *   jsonUrl: '/api/rows.json',          // default: null (con filterForm: action del form)
  *   jqDatatableMode: false,             // default: false (true: default compatibili con jQuery DataTables)
  *   jsonDataField: 'data',              // default: 'data'
  *   totRecField: 'totRec',              // default: 'totRec'
@@ -202,6 +203,10 @@ export class JsonTable extends HTMLElement {
     this._requestGeneration = 0;
     /** timer di debounce della ricerca in sospeso (vedi `search.js`) @type {ReturnType<typeof setTimeout>|undefined} */
     this._searchTimer = undefined;
+    /** timer della comparsa ritardata dell'overlay di caricamento (vedi `loaderDelay`) @type {ReturnType<typeof setTimeout>|undefined} */
+    this._loaderTimer = undefined;
+    /** true quando il primo caricamento è terminato e la tabella è stata renderizzata con i dati */
+    this._loaded = false;
     /** valori correnti del form di filtro (vedi `filter-form.js`) @type {URLSearchParams|null} */
     this._filters = null;
     /** rimuove i listener del form di filtro @type {AbortController|null} */
@@ -292,6 +297,8 @@ export class JsonTable extends HTMLElement {
    */
   destroy() {
     clearTimeout(this._searchTimer);
+    clearTimeout(this._loaderTimer);
+    this._loaded = false;
     this._filterFormController?.abort();
     this._filterFormController = null;
     this._filters = null;
@@ -342,7 +349,7 @@ export class JsonTable extends HTMLElement {
    * setInterval(() => el.refresh(), 60_000);
    */
   async refresh() {
-    if (!this.elements.wrapper) {
+    if (!this._loaded) {
       await this.reload();
       return;
     }
@@ -481,7 +488,9 @@ export class JsonTable extends HTMLElement {
       return;
     }
     this._loadStarted = true;
+    this._loaded = false;
     clearTimeout(this._searchTimer);
+    clearTimeout(this._loaderTimer);
     const generation = this._loadGeneration;
 
     // modulo opzionale `jqDatatableMode`: caricato (chunk separato) solo dalle tabelle che lo usano
@@ -530,13 +539,8 @@ export class JsonTable extends HTMLElement {
     this._validateParams(params);
     bindFilterForm(this);
 
-    // placeholder di caricamento (spinner di minimo)
-    domBuilder([
-      {
-        className: 'spinner',
-        children: [{ tag: 'span', className: 'visually-hidden', content: params.labels.loading }]
-      }
-    ], this, { emptyParent: true });
+    // spinner del primo caricamento, al posto della struttura non ancora costruita (vedi `loader`)
+    domBuilder([loaderPart(this, null, true)], this, { emptyParent: true });
 
     // analisi delle colonne (gli errori di configurazione vengono segnalati e fermano il rendering)
     try {
@@ -663,6 +667,7 @@ export class JsonTable extends HTMLElement {
 
     this._computeState();
     this._render();
+    this._loaded = true;
     this._saveState();
 
     if (params.debug) {
@@ -721,6 +726,21 @@ export class JsonTable extends HTMLElement {
     const delta = Number(params.paginationDelta);
     params.paginationDelta = Number.isFinite(delta) && delta >= 0 ? Math.floor(delta) : defaults.paginationDelta;
 
+    const hasFilterForm = params.filterForm != null && params.filterForm !== '';
+
+    // con `filterForm` e senza `jsonUrl` (né `data`), l'URL viene ricavato dall'attributo `action` del form
+    if (hasFilterForm && params.data == null && !params.jsonUrl) {
+      const form = resolveFilterForm(params.filterForm);
+      if (form) {
+        const action = form.getAttribute('action')?.trim();
+        if (action) {
+          params.jsonUrl = form.action; // URL assoluto, risolto dal browser
+        } else {
+          console.error('[json-table] Nessuna sorgente dati: `jsonUrl` non impostato e il form di `filterForm` non ha l\'attributo `action`.');
+        }
+      }
+    }
+
     if (params.serverSide && (params.data != null || !params.jsonUrl)) {
       console.warn('[json-table] `serverSide` richiede `jsonUrl` (senza `data`): modalità server-side ignorata');
       params.serverSide = false;
@@ -731,8 +751,10 @@ export class JsonTable extends HTMLElement {
       params.tfoot = false;
     }
 
-    if (params.filterForm != null && params.filterForm !== '' && (params.data != null || !params.jsonUrl)) {
-      console.warn('[json-table] `filterForm` richiede `jsonUrl` (senza `data`): parametro ignorato');
+    if (hasFilterForm && (params.data != null || !params.jsonUrl)) {
+      if (params.data != null) {
+        console.warn('[json-table] `filterForm` non è compatibile con `data` inline: parametro ignorato');
+      }
       params.filterForm = null;
     }
 
@@ -844,7 +866,7 @@ export class JsonTable extends HTMLElement {
    * @returns {void}
    */
   _saveState() {
-    if (!this._stateTarget || !this.elements.wrapper) {
+    if (!this._stateTarget || !this._loaded) {
       return;
     }
     const { state, params } = this;
@@ -947,7 +969,7 @@ export class JsonTable extends HTMLElement {
    * @returns {Promise<void>}
    */
   async _applyFilters(filters) {
-    if (!this.elements.wrapper) {
+    if (!this._loaded) {
       await this.reload();
       return;
     }
@@ -978,7 +1000,8 @@ export class JsonTable extends HTMLElement {
       const generation = ++this._requestGeneration;
       const loadGeneration = this._loadGeneration;
       const requestedPage = this.state.page;
-      this.elements.wrapper?.setAttribute('aria-busy', 'true');
+      // overlay di caricamento solo in modalità server-side; altrimenti (refetch) solo `aria-busy`
+      showLoader(this, this.params.serverSide);
 
       /** @type {import('./src/get-data.js').DataResult|null} */
       let result = null;
@@ -992,7 +1015,7 @@ export class JsonTable extends HTMLElement {
       if (generation !== this._requestGeneration || loadGeneration !== this._loadGeneration) {
         return; // sostituita da una richiesta più recente o da un reload/destroy
       }
-      this.elements.wrapper?.removeAttribute('aria-busy');
+      hideLoader(this);
 
       if (!result) {
         return;
