@@ -152,7 +152,7 @@ const other = document.createElement('json-table');
 I nomi degli attributi sono case-insensitive (`jsonurl` e `jsonUrl` sono equivalenti).
 Gli attributi booleani accettano i formati HTML idiomatici: `search` (presente senza valore),
 `search="true"`, `search="1"` → true; `search="false"`, `search="0"` → false. Gli attributi
-numerici (`perpage`, `paginationdelta`, `searchdebounce`) vengono convertiti in numero.
+numerici (`perpage`, `paginationbuttons`, `searchdebounce`) vengono convertiti in numero.
 I valori che iniziano con `[` o `{` vengono interpretati come JSON (un JSON malformato viene
 segnalato in console e ignorato).
 
@@ -187,7 +187,7 @@ Il `render` di colonna può essere una stringa con una sintassi ispirata a [Must
 | `[[key]]` | valore della riga, con **escape HTML** (`&`, `<`, `>`, `"`, `'`) |
 | `[[& key]]` | valore della riga così com'è, **senza escape** |
 | `[[#key]]…[[/key]]` | contenuto mostrato solo se il valore è vero ([Sezioni condizionali](#mustache-sezioni)) |
-| `[[^key]]…[[/key]]` | contenuto mostrato solo se il valore è falso |
+| `[[^key]]…[[/key]]` | contenuto mostrato solo se il valore è falso o null |
 | `[[@icon:nome classi]]` | icona del file sprite `iconFile` ([Icone](#mustache-icone)) |
 
 - `key` ammette la notazione con punto per i valori annidati (`[[owner.name]]`); gli spazi attorno alla chiave vengono ignorati (`[[ name ]]`, `[[& html]]`)
@@ -274,9 +274,14 @@ jtable.init({
   filterForm: 'jt-filter', // oppure document.getElementById('jt-filter') (HTMLFormElement)
   tfoot: true
   cols: [
-    { key: 'id', dataType: 'id' },
+    { key: 'id', dataType: 'id'},
     { key: 'name', title: 'Nome', render: row => `<a href="${linkScheda}/${row.id}">${row.name}</a>` },
-    { key: 'amount', title: 'Importo', dataType: 'euro', tfootRender: '@sum' },
+    { 
+        key: 'amount', 
+        title: [{ tag: 'span', attrs: { title: 'Importo complessivo' }, content: 'Imp.' }]
+        dataType: 'euro', 
+        tfootRender: '@sum' 
+     },
     { key: 'active', title: 'Attivo', dataType: 'bool' }
   ],
 });
@@ -463,14 +468,23 @@ jtable.addEventListener('jt:stateload', e => {
 
 
 jtable.init({
-  jqDatatableMode: true, // URL JSON: `action` del form (`filterForm`)
+  //jqDatatableMode: true, // se necessario
   filterForm: jtFilterForm,
   stateKey: jtStorageKey, // chiave dello storage
   search: false,
   perPage: 30,
   serverSide: true,
   initialSort: {xxxx: 'desc'},
-  cols: []
+  cols: [
+    { key: 'id', dataType: 'id' }, 
+    { 
+        key: 'amount', 
+        title: [{ tag: 'span', attrs: { title: 'Importo complessivo' }, content: 'Imp.' }]
+        dataType: 'euro', 
+        tfootRender: '@sum' 
+     }
+    // ...
+  ]
 });
 ```
 
@@ -482,20 +496,30 @@ jtable.init({
 
 Tutti i parametri sono impostabili sia da attributo HTML che come oggetto in `init({...})`. I valori di tipo funzione solo da `init()`.
 
+**Parametri non riconosciuti.** In sviluppo (`process.env.NODE_ENV === 'development'`, impostato da webpack) o con `debug: true`, il componente segnala in console con un `console.warn` i parametri che non riconosce e che quindi vengono ignorati. Il controllo riguarda:
+
+- le chiavi passate a `init()`/`reload()` e a `JsonTable.setDefaults()`;
+- gli attributi HTML (esclusi quelli globali come `id`, `class`, `style`, e gli attributi `data-*`, `aria-*`, `on*`);
+- le chiavi di `classes`, `labels` e `serverParams`;
+- le chiavi delle definizioni delle colonne (`cols`).
+
+Quando il nome sembra un errore di digitazione viene suggerito quello corretto, es. `` init(): `perpage` non riconosciuto, ignorato (forse `perPage`?) ``. Ogni avviso viene mostrato una sola volta; in produzione il controllo non viene eseguito.
+
 | Parametro | Tipo / default | Descrizione |
 |---|---|---|
 | `boolFalseIcon` | icona, vedi nota (icona `x-bold`) | Icona per i valori `false` (tipo bool). Sovrascrivibile per colonna ([Icone bool di colonna](#colonne-bool-icone)) |
 | `boolNullIcon` | icona, vedi nota (`null`) | Icona per i valori nulli o non booleani (tipo bool), al posto di `renderNullAs`. Sovrascrivibile per colonna |
 | `boolTrueIcon` | icona, vedi nota (icona `check-bold` di minimo (Phosphor)) | Icona per i valori `true` (tipi bool e boolTrueOnly). Sovrascrivibile per colonna |
 | `caption` | string o Function (`null`) | Caption della tabella (testo o HTML), oppure funzione che restituisce stringa o Node. Mostrata sotto la tabella (vedi "Caption e paginazione") |
+| `captionPosition` | `'top'`, `'abovePagination'` o `'belowPagination'` (`'abovePagination'`) | Posizione della caption, su una riga propria: `'top'` sopra la tabella; `'abovePagination'`/`'belowPagination'` sotto la tabella, nella barra del footer, sopra/sotto la navigazione delle pagine. Non ha effetto se il template colloca altrove `caption` o `pagination` |
 | `classes` | Object | Classi consumer (vedi sotto), unite ai default |
 | `cols` | ColDefinition[] | **OBBLIGATORIO**: definizione delle colonne (vedi sotto). Se assente o vuoto la tabella non viene generata e viene segnalato un errore in console. Senza `init()` l'errore compare al termine del caricamento della pagina, così `cols` può essere passato anche da uno script separato; un `init()` chiamato dopo il caricamento della pagina (ad es. dopo un `await`) funziona, ma l'errore può comparire comunque |
 | `currency` | string (`'EUR'`) | Codice ISO 4217 usato dal tipo `currency` |
-| `currPercLocaleOpts` | Intl.NumberFormatOptions (`{ minimumFractionDigits: 2, maximumFractionDigits: 2 }`) | Tipi currency/euro/perc/percDecimal |
+| `currPercLocaleOpts` | Intl.NumberFormatOptions (`{ minimumFractionDigits: 2, maximumFractionDigits: 2, useGrouping: 'always' }`) | Tipi currency/euro/euroNoDec/perc/percDecimal (`euroNoDec` ne sovrascrive i decimali). `useGrouping: 'always'` forza il separatore delle migliaia anche dove il locale lo omette (es. `1234` in `it-IT`) |
 | `data` | Array&lt;Object&gt; (`null`) | Righe inline; prevale su `jsonUrl`. Da attributo va passato come stringa JSON ed è sempre inteso come array delle righe (`jsonDataField` ignorato) |
 | `dataTypes` | Object (`{}`) | Tipi di dato personalizzati, uniti a quelli predefiniti (vedi [dataTypes](#datatypes)) |
 | `datesLocaleOpts` | Intl.DateTimeFormatOptions (`{ year: 'numeric', month: 'short', day: 'numeric' }`) | Parte data dei tipi date/datetime |
-| `debug` | boolean (`false`) | Log in console di parametri, colonne, dati, stato ed elementi generati |
+| `debug` | boolean (`false`) | Log in console di parametri, colonne, dati, stato ed elementi generati; attiva anche la segnalazione dei parametri non riconosciuti fuori dall'ambiente di sviluppo (vedi sopra) |
 | `filterForm` | string o HTMLFormElement (`null`) | Id del form di filtro collegato (da `init()` anche l'elemento): i suoi valori vengono aggiunti alla query string di `jsonUrl` e al submit/reset la tabella viene aggiornata. Senza `jsonUrl` viene usato l'attributo `action` del form. Vedi [Form di filtro collegato](#filterform) |
 | `filteredRecField` | string (`'filteredRec'`) | Solo server-side: chiave del JSON con il numero di record che soddisfano la ricerca corrente; se assente vale `totRecField` |
 | `iconClass` | string o null (`'icon'`) | Classe/i di base delle icone del file sprite (`[[@icon:nome]]`, `'@icon:nome'`), a cui si aggiungono le classi indicate dopo il nome; `null` o `''` = nessuna classe di base (vedi [Icone](#mustache-icone)) |
@@ -510,8 +534,8 @@ Tutti i parametri sono impostabili sia da attributo HTML che come oggetto in `in
 | `loader` | boolean (`true`) | Spinner di caricamento: al primo caricamento, al posto della tabella non ancora costruita, e in modalità server-side come overlay che copre la tabella a ogni richiesta successiva. Vedi [Spinner di caricamento](#parametri-loader) |
 | `loaderDelay` | number (`0`) | Solo server-side: ritardo (ms) prima della comparsa dell'overlay: le richieste più rapide non lo mostrano; `0` = immediato |
 | `loaderIcon` | icona, vedi nota (`null`) | Contenuto al posto dello spinner predefinito di minimo (es. uno SVG animato); `null` = spinner predefinito |
-| `numbersLocaleOpts` | Intl.NumberFormatOptions (`{ maximumFractionDigits: 2 }`) | Tipo `num` |
-| `paginationDelta` | number (`2`) | Pulsanti pagina mostrati a ciascun lato della pagina corrente |
+| `numbersLocaleOpts` | Intl.NumberFormatOptions (`{ maximumFractionDigits: 2, useGrouping: 'always' }`) | Tipo `num` (per `useGrouping` vedi `currPercLocaleOpts`) |
+| `paginationButtons` | number (`10`) | Numero di pulsanti di pagina consecutivi mostrati nella navigazione sotto la tabella, oltre alla prima e all'ultima pagina (sempre visibili). Le pagine omesse sono sostituite da un pulsante "…" che fa scorrere i pulsanti visibili di `paginationButtons` posizioni, senza cambiare pagina ([Paginazione](#paginazione-tabella)) |
 | `paginationNextIcon` | icona, vedi nota (icona `caret-right`) | Icona del pulsante "pagina successiva" |
 | `paginationPrevIcon` | icona, vedi nota (icona `caret-left`) | Icona del pulsante "pagina precedente" |
 | `perPage` | number (`25`) | Righe per pagina; `0` = nessuna paginazione (tutte le righe, nessuna navigazione) |
@@ -558,14 +582,15 @@ Nomi delle classi assegnate agli elementi generati. Le classi interne di layout 
 | `boolTrue` | `null` | classe aggiuntiva per le celle bool con valore true |
 | `caption` | `null` | contenitore della caption |
 | `empty` | `null` | cella unica mostrata in assenza di righe |
-| `info` | `null` | sezione info (testo + ricerca) |
+| `info` | `null` | sezione info (testo + navigazione rapida + ricerca) |
 | `infoOuter` | `null` | contenitore esterno della sezione info |
+| `infoPagination` | `null` | navigazione rapida (pagina precedente/successiva) della sezione info |
 | `loader` | `null` | contenitore dello spinner di caricamento (iniziale e overlay) |
 | `loaderSpinner` | `null` | spinner di caricamento (aggiunta a `spinner`, o al contenitore di `loaderIcon`) |
 | `nowrap` | `'text-nowrap'` | no-wrap |
 | `numeric` | `'text-numeric'` | cifre tabulari (tipi numerici) |
 | `pagination` | `null` | `<nav>` della paginazione |
-| `paginationBtn` | `'btn-reset'` | pulsanti della paginazione |
+| `paginationBtn` | `'btn-reset'` | pulsanti della paginazione (anche della navigazione rapida della sezione info) |
 | `resultInfo` | `null` | contenitore del testo info |
 | `search` | `null` | wrapper dell'input di ricerca |
 | `searchInput` | `'form-control form-control-sm'` | input di ricerca |
@@ -593,13 +618,17 @@ tipi di dato predefiniti: modificandole si cambiano le classi di tutte le colonn
 |---|---|---|
 | `currentPage` | `'Pagina {page}, corrente'` | `title`/`aria-label` del pulsante della pagina corrente |
 | `info` | `'Stai visualizzando le righe da {start} a {end}, su un totale di {filteredRec} record trovati'` | template del testo info (vedi `infoText`) |
+| `infoPages` | `' - pag. {page} di {totPages}'` | accodato a `info` quando la paginazione è attiva (`perPage` > 0), con gli stessi segnaposto; `''` per non mostrarlo. Non viene accodato a un `infoText` personalizzato |
+| `infoPaginationAriaLabel` | `'Pagina precedente o successiva'` | `aria-label` della navigazione rapida della sezione info |
 | `loading` | `'Caricamento dati…'` | testo dello spinner di caricamento (nascosto visivamente) |
 | `nextPage` | `'Pagina successiva'` | `title`/`aria-label` del pulsante successivo |
+| `nextPages` | `'Mostra le pagine da {start} a {end}'` | `title`/`aria-label` del pulsante "…" che fa scorrere in avanti i pulsanti di pagina; `{start}`/`{end}` = prima/ultima pagina che verrà mostrata |
 | `noResults` | `'Nessun risultato per la ricerca'` | testo info e cella unica con ricerca senza risultati |
 | `noRows` | `'Nessun record trovato'` | testo info e cella unica con set di dati vuoto |
 | `pageTitle` | `'Vai a pagina {page}'` | `title`/`aria-label` dei pulsanti pagina |
 | `paginationAriaLabel` | `'Navigazione pagine'` | `aria-label` del `<nav>` |
 | `prevPage` | `'Pagina precedente'` | `title`/`aria-label` del pulsante precedente |
+| `prevPages` | `'Mostra le pagine da {start} a {end}'` | come `nextPages`, scorrimento indietro |
 | `searchAriaLabel` | `'Filtra risultati'` | `aria-label` dell'input di ricerca |
 | `searchPlaceholder` | `'Cerca...'` | placeholder dell'input di ricerca |
 | `searchTitle` | `'Cerca nella tabella'` | attributo `title` dell'input di ricerca |
@@ -611,8 +640,8 @@ tipi di dato predefiniti: modificandole si cambiano le classi di tutte le colonn
 
 Definisce il contenuto dell'area info (`elements.resultInfo`), aggiornata a ogni cambio di pagina, ricerca, ordinamento o filtro. Può essere:
 
-- `null` (default): viene usato il template `labels.info`
-- una stringa mustache-like con i segnaposto elencati sotto, che sostituisce `labels.info`
+- `null` (default): viene usato il template `labels.info`, seguito da `labels.infoPages` quando la paginazione è attiva (es. `… record trovati - pag. 2 di 5`)
+- una stringa mustache-like con i segnaposto elencati sotto, che sostituisce `labels.info` (e `labels.infoPages`)
 - una funzione con argomenti posizionali, che restituisce il contenuto (testo, stringa HTML, Node o array domBuilder):
 
 ```javascript
@@ -692,7 +721,7 @@ Accorgimenti:
 Lo spinner di caricamento viene mostrato:
 
 - al **primo caricamento** (e a ogni `reload()`, che ricostruisce la tabella), in qualunque modalità: prima che la struttura della tabella venga costruita, al posto della tabella stessa;
-- solo in modalità **server-side**, a ogni richiesta successiva (cambio pagina, ordinamento, ricerca, submit/reset di `filterForm`, `refresh()`): come overlay semitrasparente che copre la tabella, compresa la barra del footer con la paginazione, con lo spinner in alto, sopra l'intestazione, così da restare visibile anche con tabelle lunghe. L'overlay blocca i click su intestazioni e paginazione finché la richiesta non termina; l'input di ricerca e il form di filtro restano utilizzabili.
+- solo in modalità **server-side**, a ogni richiesta successiva (cambio pagina, ordinamento, ricerca, submit/reset di `filterForm`, `refresh()`): come overlay semitrasparente che copre la tabella, compresa la barra del footer con la paginazione, con lo spinner all'altezza del click che ha generato la richiesta (es. pulsante di paginazione o intestazione; da tastiera, all'altezza dell'elemento attivo), sempre entro i limiti dell'overlay, così da restare visibile anche con tabelle lunghe. Quando la richiesta non nasce da un'interazione con la tabella (ricerca, `filterForm`, `refresh()`) lo spinner segue `--jt-loader-justify-content` (predefinito: in alto, sopra l'intestazione). L'overlay blocca i click su intestazioni e paginazione finché la richiesta non termina; l'input di ricerca e il form di filtro restano utilizzabili.
 
 In modalità client-side le richieste successive al primo caricamento (`refresh()`, `filterForm`) riducono soltanto l'opacità della tabella (`--jt-busy-opacity`).
 
@@ -985,6 +1014,7 @@ e valori di ordinamento/ricerca. Tipi predefiniti:
 | `datetime` | come `date`, con la parte ora (`timesLocaleOpts`): `<time><span class="[nowrap]">data</span> <small>ora</small></time>` | `textEnd nowrap` |
 | `email` | andate a capo facoltative attorno alla `@` | – |
 | `euro` | come `currency`, EUR forzato | `textEnd numeric nowrap` |
+| `euroNoDec` | come `euro`, senza decimali (arrotondato all'unità) | `textEnd numeric nowrap` |
 | `id` | id numerico: valore grezzo, allineato a destra, non ricercabile | `textEnd numeric` |
 | `num` | numero formattato con `numbersLocaleOpts` | `textEnd numeric nowrap` |
 | `perc` | percentuale in scala 0–100, `currPercLocaleOpts` + `%` | `textEnd numeric nowrap` |
@@ -2115,7 +2145,7 @@ Proprietà disponibili dopo il caricamento:
 | `cols` | colonne dopo il parsing (solo quelle visibili, con classi e tipo di dato risolti) |
 | `data` | righe grezze (array di oggetti; in modalità server-side solo quelle della pagina corrente) |
 | `dataTypes` | mappa dei tipi di dato (predefiniti + personalizzati) |
-| `elements` | elementi generati: `wrapper`, `infoOuter`, `info`, `resultInfo`, `searchInput`, `tableWrapper`, `table`, `thead`, `tbody`, `tfoot`, `tableFooter`, `caption`, `pagination` |
+| `elements` | elementi generati: `wrapper`, `infoOuter`, `info`, `resultInfo`, `infoPagination`, `searchInput`, `tableWrapper`, `table`, `thead`, `tbody`, `tfoot`, `tableFooter`, `caption`, `pagination` |
 | `params` | parametri risolti |
 | `state` | stato del rendering: `totRec`, `filteredRec`, `rows`, `filtered`, `pageRows`, `searchTerm`, `sort` (`{ key, dir }` o `null`), `page`, `totPages` |
 
@@ -2552,17 +2582,22 @@ jtable.init({ jsonUrl: '/api/rows.json', cols: [...] });
 [⬆︎ Torna all'indice](#indice)
 
 Con `perPage` > 0 (default 25) le righe vengono suddivise in pagine e sotto la tabella compare la
-navigazione: pulsanti precedente/successivo (icone `paginationPrevIcon`/`paginationNextIcon`),
-la prima e l'ultima pagina e `paginationDelta` pagine per lato della corrente, con puntini di
-sospensione per le pagine omesse. La navigazione è nascosta quando c'è una sola pagina.
-`perPage: 0` disattiva la paginazione (tutte le righe in un'unica pagina).
+navigazione, centrata: pulsanti precedente/successivo (icone `paginationPrevIcon`/`paginationNextIcon`), la prima e l'ultima pagina e una finestra di `paginationButtons` (default 10) pagine consecutive. Con al massimo `paginationButtons` + 2 pagine vengono mostrate tutte.
+
+Le pagine omesse tra la prima pagina e la finestra, e tra la finestra e l'ultima, sono sostituite da un pulsante "…" che fa scorrere la finestra di `paginationButtons` posizioni nella relativa direzione (senza superare la prima o l'ultima pagina), **senza cambiare pagina**: ad esempio, con 50 pagine e la finestra 2–11, "…" mostra le pagine 12–21. Quando il salto nasconderebbe una sola pagina, viene mostrata quella pagina al posto del pulsante "…".
+
+Al cambio di pagina la finestra si sposta solo se necessario: resta ferma se la nuova pagina è già visibile, si sposta del minimo indispensabile per includerla altrimenti, e si accosta all'estremo quando si va alla prima o all'ultima pagina. Al primo rendering, o quando cambia il numero di pagine (ricerca, filtri), viene centrata sulla pagina corrente.
+
+Nella sezione info, al centro tra il testo informativo e la ricerca, compaiono inoltre due pulsanti di navigazione rapida, pagina precedente e successiva (stesse icone), collocabili anche altrove con lo slot `infoPagination` del [template](#template). Il testo info riporta la pagina corrente e il numero di pagine (`labels.infoPages`).
+
+Tutta la navigazione è nascosta quando c'è una sola pagina. `perPage: 0` disattiva la paginazione (tutte le righe in un'unica pagina).
 
 `goToPage(page)` cambia pagina via script; `state.page`/`state.totPages` riportano lo stato.
 
 ### <a id="paginazione-caption"></a>Caption e paginazione
 
-La caption è mostrata **sotto la tabella**, nella barra `tableFooter`, allineata a sinistra; a
-destra, nella stessa barra, la navigazione delle pagine. La caption non è un elemento
+La caption è mostrata **sotto la tabella**, nella barra `tableFooter`, su una riga propria sopra la
+navigazione delle pagine (centrata), oppure sotto con `captionPosition: 'belowPagination'`; con `captionPosition: 'top'` è invece mostrata sopra la tabella. La caption non è un elemento
 `<caption>` (che dovrebbe stare dentro la tabella e non potrebbe ospitare la navigazione senza
 farla leggere come nome della tabella) ma un contenitore con id, collegato alla tabella tramite
 `aria-labelledby`: il nome accessibile della tabella è quindi lo stesso di una `<caption>`.
@@ -2578,7 +2613,8 @@ elementi `{ slot: 'nome' }` vengono sostituiti dalle parti predefinite:
 | Slot | Contenuto |
 |---|---|
 | `caption` | solo la caption (se `caption` è impostata) |
-| `infoSection` | sezione info completa (testo info + input di ricerca, in riga) |
+| `infoPagination` | solo la navigazione rapida pagina precedente/successiva (se `perPage` > 0) |
+| `infoSection` | sezione info completa (testo info + navigazione rapida + input di ricerca, in riga) |
 | `pagination` | solo la navigazione delle pagine (se `perPage` > 0) |
 | `resultInfo` | solo il testo info |
 | `search` | solo l'input di ricerca (se `search` è true) |
@@ -2613,7 +2649,13 @@ riconosciuti vengono segnalati in console e ignorati.
   <section class="[wrapper] [classes.wrapper]">
     <div class="[infoOuter] [classes.infoOuter]">
       <div class="[info] [classes.info]">
-        <div class="[resultInfo] [classes.resultInfo]" aria-live="polite">Stai visualizzando le righe da 1 a 25, ...</div>
+        <div class="[resultInfo] [classes.resultInfo]" aria-live="polite">Stai visualizzando le righe da 1 a 25, ... - pag. 1 di 50</div>
+        <div class="[infoPagination] [classes.infoPagination]" role="group" aria-label="Pagina precedente o successiva">  <!-- solo se perPage > 0; hidden con una sola pagina -->
+          <ul class="[paginationList]">
+            <li class="[paginationItem]"><button type="button" class="[paginationBtn] [paginationArrow] btn-reset" data-page="prev" aria-label="Pagina precedente" disabled><svg ...></svg></button></li>
+            <li class="[paginationItem]"><button type="button" class="[paginationBtn] [paginationArrow] btn-reset" data-page="next" aria-label="Pagina successiva"><svg ...></svg></button></li>
+          </ul>
+        </div>
         <div class="[search] [classes.search]">           <!-- solo se search: true -->
           <input type="search" class="form-control form-control-sm" ...>
         </div>
@@ -2654,8 +2696,9 @@ riconosciuti vengono segnalati in console e ignorati.
             <li class="[paginationItem]"><button type="button" class="[paginationBtn] btn-reset [paginationArrow]" data-page="prev" aria-label="Pagina precedente" disabled><svg ...></svg></button></li>
             <li class="[paginationItem]"><button type="button" class="[paginationBtn] btn-reset" data-page="1" aria-current="page" aria-label="Pagina 1, corrente">1</button></li>
             <li class="[paginationItem]"><button type="button" class="[paginationBtn] btn-reset" data-page="2" aria-label="Vai a pagina 2">2</button></li>
-            <li class="[paginationItem]"><span class="[paginationEllipsis]" aria-hidden="true">…</span></li>
-            <li class="[paginationItem]"><button type="button" class="[paginationBtn] btn-reset" data-page="10" aria-label="Vai a pagina 10">10</button></li>
+            <!-- ... pagine 3–11 (finestra di paginationButtons pulsanti) -->
+            <li class="[paginationItem]"><button type="button" class="[paginationBtn] btn-reset [paginationJump]" data-jump="forward" data-window="12" aria-label="Mostra le pagine da 12 a 21">…</button></li>  <!-- data-jump="back" per lo scorrimento indietro -->
+            <li class="[paginationItem]"><button type="button" class="[paginationBtn] btn-reset" data-page="50" aria-label="Vai a pagina 50">50</button></li>
             <li class="[paginationItem]"><button type="button" class="[paginationBtn] btn-reset [paginationArrow]" data-page="next" aria-label="Pagina successiva"><svg ...></svg></button></li>
           </ul>
         </nav>
@@ -2696,7 +2739,7 @@ Definite in `json-table.minimo.tokens.mjs` (namespace `--jt-*`):
 | `--jt-info-outer-padding-block-end` | `{size.xs}` |
 | `--jt-loader-backdrop-filter` | `none` (solo overlay, es. `blur(2px)`) |
 | `--jt-loader-background-color` | `color-mix(in srgb, {body.background.color} 70%, transparent)` (solo overlay) |
-| `--jt-loader-justify-content` | `flex-start` (solo overlay, posizione verticale dello spinner: `flex-start`, `center`, `flex-end`) |
+| `--jt-loader-justify-content` | `flex-start` (solo overlay, posizione verticale dello spinner quando la richiesta non nasce da un click nella tabella: `flex-start`, `center`, `flex-end`) |
 | `--jt-loader-padding-block` | `{size.md}` |
 | `--jt-loader-spinner-color` | `{primary.100}` |
 | `--jt-loader-spinner-size` | `{size.lg}` |

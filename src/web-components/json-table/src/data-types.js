@@ -116,6 +116,7 @@ export function formatNumber(value, params, formatOpts, wrap) {
  * | `percDecimal` | percentuale in scala 0–1 (moltiplicata per 100)                     |
  * | `currency`    | formato valuta `Intl`, `params.currency`                            |
  * | `euro`        | come `currency`, EUR forzato                                        |
+ * | `euroNoDec`   | come `euro`, senza decimali                                         |
  * | `date`        | elemento `<time>`, `datesLocaleOpts`                                |
  * | `datetime`    | come `date`, più la parte oraria (`timesLocaleOpts`)                |
  * | `bool`        | `boolTrueIcon`/`boolFalseIcon`/`boolNullIcon`                       |
@@ -218,6 +219,10 @@ export function builtInDataTypes(params) {
     currency: numericType({ style: 'currency', currency: params.currency, ...params.currPercLocaleOpts }),
 
     euro: numericType({ style: 'currency', currency: 'EUR', ...params.currPercLocaleOpts }),
+
+    euroNoDec: numericType({
+      style: 'currency', currency: 'EUR', ...params.currPercLocaleOpts, minimumFractionDigits: 0, maximumFractionDigits: 0
+    }),
 
     date: dateType(false),
 

@@ -156,7 +156,7 @@ export default {
       'justify-content': {
         $type: 'string',
         $value: 'flex-start',
-        $description: 'Posizione verticale dello spinner nell\'overlay: `flex-start` (in alto, sopra l\'intestazione, visibile anche con tabelle lunghe), `center`, `flex-end`'
+        $description: 'Posizione verticale dello spinner nell\'overlay quando la richiesta non nasce da un click nella tabella: `flex-start` (in alto, sopra l\'intestazione, visibile anche con tabelle lunghe), `center`, `flex-end`'
       },
       padding: {
         block: {

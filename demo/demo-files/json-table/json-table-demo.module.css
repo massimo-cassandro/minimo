@@ -9,3 +9,9 @@ h2 {
   align-items: center;
   justify-content: space-between;
 }
+
+/* demo classes.infoPagination */
+.demoInfoPagination {
+  outline: 1px dashed #999;
+  outline-offset: 2px;
+}

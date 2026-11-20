@@ -12,6 +12,7 @@ import { loaderPart, showLoader, hideLoader } from './src/loader.js';
 import { renderTbody } from './src/table-body.js';
 import { renderTfoot } from './src/tfoot.js';
 import { updateInfo } from './src/update-info.js';
+import { checkUnknownParams } from './src/check-params.js';
 import { applySortState, setSortListener } from './src/thead.js';
 import { setSearchListener, filterRows, normalizeSearchFields } from './src/search.js';
 import { sortRows } from './src/sorting.js';
@@ -117,10 +118,11 @@ const emptyState = () => ({
  *   ],
  *   dataTypes: {},                      // default: {} (tipi personalizzati, uniti a quelli predefiniti)
  *   caption: 'Utenti',                  // default: null
+ *   captionPosition: 'abovePagination', // default: 'abovePagination' ('belowPagination' = sotto la paginazione, 'top' = sopra la tabella)
  *   search: true,                       // default: true
  *   searchDebounce: 300,                // default: 300 (ms)
  *   perPage: 25,                        // default: 25 (0 = nessuna paginazione)
- *   paginationDelta: 2,                 // default: 2
+ *   paginationButtons: 10,              // default: 10
  *   serverSide: false,                  // default: false
  *   serverParams: { page: 'page', start: 'start', perPage: 'perPage', sort: 'sort', dir: 'dir', search: 'search', searchFields: 'searchFields' }, // default
  *   searchFields: null,                 // default: null (campi di ricerca aggiuntivi, anche non presenti in cols)
@@ -205,6 +207,12 @@ export class JsonTable extends HTMLElement {
     this._searchTimer = undefined;
     /** timer della comparsa ritardata dell'overlay di caricamento (vedi `loaderDelay`) @type {ReturnType<typeof setTimeout>|undefined} */
     this._loaderTimer = undefined;
+    /** ultimo `pointerdown` nel componente, usato per posizionare lo spinner dell'overlay (vedi `showLoader()`)
+     * @type {{ y: number, target: EventTarget|null, time: number }|null} */
+    this._lastPointer = null;
+    this.addEventListener('pointerdown', e => {
+      this._lastPointer = { y: e.clientY, target: e.target, time: performance.now() };
+    }, { capture: true, passive: true });
     /** true quando il primo caricamento è terminato e la tabella è stata renderizzata con i dati */
     this._loaded = false;
     /** valori correnti del form di filtro (vedi `filter-form.js`) @type {URLSearchParams|null} */
@@ -521,6 +529,9 @@ export class JsonTable extends HTMLElement {
     }
     this.params = params;
 
+    // solo in sviluppo (o con `debug`): segnala parametri, attributi e chiavi delle colonne non riconosciuti
+    checkUnknownParams(this, params, this._config, projectDefaults);
+
     // form di filtro indicato per id ma non ancora presente (markup successivo alla tabella, documento in caricamento)
     if (typeof params.filterForm === 'string' && params.filterForm && !document.getElementById(params.filterForm)
       && document.readyState === 'loading') {
@@ -712,7 +723,7 @@ export class JsonTable extends HTMLElement {
 
   /**
    * Normalizza i parametri risolti che dipendono l'uno dall'altro, segnalando le incoerenze:
-   * `perPage`/`paginationDelta` devono essere numeri non negativi, `serverSide` richiede `jsonUrl`
+   * `perPage` deve essere un numero non negativo, `paginationButtons` un numero positivo, `captionPosition` `'top'`, `'abovePagination'` o `'belowPagination'`, `serverSide` richiede `jsonUrl`
    * (ignorato con `data` inline) e disattiva `tfoot` (gli aggregati verrebbero calcolati solo sulla
    * pagina corrente).
    * @param {JsonTableParams} params - Parametri risolti (modificati)
@@ -723,8 +734,13 @@ export class JsonTable extends HTMLElement {
     const perPage = Number(params.perPage);
     params.perPage = Number.isFinite(perPage) && perPage >= 0 ? Math.floor(perPage) : defaults.perPage;
 
-    const delta = Number(params.paginationDelta);
-    params.paginationDelta = Number.isFinite(delta) && delta >= 0 ? Math.floor(delta) : defaults.paginationDelta;
+    const buttons = Number(params.paginationButtons);
+    params.paginationButtons = Number.isFinite(buttons) && buttons >= 1 ? Math.floor(buttons) : defaults.paginationButtons;
+
+    if (!['top', 'abovePagination', 'belowPagination'].includes(params.captionPosition)) {
+      console.error(`[json-table] captionPosition: valore non valido (${params.captionPosition}), viene usato '${defaults.captionPosition}'`);
+      params.captionPosition = defaults.captionPosition;
+    }
 
     const hasFilterForm = params.filterForm != null && params.filterForm !== '';
 

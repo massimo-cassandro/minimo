@@ -35,11 +35,31 @@ export function jsonTableDemo(){
   /** @type {JsonTable} */
   let reloadableTable;
 
+  /** @type {JsonTable} */
+  let paginationTable;
+
+  /** colonne comuni alle demo di paginazione */
+  const paginationCols = [
+    { key: 'id', dataType: 'id' },
+    { key: 'text', title: 'Testo' },
+    { key: 'date', title: 'Data', dataType: 'date' },
+    { key: 'euro', title: 'Importo', dataType: 'euro' }
+  ];
+
+  /** @type {(label: string, onClick: () => void) => DomBuilderItem} */
+  const apiBtn = (label, onClick) => ({
+    tag: 'button',
+    className: 'btn btn-outline-secondary btn-sm',
+    attrs: { type: 'button' },
+    content: label,
+    callback: el => el.addEventListener('click', onClick)
+  });
+
   domBuilder([
 
     // =>> 1. Solo attributi HTML (senza JS)
     'h2 1. Configurazione solo da attributi HTML (senza JS)',
-    'p Tutto da attributi (via domBuilder <code>attrs</code>): <code>data</code>, <code>cols</code>, <code>labels</code>, <code>tfoot</code> e <code>perpage</code> serializzati. Il render della colonna "Testo" usa la sintassi mustache-like <code>[[key]]</code>, la colonna "Importo" ha <code>tfootRender: "@sum"</code>. Ordinamento e ricerca sono lato client; con <code>perpage="5"</code> la navigazione pagine compare nella barra sotto la tabella, a destra della caption.',
+    'p Tutto da attributi (via domBuilder <code>attrs</code>): <code>data</code>, <code>cols</code>, <code>labels</code>, <code>tfoot</code> e <code>perpage</code> serializzati. Il render della colonna "Testo" usa la sintassi mustache-like <code>[[key]]</code>, la colonna "Importo" ha <code>tfootRender: "@sum"</code>. Ordinamento e ricerca sono lato client; con <code>perpage="5"</code> la navigazione pagine compare nella barra sotto la tabella, centrata (caption su una riga propria, sopra la paginazione: <code>captionPosition: \'abovePagination\'</code> di default), e i pulsanti pagina precedente/successiva nel blocco info, tra testo e ricerca.',
     {
       tag: 'json-table',
       attrs: {
@@ -58,6 +78,83 @@ export function jsonTableDemo(){
         ]),
         labels: JSON.stringify({ searchPlaceholder: 'Placeholder da attributo labels (prevale su setDefaults)' })
       }
+    },
+
+    // =>> 1b. paginazione
+    'h2 1b. Paginazione: <code>paginationButtons</code>, pulsanti "…", navigazione rapida e pagine nel testo info',
+    'p Navigazione sotto la tabella centrata: prima e ultima pagina sempre visibili, più una finestra di <code>paginationButtons</code> pulsanti consecutivi (default 10). I pulsanti "…" fanno scorrere la finestra di <code>paginationButtons</code> posizioni <strong>senza cambiare pagina</strong>, fermandosi agli estremi. Al cambio di pagina la finestra resta ferma se la nuova pagina è visibile, altrimenti si sposta del minimo indispensabile; sulla prima/ultima pagina si accosta all\'estremo. Nel blocco info, tra testo e ricerca, i pulsanti pagina precedente/successiva; il testo info termina con <code>labels.infoPages</code> (<code>\' - pag. {page} di {totPages}\'</code>).',
+    'p <strong>Cosa provare:</strong> "…" in avanti e indietro (la pagina corrente non cambia, il focus resta sul pulsante "…"); pulsanti avanti/indietro ai bordi della finestra (scorrimento di una posizione); clic su prima/ultima pagina; avanti/indietro del blocco info (il focus resta lì, e passa all\'altro pulsante quando arriva alla prima/ultima pagina); una ricerca (es. "lorem") che riduce il numero di pagine; navigazione da tastiera (Tab, Invio).',
+
+    'h3 600 record, 5 per pagina (120 pagine), <code>paginationButtons</code> di default (10)',
+    {
+      className: 'flex flex-wrap gap-2 mbe-sm',
+      children: [
+        apiBtn('goToPage(1)', () => paginationTable.goToPage(1)),
+        apiBtn('goToPage(37)', () => paginationTable.goToPage(37)),
+        apiBtn('goToPage(60)', () => paginationTable.goToPage(60)),
+        apiBtn('goToPage(ultima)', () => paginationTable.goToPage(paginationTable.state.totPages)),
+        apiBtn('setSearch("lorem")', () => paginationTable.setSearch('lorem')),
+        apiBtn('setSearch("")', () => paginationTable.setSearch(''))
+      ]
+    },
+    {
+      tag: 'json-table',
+      id: 'jt-pagination-default',
+      callback: el => {
+        paginationTable = /** @type {JsonTable} */ (el);
+        paginationTable.init({
+          data: bigData(20),
+          perPage: 5,
+          caption: 'Paginazione con 120 pagine (paginationButtons: 10)',
+          cols: paginationCols
+        });
+      }
+    },
+
+    'h3 <code>paginationbuttons="4"</code> e <code>captionposition="belowPagination"</code> da attributo HTML, <code>labels.infoPages</code> personalizzata',
+    'p 150 record, 5 per pagina (30 pagine), finestra di 4 pulsanti: ogni "…" scorre di 4 posizioni. <code>labels.infoPages</code> è <code>\' (pagina {page} su {totPages})\'</code>, mentre <code>labels.nextPages</code>/<code>prevPages</code> personalizzano il <code>title</code> dei pulsanti "…".',
+    {
+      tag: 'json-table',
+      id: 'jt-pagination-4',
+      attrs: {
+        data: JSON.stringify(bigData(5)),
+        perpage: '5',
+        paginationbuttons: '4',
+        captionposition: 'belowPagination',
+        caption: 'Paginazione con 30 pagine (paginationButtons: 4, captionPosition: belowPagination, da attributo)',
+        cols: JSON.stringify(paginationCols),
+        labels: JSON.stringify({
+          infoPages: ' (pagina {page} su {totPages})',
+          nextPages: 'Avanti: pagine {start}–{end}',
+          prevPages: 'Indietro: pagine {start}–{end}'
+        })
+      }
+    },
+
+    'h3 Casi limite: 12 pagine (tutte visibili) e 13 pagine (pagina mostrata al posto del "…")',
+    'p Con al massimo <code>paginationButtons</code> + 2 pagine non ci sono pulsanti "…". Con 13 pagine il salto nasconderebbe una sola pagina, che viene quindi mostrata al suo posto. La prima tabella ha <code>captionPosition: \'top\'</code> (caption sopra la tabella), la seconda <code>labels.infoPages: \'\'</code> (nessuna indicazione delle pagine nel testo info) e la classe <code>classes.infoPagination</code>.',
+    {
+      tag: 'json-table',
+      id: 'jt-pagination-12',
+      callback: el => /** @type {JsonTable} */ (el).init({
+        data: bigData(2),
+        perPage: 5,
+        caption: '60 record, 12 pagine (captionPosition: top, sopra la tabella)',
+        captionPosition: 'top',
+        cols: paginationCols
+      })
+    },
+    {
+      tag: 'json-table',
+      id: 'jt-pagination-13',
+      callback: el => /** @type {JsonTable} */ (el).init({
+        data: bigData(3).slice(0, 65),
+        perPage: 5,
+        caption: '65 record, 13 pagine, senza infoPages',
+        cols: paginationCols,
+        classes: { infoPagination: styles.demoInfoPagination },
+        labels: { infoPages: '' }
+      })
     },
 
     // =>> 2. init() + jsonUrl + cols con funzioni
@@ -371,6 +468,22 @@ export function jsonTableDemo(){
     {
       tag: 'json-table',
       attrs: { data: '[{"id": 1,}' }
+    },
+    'p Parametri non riconosciuti (avvisi in console, solo in sviluppo): attributo <code>perpages</code>, chiavi <code>serach</code> e <code>paginationDelta</code> in <code>init()</code>, <code>labels.serachPlaceholder</code>, chiave <code>sortabel</code> in una colonna. La tabella funziona comunque, ignorandoli.',
+    {
+      tag: 'json-table',
+      attrs: { perpages: '5' },
+      // cast ad `any`: parametri volutamente errati
+      callback: el => /** @type {JsonTable} */ (el).init(/** @type {any} */ ({
+        data: demoData.slice(0, 6),
+        serach: false,
+        paginationDelta: 2,
+        labels: { serachPlaceholder: 'Typo nella label' },
+        cols: [
+          { key: 'id', dataType: 'id' },
+          { key: 'text', title: 'Testo', sortabel: false }
+        ]
+      }))
     },
     {
       tag: 'json-table',

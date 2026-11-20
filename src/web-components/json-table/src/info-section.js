@@ -67,28 +67,32 @@ export function searchPart(params, elements) {
 
 
 /**
- * Elemento domBuilder dell'intera sezione informativa (slot del template `infoSection`): testo informativo + input di ricerca.
+ * Elemento domBuilder dell'intera sezione informativa (slot del template `infoSection`): testo informativo,
+ * navigazione rapida tra le pagine e input di ricerca.
  *
  * Struttura generata:
  * ```
  * div.infoOuter[classes.infoOuter]
  *   div.info[classes.info]
  *     div.resultInfo                       ← resultInfoPart()
+ *     div.infoPagination[role=group]       ← infoPaginationItem (infoPaginationPart()), solo se `params.perPage` > 0
  *     div.search > input[type=search]      ← searchPart(), solo se `params.search` è true
  * ```
  *
  * I riferimenti agli elementi generati vengono memorizzati in `elements`
- * (`infoOuter`, `info`, `resultInfo`, `searchInput`).
+ * (`infoOuter`, `info`, `resultInfo`, `infoPagination`, `searchInput`).
  *
  * @param {JsonTableParams} params - Parametri risolti
  * @param {JsonTableElements} elements - Oggetto che raccoglie gli elementi generati (modificato)
+ * @param {DomBuilderItem|null} [infoPaginationItem=null] - Navigazione rapida tra le pagine (vedi `infoPaginationPart()`
+ *   in `pagination.js`) (default: null)
  * @returns {DomBuilderItem}
  *
  * @example
- * domBuilder([{ tag: 'section', children: [infoSectionPart(params, elements)] }], host);
+ * domBuilder([{ tag: 'section', children: [infoSectionPart(params, elements, infoPaginationPart(jt, elements))] }], host);
  * elements.info; // → HTMLElement
  */
-export function infoSectionPart(params, elements) {
+export function infoSectionPart(params, elements, infoPaginationItem = null) {
   return {
     className: classnames(styles.infoOuter, params.classes.infoOuter),
     callback: el => { elements.infoOuter = /** @type {HTMLElement} */ (el); },
@@ -98,6 +102,7 @@ export function infoSectionPart(params, elements) {
         callback: el => { elements.info = /** @type {HTMLElement} */ (el); },
         children: [
           resultInfoPart(params, elements),
+          ...(infoPaginationItem ? [infoPaginationItem] : []),
           searchPart(params, elements)
         ]
       }

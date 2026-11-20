@@ -112,3 +112,13 @@ li {
   font-feature-settings: 'lnum', 'tnum';
   font-variant-numeric: lining-nums tabular-nums;
 }
+
+/* .data-lining-nums {
+  font-feature-settings: 'lnum', 'pnum';
+  font-variant-numeric: lining-nums proportional-nums;
+}
+
+.data-tabular-nums {
+  font-feature-settings: 'lnum', 'pnum';
+  font-variant-numeric: lining-nums tabular-nums;
+} */

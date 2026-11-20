@@ -68,6 +68,13 @@ export const datatypeDefaults = {
     cellClass: ['textEnd', 'numeric', 'nowrap'],
     nullContent: null
   },
+  euroNoDec: {
+    sortable: true,
+    searchable: true,
+    headerClass: ['textEnd', 'numeric', 'nowrap'],
+    cellClass: ['textEnd', 'numeric', 'nowrap'],
+    nullContent: null
+  },
   date: {
     sortable: true,
     searchable: true,

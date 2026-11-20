@@ -125,6 +125,7 @@ import {
  * @property {string|null} [infoOuter] - Contenitore esterno delle info (default: null)
  * @property {string|null} [info] - Contenitore delle info (testo informativo + ricerca) (default: null)
  * @property {string|null} [resultInfo] - Contenitore del testo informativo (default: null)
+ * @property {string|null} [infoPagination] - Navigazione rapida (pagina precedente/successiva) del blocco info (default: null)
  * @property {string|null} [search] - Wrapper dell'input di ricerca (default: null)
  * @property {string|null} [searchInput] - Input di ricerca (default: 'form-control form-control-sm')
  * @property {string|null} [tableWrapper] - Div che racchiude la tabella (default: 'table-responsive')
@@ -132,7 +133,7 @@ import {
  * @property {string|null} [tableFooter] - Barra sotto la tabella che contiene caption e paginazione (default: null)
  * @property {string|null} [caption] - Contenitore della caption dentro la barra del footer della tabella (default: null)
  * @property {string|null} [pagination] - `<nav>` della paginazione (default: null)
- * @property {string|null} [paginationBtn] - Pulsanti di paginazione (default: 'btn-reset')
+ * @property {string|null} [paginationBtn] - Pulsanti di paginazione, anche della navigazione rapida del blocco info (default: 'btn-reset')
  * @property {string|null} [sortBtn] - Pulsanti di ordinamento dentro il `<th>` (default: 'btn-reset')
  * @property {string|null} [empty] - L'unica cella mostrata quando non ci sono righe (default: null)
  * @property {string|null} [textStart] - Classe di allineamento inline-start (default: null, le celle di minimo sono allineate all'inizio di default)
@@ -149,7 +150,8 @@ import {
 
 /**
  * Testi usati dal componente. Il segnaposto `{page}` delle label di paginazione viene sostituito
- * con il numero di pagina.
+ * con il numero di pagina, `{start}`/`{end}` (solo `prevPages`/`nextPages`) con la prima/ultima pagina
+ * della finestra che verrà mostrata.
  *
  * @typedef {Object} JsonTableLabels
  * @property {string} [loading] - Placeholder di caricamento (nascosto visivamente) (default: 'Caricamento dati…')
@@ -158,6 +160,8 @@ import {
  * @property {string} [searchAriaLabel] - `aria-label` dell'input di ricerca (default: 'Filtra risultati')
  * @property {string} [info] - Template del testo informativo, segnaposto: `{start}`, `{end}`, `{totRec}`, `{filteredRec}`,
  *   `{page}`, `{totPages}` (default: 'Stai visualizzando le righe da {start} a {end}, su un totale di {filteredRec} record trovati')
+ * @property {string} [infoPages] - Accodato a `info` quando la paginazione è attiva (`perPage` > 0), stessi segnaposto;
+ *   `''` per non mostrarlo. Non viene accodato a un `infoText` personalizzato (default: ' - pag. {page} di {totPages}')
  * @property {string} [noRows] - Testo informativo e contenuto della cella vuota quando l'insieme di dati è vuoto (default: 'Nessun record trovato')
  * @property {string} [noResults] - Come `noRows`, quando una ricerca non restituisce nulla (default: 'Nessun risultato per la ricerca')
  * @property {string} [sortAsc] - `aria-label`/`title` del pulsante di ordinamento quando il prossimo click ordina in modo crescente
@@ -167,6 +171,11 @@ import {
  * @property {string} [paginationAriaLabel] - `aria-label` del `<nav>` della paginazione (default: 'Navigazione pagine')
  * @property {string} [prevPage] - `aria-label`/`title` del pulsante pagina precedente (default: 'Pagina precedente')
  * @property {string} [nextPage] - Come sopra, pulsante pagina successiva (default: 'Pagina successiva')
+ * @property {string} [prevPages] - `aria-label`/`title` del pulsante "…" che fa scorrere indietro i pulsanti di pagina
+ *   (default: 'Mostra le pagine da {start} a {end}')
+ * @property {string} [nextPages] - Come sopra, scorrimento in avanti (default: 'Mostra le pagine da {start} a {end}')
+ * @property {string} [infoPaginationAriaLabel] - `aria-label` della navigazione rapida del blocco info
+ *   (default: 'Pagina precedente o successiva')
  * @property {string} [pageTitle] - `aria-label`/`title` dei pulsanti di pagina (default: 'Vai a pagina {page}')
  * @property {string} [currentPage] - `aria-label`/`title` del pulsante della pagina corrente (default: 'Pagina {page}, corrente')
  */
@@ -185,7 +194,7 @@ import {
 
 /**
  * Nomi delle parti predefinite del template.
- * @typedef {'infoSection'|'resultInfo'|'search'|'table'|'caption'|'pagination'} TemplateSlot
+ * @typedef {'infoSection'|'resultInfo'|'infoPagination'|'search'|'table'|'caption'|'pagination'} TemplateSlot
  */
 
 /**
@@ -278,16 +287,20 @@ import {
  *   (`jsonDataField` viene ignorato) (default: null)
  * @property {ColDefinition[]} cols - OBBLIGATORIO: definizione delle colonne (default: [])
  * @property {Object<string, DataTypeDefinition>} dataTypes - Data type personalizzati, uniti a quelli predefiniti
- *   (`string`, `num`, `id`, `perc`, `percDecimal`, `currency`, `euro`, `date`, `datetime`, `bool`, `email`).
+ *   (`string`, `num`, `id`, `perc`, `percDecimal`, `currency`, `euro`, `euroNoDec`, `date`, `datetime`, `bool`, `email`).
  *   Una chiave che corrisponde a un tipo predefinito ne sovrascrive solo le proprietà indicate (default: {})
- * @property {string|Function|null} caption - Caption della tabella, mostrata sotto la tabella (lato iniziale della barra del footer)
- *   e collegata alla tabella tramite `aria-labelledby`: una stringa (testo semplice o HTML) oppure, solo tramite `init()`, una funzione
- *   che restituisce una stringa o un Node (default: null)
+ * @property {string|Function|null} caption - Caption della tabella, mostrata sotto la tabella (nella barra del footer, su una riga
+ *   propria, vedi `captionPosition`) e collegata alla tabella tramite `aria-labelledby`: una stringa (testo semplice o HTML) oppure,
+ *   solo tramite `init()`, una funzione che restituisce una stringa o un Node (default: null)
+ * @property {'top'|'abovePagination'|'belowPagination'} captionPosition - Posizione della caption: `'top'` sopra la tabella;
+ *   `'abovePagination'`/`'belowPagination'` sotto la tabella, nella barra del footer, sopra/sotto la navigazione delle pagine. Non ha effetto se il template colloca altrove `caption` o `pagination` (default: 'abovePagination')
  * @property {boolean} search - Se renderizzare l'input di ricerca (default: true)
  * @property {number} searchDebounce - Ritardo (ms) tra l'ultima pressione di un tasto e l'esecuzione della ricerca (default: 300)
  * @property {number} perPage - Righe per pagina; `0` disattiva la paginazione (tutte le righe in una sola pagina, nessuna
  *   navigazione) (default: 25)
- * @property {number} paginationDelta - Numero di pulsanti di pagina mostrati per lato rispetto alla pagina corrente (default: 2)
+ * @property {number} paginationButtons - Numero di pulsanti di pagina consecutivi mostrati nella navigazione, oltre a quelli
+ *   della prima e dell'ultima pagina (sempre visibili). Con più pagine, quelle omesse sono sostituite da un pulsante "…"
+ *   che fa scorrere i pulsanti visibili di `paginationButtons` posizioni, senza cambiare pagina (default: 10)
  * @property {boolean} serverSide - Modalità server-side: paginazione, ordinamento e ricerca sono delegati al server.
  *   Ogni cambiamento attiva una nuova richiesta a `jsonUrl` (vedi `serverParams`) e si presume che il JSON contenga solo le
  *   righe della pagina richiesta, più `totRecField` e `filteredRecField`. Richiede `jsonUrl`; `tfoot` non è
@@ -337,9 +350,11 @@ import {
  *   (default: { year: 'numeric', month: 'short', day: 'numeric' })
  * @property {Intl.DateTimeFormatOptions} timesLocaleOpts - Opzioni per la parte oraria di `datetime`
  *   (default: { hour12: false, hour: '2-digit', minute: '2-digit' })
- * @property {Intl.NumberFormatOptions} numbersLocaleOpts - Opzioni per il tipo `num` (default: { maximumFractionDigits: 2 })
- * @property {Intl.NumberFormatOptions} currPercLocaleOpts - Opzioni per i tipi `currency`/`euro`/`perc`/`percDecimal`
- *   (default: { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+ * @property {Intl.NumberFormatOptions} numbersLocaleOpts - Opzioni per il tipo `num`.
+ *   `useGrouping: 'always'` forza il separatore delle migliaia anche dove il locale lo omette (es. `1234` in `it-IT`)
+ *   (default: { maximumFractionDigits: 2, useGrouping: 'always' })
+ * @property {Intl.NumberFormatOptions} currPercLocaleOpts - Opzioni per i tipi `currency`/`euro`/`euroNoDec`/`perc`/`percDecimal`
+ *   (`euroNoDec` ne sovrascrive i decimali) (default: { minimumFractionDigits: 2, maximumFractionDigits: 2, useGrouping: 'always' })
  * @property {string|null} renderNullAs - Contenuto mostrato per i valori `null`/`undefined` (default: '—')
  * @property {string|null} renderZeroAs - Se non null, contenuto mostrato per i valori numerici uguali a zero (default: null)
  * @property {string|null} renderNaNAs - Contenuto mostrato dai tipi numerici per i valori non numerici (default: '—')
@@ -397,10 +412,11 @@ export const mergedParams = ['classes', 'labels', 'dataTypes', 'serverParams'];
  *   cols: [],                          // obbligatorio
  *   dataTypes: {},
  *   caption: null,
+ *   captionPosition: 'abovePagination', // oppure 'belowPagination' o 'top' (sopra la tabella)
  *   search: true,
  *   searchDebounce: 300,
  *   perPage: 25,                       // 0 = nessuna paginazione
- *   paginationDelta: 2,
+ *   paginationButtons: 10,
  *   serverSide: false,
  *   serverParams: { page: 'page', start: 'start', perPage: 'perPage', sort: 'sort', dir: 'dir', search: 'search', searchFields: 'searchFields' },
  *   searchFields: null,                // es. ['note', 'owner.name'] (client-side), ['clienti.nome', 'comuni.nome'] (server-side)
@@ -417,10 +433,10 @@ export const mergedParams = ['classes', 'labels', 'dataTypes', 'serverParams'];
  *   template: [{ slot: 'infoSection' }, { slot: 'table' }],
  *   locale: 'it-IT',
  *   currency: 'EUR',
- *   datesLocaleOpts: { year: 'numeric', month: 'short', day: 'numeric' },
+ *   datesLocaleOpts: { year: '2-digit', month: 'short', day: 'numeric' },
  *   timesLocaleOpts: { hour12: false, hour: '2-digit', minute: '2-digit' },
- *   numbersLocaleOpts: { maximumFractionDigits: 2 },
- *   currPercLocaleOpts: { minimumFractionDigits: 2, maximumFractionDigits: 2 },
+ *   numbersLocaleOpts: { maximumFractionDigits: 2, useGrouping: 'always' },
+ *   currPercLocaleOpts: { minimumFractionDigits: 2, maximumFractionDigits: 2, useGrouping: 'always' },
  *   renderNullAs: '—',
  *   renderZeroAs: null,
  *   renderNaNAs: '—',
@@ -457,11 +473,12 @@ export const defaults = {
   dataTypes: {},
 
   caption: null,
+  captionPosition: 'abovePagination',
   search: true,
   searchDebounce: 300,
 
   perPage: 25,
-  paginationDelta: 2,
+  paginationButtons: 10,
   serverSide: false,
   serverParams: {
     page: 'page',
@@ -491,8 +508,8 @@ export const defaults = {
   currency: 'EUR',
   datesLocaleOpts: { year: 'numeric', month: 'short', day: 'numeric' },
   timesLocaleOpts: { hour12: false, hour: '2-digit', minute: '2-digit' },
-  numbersLocaleOpts: { maximumFractionDigits: 2 },
-  currPercLocaleOpts: { minimumFractionDigits: 2, maximumFractionDigits: 2 },
+  numbersLocaleOpts: { maximumFractionDigits: 2, useGrouping: 'always' },
+  currPercLocaleOpts: { minimumFractionDigits: 2, maximumFractionDigits: 2, useGrouping: 'always' },
 
   renderNullAs: '—',
   renderZeroAs: null,
@@ -522,6 +539,7 @@ export const defaults = {
     infoOuter: null,
     info: null,
     resultInfo: null,
+    infoPagination: null,
     search: null,
     searchInput: 'form-control form-control-sm',
     tableWrapper: 'table-responsive',
@@ -550,6 +568,7 @@ export const defaults = {
     searchTitle: 'Cerca nella tabella',
     searchAriaLabel: 'Filtra risultati',
     info: 'Stai visualizzando le righe da {start} a {end}, su un totale di {filteredRec} record trovati',
+    infoPages: ' - pag. {page} di {totPages}',
     noRows: 'Nessun record trovato',
     noResults: 'Nessun risultato per la ricerca',
     sortAsc: 'Ordina questa colonna in senso ascendente (A → Z)',
@@ -558,6 +577,9 @@ export const defaults = {
     paginationAriaLabel: 'Navigazione pagine',
     prevPage: 'Pagina precedente',
     nextPage: 'Pagina successiva',
+    prevPages: 'Mostra le pagine da {start} a {end}',
+    nextPages: 'Mostra le pagine da {start} a {end}',
+    infoPaginationAriaLabel: 'Pagina precedente o successiva',
     pageTitle: 'Vai a pagina {page}',
     currentPage: 'Pagina {page}, corrente'
   }

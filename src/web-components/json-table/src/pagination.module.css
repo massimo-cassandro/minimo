@@ -1,7 +1,17 @@
 /* purgecss start ignore */
 
+/* `<nav>` sotto la tabella: centrata nella barra del footer (vedi `.tableFooter` in json-table-component.module.css) */
 .pagination {
-  margin-inline-start: auto;
+  justify-self: center;
+}
+
+/* navigazione rapida (precedente/successiva) del blocco info */
+.infoPagination {
+  justify-self: center;
+
+  &[hidden] {
+    display: none;
+  }
 }
 
 .paginationList {
@@ -29,8 +39,7 @@
   }
 }
 
-.paginationBtn,
-.paginationEllipsis {
+.paginationBtn {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -41,9 +50,6 @@
   font-size: var(--jt-pagination-font-size);
   line-height: var(--jt-pagination-line-height);
   color: inherit;
-}
-
-.paginationBtn {
   cursor: pointer;
 
   &[disabled] {
@@ -68,6 +74,11 @@
     aspect-ratio: 1;
     fill: currentColor;
   }
+}
+
+/* pulsanti "…": fanno scorrere la finestra delle pagine visibili */
+.paginationJump {
+  letter-spacing: .05em;
 }
 
 .paginationArrow {

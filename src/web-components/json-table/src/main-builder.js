@@ -5,7 +5,7 @@ import { classnames } from '../../../utilities/classnames.js';
 import { defaults } from './defaults.js';
 import { infoSectionPart, resultInfoPart, searchPart } from './info-section.js';
 import { tablePart, tableFooterPart, captionPart, captionId } from './table-builder.js';
-import { paginationPart } from './pagination.js';
+import { paginationPart, infoPaginationPart } from './pagination.js';
 
 /** @typedef {import('../json-table-component.js').JsonTable} JsonTable */
 /** @typedef {import('./defaults.js').TemplateItem} TemplateItem */
@@ -16,8 +16,9 @@ import { paginationPart } from './pagination.js';
  * @typedef {Object} JsonTableElements
  * @property {HTMLElement} [wrapper] - Wrapper principale (`section`), contiene le parti del template
  * @property {HTMLElement} [infoOuter] - Contenitore esterno delle info
- * @property {HTMLElement} [info] - Contenitore delle info (riga flex: testo informativo + ricerca)
+ * @property {HTMLElement} [info] - Contenitore delle info (testo informativo, navigazione rapida, ricerca)
  * @property {HTMLElement} [resultInfo] - Contenitore del testo informativo
+ * @property {HTMLElement} [infoPagination] - Navigazione rapida (pagina precedente/successiva) del blocco info (solo quando `perPage` > 0)
  * @property {HTMLInputElement} [searchInput] - Input di ricerca (solo quando `search` è true)
  * @property {HTMLElement} [tableWrapper] - Div che racchiude la tabella (`table-responsive` di default)
  * @property {HTMLTableElement} [table] - L'elemento `<table>`
@@ -127,8 +128,9 @@ export function expandSlots(items, parts) {
  * un wrapper principale fisso il cui contenuto è definito da `params.template`.
  *
  * Slot del template disponibili (vedi `TemplateItem`):
- * - `infoSection` → `infoSectionPart()` (testo informativo + input di ricerca)
+ * - `infoSection` → `infoSectionPart()` (testo informativo + navigazione rapida + input di ricerca)
  * - `resultInfo`  → `resultInfoPart()` (solo testo informativo)
+ * - `infoPagination` → `infoPaginationPart()` (solo navigazione rapida: pagina precedente/successiva)
  * - `search`      → `searchPart()` (solo input di ricerca)
  * - `table`       → `tablePart()` (wrapper della tabella + tabella con thead, tbody, tfoot, più la barra del footer)
  * - `caption`     → `captionPart()` (contenitore della caption; parte della barra del footer di `table` se non collocato esplicitamente)
@@ -140,13 +142,16 @@ export function expandSlots(items, parts) {
  *   div.infoOuter[classes.infoOuter]
  *     div.info[classes.info]
  *       div.resultInfo
+ *       div.infoPagination[role=group]      (se `perPage` > 0)
  *       div.search > input[type=search]     (se `search`)
  *   div.tableOuter
+ *     div.caption.captionTop                (se `caption` e `captionPosition: 'top'`)
  *     div.tableWrapper[classes.tableWrapper]
  *       table#tableId.table[classes.table]
  *         thead / tbody / tfoot             (tfoot se `tfoot`)
  *     div.tableFooter[classes.tableFooter]  (se `caption` o `perPage` > 0)
- *       div.caption                         (se `caption`)
+ *       div.caption                         (se `caption` e `captionPosition` non è `'top'`; dopo la paginazione
+ *                                           con `captionPosition: 'belowPagination'`)
  *       nav.pagination                      (se `perPage` > 0)
  *     div.loader[classes.loader][hidden]    (se `loader`)
  * ```
@@ -177,19 +182,30 @@ export function mainBuilder(jt) {
   const captionItem = captionPart(jt, elements, capId);
   const paginationItem = paginationPart(jt, elements);
 
+  // caption sopra la tabella (`captionPosition: 'top'`): copia dell'elemento caption, con una classe in più,
+  // disattivata più sotto se il template colloca la caption altrove
+  const captionTop = params.captionPosition === 'top'
+    ? { ...captionItem, className: classnames(captionItem.className, styles.captionTop) }
+    : null;
+
   // parti della barra del footer: rimosse più sotto quando il template le colloca altrove
   /** @type {DomBuilderItem[]} */
-  const footerChildren = [captionItem, paginationItem];
+  const footerChildren = {
+    top: [paginationItem],
+    abovePagination: [captionItem, paginationItem],
+    belowPagination: [paginationItem, captionItem]
+  }[params.captionPosition] ?? [captionItem, paginationItem];
   const footerBar = tableFooterPart(jt, elements, footerChildren);
 
   /** @type {Object<string, DomBuilderItem>} */
   const parts = {
-    infoSection: infoSectionPart(params, elements),
+    infoSection: infoSectionPart(params, elements, infoPaginationPart(jt, elements)),
     resultInfo: resultInfoPart(params, elements),
+    infoPagination: infoPaginationPart(jt, elements),
     search: searchPart(params, elements),
     caption: captionItem,
     pagination: paginationItem,
-    table: tablePart(jt, elements, footerBar, capId)
+    table: tablePart(jt, elements, footerBar, capId, captionTop)
   };
 
   const template = typeof params.template === 'function'
@@ -200,10 +216,14 @@ export function mainBuilder(jt) {
   const usedSlots = collectSlots(items);
 
   ['caption', 'pagination'].forEach(slot => {
-    if (usedSlots.has(slot)) {
-      footerChildren.splice(footerChildren.indexOf(parts[slot]), 1);
+    const idx = footerChildren.indexOf(parts[slot]);
+    if (usedSlots.has(slot) && idx >= 0) {
+      footerChildren.splice(idx, 1);
     }
   });
+  if (captionTop && usedSlots.has('caption')) {
+    captionTop.condition = false;
+  }
   footerBar.condition = footerChildren.some(item => item.condition !== false);
 
   domBuilder([

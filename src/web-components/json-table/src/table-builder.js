@@ -59,8 +59,8 @@ export function captionPart(jt, elements, id) {
 
 
 /**
- * Elemento domBuilder della barra del footer sotto la tabella: caption (lato iniziale) e paginazione (lato
- * finale). Renderizzato solo quando `children` non è vuoto (vedi `mainBuilder`, che rimuove le parti
+ * Elemento domBuilder della barra del footer sotto la tabella: caption e paginazione, su righe distinte nell'ordine
+ * definito da `captionPosition` (con `'top'` la caption non fa parte della barra). Renderizzato solo quando `children` non è vuoto (vedi `mainBuilder`, che rimuove le parti
  * collocate altrove dal template).
  *
  * Struttura generata: `div.tableFooter[classes.tableFooter] > [caption] [pagination]`; l'elemento
@@ -91,8 +91,9 @@ export function tableFooterPart(jt, elements, children) {
 /**
  * Elemento domBuilder della tabella (slot del template `table`).
  *
- * Generated structure:
+ * Struttura generata:
  * ```
+ * div.caption.captionTop        ← captionTop (caption sopra la tabella, `captionPosition: 'top'`), se indicata
  * div.tableWrapper[classes.tableWrapper]
  *   table#tableId.table[classes.table][aria-labelledby=<caption id>]   (aria-labelledby se `caption`)
  *     thead                     ← theadPart()
@@ -109,19 +110,21 @@ export function tableFooterPart(jt, elements, children) {
  * @param {JsonTableElements} elements - Oggetto che raccoglie gli elementi generati (modificato)
  * @param {DomBuilderItem|null} [footerBar=null] - Elemento della barra del footer (vedi `tableFooterPart`) (default: null)
  * @param {string|null} [captionElId=null] - Id dell'elemento caption, per `aria-labelledby` (default: null)
+ * @param {DomBuilderItem|null} [captionTop=null] - Caption da collocare sopra la tabella (`captionPosition: 'top'`) (default: null)
  * @returns {DomBuilderItem} Un `div` che racchiude il wrapper della tabella e la barra del footer
  *
  * @example
  * domBuilder([tablePart(jt, elements, footerBar, 'users-caption')], host);
  * elements.tbody; // → HTMLTableSectionElement (vuoto finché non viene chiamato renderTbody())
  */
-export function tablePart(jt, elements, footerBar = null, captionElId = null) {
+export function tablePart(jt, elements, footerBar = null, captionElId = null, captionTop = null) {
 
   const { params } = jt;
 
   return {
     className: styles.tableOuter,
     children: [
+      ...(captionTop ? [captionTop] : []),
       {
         className: classnames(styles.tableWrapper, params.classes.tableWrapper),
         callback: el => { elements.tableWrapper = /** @type {HTMLElement} */ (el); },

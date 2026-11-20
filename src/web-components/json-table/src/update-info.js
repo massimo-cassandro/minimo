@@ -9,9 +9,9 @@ import { setContent } from './content-utils.js';
  * Risoluzione del contenuto:
  * - funzione `params.infoText` → `infoText(start, end, totRec, filteredRec, page, totPages)`
  * - nessuna riga → `labels.noResults` (ricerca attiva) oppure `labels.noRows`
- * - altrimenti il template in stile mustache `params.infoText` (stringa) o `labels.info`, con i
- *   segnaposto `{start}`, `{end}`, `{totRec}`, `{filteredRec}`, `{page}`, `{totPages}` sostituiti
- *   dai numeri formattati secondo il locale
+ * - altrimenti il template in stile mustache `params.infoText` (stringa) o `labels.info` (seguito da
+ *   `labels.infoPages` quando la paginazione è attiva), con i segnaposto `{start}`, `{end}`, `{totRec}`,
+ *   `{filteredRec}`, `{page}`, `{totPages}` sostituiti dai numeri formattati secondo il locale
  *
  * `start`/`end` sono gli indici (da 1) della prima/ultima riga della pagina corrente all'interno
  * dell'insieme filtrato (0 quando non ci sono righe).
@@ -21,7 +21,8 @@ import { setContent } from './content-utils.js';
  *
  * @example
  * updateInfo(jt);
- * // `labels.info` di default, pagina 2 con 25 righe per pagina, 60 righe → "Stai visualizzando le righe da 26 a 50, su un totale di 60 record trovati"
+ * // `labels.info` di default, pagina 2 con 25 righe per pagina, 60 righe →
+ * // "Stai visualizzando le righe da 26 a 50, su un totale di 60 record trovati - pag. 2 di 3"
  */
 export function updateInfo(jt) {
 
@@ -55,7 +56,7 @@ export function updateInfo(jt) {
     content = state.searchTerm ? params.labels.noResults : params.labels.noRows;
 
   } else {
-    const tpl = params.infoText ?? params.labels.info ?? '';
+    const tpl = params.infoText ?? (params.labels.info ?? '') + (params.perPage > 0 ? params.labels.infoPages ?? '' : '');
     content = String(tpl).replace(
       /\{(start|end|totRec|filteredRec|page|totPages)\}/g,
       (_, key) => values[key].toLocaleString(params.locale)

@@ -26,11 +26,13 @@ json-table {
   padding-block-end: var(--jt-info-outer-padding-block-end);
 }
 
+/* testo informativo, navigazione rapida (precedente/successiva) e ricerca: impilati su schermi piccoli,
+   su tre colonne dal breakpoint medio, con la navigazione al centro */
 .info {
-  display: flex;
-  flex-flow: column wrap;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--jt-info-gap);
-  justify-content: stretch;
+  align-items: center;
 }
 
 .resultInfo {
@@ -41,18 +43,24 @@ json-table {
 
 @media (--media-medium-viewport-up) {
   .info {
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
   }
 
   .resultInfo {
-    flex: 1;
+    grid-column: 1;
     text-align: start;
   }
 
+  /* navigazione rapida (`infoPagination`, classe di pagination.module.css) */
+  .info > [role='group'] {
+    grid-column: 2;
+  }
+
   .search {
-    flex: 0 1 var(--jt-search-max-width);
+    grid-column: 3;
+    justify-self: end;
+    inline-size: 100%;
+    max-inline-size: var(--jt-search-max-width);
   }
 }
 
@@ -136,6 +144,13 @@ json-table {
   cursor: progress;
   background-color: var(--jt-loader-background-color);
   backdrop-filter: var(--jt-loader-backdrop-filter);
+
+  /* spinner all'altezza del click che ha generato la richiesta (offset calcolato da `showLoader()` in src/loader.js,
+     già limitato ai bordi dell'overlay) */
+  &.loaderAnchored {
+    justify-content: flex-start;
+    padding-block-start: var(--jt-loader-anchor-offset);
+  }
 }
 
 /* spinner del primo caricamento, prima della costruzione della struttura */
@@ -171,21 +186,25 @@ json-table {
   clip-path: inset(50%);
 }
 
-/* =>> footer bar: caption (start) + pagination (end) */
+/* =>> footer bar: caption + pagination */
 
+/* caption e paginazione su righe distinte (ordine definito da `captionPosition`), paginazione centrata
+   (`justify-self: center` in pagination.module.css) */
 .tableFooter {
-  display: flex;
-  flex-flow: row wrap;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--jt-info-gap);
-  align-items: center;
-  justify-content: space-between;
   padding-block-start: var(--jt-table-footer-padding-block-start);
 }
 
 .caption {
-  flex: 1 1 auto;
   font-size: var(--jt-caption-font-size);
   color: var(--jt-caption-color);
+}
+
+/* caption sopra la tabella (`captionPosition: 'top'`) */
+.captionTop {
+  padding-block-end: var(--jt-table-footer-padding-block-start);
 }
 
 /* purgecss end ignore */
