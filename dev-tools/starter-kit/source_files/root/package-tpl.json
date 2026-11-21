@@ -23,7 +23,6 @@
     "symfony server": "symfony serve --port=[[port8000]] --listen-ip=0.0.0.0 # http://192.168.1.135:[[port8000]] # -d (deamon): rimane aperto anche dopo la chiusura del terminale, terminare con `symfony server:stop`",
     "docker up": "docker compose up -d && npm run 'docker svuota cache sf'",
     "docker svuota cache sf": "docker compose exec app sh -c 'rm -rf var/cache/*' # cancella la cache Symfony, rigenerata alla prima richiesta",
-    "launchChrome": "open -n -a 'Google Chrome' --args --profile-directory='Profile 3' # mbn: 1 / mg2: 3",
     "webpack PROD": "npm run 'UPD-version' && npm run 'build custom media' && NODE_ENV=production webpack --config ./webpack.config.mjs --stats minimal",
     "email sass": "npx sass ./app/email:./templates/email/css --no-source-map --style=compressed --watch",
     "postcss email": "postcss ./app/email/[!_]*.css --dir ./templates/email/css --no-map --verbose --config ./app/email --watch",

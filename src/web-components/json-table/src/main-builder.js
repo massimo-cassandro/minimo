@@ -139,13 +139,13 @@ export function expandSlots(items, parts) {
  * Struttura generata con il template predefinito (`[{ slot: 'infoSection' }, { slot: 'table' }]`):
  * ```
  * section.wrapper[classes.wrapper]
+ *   div.caption.captionTop                (se `caption` e `captionPosition: 'top'`: prima di tutte le parti del template)
  *   div.infoOuter[classes.infoOuter]
  *     div.info[classes.info]
  *       div.resultInfo
  *       div.infoPagination[role=group]      (se `perPage` > 0)
  *       div.search > input[type=search]     (se `search`)
  *   div.tableOuter
- *     div.caption.captionTop                (se `caption` e `captionPosition: 'top'`)
  *     div.tableWrapper[classes.tableWrapper]
  *       table#tableId.table[classes.table]
  *         thead / tbody / tfoot             (tfoot se `tfoot`)
@@ -182,7 +182,7 @@ export function mainBuilder(jt) {
   const captionItem = captionPart(jt, elements, capId);
   const paginationItem = paginationPart(jt, elements);
 
-  // caption sopra la tabella (`captionPosition: 'top'`): copia dell'elemento caption, con una classe in più,
+  // caption in cima al componente, sopra il blocco info (`captionPosition: 'top'`): copia dell'elemento caption, con una classe in più,
   // disattivata più sotto se il template colloca la caption altrove
   const captionTop = params.captionPosition === 'top'
     ? { ...captionItem, className: classnames(captionItem.className, styles.captionTop) }
@@ -205,7 +205,7 @@ export function mainBuilder(jt) {
     search: searchPart(params, elements),
     caption: captionItem,
     pagination: paginationItem,
-    table: tablePart(jt, elements, footerBar, capId, captionTop)
+    table: tablePart(jt, elements, footerBar, capId)
   };
 
   const template = typeof params.template === 'function'
@@ -231,7 +231,10 @@ export function mainBuilder(jt) {
       tag: 'section',
       className: classnames(styles.wrapper, params.classes.wrapper),
       callback: el => { elements.wrapper = /** @type {HTMLElement} */ (el); },
-      children: expandSlots(items, parts)
+      children: [
+        ...(captionTop ? [captionTop] : []),
+        ...expandSlots(items, parts)
+      ]
     }
   ], jt, { emptyParent: true });
 

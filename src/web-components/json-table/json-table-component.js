@@ -118,7 +118,7 @@ const emptyState = () => ({
  *   ],
  *   dataTypes: {},                      // default: {} (tipi personalizzati, uniti a quelli predefiniti)
  *   caption: 'Utenti',                  // default: null
- *   captionPosition: 'abovePagination', // default: 'abovePagination' ('belowPagination' = sotto la paginazione, 'top' = sopra la tabella)
+ *   captionPosition: 'abovePagination', // default: 'abovePagination' ('belowPagination' = sotto la paginazione, 'top' = in cima, sopra il blocco info)
  *   search: true,                       // default: true
  *   searchDebounce: 300,                // default: 300 (ms)
  *   perPage: 25,                        // default: 25 (0 = nessuna paginazione)

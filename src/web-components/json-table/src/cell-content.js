@@ -97,8 +97,27 @@ const aggregates = {
 
 
 /**
+ * Formatta un valore numerico del footer con il data type della colonna, con ripiego su
+ * `toLocaleString(params.locale, params.numbersLocaleOpts)` se il data type non ha `render`.
+ *
+ * @param {ParsedCol} col - Colonna analizzata
+ * @param {number} value - Valore da formattare
+ * @param {JsonTableParams} params - Parametri risolti
+ * @returns {CellContent}
+ */
+function formatTfootNumber(col, value, params) {
+  return typeof col._type.render === 'function'
+    ? col._type.render(value, null, params)
+    : value.toLocaleString(params.locale, params.numbersLocaleOpts);
+}
+
+
+/**
  * Calcola il contenuto di una cella del footer dal `tfootRender` della colonna:
- * - funzione `(rows, td) => content`
+ * - funzione `(rows, td) => content`: se restituisce un numero, viene formattato dal data type della
+ *   colonna come gli aggregati (es. un totale calcolato fuori dalla tabella); stringhe, Node, array
+ *   domBuilder e `null`/`undefined` (→ cella vuota) restano invariati. Per un numero non formattato
+ *   restituire una stringa
  * - aggregato predefinito `'@sum'`, `'@avg'`, `'@min'`, `'@max'` (formattato dal data
  *   type della colonna, ad es. come valuta per le colonne `euro`) oppure `'@count'` (numero di valori numerici)
  * - qualsiasi altra stringa: contenuto statico (ad es. un'etichetta "Totale")
@@ -114,6 +133,8 @@ const aggregates = {
  * tfootContent({ ...col, key: 'amount', tfootRender: '@sum', _type: types.euro }, rows, params); // → '1.234,56 €'
  * tfootContent({ ...col, tfootRender: 'Totale' }, rows, params);                                 // → 'Totale'
  * tfootContent({ ...col, tfootRender: rows => `${rows.length} righe` }, rows, params);           // → '10 righe'
+ * tfootContent({ ...col, tfootRender: () => 15942.24, _type: types.euro }, rows, params);       // → '15.942,24 €'
+ * tfootContent({ ...col, tfootRender: () => String(15942.24), _type: types.euro }, rows, params); // → '15942.24'
  * tfootContent({ ...col, tfootRender: null }, rows, params);                                     // → ''
  */
 export function tfootContent(col, rows, params, td) {
@@ -125,7 +146,11 @@ export function tfootContent(col, rows, params, td) {
   }
 
   if (typeof renderer === 'function') {
-    return renderer(rows, td) ?? '';
+    const content = renderer(rows, td);
+
+    return typeof content === 'number'
+      ? formatTfootNumber(col, content, params)
+      : content ?? '';
   }
 
   const tpl = String(renderer);
@@ -151,9 +176,7 @@ export function tfootContent(col, rows, params, td) {
       return result.toLocaleString(params.locale);
     }
 
-    return typeof col._type.render === 'function'
-      ? col._type.render(result, null, params)
-      : result.toLocaleString(params.locale, params.numbersLocaleOpts);
+    return formatTfootNumber(col, result, params);
   }
 
   return tpl;

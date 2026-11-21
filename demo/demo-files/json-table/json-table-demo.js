@@ -82,7 +82,7 @@ export function jsonTableDemo(){
 
     // =>> 1b. paginazione
     'h2 1b. Paginazione: <code>paginationButtons</code>, pulsanti "…", navigazione rapida e pagine nel testo info',
-    'p Navigazione sotto la tabella centrata: prima e ultima pagina sempre visibili, più una finestra di <code>paginationButtons</code> pulsanti consecutivi (default 10). I pulsanti "…" fanno scorrere la finestra di <code>paginationButtons</code> posizioni <strong>senza cambiare pagina</strong>, fermandosi agli estremi. Al cambio di pagina la finestra resta ferma se la nuova pagina è visibile, altrimenti si sposta del minimo indispensabile; sulla prima/ultima pagina si accosta all\'estremo. Nel blocco info, tra testo e ricerca, i pulsanti pagina precedente/successiva; il testo info termina con <code>labels.infoPages</code> (<code>\' - pag. {page} di {totPages}\'</code>).',
+    'p Navigazione sotto la tabella centrata: prima e ultima pagina sempre visibili, più una finestra di <code>paginationButtons</code> pulsanti consecutivi (default 10). I pulsanti "…" fanno scorrere la finestra di <code>paginationButtons</code> posizioni <strong>senza cambiare pagina</strong>, fermandosi agli estremi. Al cambio di pagina la finestra resta ferma se la nuova pagina è visibile, altrimenti si sposta del minimo indispensabile; sulla prima/ultima pagina si accosta all\'estremo. Nel blocco info, tra testo e ricerca, i pulsanti pagina precedente/successiva; il testo info termina con <code>labels.infoPages</code> (<code>\' (pag. {page} di {totPages})\'</code>), solo se c\'è più di una pagina.',
     'p <strong>Cosa provare:</strong> "…" in avanti e indietro (la pagina corrente non cambia, il focus resta sul pulsante "…"); pulsanti avanti/indietro ai bordi della finestra (scorrimento di una posizione); clic su prima/ultima pagina; avanti/indietro del blocco info (il focus resta lì, e passa all\'altro pulsante quando arriva alla prima/ultima pagina); una ricerca (es. "lorem") che riduce il numero di pagine; navigazione da tastiera (Tab, Invio).',
 
     'h3 600 record, 5 per pagina (120 pagine), <code>paginationButtons</code> di default (10)',
@@ -132,14 +132,14 @@ export function jsonTableDemo(){
     },
 
     'h3 Casi limite: 12 pagine (tutte visibili) e 13 pagine (pagina mostrata al posto del "…")',
-    'p Con al massimo <code>paginationButtons</code> + 2 pagine non ci sono pulsanti "…". Con 13 pagine il salto nasconderebbe una sola pagina, che viene quindi mostrata al suo posto. La prima tabella ha <code>captionPosition: \'top\'</code> (caption sopra la tabella), la seconda <code>labels.infoPages: \'\'</code> (nessuna indicazione delle pagine nel testo info) e la classe <code>classes.infoPagination</code>.',
+    'p Con al massimo <code>paginationButtons</code> + 2 pagine non ci sono pulsanti "…". Con 13 pagine il salto nasconderebbe una sola pagina, che viene quindi mostrata al suo posto. La prima tabella ha <code>captionPosition: \'top\'</code> (caption in cima, sopra il blocco info), la seconda <code>labels.infoPages: \'\'</code> (nessuna indicazione delle pagine nel testo info) e la classe <code>classes.infoPagination</code>.',
     {
       tag: 'json-table',
       id: 'jt-pagination-12',
       callback: el => /** @type {JsonTable} */ (el).init({
         data: bigData(2),
         perPage: 5,
-        caption: '60 record, 12 pagine (captionPosition: top, sopra la tabella)',
+        caption: '60 record, 12 pagine (captionPosition: top, sopra il blocco info)',
         captionPosition: 'top',
         cols: paginationCols
       })

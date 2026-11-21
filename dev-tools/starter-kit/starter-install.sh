@@ -87,11 +87,9 @@ echo -e "${DIM}Porte: ${PORT_8000} (server), ${PORT_5700} (webpack dev server)${
 optionalPackages=(
   "dotenv-webpack                                    | dev | gestione variabili d'ambiente (.env) nel bundle webpack"
   "@principalstudio/html-webpack-inject-preload      | dev | injection dei tag <link rel=preload> nell'html generato"
-  "postcss-jit-props                                 | dev | include nel CSS compilato solo le custom properties effettivamente usate"
   "@svgdotjs/svg.js                                  |     | richiesto da charts/"
   "blurhash                                          |     | richiesto da unsplash-page (create-blurhash-canvas)"
   "style-dictionary                                  | dev | richiesto da dev-tools/design-tokens-builder (build-tokens)"
-  "@cybozu/eslint-config                             | dev | utilizzato da eslint per il check dei file css"
   "sass                                              | dev | per email (scss)"
   "postcss postcss-cli postcss-import postcss-nested postcss-custom-properties autoprefixer cssnano | dev | per email (postcss)"
 )

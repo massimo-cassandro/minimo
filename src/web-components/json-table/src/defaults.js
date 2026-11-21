@@ -43,8 +43,9 @@ import {
  * Renderer delle celle del footer.
  * @callback TfootRender
  * @param {Object[]} rows - L'intero insieme di dati filtrato, oppure solo la pagina corrente quando `updateFooterOnPageChange` è true
- * @param {HTMLTableCellElement} [td] - L'elemento cella del footer
- * @returns {CellContent}
+ * @param {HTMLTableCellElement} [td] - L'elemento cella del footer (non ancora inserito nel DOM)
+ * @returns {CellContent|number} Un numero viene formattato dal data type della colonna, come gli aggregati predefiniti;
+ *   stringhe, Node e array domBuilder vengono usati così come sono (per un numero non formattato restituire una stringa)
  */
 
 /**
@@ -64,7 +65,7 @@ import {
  *   condizionale, `[[@icon:nome classi]]` icona di `iconFile` (vedi `resolveMustache`). Sovrascrive il rendering del data type
  *   (default: null)
  * @property {TfootRender|string|null} [tfootRender] - Contenuto della cella del footer (solo quando `tfoot` è true): una funzione
- *   `(rows, td) => content`, una stringa statica o uno degli aggregati predefiniti `'@sum'`, `'@avg'`, `'@min'`,
+ *   `(rows, td) => content` (un numero restituito viene formattato dal data type), una stringa statica o uno degli aggregati predefiniti `'@sum'`, `'@avg'`, `'@min'`,
  *   `'@max'`, `'@count'` calcolati sui valori della colonna e formattati dal data type della colonna.
  *   `null` rende una cella vuota (default: null)
  * @property {boolean} [rowHeading] - Se true la cella è un'intestazione di riga (`<th scope="row">`) (default: false)
@@ -159,9 +160,9 @@ import {
  * @property {string} [searchTitle] - `title` dell'input di ricerca (default: 'Cerca nella tabella')
  * @property {string} [searchAriaLabel] - `aria-label` dell'input di ricerca (default: 'Filtra risultati')
  * @property {string} [info] - Template del testo informativo, segnaposto: `{start}`, `{end}`, `{totRec}`, `{filteredRec}`,
- *   `{page}`, `{totPages}` (default: 'Stai visualizzando le righe da {start} a {end}, su un totale di {filteredRec} record trovati')
- * @property {string} [infoPages] - Accodato a `info` quando la paginazione è attiva (`perPage` > 0), stessi segnaposto;
- *   `''` per non mostrarlo. Non viene accodato a un `infoText` personalizzato (default: ' - pag. {page} di {totPages}')
+ *   `{page}`, `{totPages}` (default: 'Righe {start}–{end} di {filteredRec}')
+ * @property {string} [infoPages] - Accodato a `info` quando c'è più di una pagina, stessi segnaposto; `''` per non mostrarlo.
+ *   Non viene accodato a un `infoText` personalizzato (default: ' (pag. {page} di {totPages})')
  * @property {string} [noRows] - Testo informativo e contenuto della cella vuota quando l'insieme di dati è vuoto (default: 'Nessun record trovato')
  * @property {string} [noResults] - Come `noRows`, quando una ricerca non restituisce nulla (default: 'Nessun risultato per la ricerca')
  * @property {string} [sortAsc] - `aria-label`/`title` del pulsante di ordinamento quando il prossimo click ordina in modo crescente
@@ -292,7 +293,7 @@ import {
  * @property {string|Function|null} caption - Caption della tabella, mostrata sotto la tabella (nella barra del footer, su una riga
  *   propria, vedi `captionPosition`) e collegata alla tabella tramite `aria-labelledby`: una stringa (testo semplice o HTML) oppure,
  *   solo tramite `init()`, una funzione che restituisce una stringa o un Node (default: null)
- * @property {'top'|'abovePagination'|'belowPagination'} captionPosition - Posizione della caption: `'top'` sopra la tabella;
+ * @property {'top'|'abovePagination'|'belowPagination'} captionPosition - Posizione della caption: `'top'` in cima al componente, sopra il blocco info;
  *   `'abovePagination'`/`'belowPagination'` sotto la tabella, nella barra del footer, sopra/sotto la navigazione delle pagine. Non ha effetto se il template colloca altrove `caption` o `pagination` (default: 'abovePagination')
  * @property {boolean} search - Se renderizzare l'input di ricerca (default: true)
  * @property {number} searchDebounce - Ritardo (ms) tra l'ultima pressione di un tasto e l'esecuzione della ricerca (default: 300)
@@ -567,8 +568,8 @@ export const defaults = {
     searchPlaceholder: 'Cerca...',
     searchTitle: 'Cerca nella tabella',
     searchAriaLabel: 'Filtra risultati',
-    info: 'Stai visualizzando le righe da {start} a {end}, su un totale di {filteredRec} record trovati',
-    infoPages: ' - pag. {page} di {totPages}',
+    info: 'Righe {start}–{end} di {filteredRec}',
+    infoPages: ' (pag. {page} di {totPages})',
     noRows: 'Nessun record trovato',
     noResults: 'Nessun risultato per la ricerca',
     sortAsc: 'Ordina questa colonna in senso ascendente (A → Z)',

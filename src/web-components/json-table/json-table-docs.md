@@ -511,7 +511,7 @@ Quando il nome sembra un errore di digitazione viene suggerito quello corretto, 
 | `boolNullIcon` | icona, vedi nota (`null`) | Icona per i valori nulli o non booleani (tipo bool), al posto di `renderNullAs`. Sovrascrivibile per colonna |
 | `boolTrueIcon` | icona, vedi nota (icona `check-bold` di minimo (Phosphor)) | Icona per i valori `true` (tipi bool e boolTrueOnly). Sovrascrivibile per colonna |
 | `caption` | string o Function (`null`) | Caption della tabella (testo o HTML), oppure funzione che restituisce stringa o Node. Mostrata sotto la tabella (vedi "Caption e paginazione") |
-| `captionPosition` | `'top'`, `'abovePagination'` o `'belowPagination'` (`'abovePagination'`) | Posizione della caption, su una riga propria: `'top'` sopra la tabella; `'abovePagination'`/`'belowPagination'` sotto la tabella, nella barra del footer, sopra/sotto la navigazione delle pagine. Non ha effetto se il template colloca altrove `caption` o `pagination` |
+| `captionPosition` | `'top'`, `'abovePagination'` o `'belowPagination'` (`'abovePagination'`) | Posizione della caption, su una riga propria: `'top'` in cima al componente, sopra il blocco info (testo info, navigazione rapida e ricerca); `'abovePagination'`/`'belowPagination'` sotto la tabella, nella barra del footer, sopra/sotto la navigazione delle pagine. Non ha effetto se il template colloca altrove `caption` o `pagination` |
 | `classes` | Object | Classi consumer (vedi sotto), unite ai default |
 | `cols` | ColDefinition[] | **OBBLIGATORIO**: definizione delle colonne (vedi sotto). Se assente o vuoto la tabella non viene generata e viene segnalato un errore in console. Senza `init()` l'errore compare al termine del caricamento della pagina, così `cols` può essere passato anche da uno script separato; un `init()` chiamato dopo il caricamento della pagina (ad es. dopo un `await`) funziona, ma l'errore può comparire comunque |
 | `currency` | string (`'EUR'`) | Codice ISO 4217 usato dal tipo `currency` |
@@ -617,8 +617,8 @@ tipi di dato predefiniti: modificandole si cambiano le classi di tutte le colonn
 | Parametro | Default | Descrizione |
 |---|---|---|
 | `currentPage` | `'Pagina {page}, corrente'` | `title`/`aria-label` del pulsante della pagina corrente |
-| `info` | `'Stai visualizzando le righe da {start} a {end}, su un totale di {filteredRec} record trovati'` | template del testo info (vedi `infoText`) |
-| `infoPages` | `' - pag. {page} di {totPages}'` | accodato a `info` quando la paginazione è attiva (`perPage` > 0), con gli stessi segnaposto; `''` per non mostrarlo. Non viene accodato a un `infoText` personalizzato |
+| `info` | `'Righe {start}–{end} di {filteredRec}'` | template del testo info (vedi `infoText`) |
+| `infoPages` | `' (pag. {page} di {totPages})'` | accodato a `info` quando c'è più di una pagina, con gli stessi segnaposto; `''` per non mostrarlo. Non viene accodato a un `infoText` personalizzato |
 | `infoPaginationAriaLabel` | `'Pagina precedente o successiva'` | `aria-label` della navigazione rapida della sezione info |
 | `loading` | `'Caricamento dati…'` | testo dello spinner di caricamento (nascosto visivamente) |
 | `nextPage` | `'Pagina successiva'` | `title`/`aria-label` del pulsante successivo |
@@ -640,7 +640,7 @@ tipi di dato predefiniti: modificandole si cambiano le classi di tutte le colonn
 
 Definisce il contenuto dell'area info (`elements.resultInfo`), aggiornata a ogni cambio di pagina, ricerca, ordinamento o filtro. Può essere:
 
-- `null` (default): viene usato il template `labels.info`, seguito da `labels.infoPages` quando la paginazione è attiva (es. `… record trovati - pag. 2 di 5`)
+- `null` (default): viene usato il template `labels.info`, seguito da `labels.infoPages` quando c'è più di una pagina (es. `Righe 26–50 di 214 (pag. 2 di 9)`)
 - una stringa mustache-like con i segnaposto elencati sotto, che sostituisce `labels.info` (e `labels.infoPages`)
 - una funzione con argomenti posizionali, che restituisce il contenuto (testo, stringa HTML, Node o array domBuilder):
 
@@ -781,7 +781,7 @@ cols: [
 | `sortable` | boolean | `true` | Abilita l'ordinamento sulla colonna |
 | `sortKeys` | array di stringhe | `null` | Solo server-side: chiavi di ordinamento inviate al posto di `key` ([vedi sotto](#colonne-ricerca)) |
 | `sortValue` | valore o `row => valore` | non impostato (tipo di dato / valore grezzo) | Solo client-side: valore usato per l'ordinamento ([vedi sotto](#colonne-ricerca)) |
-| `tfootRender` | `(rows, td) => contenuto`, aggregato `'@…'` o stringa statica | `null` | Contenuto della cella del tfoot (solo se `tfoot` è `true`). `null` = cella vuota |
+| `tfootRender` | `(rows, td) => contenuto`, aggregato `'@…'` o stringa statica | `null` | Contenuto della cella del tfoot (solo se `tfoot` è `true`). `null` = cella vuota. I numeri restituiti dalla funzione sono formattati dal tipo di dato |
 | `title` | testo, HTML, Node, array domBuilder o funzione | la chiave | Contenuto del `<th>`. Nelle colonne ordinabili è il testo del pulsante |
 
 ### <a id="colonne-ricerca"></a>Ricerca e ordinamento
@@ -948,6 +948,25 @@ per `euro`, con `%` per `perc`):
 
 Un aggregato non riconosciuto viene segnalato in console e produce una cella vuota. Le celle del
 footer ricevono le stesse classi (`cellClass`) delle celle del body.
+
+Se la funzione restituisce un **numero**, questo viene formattato dal tipo di dato della colonna, come gli aggregati (con ripiego su `toLocaleString` con `locale` e `numbersLocaleOpts` se il tipo non ha un `render`). Stringhe, Node, array domBuilder e `null`/`undefined` (cella vuota) restano invariati: per mostrare un valore numerico non formattato basta restituire una stringa. È il modo più semplice per mostrare un totale calcolato fuori dalla tabella (ad es. restituito dal server insieme ai dati):
+
+```javascript
+cols: [
+  { key: 'descrizione', tfootRender: 'Totale' },
+  {
+    key: 'importo',
+    dataType: 'euro',
+    tfootRender: () => totali.importo // 15942.239999999998 → '15.942,24 €'
+  },
+  {
+    key: 'codice',
+    tfootRender: () => String(totali.codice) // stringa: nessuna formattazione
+  }
+]
+```
+
+La funzione viene invocata prima che la cella sia inserita nel DOM, quindi `td.closest('json-table')` restituisce `null`: per formattare i valori conviene restituire un numero e lasciare il lavoro al tipo di dato.
 
 Il `tfoot` non è disponibile in modalità server-side (il componente riceve solo la pagina
 corrente, gli aggregati sarebbero parziali): se richiesto viene ignorato con un avviso in console.
@@ -1816,6 +1835,8 @@ Allo stesso modo, gli aggregati su una chiave annidata vanno calcolati con una f
 }
 ```
 
+Il numero restituito viene formattato dal tipo di dato della colonna (qui `euro`), come gli aggregati predefiniti.
+
 ### <a id="rowspan-server"></a>Server-side
 
 Il server ordina e pagina i record prima che il client calcoli i `<tr>`, quindi deve conoscere da solo il criterio da applicare a ogni colonna del subarray.
@@ -2597,7 +2618,7 @@ Tutta la navigazione è nascosta quando c'è una sola pagina. `perPage: 0` disat
 ### <a id="paginazione-caption"></a>Caption e paginazione
 
 La caption è mostrata **sotto la tabella**, nella barra `tableFooter`, su una riga propria sopra la
-navigazione delle pagine (centrata), oppure sotto con `captionPosition: 'belowPagination'`; con `captionPosition: 'top'` è invece mostrata sopra la tabella. La caption non è un elemento
+navigazione delle pagine (centrata), oppure sotto con `captionPosition: 'belowPagination'`; con `captionPosition: 'top'` è invece mostrata in cima al componente, sopra il blocco info. La caption non è un elemento
 `<caption>` (che dovrebbe stare dentro la tabella e non potrebbe ospitare la navigazione senza
 farla leggere come nome della tabella) ma un contenitore con id, collegato alla tabella tramite
 `aria-labelledby`: il nome accessibile della tabella è quindi lo stesso di una `<caption>`.
@@ -2647,9 +2668,10 @@ riconosciuti vengono segnalati in console e ignorati.
 ```html
 <json-table>
   <section class="[wrapper] [classes.wrapper]">
+    <div class="[caption] [classes.caption] [captionTop]" id="jt-1-caption">Utenti</div>  <!-- solo con captionPosition: 'top' (in alternativa a quella nella barra sotto la tabella) -->
     <div class="[infoOuter] [classes.infoOuter]">
       <div class="[info] [classes.info]">
-        <div class="[resultInfo] [classes.resultInfo]" aria-live="polite">Stai visualizzando le righe da 1 a 25, ... - pag. 1 di 50</div>
+        <div class="[resultInfo] [classes.resultInfo]" aria-live="polite">Righe 1–25 di 1.250 (pag. 1 di 50)</div>
         <div class="[infoPagination] [classes.infoPagination]" role="group" aria-label="Pagina precedente o successiva">  <!-- solo se perPage > 0; hidden con una sola pagina -->
           <ul class="[paginationList]">
             <li class="[paginationItem]"><button type="button" class="[paginationBtn] [paginationArrow] btn-reset" data-page="prev" aria-label="Pagina precedente" disabled><svg ...></svg></button></li>

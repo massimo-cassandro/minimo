@@ -202,7 +202,7 @@ json-table {
   color: var(--jt-caption-color);
 }
 
-/* caption sopra la tabella (`captionPosition: 'top'`) */
+/* caption in cima al componente, sopra il blocco info (`captionPosition: 'top'`) */
 .captionTop {
   padding-block-end: var(--jt-table-footer-padding-block-start);
 }
